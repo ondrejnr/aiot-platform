@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-mqtt-bridge
+  namespace: emqx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-mqtt-bridge
+  template:
+    metadata:
+      labels:
+        app: go-mqtt-bridge
+    spec:
+      containers:
+      - name: bridge
+        image: go-mqtt-bridge:v1
+        env:
+        - name: MQTT_HOST
+          value: emqx.emqx.svc.cluster.local
+        - name: MQTT_PORT
+          value: "1883"
+        - name: KAFKA_BOOTSTRAP
+          value: redpanda.aiot.svc.cluster.local:9092
+        - name: KAFKA_TOPIC
+          value: telemetry
+        - name: BATCH_SIZE
+          value: "200000"
+        - name: LINGER_MS
+          value: "50"
+        - name: BUFFER_SIZE
+          value: "100000"
+        - name: METRICS_PORT
+          value: "9090"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi

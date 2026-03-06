@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-sink
+  namespace: aiot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pg-sink
+  template:
+    metadata:
+      labels:
+        app: pg-sink
+    spec:
+      containers:
+      - name: pg-sink
+        image: python:3.11-slim
+        command: ["/bin/sh", "-c"]
+        args:
+        - "pip install kafka-python-ng psycopg2-binary lz4 --quiet && python3 /code/pg_sink.py"
+        env:
+        - name: PG_HOST
+          value: postgres.aiot.svc.cluster.local
+        - name: PG_DB
+          value: aiot
+        - name: PG_USER
+          value: aiot_admin
+        - name: PG_PASS
+          value: "AioT2026!Prod"
+        - name: KAFKA_BOOTSTRAP
+          value: redpanda.aiot.svc.cluster.local:9092
+        - name: KAFKA_TOPIC
+          value: telemetry
+        - name: BATCH_SIZE
+          value: "50"
+        - name: FLUSH_INTERVAL
+          value: "5"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        volumeMounts:
+        - mountPath: /code
+          name: code
+      volumes:
+      - name: code
+        configMap:
+          name: pg-sink-code
