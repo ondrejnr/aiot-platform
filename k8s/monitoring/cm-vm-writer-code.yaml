@@ -1,19 +1,20 @@
 apiVersion: v1
 data:
   vm_writer.py: |
-    import json
-    import time
-    import sys
+    import json, time, sys, logging
     import requests
     from kafka import KafkaConsumer
+
+    logging.basicConfig(level=logging.INFO)
+    log = logging.getLogger("vm-writer")
 
     KAFKA = "redpanda.aiot.svc.cluster.local:9092"
     VM_URL = "http://victoriametrics.monitoring.svc.cluster.local:8428/api/v1/import/prometheus"
     TOPIC = "telemetry"
+    BATCH_SIZE = 200
+    FLUSH_INTERVAL = 2.0
 
-    print(f"[VM-WRITER] Starting...", flush=True)
-    print(f"[VM-WRITER] Kafka: {KAFKA}", flush=True)
-    print(f"[VM-WRITER] VM: {VM_URL}", flush=True)
+    log.info(f"Starting — Kafka: {KAFKA}, VM: {VM_URL}, batch={BATCH_SIZE}")
 
     consumer = KafkaConsumer(
         TOPIC,
@@ -21,20 +22,20 @@ data:
         value_deserializer=lambda m: json.loads(m.decode("utf-8")),
         auto_offset_reset="latest",
         group_id="vm-writer-group-v3",
-        consumer_timeout_ms=-1
+        consumer_timeout_ms=-1,
+        max_poll_records=500
     )
-    print("[VM-WRITER] Kafka consumer connected, waiting for messages...", flush=True)
+    log.info("Kafka consumer connected")
 
     count = 0
     batch = []
+    last_flush = time.time()
 
     for msg in consumer:
         try:
             data = msg.value
             topic = data.get("topic", "unknown")
             payload = data.get("payload", {})
-
-            # VZDY pouzij aktualny cas - nie timestamp zo spravy
             ts_ms = int(time.time() * 1000)
 
             count += 1
@@ -47,7 +48,6 @@ data:
 
             labels = f'machine_id="{machine_id}",machine_type="{machine_type}",topic="{topic}",status="{status}",location="{location}"'
 
-            lines = []
             numeric_fields = [
                 "temperature", "vibration", "pressure", "humidity",
                 "rpm", "anomaly_score", "value", "voltage",
@@ -60,31 +60,31 @@ data:
                     if isinstance(val, (int, float)):
                         metric_name = f"iot_{field}"
                         if unit:
-                            lines.append(f'{metric_name}{{{labels},unit="{unit}"}} {val} {ts_ms}')
+                            batch.append(f'{metric_name}{{{labels},unit="{unit}"}} {val} {ts_ms}')
                         else:
-                            lines.append(f'{metric_name}{{{labels}}} {val} {ts_ms}')
+                            batch.append(f'{metric_name}{{{labels}}} {val} {ts_ms}')
 
             status_map = {"normal": 1, "warning": 2, "critical": 3, "unknown": 0}
             if "status" in payload:
                 status_val = status_map.get(str(payload["status"]), 0)
-                lines.append(f'iot_status{{{labels}}} {status_val} {ts_ms}')
+                batch.append(f'iot_status{{{labels}}} {status_val} {ts_ms}')
 
-            if lines:
-                batch.extend(lines)
-
-            if len(batch) >= 5:
-                body = "\n".join(batch)
-                r = requests.post(VM_URL, data=body, timeout=5)
-                print(f"[VM-WRITER] Sent {len(batch)} metrics (msg #{count}) -> HTTP {r.status_code}", flush=True)
-                batch = []
+            now = time.time()
+            if len(batch) >= BATCH_SIZE or (now - last_flush) >= FLUSH_INTERVAL:
+                if batch:
+                    body = "\n".join(batch)
+                    r = requests.post(VM_URL, data=body, timeout=10)
+                    if count % 5000 < 10:
+                        log.info(f"Sent {len(batch)} metrics (msg #{count}) -> HTTP {r.status_code}")
+                    batch = []
+                    last_flush = now
 
         except Exception as e:
-            import traceback
-            print(f"[VM-WRITER] ERROR: {e}", flush=True)
-            traceback.print_exc()
-            sys.stdout.flush()
+            log.error(f"ERROR: {e}")
+            batch = []
 kind: ConfigMap
 metadata:
   annotations:
+      {"apiVersion":"v1","data":{"vm_writer.py":"import json, time, sys, logging\nimport requests\nfrom kafka import KafkaConsumer\n\nlogging.basicConfig(level=logging.INFO)\nlog = logging.getLogger(\"vm-writer\")\n\nKAFKA = \"redpanda.aiot.svc.cluster.local:9092\"\nVM_URL = \"http://victoriametrics.monitoring.svc.cluster.local:8428/api/v1/import/prometheus\"\nTOPIC = \"telemetry\"\nBATCH_SIZE = 200\nFLUSH_INTERVAL = 2.0\n\nlog.info(f\"Starting — Kafka: {KAFKA}, VM: {VM_URL}, batch={BATCH_SIZE}\")\n\nconsumer = KafkaConsumer(\n    TOPIC,\n    bootstrap_servers=KAFKA,\n    value_deserializer=lambda m: json.loads(m.decode(\"utf-8\")),\n    auto_offset_reset=\"latest\",\n    group_id=\"vm-writer-group-v3\",\n    consumer_timeout_ms=-1,\n    max_poll_records=500\n)\nlog.info(\"Kafka consumer connected\")\n\ncount = 0\nbatch = []\nlast_flush = time.time()\n\nfor msg in consumer:\n    try:\n        data = msg.value\n        topic = data.get(\"topic\", \"unknown\")\n        payload = data.get(\"payload\", {})\n        ts_ms = int(time.time() * 1000)\n\n        count += 1\n\n        machine_id = payload.get(\"machine_id\", payload.get(\"sensor_id\", \"unknown\"))\n        machine_type = payload.get(\"machine_type\", \"sensor\")\n        status = payload.get(\"status\", \"unknown\")\n        location = payload.get(\"location\", \"unknown\")\n        unit = payload.get(\"unit\", \"\")\n\n        labels = f'machine_id=\"{machine_id}\",machine_type=\"{machine_type}\",topic=\"{topic}\",status=\"{status}\",location=\"{location}\"'\n\n        numeric_fields = [\n            \"temperature\", \"vibration\", \"pressure\", \"humidity\",\n            \"rpm\", \"anomaly_score\", \"value\", \"voltage\",\n            \"power_consumption\", \"uptime_hours\"\n        ]\n\n        for field in numeric_fields:\n            if field in payload:\n                val = payload[field]\n                if isinstance(val, (int, float)):\n                    metric_name = f\"iot_{field}\"\n                    if unit:\n                        batch.append(f'{metric_name}{{{labels},unit=\"{unit}\"}} {val} {ts_ms}')\n                    else:\n                        batch.append(f'{metric_name}{{{labels}}} {val} {ts_ms}')\n\n        status_map = {\"normal\": 1, \"warning\": 2, \"critical\": 3, \"unknown\": 0}\n        if \"status\" in payload:\n            status_val = status_map.get(str(payload[\"status\"]), 0)\n            batch.append(f'iot_status{{{labels}}} {status_val} {ts_ms}')\n\n        now = time.time()\n        if len(batch) \u003e= BATCH_SIZE or (now - last_flush) \u003e= FLUSH_INTERVAL:\n            if batch:\n                body = \"\\n\".join(batch)\n                r = requests.post(VM_URL, data=body, timeout=10)\n                if count % 5000 \u003c 10:\n                    log.info(f\"Sent {len(batch)} metrics (msg #{count}) -\u003e HTTP {r.status_code}\")\n                batch = []\n                last_flush = now\n\n    except Exception as e:\n        log.error(f\"ERROR: {e}\")\n        batch = []\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"vm-writer-code","namespace":"monitoring"}}
   name: vm-writer-code
   namespace: monitoring

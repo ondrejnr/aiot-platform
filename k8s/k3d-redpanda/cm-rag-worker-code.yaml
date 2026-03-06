@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rag-worker-code
+  namespace: aiot
+data:
+  worker.py: |
+    # See rag-worker deployed via kubectl apply
