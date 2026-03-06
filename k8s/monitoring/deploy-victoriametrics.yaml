@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: victoriametrics
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: victoriametrics
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: victoriametrics
+    spec:
+      containers:
+      - name: victoriametrics
+        image: victoriametrics/victoria-metrics:v1.99.0
+        args:
+        - -storageDataPath=/victoria-metrics-data
+        - -httpListenAddr=:8428
+        - -retentionPeriod=30d
+        - -memory.allowedPercent=80
+        - -search.maxQueryDuration=60s
+        - -search.cacheTimestampOffset=5m
+        - -search.latencyOffset=5s
+        ports:
+        - containerPort: 8428
+        resources:
+          requests:
+            cpu: 50m
+            memory: 1Gi
+          limits:
+            cpu: "1"
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /victoria-metrics-data
+          name: vm-data
+      volumes:
+      - name: vm-data
+        emptyDir: {}

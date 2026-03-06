@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sensor-simulator
+  namespace: aiot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sensor-simulator
+  template:
+    metadata:
+      labels:
+        app: sensor-simulator
+    spec:
+      containers:
+      - name: simulator
+        image: python:3.11-slim
+        command: ["/bin/sh", "-c"]
+        args:
+        - pip install paho-mqtt --quiet && python /code/sim.py
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /code
+          name: code
+      volumes:
+      - name: code
+        configMap:
+          name: sensor-sim

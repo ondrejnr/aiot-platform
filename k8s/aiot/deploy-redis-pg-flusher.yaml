@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-pg-flusher
+  namespace: aiot
+  labels:
+    app: redis-pg-flusher
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: redis-pg-flusher
+  template:
+    metadata:
+      labels:
+        app: redis-pg-flusher
+    spec:
+      containers:
+      - name: flusher
+        image: python:3.11-slim
+        command: ["/bin/sh", "-c"]
+        args:
+        - pip install --quiet redis psycopg2-binary && python3 /code/flusher.py
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: /code
+          name: code
+      volumes:
+      - name: code
+        configMap:
+          name: redis-pg-flusher-code

@@ -1,0 +1,94 @@
+apiVersion: v1
+data:
+  app.py: "from flask import Flask, render_template_string, jsonify\nimport requests,
+    os\n\napp = Flask(__name__)\nTWIN_URL = os.environ.get(\"TWIN_URL\", \"http://digital-twin.aiot.svc.cluster.local:8001\")\n\nHTML
+    = r\"\"\"<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta
+    name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Cerebrus
+    AIoT — Fleet Monitor</title>\n<link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap\"
+    rel=\"stylesheet\">\n<style>\n:root{--bg:#06080f;--text:#c9d1e0;--muted:#4a5578;--dim:#2a3352}\n*{margin:0;padding:0;box-sizing:border-box}\nbody{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;font-weight:400;letter-spacing:.01em}\nbody::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
+    80% 50% at 50% -10%,rgba(99,102,241,.07),transparent),radial-gradient(ellipse
+    60% 40% at 80% 0%,rgba(236,72,153,.04),transparent);pointer-events:none}\n\nheader{display:flex;align-items:center;justify-content:space-between;padding:18px
+    32px;border-bottom:1px solid rgba(255,255,255,.04)}\n.brand{display:flex;align-items:center;gap:12px}\n.brand-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#ec4899);display:grid;place-items:center;font-size:.95rem;box-shadow:0
+    0 24px rgba(99,102,241,.25)}\n.brand h1{font-size:.95rem;font-weight:700;letter-spacing:-.3px;color:#e2e8f0}\n.brand
+    p{font-size:.65rem;color:var(--muted);font-weight:400;letter-spacing:.8px;text-transform:uppercase;margin-top:1px}\n.live-pill{display:flex;align-items:center;gap:7px;font-size:.68rem;color:#34d399;background:rgba(52,211,153,.06);border:1px
+    solid rgba(52,211,153,.12);padding:5px 14px;border-radius:20px;font-weight:500}\n.live-pip{width:5px;height:5px;background:#34d399;border-radius:50%;box-shadow:0
+    0 8px #34d399;animation:pip 2.5s ease infinite}\n@keyframes pip{0%,100%{opacity:1;box-shadow:0
+    0 8px #34d399}50%{opacity:.4;box-shadow:0 0 3px #34d399}}\n\n.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:20px
+    32px}\n.kpi-card{border-radius:14px;padding:20px 22px;position:relative;overflow:hidden}\n.kpi-card::after{content:'';position:absolute;inset:0;border-radius:14px;opacity:.08}\n.kpi-card.ok{background:rgba(52,211,153,.04);border:1px
+    solid rgba(52,211,153,.12)}.kpi-card.ok::after{background:linear-gradient(135deg,#34d399,#06b6d4)}\n.kpi-card.w{background:rgba(251,191,36,.04);border:1px
+    solid rgba(251,191,36,.12)}.kpi-card.w::after{background:linear-gradient(135deg,#fbbf24,#f97316)}\n.kpi-card.c{background:rgba(248,113,113,.04);border:1px
+    solid rgba(248,113,113,.12)}.kpi-card.c::after{background:linear-gradient(135deg,#f87171,#ef4444)}\n.kpi-label{font-size:.6rem;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;position:relative;z-index:1}\n.kpi-card.ok
+    .kpi-label{color:#34d399}.kpi-card.w .kpi-label{color:#fbbf24}.kpi-card.c .kpi-label{color:#f87171}\n.kpi-num{font-size:2.4rem;font-weight:900;line-height:1.1;margin-top:4px;position:relative;z-index:1}\n.kpi-card.ok
+    .kpi-num{color:#34d399}.kpi-card.w .kpi-num{color:#fbbf24}.kpi-card.c .kpi-num{color:#f87171}\n.kpi-sub{font-size:.6rem;color:var(--muted);margin-top:4px;position:relative;z-index:1;font-weight:400}\n\n.fleet{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;padding:6px
+    32px 32px}\n\n.m{border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.04);transition:all
+    .35s cubic-bezier(.25,.8,.25,1)}\n.m:hover{transform:translateY(-3px);border-color:rgba(99,102,241,.2);box-shadow:0
+    16px 48px rgba(0,0,0,.35)}\n.m.st-OK{background:linear-gradient(165deg,#0a1628,#0d1f2d
+    40%,#091a1f)}\n.m.st-OK:hover{background:linear-gradient(165deg,#0c1a30,#102838
+    40%,#0b2028)}\n.m.st-WARNING{background:linear-gradient(165deg,#12100a,#1c1708
+    40%,#1a1306)}\n.m.st-WARNING:hover{background:linear-gradient(165deg,#181408,#24200a
+    40%,#221a08)}\n.m.st-CRITICAL{background:linear-gradient(165deg,#150a0a,#1e0c0c
+    40%,#1a0808)}\n.m.st-CRITICAL:hover{background:linear-gradient(165deg,#1c0e0e,#261010
+    40%,#200a0a)}\n\n.m-head{display:flex;align-items:center;justify-content:space-between;padding:16px
+    20px}\n.m-id{display:flex;align-items:center;gap:10px}\n.m-icon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:.95rem}\n.m-icon.compressor{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(99,102,241,.05))}\n.m-icon.motor{background:linear-gradient(135deg,rgba(250,204,21,.15),rgba(250,204,21,.05))}\n.m-icon.pump{background:linear-gradient(135deg,rgba(6,182,212,.15),rgba(6,182,212,.05))}\n.m-icon.turbine{background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(167,139,250,.05))}\n.m-icon.conveyor{background:linear-gradient(135deg,rgba(251,146,60,.15),rgba(251,146,60,.05))}\n.m-icon.generator{background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(52,211,153,.05))}\n.m-name{font-size:.82rem;font-weight:600;color:#d4dae8;letter-spacing:-.2px}\n.m-type{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:1px}\n.pill{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:4px
+    12px;border-radius:20px}\n.pill.OK{background:linear-gradient(135deg,#34d399,#06b6d4);color:#021a18;box-shadow:0
+    0 14px rgba(52,211,153,.2)}\n.pill.WARNING{background:linear-gradient(135deg,#fbbf24,#f97316);color:#1a0e00;box-shadow:0
+    0 14px rgba(251,191,36,.2)}\n.pill.CRITICAL{background:linear-gradient(135deg,#f87171,#dc2626);color:#fff;box-shadow:0
+    0 14px rgba(248,113,113,.25);animation:pill-glow 3s ease infinite}\n@keyframes
+    pill-glow{0%,100%{box-shadow:0 0 14px rgba(248,113,113,.25)}50%{box-shadow:0 0
+    28px rgba(248,113,113,.45)}}\n\n.m-metrics{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px
+    solid rgba(255,255,255,.03)}\n.mc{padding:14px 16px;border-right:1px solid rgba(255,255,255,.03);border-bottom:1px
+    solid rgba(255,255,255,.03);position:relative}\n.mc:nth-child(3n){border-right:none}\n.mc:nth-child(n+4){border-bottom:none}\n.mc-l{font-size:.55rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:500;margin-bottom:5px}\n.mc-v{font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums;color:#d4dae8}\n.mc-u{font-size:.55rem;font-weight:400;color:var(--muted);margin-left:2px}\n.mc-bar{height:2px;background:rgba(255,255,255,.04);border-radius:2px;margin-top:7px;overflow:hidden}\n.mc-bar
+    i{display:block;height:100%;border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1)}\n.mc-bar
+    i.g{background:linear-gradient(90deg,#34d399,#06b6d4)}\n.mc-bar i.y{background:linear-gradient(90deg,#fbbf24,#f97316)}\n.mc-bar
+    i.r{background:linear-gradient(90deg,#f87171,#dc2626)}\n\n.m-viols{padding:10px
+    16px;border-top:1px solid rgba(255,255,255,.03)}\n.vl{display:flex;align-items:center;gap:7px;padding:7px
+    10px;border-radius:8px;font-size:.65rem;color:#fca5a5;margin-bottom:4px;font-weight:400;background:rgba(248,113,113,.05);border:1px
+    solid rgba(248,113,113,.08);animation:vl-blink 3s ease-in-out infinite}\n.vl:last-child{margin-bottom:0}\n@keyframes
+    vl-blink{0%,100%{background:rgba(248,113,113,.05);border-color:rgba(248,113,113,.08)}50%{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.2)}}\n.vl-dot{width:4px;height:4px;border-radius:50%;background:#f87171;flex-shrink:0;animation:vl-dot
+    2s ease infinite}\n@keyframes vl-dot{0%,100%{opacity:1}50%{opacity:.3}}\n\nfooter{text-align:center;padding:14px;font-size:.58rem;color:var(--muted);letter-spacing:.5px;border-top:1px
+    solid rgba(255,255,255,.03)}\n@media(max-width:800px){.kpi,.fleet{grid-template-columns:1fr;padding-left:14px;padding-right:14px}header{padding:14px}.m-metrics{grid-template-columns:repeat(2,1fr)}}\n</style>\n</head>\n<body>\n<header>\n
+    \ <div class=\"brand\"><div class=\"brand-mark\">\U0001F3ED</div><div><h1>Cerebrus
+    AIoT</h1><p>Fleet Monitor · Digital Twin</p></div></div>\n  <div class=\"live-pill\"><div
+    class=\"live-pip\"></div>LIVE<span id=\"ck\" style=\"color:#4a5578;margin-left:4px\"></span></div>\n</header>\n<div
+    class=\"kpi\" id=\"kpi\"></div>\n<div class=\"fleet\" id=\"fleet\"></div>\n<footer>Cerebrus
+    AIoT Platform © 2026 · Real-time Digital Twin</footer>\n<script>\nvar IC={compressor:'\\u{1F527}',motor:'\\u26A1',pump:'\\u{1F4A7}',turbine:'\\u{1F300}',conveyor:'\\u{1F517}',generator:'\\u2699\\uFE0F'};\nfunction
+    P(v,l){if(!l)return 50;return Math.max(0,Math.min(100,((v-l[0])/(l[1]-l[0]))*100))}\nfunction
+    C(v,l){if(!l)return'g';var p=P(v,l);return p>100||p<0?'r':p>85?'y':'g'}\nfunction
+    rK(s){\n  var cm=(s.critical_machines||[]).join(', ')||'—';\n  var wm=(s.warning_machines||[]).join(',
+    ')||'—';\n  document.getElementById('kpi').innerHTML=\n    '<div class=\"kpi-card
+    ok\"><div class=\"kpi-label\">Operational</div><div class=\"kpi-num\">'+(s.ok||0)+'</div><div
+    class=\"kpi-sub\">All systems nominal</div></div>'+\n    '<div class=\"kpi-card
+    w\"><div class=\"kpi-label\">Warning</div><div class=\"kpi-num\">'+(s.warning||0)+'</div><div
+    class=\"kpi-sub\">'+wm+'</div></div>'+\n    '<div class=\"kpi-card c\"><div class=\"kpi-label\">Critical</div><div
+    class=\"kpi-num\">'+(s.critical||0)+'</div><div class=\"kpi-sub\">'+cm+'</div></div>';\n}\nfunction
+    rF(machines){\n  var s=Object.values(machines).sort(function(a,b){var o={CRITICAL:0,WARNING:1,OK:2};return(o[a.status]||2)-(o[b.status]||2)});\n
+    \ var h='';\n  for(var i=0;i<s.length;i++){\n    var m=s[i],mt=m.metrics||{},li=m.limits||{},ic=IC[m.machine_type]||'\\u{1F3ED}';\n
+    \   function ce(l,k,u){\n      var v=mt[k],d=v!=null?(k==='rpm'?v.toFixed(0):k==='anomaly_score'?v.toFixed(3):v.toFixed(1)):'-';\n
+    \     var c=k==='anomaly_score'?(v>0.5?'r':v>0.3?'y':'g'):k==='humidity'?'g':C(v,li[k]);\n
+    \     var w=k==='anomaly_score'?((v||0)*100):k==='humidity'?(v||0):Math.min(P(v,li[k]),100);\n
+    \     return '<div class=\"mc\"><div class=\"mc-l\">'+l+'</div><div class=\"mc-v\">'+d+'<span
+    class=\"mc-u\">'+u+'</span></div><div class=\"mc-bar\"><i class=\"'+c+'\" style=\"width:'+w+'%\"></i></div></div>';\n
+    \   }\n    var vl='';\n    if(m.violations&&m.violations.length){\n      vl='<div
+    class=\"m-viols\">';\n      for(var j=0;j<m.violations.length;j++){var v=m.violations[j];vl+='<div
+    class=\"vl\"><span class=\"vl-dot\"></span>'+v.metric+' = '+v.value+' · '+v.type.toLowerCase()+'
+    limit '+v.limit+'</div>';}\n      vl+='</div>';\n    }\n    h+='<div class=\"m
+    st-'+m.status+'\"><div class=\"m-head\"><div class=\"m-id\"><div class=\"m-icon
+    '+m.machine_type+'\">'+ic+'</div><div><div class=\"m-name\">'+m.machine_id+'</div><div
+    class=\"m-type\">'+m.machine_type+'</div></div></div><span class=\"pill '+m.status+'\">'+m.status+'</span></div>';\n
+    \   h+='<div class=\"m-metrics\">';\n    h+=ce('Temperature','temperature','°C');\n
+    \   h+=ce('Vibration','vibration','mm/s');\n    h+=ce('RPM','rpm','');\n    h+=ce('Pressure','pressure','bar');\n
+    \   h+=ce('Humidity','humidity','%');\n    h+=ce('Anomaly','anomaly_score','');\n
+    \   h+='</div>'+vl+'</div>';\n  }\n  document.getElementById('fleet').innerHTML=h;\n}\nfunction
+    ck(){document.getElementById('ck').textContent=new Date().toLocaleTimeString()}\nasync
+    function go(){try{var r=await fetch('/api/twin');var d=await r.json();rK(d.summary||{});rF(d.machines||{});}catch(e){console.error(e)}ck()}\ngo();setInterval(go,5000);setInterval(ck,1000);\n</script>\n</body></html>\"\"\"\n\n@app.route('/')\ndef
+    index():\n    return render_template_string(HTML)\n\n@app.route('/api/twin')\ndef
+    api_twin():\n    try:\n        r = requests.get(f\"{TWIN_URL}/twin\", timeout=5)\n
+    \       return jsonify(r.json())\n    except Exception as e:\n        return jsonify({\"error\":
+    str(e)}), 502\n\n@app.route('/health')\ndef health():\n    return jsonify({\"status\":
+    \"ok\", \"service\": \"ai-accelerator-dashboard\"})\n\nif __name__ == '__main__':\n
+    \   app.run(host='0.0.0.0', port=5000)\n"
+kind: ConfigMap
+metadata:
+  annotations:
+  name: ai-accelerator-code
+  namespace: ingress-nginx

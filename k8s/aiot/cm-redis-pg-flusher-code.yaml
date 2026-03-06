@@ -1,0 +1,99 @@
+apiVersion: v1
+data:
+  flusher.py: |
+    import os, json, time, logging, io
+    import redis
+    import psycopg2
+    from datetime import datetime, timezone
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    log = logging.getLogger("flusher")
+
+    PG_HOST = os.getenv("PG_HOST", "postgres.aiot.svc.cluster.local")
+    PG_DB   = os.getenv("PG_DB", "aiot")
+    PG_USER = os.getenv("PG_USER", "aiot_admin")
+    PG_PASS = os.getenv("PG_PASS", "AioT2026!Prod")
+    REDIS_HOST = os.getenv("REDIS_HOST", "redis-master.aiot.svc.cluster.local")
+    REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_DB   = int(os.getenv("REDIS_DB", "7"))
+    FLUSH_INTERVAL = float(os.getenv("FLUSH_INTERVAL", "1.0"))
+    BATCH_SIZE = int(os.getenv("BATCH_SIZE", "1000"))
+    QUEUE_KEY = "sensor:write_buffer"
+
+    COLUMNS = "ts,machine_id,machine_type,location,status,temperature,vibration,pressure,rpm,humidity,anomaly_score,power_consumption,uptime_hours,violations_count,violations_json,topic"
+
+    def connect_pg():
+        conn = psycopg2.connect(host=PG_HOST, dbname=PG_DB, user=PG_USER, password=PG_PASS)
+        conn.autocommit = False
+        return conn
+
+    def flush_batch(r, conn):
+        pipe = r.pipeline()
+        pipe.lrange(QUEUE_KEY, 0, BATCH_SIZE - 1)
+        pipe.ltrim(QUEUE_KEY, BATCH_SIZE, -1)
+        results = pipe.execute()
+        items = results[0]
+        if not items:
+            return 0
+        buf = io.StringIO()
+        for raw in items:
+            try:
+                d = json.loads(raw)
+                ts = d.get("ts", datetime.now(timezone.utc).isoformat())
+                vals = [
+                    str(ts),
+                    str(d.get("machine_id", "")),
+                    str(d.get("machine_type", "")),
+                    str(d.get("location", "") or "\\N"),
+                    str(d.get("status", "")),
+                    str(d.get("temperature", "") or "\\N"),
+                    str(d.get("vibration", "") or "\\N"),
+                    str(d.get("pressure", "") or "\\N"),
+                    str(d.get("rpm", "") or "\\N"),
+                    str(d.get("humidity", "") or "\\N"),
+                    str(d.get("anomaly_score", "") or "\\N"),
+                    str(d.get("power_consumption", "") or "\\N"),
+                    str(d.get("uptime_hours", "") or "\\N"),
+                    str(d.get("violations_count", 0)),
+                    str(d.get("violations_json", "") or "\\N"),
+                    str(d.get("topic", "") or ""),
+                ]
+                buf.write("\t".join(vals) + "\n")
+            except Exception as e:
+                log.error("Parse error: %s", e)
+        buf.seek(0)
+        cur = conn.cursor()
+        cur.copy_from(buf, "sensor_data", columns=COLUMNS.split(","))
+        conn.commit()
+        return len(items)
+
+    def main():
+        log.info("Redis->PG Flusher starting")
+        log.info("Redis: %s:%d db=%d key=%s", REDIS_HOST, REDIS_PORT, REDIS_DB, QUEUE_KEY)
+        log.info("PG: %s/%s batch=%d interval=%.1fs", PG_HOST, PG_DB, BATCH_SIZE, FLUSH_INTERVAL)
+        r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+        conn = connect_pg()
+        total = 0
+        while True:
+            try:
+                qlen = r.llen(QUEUE_KEY)
+                if qlen > 0:
+                    flushed = flush_batch(r, conn)
+                    total += flushed
+                    if flushed > 0:
+                        log.info("Flushed %d rows (queue: %d, total: %d)", flushed, qlen - flushed, total)
+                time.sleep(FLUSH_INTERVAL)
+            except Exception as e:
+                log.error("Flush error: %s", e)
+                try:
+                    conn = connect_pg()
+                except:
+                    time.sleep(5)
+
+    if __name__ == "__main__":
+        main()
+kind: ConfigMap
+metadata:
+  annotations:
+  name: redis-pg-flusher-code
+  namespace: aiot
