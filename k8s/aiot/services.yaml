@@ -6,14 +6,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"api-gateway","namespace":"aiot"},"spec":{"externalTrafficPolicy":"Cluster","internalTrafficPolicy":"Cluster","ipFamilies":["IPv4"],"ipFamilyPolicy":"SingleStack","ports":[{"nodePort":31179,"port":8080,"protocol":"TCP","targetPort":8080}],"selector":{"app":"api-gateway"},"sessionAffinity":"None","type":"NodePort"},"status":{}}
-    creationTimestamp: "2026-03-05T19:06:17Z"
     name: api-gateway
     namespace: aiot
-    resourceVersion: "807763"
-    uid: e9824140-4485-4f58-9e17-0f2fd4579e1d
   spec:
-    clusterIP: 10.101.49.182
-    clusterIPs:
     - 10.101.49.182
     externalTrafficPolicy: Cluster
     internalTrafficPolicy: Cluster
@@ -37,14 +32,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"digital-twin","namespace":"aiot"},"spec":{"externalTrafficPolicy":"Cluster","internalTrafficPolicy":"Cluster","ipFamilies":["IPv4"],"ipFamilyPolicy":"SingleStack","ports":[{"nodePort":31801,"port":8001,"protocol":"TCP","targetPort":8001}],"selector":{"app":"digital-twin"},"sessionAffinity":"None","type":"NodePort"},"status":{}}
-    creationTimestamp: "2026-03-05T18:43:20Z"
     name: digital-twin
     namespace: aiot
-    resourceVersion: "804715"
-    uid: e45401de-6998-40bc-8f9f-2cdca44bedbf
   spec:
-    clusterIP: 10.96.179.248
-    clusterIPs:
     - 10.96.179.248
     externalTrafficPolicy: Cluster
     internalTrafficPolicy: Cluster
@@ -65,17 +55,27 @@ items:
 - apiVersion: v1
   kind: Service
   metadata:
+    labels:
+      app: emqx
+    name: emqx
+    namespace: aiot
+  spec:
+    externalName: emqx.emqx.svc.cluster.local
+    selector:
+      app: emqx
+    sessionAffinity: None
+    type: ExternalName
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"ngrok-proxy","namespace":"aiot"},"spec":{"ports":[{"port":8090,"targetPort":8090}],"selector":{"app":"ngrok-proxy"}}}
-    creationTimestamp: "2026-03-08T07:35:32Z"
     name: ngrok-proxy
     namespace: aiot
-    resourceVersion: "1277930"
-    uid: 0faeb8f2-0f44-453a-8538-eb2744280ef4
   spec:
-    clusterIP: 10.110.61.46
-    clusterIPs:
     - 10.110.61.46
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -97,14 +97,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"pgadmin","namespace":"aiot"},"spec":{"ports":[{"nodePort":31080,"port":80,"targetPort":80}],"selector":{"app":"pgadmin"},"type":"NodePort"}}
-    creationTimestamp: "2026-03-05T16:23:58Z"
     name: pgadmin
     namespace: aiot
-    resourceVersion: "785428"
-    uid: d07375a0-d906-4ba4-844d-52f89791c4f5
   spec:
-    clusterIP: 10.96.238.188
-    clusterIPs:
     - 10.96.238.188
     externalTrafficPolicy: Cluster
     internalTrafficPolicy: Cluster
@@ -128,14 +123,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"postgres","namespace":"aiot"},"spec":{"ports":[{"port":5432,"targetPort":5432}],"selector":{"app":"postgres"},"type":"ClusterIP"}}
-    creationTimestamp: "2026-03-05T16:23:53Z"
     name: postgres
     namespace: aiot
-    resourceVersion: "785355"
-    uid: 0ff4ba14-1235-46ac-a145-c9cd5ec29531
   spec:
-    clusterIP: 10.98.61.21
-    clusterIPs:
     - 10.98.61.21
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -157,14 +147,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"qdrant","namespace":"aiot"},"spec":{"ports":[{"name":"http","port":6333,"targetPort":6333},{"name":"grpc","port":6334,"targetPort":6334}],"selector":{"app":"qdrant"}}}
-    creationTimestamp: "2026-03-05T18:25:45Z"
     name: qdrant
     namespace: aiot
-    resourceVersion: "802285"
-    uid: 0a6f351a-617b-4310-87cc-222d3e626d3a
   spec:
-    clusterIP: 10.96.99.149
-    clusterIPs:
     - 10.96.99.149
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -191,14 +176,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"rag-api-svc","namespace":"aiot"},"spec":{"externalTrafficPolicy":"Cluster","internalTrafficPolicy":"Cluster","ipFamilies":["IPv4"],"ipFamilyPolicy":"SingleStack","ports":[{"nodePort":31700,"port":7000,"protocol":"TCP","targetPort":7000}],"selector":{"app":"rag-worker"},"sessionAffinity":"None","type":"NodePort"},"status":{}}
-    creationTimestamp: "2026-03-05T18:45:41Z"
     name: rag-api-svc
     namespace: aiot
-    resourceVersion: "805098"
-    uid: 89cc6378-0c8f-4baf-a047-39b7aee17493
   spec:
-    clusterIP: 10.105.168.31
-    clusterIPs:
     - 10.105.168.31
     externalTrafficPolicy: Cluster
     internalTrafficPolicy: Cluster
@@ -222,14 +202,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"redis-master","namespace":"aiot"},"spec":{"ports":[{"port":6379,"targetPort":6379}],"selector":{"app":"redis-master"}}}
-    creationTimestamp: "2026-03-05T18:25:45Z"
     name: redis-master
     namespace: aiot
-    resourceVersion: "851266"
-    uid: d84f6d7d-789c-4edd-9234-4d4152eb0f94
   spec:
-    clusterIP: 10.98.4.56
-    clusterIPs:
     - 10.98.4.56
     externalTrafficPolicy: Cluster
     internalTrafficPolicy: Cluster
@@ -253,16 +228,11 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"redpanda"},"name":"redpanda","namespace":"aiot"},"spec":{"ports":[{"name":"kafka","port":9092,"targetPort":9092},{"name":"admin","port":9644,"targetPort":9644},{"name":"pandaproxy","port":8082,"targetPort":8082}],"selector":{"app":"redpanda"},"type":"ClusterIP"}}
-    creationTimestamp: "2026-03-05T18:35:51Z"
     labels:
       app: redpanda
     name: redpanda
     namespace: aiot
-    resourceVersion: "803551"
-    uid: 5f63a6b7-49fa-484a-875f-163a68b2f17c
   spec:
-    clusterIP: 10.100.67.116
-    clusterIPs:
     - 10.100.67.116
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -293,16 +263,11 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"redpanda"},"name":"redpanda-headless","namespace":"aiot"},"spec":{"clusterIP":"None","ports":[{"name":"kafka","port":9092,"targetPort":9092},{"name":"admin","port":9644,"targetPort":9644},{"name":"rpc","port":33145,"targetPort":33145},{"name":"pandaproxy","port":8082,"targetPort":8082}],"publishNotReadyAddresses":true,"selector":{"app":"redpanda"}}}
-    creationTimestamp: "2026-03-05T18:35:51Z"
     labels:
       app: redpanda
     name: redpanda-headless
     namespace: aiot
-    resourceVersion: "803547"
-    uid: f6288f75-2fab-446b-b2dd-3319bffbe72e
   spec:
-    clusterIP: None
-    clusterIPs:
     - None
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -334,4 +299,3 @@ items:
     loadBalancer: {}
 kind: List
 metadata:
-  resourceVersion: ""

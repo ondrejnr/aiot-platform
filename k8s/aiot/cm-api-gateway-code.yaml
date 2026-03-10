@@ -1,96 +1,183 @@
 apiVersion: v1
 data:
-  gateway.py: "from fastapi import FastAPI, Request\nimport requests as req\nimport
-    json, hashlib, math, time, re, os\n\napp = FastAPI(title=\"Cerebrus AIoT Gateway\")\n\nQDRANT_URL
-    \  = \"http://qdrant.aiot.svc.cluster.local:6333\"\nTWIN_URL     = \"http://digital-twin.aiot.svc.cluster.local:8001\"\nCEREBRAS_URL
-    = \"https://api.cerebras.ai/v1/chat/completions\"\nCEREBRAS_KEY = os.environ.get(\"CEREBRAS_API_KEY\",
-    \"\")\nCEREBRAS_MODEL = \"llama3.1-8b\"\nVECTOR_SIZE  = 64\n\nSYSTEM_PROMPT =
-    \"\"\"You are Cerebrus AIoT — an intelligent industrial IoT monitoring assistant.\nYou
-    analyze sensor data from factory machines (pumps, turbines, motors, compressors,
-    conveyors, generators).\n\nRULES:\n- Answer in the SAME LANGUAGE as the user's
-    question (Slovak, Czech, English, etc.)\n- Be concise but thorough\n- Always reference
-    actual machine data provided in context\n- Highlight critical issues first\n-
-    Give actionable recommendations\n- Use units: temperature=°C, vibration=mm/s,
-    pressure=bar, RPM\n- Status levels: OK (green), WARNING (needs attention), CRITICAL
-    (immediate action)\n- If asked about trends, use the historical sensor data provided\n-
-    Format output clearly with headers and bullet points\"\"\"\n\ndef simple_embed(text):\n
-    \   vec = []\n    for i in range(VECTOR_SIZE):\n        h = hashlib.md5(f\"{text}{i}\".encode()).hexdigest()\n
-    \       vec.append((int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1)\n    norm = math.sqrt(sum(x*x
-    for x in vec))\n    return [x/norm for x in vec]\n\ndef get_twin():\n    try:\n
-    \       r = req.get(f\"{TWIN_URL}/twin\", timeout=5)\n        return r.json()
-    if r.status_code == 200 else {}\n    except:\n        return {}\n\ndef search_qdrant(query,
-    limit=10):\n    try:\n        embedding = simple_embed(query)\n        r = req.post(f\"{QDRANT_URL}/collections/sensor_history/points/search\",\n
-    \           json={\"vector\": embedding, \"limit\": limit, \"with_payload\": True},
-    timeout=10)\n        return r.json().get(\"result\", [])\n    except:\n        return
-    []\n\ndef build_context(query):\n    \"\"\"Build rich context from Digital Twin
-    + Qdrant for LLM\"\"\"\n    twin = get_twin()\n    machines = twin.get(\"machines\",
-    {})\n    summary = twin.get(\"summary\", {})\n    \n    ok = summary.get(\"ok\",
-    0)\n    warn = summary.get(\"warning\", 0)\n    crit = summary.get(\"critical\",
-    0)\n    total = ok + warn + crit\n    \n    ctx = []\n    ctx.append(f\"=== FACTORY
-    STATUS ===\")\n    ctx.append(f\"Total: {total} machines | OK: {ok} | WARNING:
-    {warn} | CRITICAL: {crit}\")\n    ctx.append(f\"Critical machines: {', '.join(summary.get('critical_machines',
-    []))}\")\n    ctx.append(f\"Warning machines: {', '.join(summary.get('warning_machines',
-    []))}\")\n    ctx.append(\"\")\n    \n    ctx.append(\"=== ALL MACHINES ===\")\n
-    \   for mid in sorted(machines.keys()):\n        m = machines[mid]\n        mt
-    = m.get(\"metrics\", {})\n        st = m.get(\"status\", \"\").upper()\n        viols
-    = m.get(\"violations\", [])\n        line = f\"{mid} ({m.get('machine_type','')})
-    [{st}] T={mt.get('temperature','-')}°C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar
-    RPM={mt.get('rpm','-')} H={mt.get('humidity','-')}%\"\n        if viols:\n            viol_str
-    = \"; \".join([f\"{v['metric']}={v['value']} (limit={v.get('limit','')})\" for
-    v in viols])\n            line += f\" VIOLATIONS: {viol_str}\"\n        ctx.append(line)\n
-    \   \n    # Qdrant history\n    results = search_qdrant(query, 5)\n    if results:\n
-    \       ctx.append(\"\")\n        ctx.append(\"=== RECENT SENSOR HISTORY (from
-    vector DB) ===\")\n        for r in results:\n            text = r.get(\"payload\",
-    {}).get(\"text\", \"\")\n            if text:\n                ctx.append(text)\n
-    \   \n    return \"\\n\".join(ctx)\n\ndef call_cerebras(system_msg, context, user_query):\n
-    \   \"\"\"Call Cerebras LLM API\"\"\"\n    try:\n        messages = [\n            {\"role\":
-    \"system\", \"content\": system_msg},\n            {\"role\": \"user\", \"content\":
-    f\"MACHINE DATA:\\n{context}\\n\\nUSER QUESTION: {user_query}\"}\n        ]\n
-    \       r = req.post(CEREBRAS_URL,\n            headers={\n                \"Authorization\":
-    f\"Bearer {CEREBRAS_KEY}\",\n                \"Content-Type\": \"application/json\"\n
-    \           },\n            json={\n                \"model\": CEREBRAS_MODEL,\n
-    \               \"messages\": messages,\n                \"max_tokens\": 2048,\n
-    \               \"temperature\": 0.3\n            },\n            timeout=30\n
-    \       )\n        if r.status_code == 200:\n            data = r.json()\n            return
-    data[\"choices\"][0][\"message\"][\"content\"]\n        else:\n            return
-    f\"LLM Error ({r.status_code}): {r.text[:200]}\"\n    except Exception as e:\n
-    \       return f\"LLM Connection Error: {str(e)}\"\n\ndef generate_analysis(query):\n
-    \   \"\"\"Generate intelligent analysis using Cerebras LLM\"\"\"\n    context
-    = build_context(query)\n    answer = call_cerebras(SYSTEM_PROMPT, context, query)\n
-    \   return answer\n\n# === API Endpoints ===\n@app.get(\"/\")\ndef root():\n    return
-    {\"service\": \"Cerebrus AIoT\", \"version\": \"3.0-LLM\", \"status\": \"running\",
-    \"llm\": CEREBRAS_MODEL}\n\n@app.get(\"/health\")\ndef health():\n    try:\n        r
-    = req.get(f\"{QDRANT_URL}/collections/sensor_history\", timeout=5)\n        info
-    = r.json().get(\"result\", {})\n        twin = get_twin()\n        return {\"status\":
-    \"healthy\", \"qdrant_points\": info.get(\"points_count\", 0),\n                \"machines\":
-    len(twin.get(\"machines\", {})), \"llm\": CEREBRAS_MODEL}\n    except Exception
-    as e:\n        return {\"status\": \"degraded\", \"error\": str(e)}\n\n@app.get(\"/search\")\ndef
-    search(q: str = \"temperature\", limit: int = 10):\n    results = search_qdrant(q,
-    limit)\n    return {\"query\": q, \"count\": len(results),\n            \"results\":
-    [{\"score\": p.get(\"score\"), \"text\": p.get(\"payload\", {}).get(\"text\",
-    \"\")} for p in results]}\n\n@app.get(\"/stats\")\ndef stats():\n    r = req.get(f\"{QDRANT_URL}/collections/sensor_history\",
-    timeout=5)\n    info = r.json().get(\"result\", {})\n    twin = get_twin()\n    return
-    {\"points\": info.get(\"points_count\", 0), \"machines\": len(twin.get(\"machines\",
-    {})),\n            \"twin_summary\": twin.get(\"summary\", {})}\n\n@app.get(\"/analyze\")\ndef
-    analyze(q: str = \"summary\"):\n    return {\"query\": q, \"analysis\": generate_analysis(q)}\n\n@app.get(\"/v1/models\")\ndef
-    models():\n    return {\"object\": \"list\", \"data\": [{\"id\": \"cerebrus-aiot\",
-    \"object\": \"model\"}]}\n\n@app.post(\"/v1/chat/completions\")\nasync def chat(request:
-    Request):\n    body = await request.json()\n    msgs = body.get(\"messages\",
-    [])\n    user_msgs = [m for m in msgs if m.get(\"role\") == \"user\"]\n    q =
-    user_msgs[-1][\"content\"].strip() if user_msgs else \"summary\"\n    \n    #
-    Stream support check\n    stream = body.get(\"stream\", False)\n    \n    answer
-    = generate_analysis(q)\n    \n    return {\n        \"id\": f\"cerebrus-{int(time.time())}\",\n
-    \       \"object\": \"chat.completion\",\n        \"model\": \"cerebrus-aiot\",\n
-    \       \"choices\": [{\"index\": 0, \"message\": {\"role\": \"assistant\", \"content\":
-    answer}, \"finish_reason\": \"stop\"}],\n        \"usage\": {\"prompt_tokens\":
-    0, \"completion_tokens\": 0, \"total_tokens\": 0}\n    }\n"
+  gateway.py: |
+    from fastapi import FastAPI, Request
+    import requests as req
+    import json, hashlib, math, time, os, re
+    import redis
+
+    app = FastAPI(title="Cerebrus AIoT Gateway")
+    bank = redis.Redis(host="redis-master.aiot.svc.cluster.local", port=6379, db=5, decode_responses=True)
+    cache = redis.Redis(host="redis-master.aiot.svc.cluster.local", port=6379, db=6, decode_responses=True)
+
+    QDRANT_URL = "http://qdrant.aiot.svc.cluster.local:6333"
+    CEREBRAS_URL = "https://api.cerebras.ai/v1/chat/completions"
+    CEREBRAS_KEY = os.environ.get("CEREBRAS_API_KEY", "")
+    CEREBRAS_MODEL = "llama3.1-8b"
+    VECTOR_SIZE = 64
+    LLM_CACHE_TTL = 1800
+    BANK_CACHE_TTL = 120
+    RATE_LIMIT_RPM = 10
+    RATE_LIMIT_KEY = "llm:rate_counter"
+
+    SYSTEM_PROMPT = """You are Cerebrus AIoT - industrial IoT monitoring assistant.
+    Analyze factory machines. Answer in SAME LANGUAGE as user. Be concise.
+    Units: temperature=C, vibration=mm/s, pressure=bar."""
+
+    SIMPLE_KW = ["summary","status","overview","suhrn","prehlad","how many","kolko","pocet","total","celkom","critical","kritick","warning","varov","alarm","list","zoznam","stav","factory"]
+    COMPLEX_KW = ["why","preco","cause","pricina","recommend","odporuc","predict","trend","analyze","analyz","compare","porovnaj","explain","vysvetli","what if","should","plan","optimiz","improve"]
+    MACH_RE = re.compile(r'(pump|turbine|motor|compressor|conveyor|generator)[-_]?\d+', re.I)
+
+    def is_complex(q):
+        return any(k in q.lower() for k in COMPLEX_KW)
+
+    def is_simple(q):
+        ql = q.lower()
+        if MACH_RE.search(ql) and not is_complex(q): return True
+        return any(k in ql for k in SIMPLE_KW) and not is_complex(q)
+
+    def simple_embed(text):
+        vec = []
+        for i in range(VECTOR_SIZE):
+            h = hashlib.md5(f"{text}{i}".encode()).hexdigest()
+            vec.append((int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1)
+        norm = math.sqrt(sum(x*x for x in vec))
+        return [x/norm for x in vec]
+
+    def check_rate():
+        try:
+            c = cache.get(RATE_LIMIT_KEY)
+            if c and int(c) >= RATE_LIMIT_RPM: return False
+            p = cache.pipeline(); p.incr(RATE_LIMIT_KEY); p.expire(RATE_LIMIT_KEY, 60); p.execute()
+            return True
+        except: return True
+
+    def get_cache(q):
+        try: return cache.get(f"llm:cache:{hashlib.sha256(q.lower().strip().encode()).hexdigest()[:16]}")
+        except: return None
+
+    def set_cache(q, r, ttl=None):
+        try: cache.setex(f"llm:cache:{hashlib.sha256(q.lower().strip().encode()).hexdigest()[:16]}", ttl or LLM_CACHE_TTL, r)
+        except: pass
+
+    def machine_detail(mid):
+        raw = bank.get(f"bank:machines:{mid}")
+        if not raw: return None
+        m = json.loads(raw); mt = m.get("metrics",{})
+        viols = "; ".join([f"{v['metric']}={v['value']}" for v in m.get("violations",[])])
+        line = f"{mid} ({m.get('machine_type','')}) [{m.get('status','')}] T={mt.get('temperature','-')}C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')}"
+        if viols: line += f" VIOLATIONS: {viols}"
+        return line
+
+    def bank_answer(query):
+        q = query.lower()
+        try:
+            raw = bank.get("bank:summary")
+            if not raw: return None
+            s = json.loads(raw)
+            total,ok,warn,crit = s.get("total",0),s.get("ok",0),s.get("warning",0),s.get("critical",0)
+            crit_list,warn_list = s.get("critical_machines",[]),s.get("warning_machines",[])
+            m = MACH_RE.search(q)
+            if m:
+                mid = m.group(0).replace("_","-")
+                mraw = bank.get(f"bank:machines:{mid}")
+                if not mraw: return f"Machine {mid} not found."
+                md = json.loads(mraw); mt = md.get("metrics",{})
+                lines = [f"{mid} | type: {md.get('machine_type','-')} | status: {md.get('status','-')}",
+                         f"T={mt.get('temperature','-')}C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')}"]
+                for v in md.get("violations",[]): lines.append(f"VIOLATION: {v['metric']}={v['value']}")
+                hist = bank.lrange(f"bank:history:{mid}", 0, 4)
+                if hist:
+                    lines.append("History:")
+                    for e in hist:
+                        d = json.loads(e); lines.append(f"  T={d.get('temperature','-')} V={d.get('vibration','-')} P={d.get('pressure','-')} [{d.get('status','-')}]")
+                return "\n".join(lines)
+            if any(k in q for k in ["summary","status","overview","suhrn","prehlad","total","celkom","factory","stav"]):
+                return f"Factory: {total} machines | OK: {ok} | Warning: {warn} | Critical: {crit}\nTop critical: {', '.join(crit_list[:10])}"
+            if any(k in q for k in ["critical","kritick","alarm"]):
+                return f"Critical ({crit}):\n" + "\n".join(f"  {n}" for n in crit_list[:20])
+            if any(k in q for k in ["warning","varov","warn"]):
+                return f"Warning ({warn}):\n" + "\n".join(f"  {n}" for n in warn_list[:20])
+            if any(k in q for k in ["how many","kolko","pocet"]):
+                return f"Total {total}: {ok} OK, {warn} warning, {crit} critical."
+        except: pass
+        return None
+
+    def bank_context(query):
+        ctx = []
+        q = query.lower()
+        try:
+            raw = bank.get("bank:summary")
+            if not raw: return "No data."
+            s = json.loads(raw)
+            ctx.append(f"FACTORY: {s.get('total',0)} machines | OK:{s.get('ok',0)} WARN:{s.get('warning',0)} CRIT:{s.get('critical',0)}")
+            crit_list = s.get('critical_machines',[])
+            m = MACH_RE.search(q)
+            if m:
+                mid = m.group(0).replace("_","-")
+                raw2 = bank.get(f"bank:machines:{mid}")
+                if raw2:
+                    md = json.loads(raw2); mt = md.get("metrics",{})
+                    ctx.append(f"\n{mid}: type={md.get('machine_type','')} status={md.get('status','')}")
+                    ctx.append(f"T={mt.get('temperature','-')}C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')}")
+                    for v in md.get("violations",[]): ctx.append(f"VIOLATION: {v['metric']}={v['value']} limit={v.get('limit','')}")
+                    for e in (bank.lrange(f"bank:history:{mid}",0,9) or [])[-5:]:
+                        d = json.loads(e); ctx.append(f"  T={d.get('temperature','-')} V={d.get('vibration','-')} P={d.get('pressure','-')} [{d.get('status','')}]")
+            else:
+                for mid2 in crit_list[:10]:
+                    d = machine_detail(mid2)
+                    if d: ctx.append(d)
+        except: pass
+        return "\n".join(ctx)[:12000]
+
+    def call_llm(context, query):
+        try:
+            r = req.post(CEREBRAS_URL, headers={"Authorization": f"Bearer {CEREBRAS_KEY}"},
+                json={"model": CEREBRAS_MODEL, "messages": [{"role":"system","content":SYSTEM_PROMPT},{"role":"user","content":f"DATA:\n{context}\n\nQUESTION: {query}"}], "max_tokens": 1500, "temperature": 0.3}, timeout=30)
+            if r.status_code == 200: return r.json()["choices"][0]["message"]["content"]
+            elif r.status_code == 429: return "Rate limit. Try again."
+            else: return f"LLM Error ({r.status_code})"
+        except Exception as e: return f"LLM Error: {e}"
+
+    def generate(query):
+        cached = get_cache(query)
+        if cached: return cached
+        if is_simple(query):
+            ans = bank_answer(query)
+            if ans: set_cache(query, ans, BANK_CACHE_TTL); return ans
+        if not check_rate():
+            ans = bank_answer(query)
+            return (ans + "\n(Rate limited)") if ans else "Rate limit: 10/min."
+        ctx = bank_context(query)
+        ans = call_llm(ctx, query)
+        if ans and "Error" not in ans: set_cache(query, ans)
+        return ans
+
+    @app.get("/")
+    def root(): return {"service":"Cerebrus AIoT","version":"5.0-BANK-FIRST","llm":CEREBRAS_MODEL}
+    @app.get("/health")
+    def health():
+        try:
+            r=req.get(f"{QDRANT_URL}/collections/sensor_history",timeout=5); info=r.json().get("result",{})
+            return {"status":"healthy","qdrant_points":info.get("points_count",0),"bank_machines":len(bank.keys("bank:machines:*")),"llm_rate":f"{int(cache.get(RATE_LIMIT_KEY) or 0)}/{RATE_LIMIT_RPM}","cache_ttl":LLM_CACHE_TTL}
+        except Exception as e: return {"status":"degraded","error":str(e)}
+    @app.get("/stats")
+    def stats(): return {"bank_machines":len(bank.keys("bank:machines:*")),"llm_calls":int(cache.get(RATE_LIMIT_KEY) or 0),"llm_max":RATE_LIMIT_RPM}
+    @app.get("/analyze")
+    def analyze(q:str="summary"): return {"query":q,"analysis":generate(q)}
+    @app.get("/v1/models")
+    def models(): return {"object":"list","data":[{"id":"cerebrus-aiot","object":"model"}]}
+    @app.post("/v1/chat/completions")
+    async def chat(request:Request):
+        body=await request.json(); msgs=body.get("messages",[]); um=[m for m in msgs if m.get("role")=="user"]
+        q=um[-1]["content"].strip() if um else "summary"
+        return {"id":f"cerebrus-{int(time.time())}","object":"chat.completion","model":"cerebrus-aiot",
+                "choices":[{"index":0,"message":{"role":"assistant","content":generate(q)},"finish_reason":"stop"}],
+                "usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}
 kind: ConfigMap
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"v1","data":{"gateway.py":"from fastapi import FastAPI, Request\nimport requests as req\nimport json, hashlib, math, time, re, os\n\napp = FastAPI(title=\"Cerebrus AIoT Gateway\")\n\nQDRANT_URL   = \"http://qdrant.aiot.svc.cluster.local:6333\"\nTWIN_URL     = \"http://digital-twin.aiot.svc.cluster.local:8001\"\nCEREBRAS_URL = \"https://api.cerebras.ai/v1/chat/completions\"\nCEREBRAS_KEY = os.environ.get(\"CEREBRAS_API_KEY\", \"\")\nCEREBRAS_MODEL = \"llama3.1-8b\"\nVECTOR_SIZE  = 64\n\nSYSTEM_PROMPT = \"\"\"You are Cerebrus AIoT — an intelligent industrial IoT monitoring assistant.\nYou analyze sensor data from factory machines (pumps, turbines, motors, compressors, conveyors, generators).\n\nRULES:\n- Answer in the SAME LANGUAGE as the user's question (Slovak, Czech, English, etc.)\n- Be concise but thorough\n- Always reference actual machine data provided in context\n- Highlight critical issues first\n- Give actionable recommendations\n- Use units: temperature=°C, vibration=mm/s, pressure=bar, RPM\n- Status levels: OK (green), WARNING (needs attention), CRITICAL (immediate action)\n- If asked about trends, use the historical sensor data provided\n- Format output clearly with headers and bullet points\"\"\"\n\ndef simple_embed(text):\n    vec = []\n    for i in range(VECTOR_SIZE):\n        h = hashlib.md5(f\"{text}{i}\".encode()).hexdigest()\n        vec.append((int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1)\n    norm = math.sqrt(sum(x*x for x in vec))\n    return [x/norm for x in vec]\n\ndef get_twin():\n    try:\n        r = req.get(f\"{TWIN_URL}/twin\", timeout=5)\n        return r.json() if r.status_code == 200 else {}\n    except:\n        return {}\n\ndef search_qdrant(query, limit=10):\n    try:\n        embedding = simple_embed(query)\n        r = req.post(f\"{QDRANT_URL}/collections/sensor_history/points/search\",\n            json={\"vector\": embedding, \"limit\": limit, \"with_payload\": True}, timeout=10)\n        return r.json().get(\"result\", [])\n    except:\n        return []\n\ndef build_context(query):\n    \"\"\"Build rich context from Digital Twin + Qdrant for LLM\"\"\"\n    twin = get_twin()\n    machines = twin.get(\"machines\", {})\n    summary = twin.get(\"summary\", {})\n    \n    ok = summary.get(\"ok\", 0)\n    warn = summary.get(\"warning\", 0)\n    crit = summary.get(\"critical\", 0)\n    total = ok + warn + crit\n    \n    ctx = []\n    ctx.append(f\"=== FACTORY STATUS ===\")\n    ctx.append(f\"Total: {total} machines | OK: {ok} | WARNING: {warn} | CRITICAL: {crit}\")\n    ctx.append(f\"Critical machines: {', '.join(summary.get('critical_machines', []))}\")\n    ctx.append(f\"Warning machines: {', '.join(summary.get('warning_machines', []))}\")\n    ctx.append(\"\")\n    \n    ctx.append(\"=== ALL MACHINES ===\")\n    for mid in sorted(machines.keys()):\n        m = machines[mid]\n        mt = m.get(\"metrics\", {})\n        st = m.get(\"status\", \"\").upper()\n        viols = m.get(\"violations\", [])\n        line = f\"{mid} ({m.get('machine_type','')}) [{st}] T={mt.get('temperature','-')}°C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')} H={mt.get('humidity','-')}%\"\n        if viols:\n            viol_str = \"; \".join([f\"{v['metric']}={v['value']} (limit={v.get('limit','')})\" for v in viols])\n            line += f\" VIOLATIONS: {viol_str}\"\n        ctx.append(line)\n    \n    # Qdrant history\n    results = search_qdrant(query, 5)\n    if results:\n        ctx.append(\"\")\n        ctx.append(\"=== RECENT SENSOR HISTORY (from vector DB) ===\")\n        for r in results:\n            text = r.get(\"payload\", {}).get(\"text\", \"\")\n            if text:\n                ctx.append(text)\n    \n    return \"\\n\".join(ctx)\n\ndef call_cerebras(system_msg, context, user_query):\n    \"\"\"Call Cerebras LLM API\"\"\"\n    try:\n        messages = [\n            {\"role\": \"system\", \"content\": system_msg},\n            {\"role\": \"user\", \"content\": f\"MACHINE DATA:\\n{context}\\n\\nUSER QUESTION: {user_query}\"}\n        ]\n        r = req.post(CEREBRAS_URL,\n            headers={\n                \"Authorization\": f\"Bearer {CEREBRAS_KEY}\",\n                \"Content-Type\": \"application/json\"\n            },\n            json={\n                \"model\": CEREBRAS_MODEL,\n                \"messages\": messages,\n                \"max_tokens\": 2048,\n                \"temperature\": 0.3\n            },\n            timeout=30\n        )\n        if r.status_code == 200:\n            data = r.json()\n            return data[\"choices\"][0][\"message\"][\"content\"]\n        else:\n            return f\"LLM Error ({r.status_code}): {r.text[:200]}\"\n    except Exception as e:\n        return f\"LLM Connection Error: {str(e)}\"\n\ndef generate_analysis(query):\n    \"\"\"Generate intelligent analysis using Cerebras LLM\"\"\"\n    context = build_context(query)\n    answer = call_cerebras(SYSTEM_PROMPT, context, query)\n    return answer\n\n# === API Endpoints ===\n@app.get(\"/\")\ndef root():\n    return {\"service\": \"Cerebrus AIoT\", \"version\": \"3.0-LLM\", \"status\": \"running\", \"llm\": CEREBRAS_MODEL}\n\n@app.get(\"/health\")\ndef health():\n    try:\n        r = req.get(f\"{QDRANT_URL}/collections/sensor_history\", timeout=5)\n        info = r.json().get(\"result\", {})\n        twin = get_twin()\n        return {\"status\": \"healthy\", \"qdrant_points\": info.get(\"points_count\", 0),\n                \"machines\": len(twin.get(\"machines\", {})), \"llm\": CEREBRAS_MODEL}\n    except Exception as e:\n        return {\"status\": \"degraded\", \"error\": str(e)}\n\n@app.get(\"/search\")\ndef search(q: str = \"temperature\", limit: int = 10):\n    results = search_qdrant(q, limit)\n    return {\"query\": q, \"count\": len(results),\n            \"results\": [{\"score\": p.get(\"score\"), \"text\": p.get(\"payload\", {}).get(\"text\", \"\")} for p in results]}\n\n@app.get(\"/stats\")\ndef stats():\n    r = req.get(f\"{QDRANT_URL}/collections/sensor_history\", timeout=5)\n    info = r.json().get(\"result\", {})\n    twin = get_twin()\n    return {\"points\": info.get(\"points_count\", 0), \"machines\": len(twin.get(\"machines\", {})),\n            \"twin_summary\": twin.get(\"summary\", {})}\n\n@app.get(\"/analyze\")\ndef analyze(q: str = \"summary\"):\n    return {\"query\": q, \"analysis\": generate_analysis(q)}\n\n@app.get(\"/v1/models\")\ndef models():\n    return {\"object\": \"list\", \"data\": [{\"id\": \"cerebrus-aiot\", \"object\": \"model\"}]}\n\n@app.post(\"/v1/chat/completions\")\nasync def chat(request: Request):\n    body = await request.json()\n    msgs = body.get(\"messages\", [])\n    user_msgs = [m for m in msgs if m.get(\"role\") == \"user\"]\n    q = user_msgs[-1][\"content\"].strip() if user_msgs else \"summary\"\n    \n    # Stream support check\n    stream = body.get(\"stream\", False)\n    \n    answer = generate_analysis(q)\n    \n    return {\n        \"id\": f\"cerebrus-{int(time.time())}\",\n        \"object\": \"chat.completion\",\n        \"model\": \"cerebrus-aiot\",\n        \"choices\": [{\"index\": 0, \"message\": {\"role\": \"assistant\", \"content\": answer}, \"finish_reason\": \"stop\"}],\n        \"usage\": {\"prompt_tokens\": 0, \"completion_tokens\": 0, \"total_tokens\": 0}\n    }\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"api-gateway-code","namespace":"aiot"}}
-  creationTimestamp: "2026-03-05T19:06:17Z"
+      {"apiVersion":"v1","data":{"gateway.py":"from fastapi import FastAPI, Request\nimport requests as req\nimport json, hashlib, math, time, os, re\nimport redis\n\napp = FastAPI(title=\"Cerebrus AIoT Gateway\")\nbank = redis.Redis(host=\"redis-master.aiot.svc.cluster.local\", port=6379, db=5, decode_responses=True)\ncache = redis.Redis(host=\"redis-master.aiot.svc.cluster.local\", port=6379, db=6, decode_responses=True)\n\nQDRANT_URL = \"http://qdrant.aiot.svc.cluster.local:6333\"\nCEREBRAS_URL = \"https://api.cerebras.ai/v1/chat/completions\"\nCEREBRAS_KEY = os.environ.get(\"CEREBRAS_API_KEY\", \"\")\nCEREBRAS_MODEL = \"llama3.1-8b\"\nVECTOR_SIZE = 64\nLLM_CACHE_TTL = 1800\nBANK_CACHE_TTL = 120\nRATE_LIMIT_RPM = 10\nRATE_LIMIT_KEY = \"llm:rate_counter\"\n\nSYSTEM_PROMPT = \"\"\"You are Cerebrus AIoT - industrial IoT monitoring assistant.\nAnalyze factory machines. Answer in SAME LANGUAGE as user. Be concise.\nUnits: temperature=C, vibration=mm/s, pressure=bar.\"\"\"\n\nSIMPLE_KW = [\"summary\",\"status\",\"overview\",\"suhrn\",\"prehlad\",\"how many\",\"kolko\",\"pocet\",\"total\",\"celkom\",\"critical\",\"kritick\",\"warning\",\"varov\",\"alarm\",\"list\",\"zoznam\",\"stav\",\"factory\"]\nCOMPLEX_KW = [\"why\",\"preco\",\"cause\",\"pricina\",\"recommend\",\"odporuc\",\"predict\",\"trend\",\"analyze\",\"analyz\",\"compare\",\"porovnaj\",\"explain\",\"vysvetli\",\"what if\",\"should\",\"plan\",\"optimiz\",\"improve\"]\nMACH_RE = re.compile(r'(pump|turbine|motor|compressor|conveyor|generator)[-_]?\\d+', re.I)\n\ndef is_complex(q):\n    return any(k in q.lower() for k in COMPLEX_KW)\n\ndef is_simple(q):\n    ql = q.lower()\n    if MACH_RE.search(ql) and not is_complex(q): return True\n    return any(k in ql for k in SIMPLE_KW) and not is_complex(q)\n\ndef simple_embed(text):\n    vec = []\n    for i in range(VECTOR_SIZE):\n        h = hashlib.md5(f\"{text}{i}\".encode()).hexdigest()\n        vec.append((int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1)\n    norm = math.sqrt(sum(x*x for x in vec))\n    return [x/norm for x in vec]\n\ndef check_rate():\n    try:\n        c = cache.get(RATE_LIMIT_KEY)\n        if c and int(c) \u003e= RATE_LIMIT_RPM: return False\n        p = cache.pipeline(); p.incr(RATE_LIMIT_KEY); p.expire(RATE_LIMIT_KEY, 60); p.execute()\n        return True\n    except: return True\n\ndef get_cache(q):\n    try: return cache.get(f\"llm:cache:{hashlib.sha256(q.lower().strip().encode()).hexdigest()[:16]}\")\n    except: return None\n\ndef set_cache(q, r, ttl=None):\n    try: cache.setex(f\"llm:cache:{hashlib.sha256(q.lower().strip().encode()).hexdigest()[:16]}\", ttl or LLM_CACHE_TTL, r)\n    except: pass\n\ndef machine_detail(mid):\n    raw = bank.get(f\"bank:machines:{mid}\")\n    if not raw: return None\n    m = json.loads(raw); mt = m.get(\"metrics\",{})\n    viols = \"; \".join([f\"{v['metric']}={v['value']}\" for v in m.get(\"violations\",[])])\n    line = f\"{mid} ({m.get('machine_type','')}) [{m.get('status','')}] T={mt.get('temperature','-')}C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')}\"\n    if viols: line += f\" VIOLATIONS: {viols}\"\n    return line\n\ndef bank_answer(query):\n    q = query.lower()\n    try:\n        raw = bank.get(\"bank:summary\")\n        if not raw: return None\n        s = json.loads(raw)\n        total,ok,warn,crit = s.get(\"total\",0),s.get(\"ok\",0),s.get(\"warning\",0),s.get(\"critical\",0)\n        crit_list,warn_list = s.get(\"critical_machines\",[]),s.get(\"warning_machines\",[])\n        m = MACH_RE.search(q)\n        if m:\n            mid = m.group(0).replace(\"_\",\"-\")\n            mraw = bank.get(f\"bank:machines:{mid}\")\n            if not mraw: return f\"Machine {mid} not found.\"\n            md = json.loads(mraw); mt = md.get(\"metrics\",{})\n            lines = [f\"{mid} | type: {md.get('machine_type','-')} | status: {md.get('status','-')}\",\n                     f\"T={mt.get('temperature','-')}C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')}\"]\n            for v in md.get(\"violations\",[]): lines.append(f\"VIOLATION: {v['metric']}={v['value']}\")\n            hist = bank.lrange(f\"bank:history:{mid}\", 0, 4)\n            if hist:\n                lines.append(\"History:\")\n                for e in hist:\n                    d = json.loads(e); lines.append(f\"  T={d.get('temperature','-')} V={d.get('vibration','-')} P={d.get('pressure','-')} [{d.get('status','-')}]\")\n            return \"\\n\".join(lines)\n        if any(k in q for k in [\"summary\",\"status\",\"overview\",\"suhrn\",\"prehlad\",\"total\",\"celkom\",\"factory\",\"stav\"]):\n            return f\"Factory: {total} machines | OK: {ok} | Warning: {warn} | Critical: {crit}\\nTop critical: {', '.join(crit_list[:10])}\"\n        if any(k in q for k in [\"critical\",\"kritick\",\"alarm\"]):\n            return f\"Critical ({crit}):\\n\" + \"\\n\".join(f\"  {n}\" for n in crit_list[:20])\n        if any(k in q for k in [\"warning\",\"varov\",\"warn\"]):\n            return f\"Warning ({warn}):\\n\" + \"\\n\".join(f\"  {n}\" for n in warn_list[:20])\n        if any(k in q for k in [\"how many\",\"kolko\",\"pocet\"]):\n            return f\"Total {total}: {ok} OK, {warn} warning, {crit} critical.\"\n    except: pass\n    return None\n\ndef bank_context(query):\n    ctx = []\n    q = query.lower()\n    try:\n        raw = bank.get(\"bank:summary\")\n        if not raw: return \"No data.\"\n        s = json.loads(raw)\n        ctx.append(f\"FACTORY: {s.get('total',0)} machines | OK:{s.get('ok',0)} WARN:{s.get('warning',0)} CRIT:{s.get('critical',0)}\")\n        crit_list = s.get('critical_machines',[])\n        m = MACH_RE.search(q)\n        if m:\n            mid = m.group(0).replace(\"_\",\"-\")\n            raw2 = bank.get(f\"bank:machines:{mid}\")\n            if raw2:\n                md = json.loads(raw2); mt = md.get(\"metrics\",{})\n                ctx.append(f\"\\n{mid}: type={md.get('machine_type','')} status={md.get('status','')}\")\n                ctx.append(f\"T={mt.get('temperature','-')}C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')}\")\n                for v in md.get(\"violations\",[]): ctx.append(f\"VIOLATION: {v['metric']}={v['value']} limit={v.get('limit','')}\")\n                for e in (bank.lrange(f\"bank:history:{mid}\",0,9) or [])[-5:]:\n                    d = json.loads(e); ctx.append(f\"  T={d.get('temperature','-')} V={d.get('vibration','-')} P={d.get('pressure','-')} [{d.get('status','')}]\")\n        else:\n            for mid2 in crit_list[:10]:\n                d = machine_detail(mid2)\n                if d: ctx.append(d)\n    except: pass\n    return \"\\n\".join(ctx)[:12000]\n\ndef call_llm(context, query):\n    try:\n        r = req.post(CEREBRAS_URL, headers={\"Authorization\": f\"Bearer {CEREBRAS_KEY}\"},\n            json={\"model\": CEREBRAS_MODEL, \"messages\": [{\"role\":\"system\",\"content\":SYSTEM_PROMPT},{\"role\":\"user\",\"content\":f\"DATA:\\n{context}\\n\\nQUESTION: {query}\"}], \"max_tokens\": 1500, \"temperature\": 0.3}, timeout=30)\n        if r.status_code == 200: return r.json()[\"choices\"][0][\"message\"][\"content\"]\n        elif r.status_code == 429: return \"Rate limit. Try again.\"\n        else: return f\"LLM Error ({r.status_code})\"\n    except Exception as e: return f\"LLM Error: {e}\"\n\ndef generate(query):\n    cached = get_cache(query)\n    if cached: return cached\n    if is_simple(query):\n        ans = bank_answer(query)\n        if ans: set_cache(query, ans, BANK_CACHE_TTL); return ans\n    if not check_rate():\n        ans = bank_answer(query)\n        return (ans + \"\\n(Rate limited)\") if ans else \"Rate limit: 10/min.\"\n    ctx = bank_context(query)\n    ans = call_llm(ctx, query)\n    if ans and \"Error\" not in ans: set_cache(query, ans)\n    return ans\n\n@app.get(\"/\")\ndef root(): return {\"service\":\"Cerebrus AIoT\",\"version\":\"5.0-BANK-FIRST\",\"llm\":CEREBRAS_MODEL}\n@app.get(\"/health\")\ndef health():\n    try:\n        r=req.get(f\"{QDRANT_URL}/collections/sensor_history\",timeout=5); info=r.json().get(\"result\",{})\n        return {\"status\":\"healthy\",\"qdrant_points\":info.get(\"points_count\",0),\"bank_machines\":len(bank.keys(\"bank:machines:*\")),\"llm_rate\":f\"{int(cache.get(RATE_LIMIT_KEY) or 0)}/{RATE_LIMIT_RPM}\",\"cache_ttl\":LLM_CACHE_TTL}\n    except Exception as e: return {\"status\":\"degraded\",\"error\":str(e)}\n@app.get(\"/stats\")\ndef stats(): return {\"bank_machines\":len(bank.keys(\"bank:machines:*\")),\"llm_calls\":int(cache.get(RATE_LIMIT_KEY) or 0),\"llm_max\":RATE_LIMIT_RPM}\n@app.get(\"/analyze\")\ndef analyze(q:str=\"summary\"): return {\"query\":q,\"analysis\":generate(q)}\n@app.get(\"/v1/models\")\ndef models(): return {\"object\":\"list\",\"data\":[{\"id\":\"cerebrus-aiot\",\"object\":\"model\"}]}\n@app.post(\"/v1/chat/completions\")\nasync def chat(request:Request):\n    body=await request.json(); msgs=body.get(\"messages\",[]); um=[m for m in msgs if m.get(\"role\")==\"user\"]\n    q=um[-1][\"content\"].strip() if um else \"summary\"\n    return {\"id\":f\"cerebrus-{int(time.time())}\",\"object\":\"chat.completion\",\"model\":\"cerebrus-aiot\",\n            \"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":generate(q)},\"finish_reason\":\"stop\"}],\n            \"usage\":{\"prompt_tokens\":0,\"completion_tokens\":0,\"total_tokens\":0}}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"api-gateway-code","namespace":"aiot"}}
   name: api-gateway-code
   namespace: aiot
-  resourceVersion: "813057"
-  uid: ff2a6825-7e12-4336-ae31-eb5a4c756b1a

@@ -21,8 +21,5 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"v1","data":{"default.conf":"server {\n    listen 80;\n    root /var/www/html/site/public;\n    index index.php;\n\n    location / {\n        try_files $uri $uri/ /index.php?$query_string;\n    }\n\n    location ~ \\.php$ {\n        fastcgi_pass 127.0.0.1:9000;\n        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n        include fastcgi_params;\n    }\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"nginx-lamp-config","namespace":"default"}}
-  creationTimestamp: "2026-03-01T22:07:15Z"
   name: nginx-lamp-config
   namespace: default
-  resourceVersion: "48105"
-  uid: a3e02615-22ca-4e4a-af8c-4fcb67b3a9e6

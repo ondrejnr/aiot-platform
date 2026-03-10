@@ -3,19 +3,14 @@ kind: StatefulSet
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"name":"redpanda","namespace":"aiot"},"spec":{"podManagementPolicy":"Parallel","replicas":4,"selector":{"matchLabels":{"app":"redpanda"}},"serviceName":"redpanda-headless","template":{"metadata":{"labels":{"app":"redpanda"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app":"redpanda"}},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"containers":[{"command":["/bin/bash","-c","# Extract ordinal from hostname (redpanda-0, redpanda-1, etc.)\nORDINAL=${HOSTNAME##*-}\n\n# Build seed list (all nodes)\nSEEDS=\"\"\nfor i in $(seq 0 3); do\n  if [ $i -gt 0 ]; then SEEDS=\"${SEEDS},\"; fi\n  SEEDS=\"${SEEDS}redpanda-${i}.redpanda-headless.aiot.svc.cluster.local:33145\"\ndone\n\nrpk redpanda start \\\n  --overprovisioned \\\n  --smp 1 \\\n  --memory 512M \\\n  --reserve-memory 0M \\\n  --node-id ${ORDINAL} \\\n  --check=false \\\n  --kafka-addr 0.0.0.0:9092 \\\n  --advertise-kafka-addr ${HOSTNAME}.redpanda-headless.aiot.svc.cluster.local:9092 \\\n  --rpc-addr 0.0.0.0:33145 \\\n  --advertise-rpc-addr ${HOSTNAME}.redpanda-headless.aiot.svc.cluster.local:33145 \\\n  --pandaproxy-addr 0.0.0.0:8082 \\\n  --advertise-pandaproxy-addr ${HOSTNAME}.redpanda-headless.aiot.svc.cluster.local:8082 \\\n  --seeds ${SEEDS} \\\n  --set redpanda.default_topic_replications=3 \\\n  --set redpanda.default_topic_partitions=4 \\\n  --set redpanda.auto_create_topics_enabled=true \\\n  --set redpanda.group_min_session_timeout_ms=250 \\\n  --set redpanda.log_segment_size=134217728 \\\n  --set redpanda.compacted_log_segment_size=67108864\n"],"image":"docker.redpanda.com/redpandadata/redpanda:v24.1.7","livenessProbe":{"httpGet":{"path":"/v1/status/ready","port":9644},"initialDelaySeconds":30,"periodSeconds":15,"timeoutSeconds":5},"name":"redpanda","ports":[{"containerPort":9092,"name":"kafka"},{"containerPort":33145,"name":"rpc"},{"containerPort":9644,"name":"admin"},{"containerPort":8082,"name":"pandaproxy"}],"readinessProbe":{"httpGet":{"path":"/v1/status/ready","port":9644},"initialDelaySeconds":15,"periodSeconds":10,"timeoutSeconds":5},"resources":{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"200m","memory":"512Mi"}},"volumeMounts":[{"mountPath":"/var/lib/redpanda/data","name":"data"}]}],"terminationGracePeriodSeconds":30}},"volumeClaimTemplates":[{"metadata":{"name":"data"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"5Gi"}},"storageClassName":"local-path"}}]}}
-  creationTimestamp: "2026-03-05T18:35:51Z"
-  generation: 1
   name: redpanda
   namespace: aiot
-  resourceVersion: "803886"
-  uid: 6806d0c9-4fad-45c8-a469-720aa5a90e5b
 spec:
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain
     whenScaled: Retain
   podManagementPolicy: Parallel
-  replicas: 4
+  replicas: 3
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -23,7 +18,6 @@ spec:
   serviceName: redpanda-headless
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: redpanda
     spec:
@@ -132,25 +126,14 @@ spec:
   - apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-      creationTimestamp: null
       name: data
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 5Gi
-      storageClassName: local-path
+          storage: 10Gi
+      storageClassName: longhorn
       volumeMode: Filesystem
     status:
       phase: Pending
-status:
-  availableReplicas: 4
-  collisionCount: 0
-  currentReplicas: 4
-  currentRevision: redpanda-fbcc4f9f5
-  observedGeneration: 1
-  readyReplicas: 4
-  replicas: 4
-  updateRevision: redpanda-fbcc4f9f5
-  updatedReplicas: 4

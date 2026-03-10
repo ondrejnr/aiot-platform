@@ -35,8 +35,5 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"v1","data":{"metricbeat.yml":"\nmetricbeat.modules:\n\n- module: system\n  metricsets: [cpu, memory, network, diskio, load, process, process_summary, uptime]\n  period: 10s\n  hostfs: /hostfs\n  cpu.metrics: [percentages, normalized_percentages]\n\n- module: kubernetes\n  metricsets: [node, pod, container, system, volume, event]\n  period: 10s\n  host: ${NODE_NAME}\n  hosts: [\"https://${NODE_NAME}:10250\"]\n  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n  ssl.verification_mode: \"none\"\n  add_metadata: true\n\n- module: docker\n  metricsets: [container, cpu, diskio, memory, network]\n  period: 10s\n  hosts: [\"unix:///var/run/docker.sock\"]\n\noutput.elasticsearch:\n  hosts: [\"http://10.97.69.109:9200\"]\n\nsetup.kibana:\n  host: \"http://10.106.163.171:5601\"\nsetup.dashboards.enabled: true\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"metricbeat-config","namespace":"default"}}
-  creationTimestamp: "2026-03-01T22:46:13Z"
   name: metricbeat-config
   namespace: default
-  resourceVersion: "431733"
-  uid: 2d284727-65df-4b61-9dea-ff55191cb2d1

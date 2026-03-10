@@ -2,15 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "1"
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"ngrok-proxy","namespace":"aiot"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"ngrok-proxy"}},"template":{"metadata":{"labels":{"app":"ngrok-proxy"}},"spec":{"containers":[{"args":["pip install fastapi uvicorn requests --quiet \u0026\u0026 uvicorn proxy:app --host 0.0.0.0 --port 8090"],"command":["/bin/sh","-c"],"env":[{"name":"NGROK_TARGET","value":"http://rag-api-svc.aiot.svc.cluster.local:7000"}],"image":"python:3.11-slim","name":"ngrok-proxy","ports":[{"containerPort":8090}],"resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"volumeMounts":[{"mountPath":"/code","name":"code"}],"workingDir":"/code"}],"volumes":[{"configMap":{"name":"ngrok-proxy-code"},"name":"code"}]}}}}
-  creationTimestamp: "2026-03-08T07:35:32Z"
-  generation: 1
   name: ngrok-proxy
   namespace: aiot
-  resourceVersion: "1277975"
-  uid: 050153da-f52e-4d8b-8bd7-9cb7dfaba169
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -25,7 +20,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: ngrok-proxy
     spec:
@@ -59,6 +53,8 @@ spec:
           name: code
         workingDir: /code
       dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/hostname: instance-worker-02
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
@@ -68,22 +64,3 @@ spec:
           defaultMode: 420
           name: ngrok-proxy-code
         name: code
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2026-03-08T07:35:34Z"
-    lastUpdateTime: "2026-03-08T07:35:34Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2026-03-08T07:35:32Z"
-    lastUpdateTime: "2026-03-08T07:35:34Z"
-    message: ReplicaSet "ngrok-proxy-766d89f766" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1

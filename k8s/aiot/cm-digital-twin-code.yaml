@@ -11,7 +11,9 @@ data:
 
     KAFKA_BROKER = "redpanda.aiot.svc.cluster.local:9092"
     r = redis.Redis(host="redis-master.aiot.svc.cluster.local", port=6379, db=4, decode_responses=True)
+    bank = redis.Redis(host="redis-master.aiot.svc.cluster.local", port=6379, db=5, decode_responses=True)
     app = Flask(__name__)
+    BANK_TTL = 3600
 
     LIMITS = {
         "pump":       {"temperature": (20,60),  "vibration": (0,2.0), "pressure": (70,115), "rpm": (800,1800)},
@@ -19,6 +21,7 @@ data:
         "motor":      {"temperature": (20,75),  "vibration": (0,2.5), "pressure": (0,999),  "rpm": (500,2500)},
         "conveyor":   {"temperature": (20,50),  "vibration": (0,1.5), "pressure": (0,999),  "rpm": (200,1200)},
         "turbine":    {"temperature": (20,100), "vibration": (0,4.0), "pressure": (70,200), "rpm": (1000,3500)},
+        "generator":  {"temperature": (20,90),  "vibration": (0,3.0), "pressure": (60,160), "rpm": (800,2200)},
     }
 
     def check_metrics(machine_type, payload):
@@ -26,33 +29,61 @@ data:
         violations = []
         for metric, (mn, mx) in limits.items():
             val = payload.get(metric)
-            if val is None:
-                continue
+            if val is None: continue
             val = float(val)
-            if val > mx:
-                violations.append({"metric": metric, "value": round(val,2), "limit": mx, "type": "HIGH"})
-            elif val < mn:
-                violations.append({"metric": metric, "value": round(val,2), "limit": mn, "type": "LOW"})
+            if val > mx: violations.append({"metric": metric, "value": round(val,2), "limit": mx, "type": "HIGH"})
+            elif val < mn: violations.append({"metric": metric, "value": round(val,2), "limit": mn, "type": "LOW"})
         return violations
 
     def get_status(violations, anomaly_score):
-        if float(anomaly_score or 0) > 0.7:
-            return "CRITICAL"
-        if len(violations) >= 2:
-            return "CRITICAL"
-        if len(violations) == 1:
-            return "WARNING"
+        if float(anomaly_score or 0) > 0.7: return "CRITICAL"
+        if len(violations) >= 2: return "CRITICAL"
+        if len(violations) == 1: return "WARNING"
         return "OK"
 
+    def write_bank(machine_id, twin, status, violations, anomaly_score, payload):
+        try:
+            bank.setex(f"bank:machines:{machine_id}", BANK_TTL, json.dumps(twin))
+            h = {"temperature": payload.get("temperature"), "vibration": payload.get("vibration"),
+                 "pressure": payload.get("pressure"), "rpm": payload.get("rpm"),
+                 "humidity": payload.get("humidity"), "anomaly_score": float(anomaly_score),
+                 "status": status, "ts": time.time()}
+            bank.lpush(f"bank:history:{machine_id}", json.dumps(h))
+            bank.ltrim(f"bank:history:{machine_id}", 0, 59)
+            bank.expire(f"bank:history:{machine_id}", BANK_TTL)
+            if status != "OK":
+                alert = {"machine_id": machine_id, "machine_type": twin.get("machine_type",""),
+                         "status": status, "violations": violations, "anomaly_score": float(anomaly_score),
+                         "metrics": twin["metrics"], "ts": time.time()}
+                bank.lpush("bank:alerts", json.dumps(alert))
+                bank.ltrim("bank:alerts", 0, 99)
+                bank.expire("bank:alerts", BANK_TTL)
+        except Exception as e:
+            log.error(f"Bank write error: {e}")
+
+    def update_bank_summary():
+        try:
+            keys = bank.keys("bank:machines:*")
+            machines = {}
+            for k in keys:
+                raw = bank.get(k)
+                if raw: machines[k.replace("bank:machines:","")] = json.loads(raw)
+            critical = [k for k,v in machines.items() if v.get("status")=="CRITICAL"]
+            warning = [k for k,v in machines.items() if v.get("status")=="WARNING"]
+            ok = [k for k,v in machines.items() if v.get("status")=="OK"]
+            s = {"total": len(machines), "ok": len(ok), "warning": len(warning), "critical": len(critical),
+                 "critical_machines": critical, "warning_machines": warning, "ok_machines": ok, "ts": time.time()}
+            bank.setex("bank:summary", BANK_TTL, json.dumps(s))
+        except Exception as e:
+            log.error(f"Bank summary error: {e}")
+
+    summary_counter = 0
     def consume():
-        consumer = KafkaConsumer(
-            "telemetry",
-            bootstrap_servers=KAFKA_BROKER,
+        global summary_counter
+        consumer = KafkaConsumer("telemetry", bootstrap_servers=KAFKA_BROKER,
             value_deserializer=lambda x: json.loads(x.decode("utf-8")),
-            group_id="digital-twin-group4",
-            auto_offset_reset="latest"
-        )
-        log.info("Digital twin multi-metric consumer started")
+            group_id="digital-twin-group4", auto_offset_reset="latest")
+        log.info("Digital twin + bank consumer started")
         for msg in consumer:
             try:
                 data = msg.value
@@ -62,85 +93,92 @@ data:
                 anomaly_score = float(payload.get("anomaly_score") or 0)
                 violations = check_metrics(machine_type, payload)
                 status = get_status(violations, anomaly_score)
-                twin = {
-                    "machine_id": machine_id,
-                    "machine_type": machine_type,
-                    "status": status,
-                    "violations": violations,
-                    "metrics": {
-                        "temperature":   payload.get("temperature"),
-                        "vibration":     payload.get("vibration"),
-                        "pressure":      payload.get("pressure"),
-                        "rpm":           payload.get("rpm"),
-                        "humidity":      payload.get("humidity"),
-                        "anomaly_score": anomaly_score
-                    },
-                    "limits": LIMITS.get(machine_type, {}),
-                    "topic": data.get("topic", ""),
-                    "updated_at": time.time()
-                }
+                twin = {"machine_id": machine_id, "machine_type": machine_type, "status": status,
+                        "violations": violations, "metrics": {"temperature": payload.get("temperature"),
+                        "vibration": payload.get("vibration"), "pressure": payload.get("pressure"),
+                        "rpm": payload.get("rpm"), "humidity": payload.get("humidity"),
+                        "anomaly_score": anomaly_score}, "limits": LIMITS.get(machine_type, {}),
+                        "topic": data.get("topic",""), "updated_at": time.time()}
                 r.hset("digital-twin:machines", machine_id, json.dumps(twin))
+                r.expire("digital-twin:machines", 7200)
                 r.setex("digital-twin:last-update", 60, str(time.time()))
                 prev_raw = r.hget("digital-twin:prev-status", machine_id)
                 prev_status = json.loads(prev_raw)["status"] if prev_raw else "OK"
                 if status != "OK":
                     if status != prev_status:
-                        alert = {
-                            "machine_id": machine_id,
-                            "machine_type": machine_type,
-                            "status": status,
-                            "violations": violations,
-                            "anomaly_score": anomaly_score,
-                            "metrics": twin["metrics"],
-                            "ts": time.time()
-                        }
+                        alert = {"machine_id": machine_id, "machine_type": machine_type, "status": status,
+                                 "violations": violations, "anomaly_score": anomaly_score,
+                                 "metrics": twin["metrics"], "ts": time.time()}
                         r.lpush("digital-twin:alerts", json.dumps(alert))
                         r.ltrim("digital-twin:alerts", 0, 49)
-                        log.warning("ALERT " + status + ": " + machine_id + " violations=" + str(len(violations)) + " " + str([v["metric"] for v in violations]))
-                else:
-                    log.info("OK: " + machine_id + " (" + machine_type + ")" +
-                        " T=" + str(payload.get("temperature")) +
-                        " V=" + str(payload.get("vibration")) +
-                        " P=" + str(payload.get("pressure")) +
-                        " RPM=" + str(payload.get("rpm")))
+                        r.expire("digital-twin:alerts", 7200)
+                        log.warning(f"ALERT {status}: {machine_id}")
                 r.hset("digital-twin:prev-status", machine_id, json.dumps({"status": status}))
+                r.expire("digital-twin:prev-status", 7200)
+                write_bank(machine_id, twin, status, violations, anomaly_score, payload)
+                summary_counter += 1
+                if summary_counter >= 50:
+                    update_bank_summary()
+                    summary_counter = 0
             except Exception as e:
-                log.error("Consume error: " + str(e))
+                log.error(f"Consume error: {e}")
 
     @app.route("/twin")
     def get_twin():
         machines = r.hgetall("digital-twin:machines")
         result = {k: json.loads(v) for k, v in machines.items()}
-        critical = [k for k,v in result.items() if v["status"] == "CRITICAL"]
-        warning  = [k for k,v in result.items() if v["status"] == "WARNING"]
-        ok       = [k for k,v in result.items() if v["status"] == "OK"]
-        return jsonify({
-            "machines": result,
-            "count": len(result),
-            "summary": {
-                "ok": len(ok),
-                "warning": len(warning),
-                "critical": len(critical),
-                "critical_machines": critical,
-                "warning_machines": warning
-            },
-            "timestamp": time.time()
-        })
+        critical = [k for k,v in result.items() if v["status"]=="CRITICAL"]
+        warning = [k for k,v in result.items() if v["status"]=="WARNING"]
+        ok = [k for k,v in result.items() if v["status"]=="OK"]
+        return jsonify({"machines": result, "count": len(result),
+            "summary": {"ok": len(ok), "warning": len(warning), "critical": len(critical),
+                        "critical_machines": critical, "warning_machines": warning}, "timestamp": time.time()})
 
     @app.route("/twin/<machine_id>")
     def get_machine(machine_id):
         data = r.hget("digital-twin:machines", machine_id)
-        if not data:
-            return jsonify({"error": "not found"}), 404
+        if not data: return jsonify({"error": "not found"}), 404
         return jsonify(json.loads(data))
 
     @app.route("/alerts")
     def get_alerts():
         alerts = r.lrange("digital-twin:alerts", 0, 49)
-        return jsonify({
-            "count": len(alerts),
-            "alerts": [json.loads(a) for a in alerts]
-        })
+        return jsonify({"count": len(alerts), "alerts": [json.loads(a) for a in alerts]})
+
+    @app.route("/bank/summary")
+    def bank_summary():
+        raw = bank.get("bank:summary")
+        if not raw: return jsonify({"error": "no data"}), 404
+        return jsonify(json.loads(raw))
+
+    @app.route("/bank/machine/<machine_id>")
+    def bank_machine(machine_id):
+        raw = bank.get(f"bank:machines:{machine_id}")
+        if not raw: return jsonify({"error": "not found"}), 404
+        return jsonify(json.loads(raw))
+
+    @app.route("/bank/history/<machine_id>")
+    def bank_history(machine_id):
+        entries = bank.lrange(f"bank:history:{machine_id}", 0, 59)
+        return jsonify({"machine_id": machine_id, "count": len(entries), "history": [json.loads(e) for e in entries]})
+
+    @app.route("/bank/alerts")
+    def bank_alerts():
+        alerts = bank.lrange("bank:alerts", 0, 99)
+        return jsonify({"count": len(alerts), "alerts": [json.loads(a) for a in alerts]})
+
+    @app.route("/bank/all")
+    def bank_all():
+        keys = bank.keys("bank:machines:*")
+        machines = {}
+        for k in keys:
+            raw = bank.get(k)
+            if raw: machines[k.replace("bank:machines:","")] = json.loads(raw)
+        raw_s = bank.get("bank:summary")
+        summary = json.loads(raw_s) if raw_s else {}
+        alerts = bank.lrange("bank:alerts", 0, 19)
+        return jsonify({"machines": machines, "summary": summary,
+                        "recent_alerts": [json.loads(a) for a in alerts], "ts": time.time()})
 
     @app.route("/health")
     def health():
@@ -148,26 +186,20 @@ data:
         age = time.time() - float(last) if last else 999
         machines = r.hgetall("digital-twin:machines")
         result = {k: json.loads(v) for k, v in machines.items()}
-        critical = [k for k,v in result.items() if v["status"] == "CRITICAL"]
-        warning  = [k for k,v in result.items() if v["status"] == "WARNING"]
-        return jsonify({
-            "status": "ok" if age < 30 else "stale",
-            "data_age_seconds": round(age, 1),
-            "machines_monitored": len(result),
-            "critical": len(critical),
-            "warning": len(warning)
-        })
+        critical = [k for k,v in result.items() if v["status"]=="CRITICAL"]
+        warning = [k for k,v in result.items() if v["status"]=="WARNING"]
+        bk = len(bank.keys("bank:machines:*"))
+        return jsonify({"status": "ok" if age < 30 else "stale", "data_age_seconds": round(age,1),
+                        "machines_monitored": len(result), "bank_machines": bk,
+                        "critical": len(critical), "warning": len(warning)})
 
     threading.Thread(target=consume, daemon=True).start()
-    log.info("Digital Twin multi-metric API on port 8001")
+    log.info("Digital Twin v2 + Bank on port 8001")
     app.run(host="0.0.0.0", port=8001)
 kind: ConfigMap
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"v1","data":{"twin.py":"import json, time, logging, threading\nfrom kafka import KafkaConsumer\nfrom flask import Flask, jsonify\nimport redis\n\nlogging.basicConfig(level=logging.INFO)\nlog = logging.getLogger(\"digital-twin\")\n\nKAFKA_BROKER = \"redpanda.aiot.svc.cluster.local:9092\"\nr = redis.Redis(host=\"redis-master.aiot.svc.cluster.local\", port=6379, db=4, decode_responses=True)\napp = Flask(__name__)\n\nLIMITS = {\n    \"pump\":       {\"temperature\": (20,60),  \"vibration\": (0,2.0), \"pressure\": (70,115), \"rpm\": (800,1800)},\n    \"compressor\": {\"temperature\": (20,80),  \"vibration\": (0,3.0), \"pressure\": (70,150), \"rpm\": (800,2000)},\n    \"motor\":      {\"temperature\": (20,75),  \"vibration\": (0,2.5), \"pressure\": (0,999),  \"rpm\": (500,2500)},\n    \"conveyor\":   {\"temperature\": (20,50),  \"vibration\": (0,1.5), \"pressure\": (0,999),  \"rpm\": (200,1200)},\n    \"turbine\":    {\"temperature\": (20,100), \"vibration\": (0,4.0), \"pressure\": (70,200), \"rpm\": (1000,3500)},\n}\n\ndef check_metrics(machine_type, payload):\n    limits = LIMITS.get(machine_type, {})\n    violations = []\n    for metric, (mn, mx) in limits.items():\n        val = payload.get(metric)\n        if val is None:\n            continue\n        val = float(val)\n        if val \u003e mx:\n            violations.append({\"metric\": metric, \"value\": round(val,2), \"limit\": mx, \"type\": \"HIGH\"})\n        elif val \u003c mn:\n            violations.append({\"metric\": metric, \"value\": round(val,2), \"limit\": mn, \"type\": \"LOW\"})\n    return violations\n\ndef get_status(violations, anomaly_score):\n    if float(anomaly_score or 0) \u003e 0.7:\n        return \"CRITICAL\"\n    if len(violations) \u003e= 2:\n        return \"CRITICAL\"\n    if len(violations) == 1:\n        return \"WARNING\"\n    return \"OK\"\n\ndef consume():\n    consumer = KafkaConsumer(\n        \"telemetry\",\n        bootstrap_servers=KAFKA_BROKER,\n        value_deserializer=lambda x: json.loads(x.decode(\"utf-8\")),\n        group_id=\"digital-twin-group4\",\n        auto_offset_reset=\"latest\"\n    )\n    log.info(\"Digital twin multi-metric consumer started\")\n    for msg in consumer:\n        try:\n            data = msg.value\n            payload = data.get(\"payload\", {})\n            machine_id = payload.get(\"machine_id\") or payload.get(\"sensor_id\", \"unknown\")\n            machine_type = payload.get(\"machine_type\") or payload.get(\"location\", \"unknown\")\n            anomaly_score = float(payload.get(\"anomaly_score\") or 0)\n            violations = check_metrics(machine_type, payload)\n            status = get_status(violations, anomaly_score)\n            twin = {\n                \"machine_id\": machine_id,\n                \"machine_type\": machine_type,\n                \"status\": status,\n                \"violations\": violations,\n                \"metrics\": {\n                    \"temperature\":   payload.get(\"temperature\"),\n                    \"vibration\":     payload.get(\"vibration\"),\n                    \"pressure\":      payload.get(\"pressure\"),\n                    \"rpm\":           payload.get(\"rpm\"),\n                    \"humidity\":      payload.get(\"humidity\"),\n                    \"anomaly_score\": anomaly_score\n                },\n                \"limits\": LIMITS.get(machine_type, {}),\n                \"topic\": data.get(\"topic\", \"\"),\n                \"updated_at\": time.time()\n            }\n            r.hset(\"digital-twin:machines\", machine_id, json.dumps(twin))\n            r.setex(\"digital-twin:last-update\", 60, str(time.time()))\n            prev_raw = r.hget(\"digital-twin:prev-status\", machine_id)\n            prev_status = json.loads(prev_raw)[\"status\"] if prev_raw else \"OK\"\n            if status != \"OK\":\n                if status != prev_status:\n                    alert = {\n                        \"machine_id\": machine_id,\n                        \"machine_type\": machine_type,\n                        \"status\": status,\n                        \"violations\": violations,\n                        \"anomaly_score\": anomaly_score,\n                        \"metrics\": twin[\"metrics\"],\n                        \"ts\": time.time()\n                    }\n                    r.lpush(\"digital-twin:alerts\", json.dumps(alert))\n                    r.ltrim(\"digital-twin:alerts\", 0, 49)\n                    log.warning(\"ALERT \" + status + \": \" + machine_id + \" violations=\" + str(len(violations)) + \" \" + str([v[\"metric\"] for v in violations]))\n            else:\n                log.info(\"OK: \" + machine_id + \" (\" + machine_type + \")\" +\n                    \" T=\" + str(payload.get(\"temperature\")) +\n                    \" V=\" + str(payload.get(\"vibration\")) +\n                    \" P=\" + str(payload.get(\"pressure\")) +\n                    \" RPM=\" + str(payload.get(\"rpm\")))\n            r.hset(\"digital-twin:prev-status\", machine_id, json.dumps({\"status\": status}))\n        except Exception as e:\n            log.error(\"Consume error: \" + str(e))\n\n@app.route(\"/twin\")\ndef get_twin():\n    machines = r.hgetall(\"digital-twin:machines\")\n    result = {k: json.loads(v) for k, v in machines.items()}\n    critical = [k for k,v in result.items() if v[\"status\"] == \"CRITICAL\"]\n    warning  = [k for k,v in result.items() if v[\"status\"] == \"WARNING\"]\n    ok       = [k for k,v in result.items() if v[\"status\"] == \"OK\"]\n    return jsonify({\n        \"machines\": result,\n        \"count\": len(result),\n        \"summary\": {\n            \"ok\": len(ok),\n            \"warning\": len(warning),\n            \"critical\": len(critical),\n            \"critical_machines\": critical,\n            \"warning_machines\": warning\n        },\n        \"timestamp\": time.time()\n    })\n\n@app.route(\"/twin/\u003cmachine_id\u003e\")\ndef get_machine(machine_id):\n    data = r.hget(\"digital-twin:machines\", machine_id)\n    if not data:\n        return jsonify({\"error\": \"not found\"}), 404\n    return jsonify(json.loads(data))\n\n@app.route(\"/alerts\")\ndef get_alerts():\n    alerts = r.lrange(\"digital-twin:alerts\", 0, 49)\n    return jsonify({\n        \"count\": len(alerts),\n        \"alerts\": [json.loads(a) for a in alerts]\n    })\n\n@app.route(\"/health\")\ndef health():\n    last = r.get(\"digital-twin:last-update\")\n    age = time.time() - float(last) if last else 999\n    machines = r.hgetall(\"digital-twin:machines\")\n    result = {k: json.loads(v) for k, v in machines.items()}\n    critical = [k for k,v in result.items() if v[\"status\"] == \"CRITICAL\"]\n    warning  = [k for k,v in result.items() if v[\"status\"] == \"WARNING\"]\n    return jsonify({\n        \"status\": \"ok\" if age \u003c 30 else \"stale\",\n        \"data_age_seconds\": round(age, 1),\n        \"machines_monitored\": len(result),\n        \"critical\": len(critical),\n        \"warning\": len(warning)\n    })\n\nthreading.Thread(target=consume, daemon=True).start()\nlog.info(\"Digital Twin multi-metric API on port 8001\")\napp.run(host=\"0.0.0.0\", port=8001)\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"digital-twin-code","namespace":"aiot"}}
-  creationTimestamp: "2026-03-05T18:43:19Z"
+      {"apiVersion":"v1","data":{"twin.py":"import json, time, logging, threading\nfrom kafka import KafkaConsumer\nfrom flask import Flask, jsonify\nimport redis\n\nlogging.basicConfig(level=logging.INFO)\nlog = logging.getLogger(\"digital-twin\")\n\nKAFKA_BROKER = \"redpanda.aiot.svc.cluster.local:9092\"\nr = redis.Redis(host=\"redis-master.aiot.svc.cluster.local\", port=6379, db=4, decode_responses=True)\nbank = redis.Redis(host=\"redis-master.aiot.svc.cluster.local\", port=6379, db=5, decode_responses=True)\napp = Flask(__name__)\nBANK_TTL = 3600\n\nLIMITS = {\n    \"pump\":       {\"temperature\": (20,60),  \"vibration\": (0,2.0), \"pressure\": (70,115), \"rpm\": (800,1800)},\n    \"compressor\": {\"temperature\": (20,80),  \"vibration\": (0,3.0), \"pressure\": (70,150), \"rpm\": (800,2000)},\n    \"motor\":      {\"temperature\": (20,75),  \"vibration\": (0,2.5), \"pressure\": (0,999),  \"rpm\": (500,2500)},\n    \"conveyor\":   {\"temperature\": (20,50),  \"vibration\": (0,1.5), \"pressure\": (0,999),  \"rpm\": (200,1200)},\n    \"turbine\":    {\"temperature\": (20,100), \"vibration\": (0,4.0), \"pressure\": (70,200), \"rpm\": (1000,3500)},\n    \"generator\":  {\"temperature\": (20,90),  \"vibration\": (0,3.0), \"pressure\": (60,160), \"rpm\": (800,2200)},\n}\n\ndef check_metrics(machine_type, payload):\n    limits = LIMITS.get(machine_type, {})\n    violations = []\n    for metric, (mn, mx) in limits.items():\n        val = payload.get(metric)\n        if val is None: continue\n        val = float(val)\n        if val \u003e mx: violations.append({\"metric\": metric, \"value\": round(val,2), \"limit\": mx, \"type\": \"HIGH\"})\n        elif val \u003c mn: violations.append({\"metric\": metric, \"value\": round(val,2), \"limit\": mn, \"type\": \"LOW\"})\n    return violations\n\ndef get_status(violations, anomaly_score):\n    if float(anomaly_score or 0) \u003e 0.7: return \"CRITICAL\"\n    if len(violations) \u003e= 2: return \"CRITICAL\"\n    if len(violations) == 1: return \"WARNING\"\n    return \"OK\"\n\ndef write_bank(machine_id, twin, status, violations, anomaly_score, payload):\n    try:\n        bank.setex(f\"bank:machines:{machine_id}\", BANK_TTL, json.dumps(twin))\n        h = {\"temperature\": payload.get(\"temperature\"), \"vibration\": payload.get(\"vibration\"),\n             \"pressure\": payload.get(\"pressure\"), \"rpm\": payload.get(\"rpm\"),\n             \"humidity\": payload.get(\"humidity\"), \"anomaly_score\": float(anomaly_score),\n             \"status\": status, \"ts\": time.time()}\n        bank.lpush(f\"bank:history:{machine_id}\", json.dumps(h))\n        bank.ltrim(f\"bank:history:{machine_id}\", 0, 59)\n        bank.expire(f\"bank:history:{machine_id}\", BANK_TTL)\n        if status != \"OK\":\n            alert = {\"machine_id\": machine_id, \"machine_type\": twin.get(\"machine_type\",\"\"),\n                     \"status\": status, \"violations\": violations, \"anomaly_score\": float(anomaly_score),\n                     \"metrics\": twin[\"metrics\"], \"ts\": time.time()}\n            bank.lpush(\"bank:alerts\", json.dumps(alert))\n            bank.ltrim(\"bank:alerts\", 0, 99)\n            bank.expire(\"bank:alerts\", BANK_TTL)\n    except Exception as e:\n        log.error(f\"Bank write error: {e}\")\n\ndef update_bank_summary():\n    try:\n        keys = bank.keys(\"bank:machines:*\")\n        machines = {}\n        for k in keys:\n            raw = bank.get(k)\n            if raw: machines[k.replace(\"bank:machines:\",\"\")] = json.loads(raw)\n        critical = [k for k,v in machines.items() if v.get(\"status\")==\"CRITICAL\"]\n        warning = [k for k,v in machines.items() if v.get(\"status\")==\"WARNING\"]\n        ok = [k for k,v in machines.items() if v.get(\"status\")==\"OK\"]\n        s = {\"total\": len(machines), \"ok\": len(ok), \"warning\": len(warning), \"critical\": len(critical),\n             \"critical_machines\": critical, \"warning_machines\": warning, \"ok_machines\": ok, \"ts\": time.time()}\n        bank.setex(\"bank:summary\", BANK_TTL, json.dumps(s))\n    except Exception as e:\n        log.error(f\"Bank summary error: {e}\")\n\nsummary_counter = 0\ndef consume():\n    global summary_counter\n    consumer = KafkaConsumer(\"telemetry\", bootstrap_servers=KAFKA_BROKER,\n        value_deserializer=lambda x: json.loads(x.decode(\"utf-8\")),\n        group_id=\"digital-twin-group4\", auto_offset_reset=\"latest\")\n    log.info(\"Digital twin + bank consumer started\")\n    for msg in consumer:\n        try:\n            data = msg.value\n            payload = data.get(\"payload\", {})\n            machine_id = payload.get(\"machine_id\") or payload.get(\"sensor_id\", \"unknown\")\n            machine_type = payload.get(\"machine_type\") or payload.get(\"location\", \"unknown\")\n            anomaly_score = float(payload.get(\"anomaly_score\") or 0)\n            violations = check_metrics(machine_type, payload)\n            status = get_status(violations, anomaly_score)\n            twin = {\"machine_id\": machine_id, \"machine_type\": machine_type, \"status\": status,\n                    \"violations\": violations, \"metrics\": {\"temperature\": payload.get(\"temperature\"),\n                    \"vibration\": payload.get(\"vibration\"), \"pressure\": payload.get(\"pressure\"),\n                    \"rpm\": payload.get(\"rpm\"), \"humidity\": payload.get(\"humidity\"),\n                    \"anomaly_score\": anomaly_score}, \"limits\": LIMITS.get(machine_type, {}),\n                    \"topic\": data.get(\"topic\",\"\"), \"updated_at\": time.time()}\n            r.hset(\"digital-twin:machines\", machine_id, json.dumps(twin))\n            r.expire(\"digital-twin:machines\", 7200)\n            r.setex(\"digital-twin:last-update\", 60, str(time.time()))\n            prev_raw = r.hget(\"digital-twin:prev-status\", machine_id)\n            prev_status = json.loads(prev_raw)[\"status\"] if prev_raw else \"OK\"\n            if status != \"OK\":\n                if status != prev_status:\n                    alert = {\"machine_id\": machine_id, \"machine_type\": machine_type, \"status\": status,\n                             \"violations\": violations, \"anomaly_score\": anomaly_score,\n                             \"metrics\": twin[\"metrics\"], \"ts\": time.time()}\n                    r.lpush(\"digital-twin:alerts\", json.dumps(alert))\n                    r.ltrim(\"digital-twin:alerts\", 0, 49)\n                    r.expire(\"digital-twin:alerts\", 7200)\n                    log.warning(f\"ALERT {status}: {machine_id}\")\n            r.hset(\"digital-twin:prev-status\", machine_id, json.dumps({\"status\": status}))\n            r.expire(\"digital-twin:prev-status\", 7200)\n            write_bank(machine_id, twin, status, violations, anomaly_score, payload)\n            summary_counter += 1\n            if summary_counter \u003e= 50:\n                update_bank_summary()\n                summary_counter = 0\n        except Exception as e:\n            log.error(f\"Consume error: {e}\")\n\n@app.route(\"/twin\")\ndef get_twin():\n    machines = r.hgetall(\"digital-twin:machines\")\n    result = {k: json.loads(v) for k, v in machines.items()}\n    critical = [k for k,v in result.items() if v[\"status\"]==\"CRITICAL\"]\n    warning = [k for k,v in result.items() if v[\"status\"]==\"WARNING\"]\n    ok = [k for k,v in result.items() if v[\"status\"]==\"OK\"]\n    return jsonify({\"machines\": result, \"count\": len(result),\n        \"summary\": {\"ok\": len(ok), \"warning\": len(warning), \"critical\": len(critical),\n                    \"critical_machines\": critical, \"warning_machines\": warning}, \"timestamp\": time.time()})\n\n@app.route(\"/twin/\u003cmachine_id\u003e\")\ndef get_machine(machine_id):\n    data = r.hget(\"digital-twin:machines\", machine_id)\n    if not data: return jsonify({\"error\": \"not found\"}), 404\n    return jsonify(json.loads(data))\n\n@app.route(\"/alerts\")\ndef get_alerts():\n    alerts = r.lrange(\"digital-twin:alerts\", 0, 49)\n    return jsonify({\"count\": len(alerts), \"alerts\": [json.loads(a) for a in alerts]})\n\n@app.route(\"/bank/summary\")\ndef bank_summary():\n    raw = bank.get(\"bank:summary\")\n    if not raw: return jsonify({\"error\": \"no data\"}), 404\n    return jsonify(json.loads(raw))\n\n@app.route(\"/bank/machine/\u003cmachine_id\u003e\")\ndef bank_machine(machine_id):\n    raw = bank.get(f\"bank:machines:{machine_id}\")\n    if not raw: return jsonify({\"error\": \"not found\"}), 404\n    return jsonify(json.loads(raw))\n\n@app.route(\"/bank/history/\u003cmachine_id\u003e\")\ndef bank_history(machine_id):\n    entries = bank.lrange(f\"bank:history:{machine_id}\", 0, 59)\n    return jsonify({\"machine_id\": machine_id, \"count\": len(entries), \"history\": [json.loads(e) for e in entries]})\n\n@app.route(\"/bank/alerts\")\ndef bank_alerts():\n    alerts = bank.lrange(\"bank:alerts\", 0, 99)\n    return jsonify({\"count\": len(alerts), \"alerts\": [json.loads(a) for a in alerts]})\n\n@app.route(\"/bank/all\")\ndef bank_all():\n    keys = bank.keys(\"bank:machines:*\")\n    machines = {}\n    for k in keys:\n        raw = bank.get(k)\n        if raw: machines[k.replace(\"bank:machines:\",\"\")] = json.loads(raw)\n    raw_s = bank.get(\"bank:summary\")\n    summary = json.loads(raw_s) if raw_s else {}\n    alerts = bank.lrange(\"bank:alerts\", 0, 19)\n    return jsonify({\"machines\": machines, \"summary\": summary,\n                    \"recent_alerts\": [json.loads(a) for a in alerts], \"ts\": time.time()})\n\n@app.route(\"/health\")\ndef health():\n    last = r.get(\"digital-twin:last-update\")\n    age = time.time() - float(last) if last else 999\n    machines = r.hgetall(\"digital-twin:machines\")\n    result = {k: json.loads(v) for k, v in machines.items()}\n    critical = [k for k,v in result.items() if v[\"status\"]==\"CRITICAL\"]\n    warning = [k for k,v in result.items() if v[\"status\"]==\"WARNING\"]\n    bk = len(bank.keys(\"bank:machines:*\"))\n    return jsonify({\"status\": \"ok\" if age \u003c 30 else \"stale\", \"data_age_seconds\": round(age,1),\n                    \"machines_monitored\": len(result), \"bank_machines\": bk,\n                    \"critical\": len(critical), \"warning\": len(warning)})\n\nthreading.Thread(target=consume, daemon=True).start()\nlog.info(\"Digital Twin v2 + Bank on port 8001\")\napp.run(host=\"0.0.0.0\", port=8001)\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"digital-twin-code","namespace":"aiot"}}
   name: digital-twin-code
   namespace: aiot
-  resourceVersion: "804695"
-  uid: 37547b85-a374-4765-a5e0-90e761953c72

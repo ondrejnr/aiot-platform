@@ -13,8 +13,5 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"v1","data":{"kubernetes.yml":"- module: kubernetes\n  metricsets: [node, pod, container, system, volume]\n  period: 10s\n  hosts: [\"https://${NODE_NAME}:10250\"]\n  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n  ssl.verification_mode: \"none\"\n  add_metadata: true"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"metricbeat-modules","namespace":"default"}}
-  creationTimestamp: "2026-03-04T00:34:28Z"
   name: metricbeat-modules
   namespace: default
-  resourceVersion: "432775"
-  uid: 1287caaa-a86e-4638-9b58-deeab61954cd

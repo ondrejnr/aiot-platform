@@ -17,8 +17,5 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"v1","data":{"CONTENT_LENGTH":"$content_length","CONTENT_TYPE":"$content_type","GATEWAY_INTERFACE":"CGI/1.1","QUERY_STRING":"$query_string","REMOTE_ADDR":"$remote_addr","REMOTE_PORT":"$remote_port","REQUEST_METHOD":"$request_method","SCRIPT_FILENAME":"/var/www/html$fastcgi_script_name","SERVER_ADDR":"$server_addr","SERVER_NAME":"$server_name","SERVER_PORT":"$server_port","SERVER_PROTOCOL":"$server_protocol"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"fastcgi-config","namespace":"default"}}
-  creationTimestamp: "2026-03-01T21:36:31Z"
   name: fastcgi-config
   namespace: default
-  resourceVersion: "46952"
-  uid: 315739d2-c710-4f62-a4ac-90757953e079

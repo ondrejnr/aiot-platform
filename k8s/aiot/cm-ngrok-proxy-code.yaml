@@ -35,8 +35,5 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"v1","data":{"proxy.py":"from fastapi import FastAPI, Request\nimport requests as req\nimport json, os\n\napp = FastAPI(title=\"Ngrok RAG Proxy\")\nNGROK_URL = os.environ.get(\"NGROK_TARGET\", \"http://rag-api-svc.aiot.svc.cluster.local:7000\")\nMODEL_NAME = \"ngrok-rag-aiot\"\n\n@app.get(\"/v1/models\")\ndef models():\n    return {\"object\": \"list\", \"data\": [{\"id\": MODEL_NAME, \"object\": \"model\", \"owned_by\": \"ngrok-proxy\"}]}\n\n@app.post(\"/v1/chat/completions\")\nasync def chat(request: Request):\n    body = await request.json()\n    body[\"model\"] = \"cerebrus-aiot\"\n    try:\n        r = req.post(f\"{NGROK_URL}/v1/chat/completions\", json=body, timeout=60)\n        data = r.json()\n        data[\"model\"] = MODEL_NAME\n        return data\n    except Exception as e:\n        return {\"id\": \"err\", \"object\": \"chat.completion\", \"model\": MODEL_NAME,\n                \"choices\": [{\"index\": 0, \"message\": {\"role\": \"assistant\", \"content\": f\"Ngrok proxy error: {e}\"}, \"finish_reason\": \"stop\"}],\n                \"usage\": {\"prompt_tokens\": 0, \"completion_tokens\": 0, \"total_tokens\": 0}}\n\n@app.get(\"/health\")\ndef health():\n    return {\"status\": \"ok\", \"target\": NGROK_URL, \"model\": MODEL_NAME}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"ngrok-proxy-code","namespace":"aiot"}}
-  creationTimestamp: "2026-03-08T07:35:32Z"
   name: ngrok-proxy-code
   namespace: aiot
-  resourceVersion: "1277923"
-  uid: df04e02c-648d-4f94-b74a-d443b3e0f965

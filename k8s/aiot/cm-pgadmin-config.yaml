@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  config_system.py: |
+    DATA_DIR = "/var/lib/pgadmin"
+    MAX_TABLE_COUNT = 500
+    TABLE_ROW_COUNT_THRESHOLD = 2000
+    SESSION_EXPIRATION_TIME = 1
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"config_system.py":"DATA_DIR = \"/var/lib/pgadmin\"\nMAX_TABLE_COUNT = 500\nTABLE_ROW_COUNT_THRESHOLD = 2000\nSESSION_EXPIRATION_TIME = 1\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"pgadmin-config","namespace":"aiot"}}
+  name: pgadmin-config
+  namespace: aiot

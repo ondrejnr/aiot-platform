@@ -3,13 +3,8 @@ kind: StatefulSet
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"name":"postgres","namespace":"aiot"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"postgres"}},"serviceName":"postgres","template":{"metadata":{"labels":{"app":"postgres"}},"spec":{"containers":[{"env":[{"name":"POSTGRES_DB","value":"aiot"},{"name":"POSTGRES_USER","value":"aiot_admin"},{"name":"POSTGRES_PASSWORD","value":"AioT2026!Prod"}],"image":"postgres:16","name":"postgres","ports":[{"containerPort":5432}],"resources":{"limits":{"cpu":"1","memory":"512Mi"},"requests":{"cpu":"200m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/var/lib/postgresql/data","name":"postgres-data"},{"mountPath":"/docker-entrypoint-initdb.d","name":"init-sql"}]}],"volumes":[{"configMap":{"name":"postgres-init"},"name":"init-sql"}]}},"volumeClaimTemplates":[{"metadata":{"name":"postgres-data"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"5Gi"}}}}]}}
-  creationTimestamp: "2026-03-05T16:23:53Z"
-  generation: 1
   name: postgres
   namespace: aiot
-  resourceVersion: "785411"
-  uid: 3e891c48-96a1-4607-8db8-835e3e16aa29
 spec:
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain
@@ -23,7 +18,6 @@ spec:
   serviceName: postgres
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: postgres
     spec:
@@ -55,6 +49,8 @@ spec:
           name: postgres-data
         - mountPath: /docker-entrypoint-initdb.d
           name: init-sql
+        - mountPath: /dev/shm
+          name: dshm
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -65,32 +61,14 @@ spec:
           defaultMode: 420
           name: postgres-init
         name: init-sql
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 256Mi
+        name: dshm
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-data-longhorn
   updateStrategy:
     rollingUpdate:
       partition: 0
     type: RollingUpdate
-  volumeClaimTemplates:
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      creationTimestamp: null
-      name: postgres-data
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 5Gi
-      volumeMode: Filesystem
-    status:
-      phase: Pending
-status:
-  availableReplicas: 1
-  collisionCount: 0
-  currentReplicas: 1
-  currentRevision: postgres-5d8d5b6887
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updateRevision: postgres-5d8d5b6887
-  updatedReplicas: 1

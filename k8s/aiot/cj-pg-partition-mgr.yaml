@@ -1,23 +1,17 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  creationTimestamp: "2026-03-09T12:44:48Z"
-  generation: 1
   name: pg-partition-mgr
   namespace: aiot
-  resourceVersion: "1442859"
-  uid: 89ed0a0a-a6a5-43e8-8dd5-55381a26f25b
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1
   jobTemplate:
     metadata:
-      creationTimestamp: null
     spec:
       activeDeadlineSeconds: 60
       template:
         metadata:
-          creationTimestamp: null
         spec:
           containers:
           - args:
@@ -77,5 +71,3 @@ spec:
   schedule: 5 * * * *
   successfulJobsHistoryLimit: 3
   suspend: false
-status:
-  lastSuccessfulTime: "2026-03-09T12:50:34Z"

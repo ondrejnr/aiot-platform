@@ -3,7 +3,8 @@ kind: Deployment
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-  name: api-gateway
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"sensor-simulator","namespace":"aiot"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"sensor-simulator"}},"template":{"metadata":{"labels":{"app":"sensor-simulator"}},"spec":{"containers":[{"args":["pip install paho-mqtt --quiet \u0026\u0026 python /code/sim.py"],"command":["/bin/sh","-c"],"image":"python:3.11-slim","name":"simulator","resources":{"requests":{"cpu":"50m","memory":"64Mi"}},"volumeMounts":[{"mountPath":"/code","name":"code"}]}],"volumes":[{"configMap":{"name":"sensor-sim"},"name":"code"}]}}}}
+  name: sensor-simulator
   namespace: aiot
 spec:
   progressDeadlineSeconds: 600
@@ -11,7 +12,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: api-gateway
+      app: sensor-simulator
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -20,42 +21,29 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/restartedAt: "2026-03-10T14:03:32Z"
+        kubectl.kubernetes.io/restartedAt: "2026-03-10T08:46:54Z"
       labels:
-        app: api-gateway
+        app: sensor-simulator
     spec:
       containers:
       - args:
-        - pip install fastapi uvicorn qdrant-client requests redis --quiet && cp /code/gateway.py
-          /tmp/gateway.py && uvicorn gateway:app --host 0.0.0.0 --port 8080 --app-dir
-          /tmp
+        - pip install paho-mqtt --quiet && python /code/sim.py
         command:
         - /bin/sh
         - -c
-        env:
-        - name: CEREBRAS_API_KEY
-          value: csk-ee2ncrfckknd3d55ee3eeny2xfpv8y24hwy62fpxvvxcefr5
         image: python:3.11-slim
         imagePullPolicy: IfNotPresent
-        name: api-gateway
-        ports:
-        - containerPort: 8080
-          protocol: TCP
+        name: simulator
         resources:
-          limits:
-            cpu: 500m
-            memory: 512Mi
           requests:
-            cpu: 100m
-            memory: 256Mi
+            cpu: 50m
+            memory: 64Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /code
           name: code
       dnsPolicy: ClusterFirst
-      nodeSelector:
-        kubernetes.io/hostname: instance-worker-02
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
@@ -63,5 +51,5 @@ spec:
       volumes:
       - configMap:
           defaultMode: 420
-          name: api-gateway-code
+          name: sensor-sim
         name: code

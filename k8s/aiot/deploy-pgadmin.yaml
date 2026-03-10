@@ -2,15 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "1"
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"pgadmin","namespace":"aiot"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"pgadmin"}},"template":{"metadata":{"labels":{"app":"pgadmin"}},"spec":{"containers":[{"env":[{"name":"PGADMIN_DEFAULT_EMAIL","value":"admin@aiot.com"},{"name":"PGADMIN_DEFAULT_PASSWORD","value":"admin123"},{"name":"PGADMIN_SERVER_JSON_FILE","value":"/pgadmin4/servers/servers.json"}],"image":"dpage/pgadmin4:latest","name":"pgadmin","ports":[{"containerPort":80}],"resources":{"limits":{"cpu":"500m","memory":"400Mi"},"requests":{"cpu":"100m","memory":"200Mi"}},"volumeMounts":[{"mountPath":"/pgadmin4/servers","name":"servers","readOnly":true}]}],"volumes":[{"configMap":{"name":"pgadmin-servers"},"name":"servers"}]}}}}
-  creationTimestamp: "2026-03-05T16:23:58Z"
-  generation: 1
   name: pgadmin
   namespace: aiot
-  resourceVersion: "785446"
-  uid: 6f05b8f3-9d54-4a16-91a1-c39ac471a2c7
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -25,7 +20,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-03-09T18:26:18Z"
       labels:
         app: pgadmin
     spec:
@@ -37,7 +33,9 @@ spec:
           value: admin123
         - name: PGADMIN_SERVER_JSON_FILE
           value: /pgadmin4/servers/servers.json
-        image: dpage/pgadmin4:latest
+        - name: GUNICORN_TIMEOUT
+          value: "86400"
+        image: dpage/pgadmin4:8.14
         imagePullPolicy: Always
         name: pgadmin
         ports:
@@ -45,17 +43,21 @@ spec:
           protocol: TCP
         resources:
           limits:
-            cpu: 500m
-            memory: 400Mi
+            cpu: 200m
+            memory: 1Gi
           requests:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 50m
+            memory: 512Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /pgadmin4/servers
           name: servers
           readOnly: true
+        - mountPath: /pgadmin4/config_system.py
+          name: pgadmin-config
+          readOnly: true
+          subPath: config_system.py
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -66,22 +68,7 @@ spec:
           defaultMode: 420
           name: pgadmin-servers
         name: servers
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2026-03-05T16:24:00Z"
-    lastUpdateTime: "2026-03-05T16:24:00Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2026-03-05T16:23:58Z"
-    lastUpdateTime: "2026-03-05T16:24:00Z"
-    message: ReplicaSet "pgadmin-56bcddddb6" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
+      - configMap:
+          defaultMode: 420
+          name: pgadmin-config
+        name: pgadmin-config

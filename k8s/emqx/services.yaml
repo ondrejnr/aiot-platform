@@ -6,14 +6,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"emqx","namespace":"emqx"},"spec":{"ports":[{"name":"mqtt","port":1883,"targetPort":1883},{"name":"mqtt-ssl","port":8883,"targetPort":8883},{"name":"ws","port":8083,"targetPort":8083},{"name":"wss","port":8084,"targetPort":8084},{"name":"dashboard","port":18083,"targetPort":18083}],"selector":{"app":"emqx"},"type":"ClusterIP"}}
-    creationTimestamp: "2026-03-05T16:43:19Z"
     name: emqx
     namespace: emqx
-    resourceVersion: "787855"
-    uid: 5f6d2a38-3b7a-4744-81b1-b1255dc0c7be
   spec:
-    clusterIP: 10.101.116.107
-    clusterIPs:
     - 10.101.116.107
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -52,14 +47,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"emqx-dashboard","namespace":"emqx"},"spec":{"ports":[{"name":"dashboard","port":18083,"targetPort":18083}],"selector":{"app":"emqx"},"sessionAffinity":"ClientIP","sessionAffinityConfig":{"clientIP":{"timeoutSeconds":3600}},"type":"ClusterIP"}}
-    creationTimestamp: "2026-03-05T17:05:24Z"
     name: emqx-dashboard
     namespace: emqx
-    resourceVersion: "791288"
-    uid: dd9bcc1b-622c-46d2-90cd-170e3cd3b285
   spec:
-    clusterIP: 10.105.30.186
-    clusterIPs:
     - 10.105.30.186
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -85,14 +75,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"emqx-headless","namespace":"emqx"},"spec":{"clusterIP":"None","ports":[{"name":"ekka","port":4370,"targetPort":4370},{"name":"mqtt","port":1883,"targetPort":1883},{"name":"dashboard","port":18083,"targetPort":18083}],"selector":{"app":"emqx"}}}
-    creationTimestamp: "2026-03-05T16:58:38Z"
     name: emqx-headless
     namespace: emqx
-    resourceVersion: "790038"
-    uid: aa7b658c-3692-4022-bcf5-a44c07dd44d0
   spec:
-    clusterIP: None
-    clusterIPs:
     - None
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -123,14 +108,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"emqx-mqtt-external","namespace":"emqx"},"spec":{"ports":[{"name":"mqtt","nodePort":31883,"port":1883,"targetPort":1883},{"name":"ws","nodePort":31083,"port":8083,"targetPort":8083}],"selector":{"app":"emqx"},"type":"NodePort"}}
-    creationTimestamp: "2026-03-05T16:43:19Z"
     name: emqx-mqtt-external
     namespace: emqx
-    resourceVersion: "787861"
-    uid: 156eccf6-b005-4e99-93bb-d93055fb4f6e
   spec:
-    clusterIP: 10.107.91.235
-    clusterIPs:
     - 10.107.91.235
     externalTrafficPolicy: Cluster
     internalTrafficPolicy: Cluster
@@ -156,4 +136,3 @@ items:
     loadBalancer: {}
 kind: List
 metadata:
-  resourceVersion: ""

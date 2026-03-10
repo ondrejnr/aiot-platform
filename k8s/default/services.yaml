@@ -6,14 +6,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"elasticsearch-svc","namespace":"default"},"spec":{"ports":[{"port":9200,"targetPort":9200}],"selector":{"app":"elasticsearch"}}}
-    creationTimestamp: "2026-03-01T22:24:57Z"
     name: elasticsearch-svc
     namespace: default
-    resourceVersion: "49843"
-    uid: 6131c508-c3d7-4d79-aede-3bc1a2f95e10
   spec:
-    clusterIP: 10.97.69.109
-    clusterIPs:
     - 10.97.69.109
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -35,14 +30,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"grafana-svc","namespace":"default"},"spec":{"ports":[{"port":3000,"targetPort":3000}],"selector":{"app":"grafana"}}}
-    creationTimestamp: "2026-03-01T22:21:32Z"
     name: grafana-svc
     namespace: default
-    resourceVersion: "49474"
-    uid: aad279af-4e7c-4a4a-b856-0bf72235e9c1
   spec:
-    clusterIP: 10.99.168.152
-    clusterIPs:
     - 10.99.168.152
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -64,14 +54,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"kibana-svc","namespace":"default"},"spec":{"ports":[{"port":5601,"targetPort":5601}],"selector":{"app":"kibana"}}}
-    creationTimestamp: "2026-03-01T22:21:32Z"
     name: kibana-svc
     namespace: default
-    resourceVersion: "433795"
-    uid: 92740f7b-90e8-4536-924f-6e47c78f69d8
   spec:
-    clusterIP: 10.106.163.171
-    clusterIPs:
     - 10.106.163.171
     externalTrafficPolicy: Cluster
     internalTrafficPolicy: Cluster
@@ -92,17 +77,12 @@ items:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: "2026-03-01T13:01:04Z"
     labels:
       component: apiserver
       provider: kubernetes
     name: kubernetes
     namespace: default
-    resourceVersion: "195"
-    uid: f3512e71-26e5-4e0a-b392-dd64fb71dfb1
   spec:
-    clusterIP: 10.96.0.1
-    clusterIPs:
     - 10.96.0.1
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -123,14 +103,9 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"lamp-service","namespace":"default"},"spec":{"ports":[{"name":"php","port":9000,"targetPort":9000},{"name":"mysql","port":3306,"targetPort":3306}],"selector":{"app":"lamp"}}}
-    creationTimestamp: "2026-03-01T21:33:50Z"
     name: lamp-service
     namespace: default
-    resourceVersion: "48188"
-    uid: daec84cf-6b30-4b45-ba89-090060449db5
   spec:
-    clusterIP: 10.106.58.52
-    clusterIPs:
     - 10.106.58.52
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -156,42 +131,10 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"open-webui-svc","namespace":"default"},"spec":{"ports":[{"port":8080,"targetPort":8080}]}}
-    creationTimestamp: "2026-03-01T13:22:14Z"
-    name: open-webui-svc
-    namespace: default
-    resourceVersion: "2423"
-    uid: ffaadf26-67cb-4ca1-b350-51a097945a1a
-  spec:
-    clusterIP: 10.97.240.80
-    clusterIPs:
-    - 10.97.240.80
-    internalTrafficPolicy: Cluster
-    ipFamilies:
-    - IPv4
-    ipFamilyPolicy: SingleStack
-    ports:
-    - port: 8080
-      protocol: TCP
-      targetPort: 8080
-    sessionAffinity: None
-    type: ClusterIP
-  status:
-    loadBalancer: {}
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"prometheus-svc","namespace":"default"},"spec":{"ports":[{"port":9090,"targetPort":9090}],"selector":{"app":"prometheus"}}}
-    creationTimestamp: "2026-03-01T22:21:43Z"
     name: prometheus-svc
     namespace: default
-    resourceVersion: "49515"
-    uid: 4bdc263c-cefa-4e36-b22c-83491fecc8de
   spec:
-    clusterIP: 10.98.33.73
-    clusterIPs:
     - 10.98.33.73
     internalTrafficPolicy: Cluster
     ipFamilies:
@@ -207,64 +150,5 @@ items:
     type: ClusterIP
   status:
     loadBalancer: {}
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"ws-proxy-svc","namespace":"default"},"spec":{"ports":[{"port":8080,"targetPort":8080}],"selector":{"app":"ws-proxy"}}}
-    creationTimestamp: "2026-03-04T14:35:49Z"
-    name: ws-proxy-svc
-    namespace: default
-    resourceVersion: "546074"
-    uid: 1b3b2fbc-1f31-46d2-90f3-c820823bd718
-  spec:
-    clusterIP: 10.96.250.89
-    clusterIPs:
-    - 10.96.250.89
-    internalTrafficPolicy: Cluster
-    ipFamilies:
-    - IPv4
-    ipFamilyPolicy: SingleStack
-    ports:
-    - port: 8080
-      protocol: TCP
-      targetPort: 8080
-    selector:
-      app: ws-proxy
-    sessionAffinity: None
-    type: ClusterIP
-  status:
-    loadBalancer: {}
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"xpra-svc","namespace":"default"},"spec":{"ports":[{"port":14501,"targetPort":14501}],"selector":{"app":"xpra-bridge"}}}
-    creationTimestamp: "2026-03-04T12:52:38Z"
-    name: xpra-svc
-    namespace: default
-    resourceVersion: "533933"
-    uid: d602d53f-afdb-4deb-9694-b747078e68c8
-  spec:
-    clusterIP: 10.100.242.159
-    clusterIPs:
-    - 10.100.242.159
-    internalTrafficPolicy: Cluster
-    ipFamilies:
-    - IPv4
-    ipFamilyPolicy: SingleStack
-    ports:
-    - port: 14501
-      protocol: TCP
-      targetPort: 14501
-    selector:
-      app: xpra-bridge
-    sessionAffinity: None
-    type: ClusterIP
-  status:
-    loadBalancer: {}
 kind: List
 metadata:
-  resourceVersion: ""

@@ -1,0 +1,17 @@
+[Unit]
+Description=Ngrok tunnel for RAG API
+After=network-online.target docker.service kubelet.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/bash -c 'for i in $(seq 1 60); do curl -sf http://localhost:8080/api/config >/dev/null 2>&1 && exit 0; sleep 5; done; echo "WebUI not ready but starting anyway"'
+ExecStart=/usr/local/bin/ngrok http http://10.164.0.3:31700
+ExecStartPost=/usr/local/bin/ngrok-update-webui.sh
+Restart=always
+RestartSec=10
+Environment=HOME=/root
+
+[Install]
+WantedBy=multi-user.target

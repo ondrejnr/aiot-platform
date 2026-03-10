@@ -4,12 +4,8 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"name":"emqx","namespace":"emqx"},"spec":{"podManagementPolicy":"Parallel","replicas":3,"selector":{"matchLabels":{"app":"emqx"}},"serviceName":"emqx-headless","template":{"metadata":{"labels":{"app":"emqx"}},"spec":{"containers":[{"env":[{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"EMQX_NODE__NAME","value":"$(POD_NAME)@$(POD_NAME).emqx-headless.emqx.svc.cluster.local"},{"name":"EMQX_CLUSTER__DISCOVERY_STRATEGY","value":"static"},{"name":"EMQX_CLUSTER__STATIC__SEEDS","value":"[emqx-0@emqx-0.emqx-headless.emqx.svc.cluster.local,emqx-1@emqx-1.emqx-headless.emqx.svc.cluster.local,emqx-2@emqx-2.emqx-headless.emqx.svc.cluster.local]"},{"name":"EMQX_DASHBOARD__DEFAULT_USERNAME","value":"admin"},{"name":"EMQX_DASHBOARD__DEFAULT_PASSWORD","value":"AioT2026Admin"},{"name":"EMQX_NODE__COOKIE","value":"emqx-aiot-secret-cookie-2026"}],"image":"emqx/emqx:5.5.1","livenessProbe":{"httpGet":{"path":"/status","port":18083},"initialDelaySeconds":30,"periodSeconds":15},"name":"emqx","ports":[{"containerPort":1883,"name":"mqtt"},{"containerPort":8883,"name":"mqtt-ssl"},{"containerPort":8083,"name":"ws"},{"containerPort":8084,"name":"wss"},{"containerPort":18083,"name":"dashboard"},{"containerPort":4370,"name":"ekka"}],"readinessProbe":{"httpGet":{"path":"/status","port":18083},"initialDelaySeconds":15,"periodSeconds":10},"resources":{"limits":{"cpu":"1","memory":"1Gi"},"requests":{"cpu":"200m","memory":"512Mi"}}}]}}}}
-  creationTimestamp: "2026-03-05T17:12:13Z"
-  generation: 1
   name: emqx
   namespace: emqx
-  resourceVersion: "792422"
-  uid: 675a7e09-0068-4a98-a249-760e200f4392
 spec:
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain
@@ -23,7 +19,6 @@ spec:
   serviceName: emqx-headless
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: emqx
     spec:
@@ -106,13 +101,3 @@ spec:
     rollingUpdate:
       partition: 0
     type: RollingUpdate
-status:
-  availableReplicas: 3
-  collisionCount: 0
-  currentReplicas: 3
-  currentRevision: emqx-b5c8f6c95
-  observedGeneration: 1
-  readyReplicas: 3
-  replicas: 3
-  updateRevision: emqx-b5c8f6c95
-  updatedReplicas: 3

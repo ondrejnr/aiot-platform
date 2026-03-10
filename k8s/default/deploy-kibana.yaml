@@ -2,15 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "1"
+    deployment.kubernetes.io/revision: "6"
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"kibana","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"kibana"}},"template":{"metadata":{"labels":{"app":"kibana"}},"spec":{"containers":[{"env":[{"name":"ELASTICSEARCH_HOSTS","value":"http://elasticsearch-svc:9200"}],"image":"kibana:8.12.0","name":"kibana","ports":[{"containerPort":5601}]}]}}}}
-  creationTimestamp: "2026-03-01T22:21:32Z"
-  generation: 1
   name: kibana
   namespace: default
-  resourceVersion: "581939"
-  uid: 9d1ac2a0-dee3-4bb3-83b5-ed87c1253764
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -25,7 +21,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-03-10T09:53:43Z"
       labels:
         app: kibana
     spec:
@@ -43,26 +40,13 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/hostname: instance-worker-02
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2026-03-01T22:21:32Z"
-    lastUpdateTime: "2026-03-01T22:22:08Z"
-    message: ReplicaSet "kibana-79c4bbfdbf" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  - lastTransitionTime: "2026-03-04T19:24:03Z"
-    lastUpdateTime: "2026-03-04T19:24:03Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists

@@ -2,18 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "1"
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"digital-twin","namespace":"aiot"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"digital-twin"}},"template":{"metadata":{"labels":{"app":"digital-twin"}},"spec":{"containers":[{"command":["sh","-c","pip install flask kafka-python redis --quiet \u0026\u0026 python /code/twin.py"],"image":"python:3.11-slim","name":"digital-twin","ports":[{"containerPort":8001}],"resources":{"limits":{"cpu":"300m","memory":"256Mi"},"requests":{"cpu":"50m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/code","name":"code"}]}],"initContainers":[{"command":["sh","-c","until nc -z redis-master.aiot.svc.cluster.local 6379; do echo waiting-redis; sleep 2; done"],"image":"busybox","name":"wait-for-redis"},{"command":["sh","-c","until nc -z redpanda.aiot.svc.cluster.local 9092; do echo waiting-redpanda; sleep 2; done"],"image":"busybox","name":"wait-for-redpanda"}],"volumes":[{"configMap":{"name":"digital-twin-code"},"name":"code"}]}}}}
-  creationTimestamp: "2026-03-05T18:43:20Z"
-  generation: 1
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"digital-twin","namespace":"aiot"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"digital-twin"}},"template":{"metadata":{"labels":{"app":"digital-twin"}},"spec":{"containers":[{"command":["python3","/code/twin.py"],"env":[{"name":"PYTHONPATH","value":"/shared"}],"image":"python:3.11-slim","name":"digital-twin","ports":[{"containerPort":8001}],"volumeMounts":[{"mountPath":"/code","name":"code"},{"mountPath":"/shared","name":"packages"}]}],"initContainers":[{"command":["sh","-c","until nc -z redis-master.aiot.svc.cluster.local 6379; do sleep 2; done"],"image":"busybox","name":"wait-for-redis"},{"command":["sh","-c","until nc -z redpanda.aiot.svc.cluster.local 9092; do sleep 2; done"],"image":"busybox","name":"wait-for-redpanda"},{"command":["sh","-c","pip install kafka-python redis flask lz4 \u0026\u0026 cp -r /usr/local/lib/python3.11/site-packages/* /shared/"],"image":"python:3.11-slim","name":"pip-install","volumeMounts":[{"mountPath":"/shared","name":"packages"}]}],"volumes":[{"configMap":{"name":"digital-twin-code"},"name":"code"},{"emptyDir":{},"name":"packages"}]}}}}
   name: digital-twin
   namespace: aiot
-  resourceVersion: "804745"
-  uid: 2a87791f-94e9-4675-a70b-2ae9993dd3f0
 spec:
   progressDeadlineSeconds: 600
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -25,15 +20,27 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-03-10T09:13:42Z"
       labels:
         app: digital-twin
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: digital-twin
+              topologyKey: kubernetes.io/hostname
+            weight: 100
       containers:
       - command:
-        - sh
-        - -c
-        - pip install flask kafka-python redis --quiet && python /code/twin.py
+        - python3
+        - /code/twin.py
+        env:
+        - name: PYTHONPATH
+          value: /shared
         image: python:3.11-slim
         imagePullPolicy: IfNotPresent
         name: digital-twin
@@ -42,23 +49,24 @@ spec:
           protocol: TCP
         resources:
           limits:
-            cpu: 300m
+            cpu: 1500m
             memory: 256Mi
           requests:
-            cpu: 50m
+            cpu: 250m
             memory: 128Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /code
           name: code
+        - mountPath: /shared
+          name: packages
       dnsPolicy: ClusterFirst
       initContainers:
       - command:
         - sh
         - -c
-        - until nc -z redis-master.aiot.svc.cluster.local 6379; do echo waiting-redis;
-          sleep 2; done
+        - until nc -z redis-master.aiot.svc.cluster.local 6379; do sleep 2; done
         image: busybox
         imagePullPolicy: Always
         name: wait-for-redis
@@ -68,14 +76,27 @@ spec:
       - command:
         - sh
         - -c
-        - until nc -z redpanda.aiot.svc.cluster.local 9092; do echo waiting-redpanda;
-          sleep 2; done
+        - until nc -z redpanda.aiot.svc.cluster.local 9092; do sleep 2; done
         image: busybox
         imagePullPolicy: Always
         name: wait-for-redpanda
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+      - command:
+        - sh
+        - -c
+        - pip install kafka-python redis flask lz4 && cp -r /usr/local/lib/python3.11/site-packages/*
+          /shared/
+        image: python:3.11-slim
+        imagePullPolicy: IfNotPresent
+        name: pip-install
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /shared
+          name: packages
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
@@ -83,24 +104,7 @@ spec:
       volumes:
       - configMap:
           defaultMode: 420
-          name: digital-twin-code
+          name: digital-twin-code-v3
         name: code
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2026-03-05T18:43:23Z"
-    lastUpdateTime: "2026-03-05T18:43:23Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2026-03-05T18:43:20Z"
-    lastUpdateTime: "2026-03-05T18:43:23Z"
-    message: ReplicaSet "digital-twin-59f7855dc5" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
+      - emptyDir: {}
+        name: packages

@@ -21,8 +21,5 @@ metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"v1","data":{"prometheus.yml":"global:\n  scrape_interval: 15s\nscrape_configs:\n  - job_name: 'kubernetes-nodes'\n    static_configs:\n      - targets: ['10.164.0.3:9100']\n  - job_name: 'ollama'\n    static_configs:\n      - targets: ['10.164.0.3:11434']\n  - job_name: 'redis'\n    static_configs:\n      - targets: ['10.164.0.3:9121']\n  - job_name: 'ai-accelerator'\n    static_configs:\n      - targets: ['10.164.0.3:5000']\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"prometheus-config","namespace":"default"}}
-  creationTimestamp: "2026-03-01T22:21:43Z"
   name: prometheus-config
   namespace: default
-  resourceVersion: "49523"
-  uid: cfd2692d-f09a-49e1-9078-2ba8707359aa

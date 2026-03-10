@@ -2,15 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "5"
+    deployment.kubernetes.io/revision: "8"
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"lamp-deployment","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"lamp"}},"template":{"metadata":{"labels":{"app":"lamp"}},"spec":{"containers":[{"image":"nginx:alpine","name":"nginx","ports":[{"containerPort":80}],"volumeMounts":[{"mountPath":"/var/www/html","name":"www-storage"},{"mountPath":"/etc/nginx/conf.d/default.conf","name":"nginx-config","subPath":"default.conf"}]},{"image":"php:8.2-fpm","name":"php","volumeMounts":[{"mountPath":"/var/www/html","name":"www-storage"}]},{"env":[{"name":"MYSQL_ROOT_PASSWORD","value":"AdminPass123"}],"image":"mysql:8.0","name":"mysql","volumeMounts":[{"mountPath":"/var/lib/mysql","name":"mysql-storage"}]}],"volumes":[{"name":"www-storage","persistentVolumeClaim":{"claimName":"www-pvc"}},{"name":"mysql-storage","persistentVolumeClaim":{"claimName":"mysql-pvc"}},{"configMap":{"name":"nginx-lamp-config"},"name":"nginx-config"}]}}}}
-  creationTimestamp: "2026-03-01T21:33:50Z"
-  generation: 5
   name: lamp-deployment
   namespace: default
-  resourceVersion: "581604"
-  uid: d86eafa1-a39e-4668-ae0c-8776c1fd09f4
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -27,7 +23,6 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/restartedAt: "2026-03-01T22:15:17Z"
-      creationTimestamp: null
       labels:
         app: lamp
     spec:
@@ -76,30 +71,11 @@ spec:
       volumes:
       - name: www-storage
         persistentVolumeClaim:
-          claimName: www-pvc
+          claimName: www-pvc-longhorn
       - name: mysql-storage
         persistentVolumeClaim:
-          claimName: mysql-pvc
+          claimName: mysql-pvc-longhorn
       - configMap:
           defaultMode: 420
           name: nginx-lamp-config
         name: nginx-config
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2026-03-01T21:33:50Z"
-    lastUpdateTime: "2026-03-01T22:15:19Z"
-    message: ReplicaSet "lamp-deployment-76c8bcc778" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  - lastTransitionTime: "2026-03-04T19:23:55Z"
-    lastUpdateTime: "2026-03-04T19:23:55Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  observedGeneration: 5
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1

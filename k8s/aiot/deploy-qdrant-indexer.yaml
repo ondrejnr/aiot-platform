@@ -2,15 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "6"
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"qdrant-indexer","namespace":"aiot"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"qdrant-indexer"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-03-03T14:33:26Z"},"creationTimestamp":null,"labels":{"app":"qdrant-indexer"}},"spec":{"containers":[{"args":["pip install kafka-python qdrant-client --quiet \u0026\u0026 python /code/indexer.py"],"command":["/bin/sh","-c"],"image":"python:3.11-slim","imagePullPolicy":"IfNotPresent","name":"qdrant-indexer","resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"50m","memory":"128Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/code","name":"code"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"name":"qdrant-indexer-code"},"name":"code"}]}}},"status":{}}
-  creationTimestamp: "2026-03-05T18:45:40Z"
-  generation: 11
   name: qdrant-indexer
   namespace: aiot
-  resourceVersion: "967087"
-  uid: bacecff7-19e8-41ac-90f3-07eddd79718b
 spec:
   progressDeadlineSeconds: 600
   replicas: 2
@@ -26,11 +20,19 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/restartedAt: "2026-03-06T15:49:18Z"
-      creationTimestamp: null
+        kubectl.kubernetes.io/restartedAt: "2026-03-10T13:45:42Z"
       labels:
         app: qdrant-indexer
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: qdrant-indexer
+              topologyKey: kubernetes.io/hostname
+            weight: 100
       containers:
       - args:
         - pip install kafka-python qdrant-client lz4 --quiet && python /code/indexer.py
@@ -42,10 +44,10 @@ spec:
         name: qdrant-indexer
         resources:
           limits:
-            cpu: 200m
+            cpu: "1"
             memory: 256Mi
           requests:
-            cpu: 50m
+            cpu: 200m
             memory: 128Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
@@ -62,22 +64,3 @@ spec:
           defaultMode: 420
           name: qdrant-indexer-code
         name: code
-status:
-  availableReplicas: 2
-  conditions:
-  - lastTransitionTime: "2026-03-06T15:47:57Z"
-    lastUpdateTime: "2026-03-06T15:47:57Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2026-03-05T18:45:40Z"
-    lastUpdateTime: "2026-03-06T15:49:21Z"
-    message: ReplicaSet "qdrant-indexer-5cdf46f858" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 11
-  readyReplicas: 2
-  replicas: 2
-  updatedReplicas: 2

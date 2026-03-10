@@ -2,15 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "2"
+    deployment.kubernetes.io/revision: "8"
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"elasticsearch","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"elasticsearch"}},"template":{"metadata":{"labels":{"app":"elasticsearch"}},"spec":{"containers":[{"env":[{"name":"discovery.type","value":"single-node"},{"name":"ES_JAVA_OPTS","value":"-Xms1g -Xmx1g"},{"name":"xpack.security.enabled","value":"false"}],"image":"elasticsearch:8.12.0","name":"elasticsearch","ports":[{"containerPort":9200}],"volumeMounts":[{"mountPath":"/usr/share/elasticsearch/data","name":"es-storage"}]}],"initContainers":[{"command":["sh","-c","chown -R 1000:1000 /usr/share/elasticsearch/data \u0026\u0026 sysctl -w vm.max_map_count=262144"],"image":"busybox","name":"fix-permissions","securityContext":{"privileged":true},"volumeMounts":[{"mountPath":"/usr/share/elasticsearch/data","name":"es-storage"}]}],"volumes":[{"name":"es-storage","persistentVolumeClaim":{"claimName":"elasticsearch-pvc"}}]}}}}
-  creationTimestamp: "2026-03-01T22:24:57Z"
-  generation: 2
   name: elasticsearch
   namespace: default
-  resourceVersion: "581919"
-  uid: aa833215-6345-4e42-b93a-57e9d6137c88
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -25,7 +21,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: elasticsearch
     spec:
@@ -76,26 +71,11 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
       volumes:
       - name: es-storage
         persistentVolumeClaim:
-          claimName: elasticsearch-pvc
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2026-03-01T22:24:57Z"
-    lastUpdateTime: "2026-03-04T08:51:31Z"
-    message: ReplicaSet "elasticsearch-6c7d695c5b" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  - lastTransitionTime: "2026-03-04T19:24:01Z"
-    lastUpdateTime: "2026-03-04T19:24:01Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  observedGeneration: 2
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
+          claimName: elasticsearch-pvc-longhorn

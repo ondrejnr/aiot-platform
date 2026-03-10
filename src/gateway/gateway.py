@@ -1,29 +1,37 @@
 from fastapi import FastAPI, Request
 import requests as req
-import json, hashlib, math, time, re, os
+import json, hashlib, math, time, os, re
+import redis
 
 app = FastAPI(title="Cerebrus AIoT Gateway")
+bank = redis.Redis(host="redis-master.aiot.svc.cluster.local", port=6379, db=5, decode_responses=True)
+cache = redis.Redis(host="redis-master.aiot.svc.cluster.local", port=6379, db=6, decode_responses=True)
 
-QDRANT_URL   = "http://qdrant.aiot.svc.cluster.local:6333"
-TWIN_URL     = "http://digital-twin.aiot.svc.cluster.local:8001"
+QDRANT_URL = "http://qdrant.aiot.svc.cluster.local:6333"
 CEREBRAS_URL = "https://api.cerebras.ai/v1/chat/completions"
 CEREBRAS_KEY = os.environ.get("CEREBRAS_API_KEY", "")
 CEREBRAS_MODEL = "llama3.1-8b"
-VECTOR_SIZE  = 64
+VECTOR_SIZE = 64
+LLM_CACHE_TTL = 1800
+BANK_CACHE_TTL = 120
+RATE_LIMIT_RPM = 10
+RATE_LIMIT_KEY = "llm:rate_counter"
 
-SYSTEM_PROMPT = """You are Cerebrus AIoT — an intelligent industrial IoT monitoring assistant.
-You analyze sensor data from factory machines (pumps, turbines, motors, compressors, conveyors, generators).
+SYSTEM_PROMPT = """You are Cerebrus AIoT - industrial IoT monitoring assistant.
+Analyze factory machines. Answer in SAME LANGUAGE as user. Be concise.
+Units: temperature=C, vibration=mm/s, pressure=bar."""
 
-RULES:
-- Answer in the SAME LANGUAGE as the user's question (Slovak, Czech, English, etc.)
-- Be concise but thorough
-- Always reference actual machine data provided in context
-- Highlight critical issues first
-- Give actionable recommendations
-- Use units: temperature=°C, vibration=mm/s, pressure=bar, RPM
-- Status levels: OK (green), WARNING (needs attention), CRITICAL (immediate action)
-- If asked about trends, use the historical sensor data provided
-- Format output clearly with headers and bullet points"""
+SIMPLE_KW = ["summary","status","overview","suhrn","prehlad","how many","kolko","pocet","total","celkom","critical","kritick","warning","varov","alarm","list","zoznam","stav","factory"]
+COMPLEX_KW = ["why","preco","cause","pricina","recommend","odporuc","predict","trend","analyze","analyz","compare","porovnaj","explain","vysvetli","what if","should","plan","optimiz","improve"]
+MACH_RE = re.compile(r'(pump|turbine|motor|compressor|conveyor|generator)[-_]?\d+', re.I)
+
+def is_complex(q):
+    return any(k in q.lower() for k in COMPLEX_KW)
+
+def is_simple(q):
+    ql = q.lower()
+    if MACH_RE.search(ql) and not is_complex(q): return True
+    return any(k in ql for k in SIMPLE_KW) and not is_complex(q)
 
 def simple_embed(text):
     vec = []
@@ -33,152 +41,133 @@ def simple_embed(text):
     norm = math.sqrt(sum(x*x for x in vec))
     return [x/norm for x in vec]
 
-def get_twin():
+def check_rate():
     try:
-        r = req.get(f"{TWIN_URL}/twin", timeout=5)
-        return r.json() if r.status_code == 200 else {}
-    except:
-        return {}
+        c = cache.get(RATE_LIMIT_KEY)
+        if c and int(c) >= RATE_LIMIT_RPM: return False
+        p = cache.pipeline(); p.incr(RATE_LIMIT_KEY); p.expire(RATE_LIMIT_KEY, 60); p.execute()
+        return True
+    except: return True
 
-def search_qdrant(query, limit=10):
+def get_cache(q):
+    try: return cache.get(f"llm:cache:{hashlib.sha256(q.lower().strip().encode()).hexdigest()[:16]}")
+    except: return None
+
+def set_cache(q, r, ttl=None):
+    try: cache.setex(f"llm:cache:{hashlib.sha256(q.lower().strip().encode()).hexdigest()[:16]}", ttl or LLM_CACHE_TTL, r)
+    except: pass
+
+def machine_detail(mid):
+    raw = bank.get(f"bank:machines:{mid}")
+    if not raw: return None
+    m = json.loads(raw); mt = m.get("metrics",{})
+    viols = "; ".join([f"{v['metric']}={v['value']}" for v in m.get("violations",[])])
+    line = f"{mid} ({m.get('machine_type','')}) [{m.get('status','')}] T={mt.get('temperature','-')}C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')}"
+    if viols: line += f" VIOLATIONS: {viols}"
+    return line
+
+def bank_answer(query):
+    q = query.lower()
     try:
-        embedding = simple_embed(query)
-        r = req.post(f"{QDRANT_URL}/collections/sensor_history/points/search",
-            json={"vector": embedding, "limit": limit, "with_payload": True}, timeout=10)
-        return r.json().get("result", [])
-    except:
-        return []
+        raw = bank.get("bank:summary")
+        if not raw: return None
+        s = json.loads(raw)
+        total,ok,warn,crit = s.get("total",0),s.get("ok",0),s.get("warning",0),s.get("critical",0)
+        crit_list,warn_list = s.get("critical_machines",[]),s.get("warning_machines",[])
+        m = MACH_RE.search(q)
+        if m:
+            mid = m.group(0).replace("_","-")
+            mraw = bank.get(f"bank:machines:{mid}")
+            if not mraw: return f"Machine {mid} not found."
+            md = json.loads(mraw); mt = md.get("metrics",{})
+            lines = [f"{mid} | type: {md.get('machine_type','-')} | status: {md.get('status','-')}",
+                     f"T={mt.get('temperature','-')}C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')}"]
+            for v in md.get("violations",[]): lines.append(f"VIOLATION: {v['metric']}={v['value']}")
+            hist = bank.lrange(f"bank:history:{mid}", 0, 4)
+            if hist:
+                lines.append("History:")
+                for e in hist:
+                    d = json.loads(e); lines.append(f"  T={d.get('temperature','-')} V={d.get('vibration','-')} P={d.get('pressure','-')} [{d.get('status','-')}]")
+            return "\n".join(lines)
+        if any(k in q for k in ["summary","status","overview","suhrn","prehlad","total","celkom","factory","stav"]):
+            return f"Factory: {total} machines | OK: {ok} | Warning: {warn} | Critical: {crit}\nTop critical: {', '.join(crit_list[:10])}"
+        if any(k in q for k in ["critical","kritick","alarm"]):
+            return f"Critical ({crit}):\n" + "\n".join(f"  {n}" for n in crit_list[:20])
+        if any(k in q for k in ["warning","varov","warn"]):
+            return f"Warning ({warn}):\n" + "\n".join(f"  {n}" for n in warn_list[:20])
+        if any(k in q for k in ["how many","kolko","pocet"]):
+            return f"Total {total}: {ok} OK, {warn} warning, {crit} critical."
+    except: pass
+    return None
 
-def build_context(query):
-    """Build rich context from Digital Twin + Qdrant for LLM"""
-    twin = get_twin()
-    machines = twin.get("machines", {})
-    summary = twin.get("summary", {})
-    
-    ok = summary.get("ok", 0)
-    warn = summary.get("warning", 0)
-    crit = summary.get("critical", 0)
-    total = ok + warn + crit
-    
+def bank_context(query):
     ctx = []
-    ctx.append(f"=== FACTORY STATUS ===")
-    ctx.append(f"Total: {total} machines | OK: {ok} | WARNING: {warn} | CRITICAL: {crit}")
-    ctx.append(f"Critical machines: {', '.join(summary.get('critical_machines', []))}")
-    ctx.append(f"Warning machines: {', '.join(summary.get('warning_machines', []))}")
-    ctx.append("")
-    
-    ctx.append("=== ALL MACHINES ===")
-    for mid in sorted(machines.keys()):
-        m = machines[mid]
-        mt = m.get("metrics", {})
-        st = m.get("status", "").upper()
-        viols = m.get("violations", [])
-        line = f"{mid} ({m.get('machine_type','')}) [{st}] T={mt.get('temperature','-')}°C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')} H={mt.get('humidity','-')}%"
-        if viols:
-            viol_str = "; ".join([f"{v['metric']}={v['value']} (limit={v.get('limit','')})" for v in viols])
-            line += f" VIOLATIONS: {viol_str}"
-        ctx.append(line)
-    
-    # Qdrant history
-    results = search_qdrant(query, 5)
-    if results:
-        ctx.append("")
-        ctx.append("=== RECENT SENSOR HISTORY (from vector DB) ===")
-        for r in results:
-            text = r.get("payload", {}).get("text", "")
-            if text:
-                ctx.append(text)
-    
-    return "\n".join(ctx)
-
-def call_cerebras(system_msg, context, user_query):
-    """Call Cerebras LLM API"""
+    q = query.lower()
     try:
-        messages = [
-            {"role": "system", "content": system_msg},
-            {"role": "user", "content": f"MACHINE DATA:\n{context}\n\nUSER QUESTION: {user_query}"}
-        ]
-        r = req.post(CEREBRAS_URL,
-            headers={
-                "Authorization": f"Bearer {CEREBRAS_KEY}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": CEREBRAS_MODEL,
-                "messages": messages,
-                "max_tokens": 2048,
-                "temperature": 0.3
-            },
-            timeout=30
-        )
-        if r.status_code == 200:
-            data = r.json()
-            return data["choices"][0]["message"]["content"]
+        raw = bank.get("bank:summary")
+        if not raw: return "No data."
+        s = json.loads(raw)
+        ctx.append(f"FACTORY: {s.get('total',0)} machines | OK:{s.get('ok',0)} WARN:{s.get('warning',0)} CRIT:{s.get('critical',0)}")
+        crit_list = s.get('critical_machines',[])
+        m = MACH_RE.search(q)
+        if m:
+            mid = m.group(0).replace("_","-")
+            raw2 = bank.get(f"bank:machines:{mid}")
+            if raw2:
+                md = json.loads(raw2); mt = md.get("metrics",{})
+                ctx.append(f"\n{mid}: type={md.get('machine_type','')} status={md.get('status','')}")
+                ctx.append(f"T={mt.get('temperature','-')}C V={mt.get('vibration','-')}mm/s P={mt.get('pressure','-')}bar RPM={mt.get('rpm','-')}")
+                for v in md.get("violations",[]): ctx.append(f"VIOLATION: {v['metric']}={v['value']} limit={v.get('limit','')}")
+                for e in (bank.lrange(f"bank:history:{mid}",0,9) or [])[-5:]:
+                    d = json.loads(e); ctx.append(f"  T={d.get('temperature','-')} V={d.get('vibration','-')} P={d.get('pressure','-')} [{d.get('status','')}]")
         else:
-            return f"LLM Error ({r.status_code}): {r.text[:200]}"
-    except Exception as e:
-        return f"LLM Connection Error: {str(e)}"
+            for mid2 in crit_list[:10]:
+                d = machine_detail(mid2)
+                if d: ctx.append(d)
+    except: pass
+    return "\n".join(ctx)[:12000]
 
-def generate_analysis(query):
-    """Generate intelligent analysis using Cerebras LLM"""
-    context = build_context(query)
-    answer = call_cerebras(SYSTEM_PROMPT, context, query)
-    return answer
+def call_llm(context, query):
+    try:
+        r = req.post(CEREBRAS_URL, headers={"Authorization": f"Bearer {CEREBRAS_KEY}"},
+            json={"model": CEREBRAS_MODEL, "messages": [{"role":"system","content":SYSTEM_PROMPT},{"role":"user","content":f"DATA:\n{context}\n\nQUESTION: {query}"}], "max_tokens": 1500, "temperature": 0.3}, timeout=30)
+        if r.status_code == 200: return r.json()["choices"][0]["message"]["content"]
+        elif r.status_code == 429: return "Rate limit. Try again."
+        else: return f"LLM Error ({r.status_code})"
+    except Exception as e: return f"LLM Error: {e}"
 
-# === API Endpoints ===
+def generate(query):
+    cached = get_cache(query)
+    if cached: return cached
+    if is_simple(query):
+        ans = bank_answer(query)
+        if ans: set_cache(query, ans, BANK_CACHE_TTL); return ans
+    if not check_rate():
+        ans = bank_answer(query)
+        return (ans + "\n(Rate limited)") if ans else "Rate limit: 10/min."
+    ctx = bank_context(query)
+    ans = call_llm(ctx, query)
+    if ans and "Error" not in ans: set_cache(query, ans)
+    return ans
+
 @app.get("/")
-def root():
-    return {"service": "Cerebrus AIoT", "version": "3.0-LLM", "status": "running", "llm": CEREBRAS_MODEL}
-
+def root(): return {"service":"Cerebrus AIoT","version":"5.0-BANK-FIRST","llm":CEREBRAS_MODEL}
 @app.get("/health")
 def health():
     try:
-        r = req.get(f"{QDRANT_URL}/collections/sensor_history", timeout=5)
-        info = r.json().get("result", {})
-        twin = get_twin()
-        return {"status": "healthy", "qdrant_points": info.get("points_count", 0),
-                "machines": len(twin.get("machines", {})), "llm": CEREBRAS_MODEL}
-    except Exception as e:
-        return {"status": "degraded", "error": str(e)}
-
-@app.get("/search")
-def search(q: str = "temperature", limit: int = 10):
-    results = search_qdrant(q, limit)
-    return {"query": q, "count": len(results),
-            "results": [{"score": p.get("score"), "text": p.get("payload", {}).get("text", "")} for p in results]}
-
+        r=req.get(f"{QDRANT_URL}/collections/sensor_history",timeout=5); info=r.json().get("result",{})
+        return {"status":"healthy","qdrant_points":info.get("points_count",0),"bank_machines":len(bank.keys("bank:machines:*")),"llm_rate":f"{int(cache.get(RATE_LIMIT_KEY) or 0)}/{RATE_LIMIT_RPM}","cache_ttl":LLM_CACHE_TTL}
+    except Exception as e: return {"status":"degraded","error":str(e)}
 @app.get("/stats")
-def stats():
-    r = req.get(f"{QDRANT_URL}/collections/sensor_history", timeout=5)
-    info = r.json().get("result", {})
-    twin = get_twin()
-    return {"points": info.get("points_count", 0), "machines": len(twin.get("machines", {})),
-            "twin_summary": twin.get("summary", {})}
-
+def stats(): return {"bank_machines":len(bank.keys("bank:machines:*")),"llm_calls":int(cache.get(RATE_LIMIT_KEY) or 0),"llm_max":RATE_LIMIT_RPM}
 @app.get("/analyze")
-def analyze(q: str = "summary"):
-    return {"query": q, "analysis": generate_analysis(q)}
-
+def analyze(q:str="summary"): return {"query":q,"analysis":generate(q)}
 @app.get("/v1/models")
-def models():
-    return {"object": "list", "data": [{"id": "cerebrus-aiot", "object": "model"}]}
-
+def models(): return {"object":"list","data":[{"id":"cerebrus-aiot","object":"model"}]}
 @app.post("/v1/chat/completions")
-async def chat(request: Request):
-    body = await request.json()
-    msgs = body.get("messages", [])
-    user_msgs = [m for m in msgs if m.get("role") == "user"]
-    q = user_msgs[-1]["content"].strip() if user_msgs else "summary"
-    
-    # Stream support check
-    stream = body.get("stream", False)
-    
-    answer = generate_analysis(q)
-    
-    return {
-        "id": f"cerebrus-{int(time.time())}",
-        "object": "chat.completion",
-        "model": "cerebrus-aiot",
-        "choices": [{"index": 0, "message": {"role": "assistant", "content": answer}, "finish_reason": "stop"}],
-        "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-    }
+async def chat(request:Request):
+    body=await request.json(); msgs=body.get("messages",[]); um=[m for m in msgs if m.get("role")=="user"]
+    q=um[-1]["content"].strip() if um else "summary"
+    return {"id":f"cerebrus-{int(time.time())}","object":"chat.completion","model":"cerebrus-aiot",
+            "choices":[{"index":0,"message":{"role":"assistant","content":generate(q)},"finish_reason":"stop"}],
+            "usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}

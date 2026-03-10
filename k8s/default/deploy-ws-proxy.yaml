@@ -2,15 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "7"
+    deployment.kubernetes.io/revision: "8"
     kubectl.kubernetes.io/last-applied-configuration: |
       {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"ws-proxy","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"ws-proxy"}},"template":{"metadata":{"labels":{"app":"ws-proxy"}},"spec":{"containers":[{"command":["node","/app/server.js"],"image":"node:18-alpine","name":"ws-proxy","ports":[{"containerPort":8080}],"resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"volumeMounts":[{"mountPath":"/app","name":"app"}]}],"initContainers":[{"command":["sh","-c","cp /config/server.js /app/server.js \u0026\u0026 cd /app \u0026\u0026 npm install http-proxy"],"image":"node:18-alpine","name":"npm-install","volumeMounts":[{"mountPath":"/config","name":"config"},{"mountPath":"/app","name":"app"}]}],"volumes":[{"configMap":{"name":"ws-proxy-config"},"name":"config"},{"emptyDir":{},"name":"app"}]}}}}
-  creationTimestamp: "2026-03-04T14:36:30Z"
-  generation: 7
   name: ws-proxy
   namespace: default
-  resourceVersion: "581972"
-  uid: 006330ed-afac-4e47-8078-8a0e7b4d2a46
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -27,7 +23,6 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/restartedAt: "2026-03-04T14:53:57Z"
-      creationTimestamp: null
       labels:
         app: ws-proxy
     spec:
@@ -70,6 +65,8 @@ spec:
           name: config
         - mountPath: /app
           name: app
+      nodeSelector:
+        kubernetes.io/hostname: instance-worker-02
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
@@ -81,22 +78,3 @@ spec:
         name: config
       - emptyDir: {}
         name: app
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2026-03-04T14:36:30Z"
-    lastUpdateTime: "2026-03-04T14:54:00Z"
-    message: ReplicaSet "ws-proxy-6887b47c44" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  - lastTransitionTime: "2026-03-04T19:24:04Z"
-    lastUpdateTime: "2026-03-04T19:24:04Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  observedGeneration: 7
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
