@@ -1,0 +1,164 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loadgen-code
+  namespace: loadtest
+data:
+  loadgen.py: |
+    import json, time, random, os, threading, uuid, signal, sys
+    from datetime import datetime, timezone
+    import paho.mqtt.client as mqtt
+    from paho.mqtt.enums import CallbackAPIVersion
+
+    MQTT_HOST = os.getenv("MQTT_HOST", "emqx.emqx.svc.cluster.local")
+    MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
+    NUM_MACHINES = int(os.getenv("NUM_MACHINES", "400"))
+    MSG_PER_SEC = int(os.getenv("MSG_PER_SEC", "1000"))
+    NUM_THREADS = int(os.getenv("NUM_THREADS", "20"))
+    REPORT_INTERVAL = int(os.getenv("REPORT_INTERVAL", "5"))
+
+    MACHINE_TYPES = ["pump", "compressor", "motor", "conveyor", "turbine", "generator"]
+    LOCATIONS = ["hall-A", "hall-B", "hall-C", "outdoor-1", "outdoor-2", "basement"]
+    STATUSES = ["OK", "OK", "OK", "OK", "OK", "OK", "OK", "WARNING", "WARNING", "CRITICAL"]
+
+    running = True
+    def handle_signal(sig, frame):
+        global running
+        print("[SIGNAL] Stopping...", flush=True)
+        running = False
+    signal.signal(signal.SIGTERM, handle_signal)
+    signal.signal(signal.SIGINT, handle_signal)
+
+    machines = []
+    for i in range(NUM_MACHINES):
+        mt = MACHINE_TYPES[i % len(MACHINE_TYPES)]
+        machines.append({
+            "machine_id": f"{mt}-{i:04d}",
+            "machine_type": mt,
+            "location": random.choice(LOCATIONS),
+        })
+
+    total_sent = 0
+    total_errors = 0
+    lock = threading.Lock()
+    start_time = None
+
+    def gen_payload(m):
+        mt = m["machine_type"]
+        anomaly = random.random()
+        if mt == "pump":
+            t, v, p, r_ = random.gauss(45,12), random.gauss(1.2,0.8), random.gauss(95,20), random.gauss(1400,300)
+        elif mt == "compressor":
+            t, v, p, r_ = random.gauss(55,15), random.gauss(1.5,1.0), random.gauss(110,30), random.gauss(1500,400)
+        elif mt == "motor":
+            t, v, p, r_ = random.gauss(50,14), random.gauss(1.3,0.9), random.gauss(100,25), random.gauss(1800,500)
+        elif mt == "conveyor":
+            t, v, p, r_ = random.gauss(35,8), random.gauss(0.8,0.5), random.gauss(80,15), random.gauss(700,200)
+        elif mt == "turbine":
+            t, v, p, r_ = random.gauss(70,20), random.gauss(2.0,1.2), random.gauss(140,35), random.gauss(2500,600)
+        else:
+            t, v, p, r_ = random.gauss(60,16), random.gauss(1.6,0.9), random.gauss(120,28), random.gauss(1800,400)
+        status = random.choice(STATUSES)
+        violations = []
+        if status == "WARNING":
+            violations = [{"metric": "temperature", "value": round(t+20,2), "limit": 80, "type": "HIGH"}]
+        elif status == "CRITICAL":
+            violations = [
+                {"metric": "temperature", "value": round(t+40,2), "limit": 80, "type": "HIGH"},
+                {"metric": "vibration", "value": round(v+3,3), "limit": 3.0, "type": "HIGH"},
+            ]
+        return {
+            "machine_id": m["machine_id"],
+            "machine_type": m["machine_type"],
+            "location": m["location"],
+            "status": status,
+            "temperature": round(max(0, t), 2),
+            "vibration": round(max(0, v), 3),
+            "pressure": round(max(0, p), 2),
+            "rpm": round(max(0, r_), 1),
+            "humidity": round(random.uniform(30, 85), 1),
+            "anomaly_score": round(anomaly, 4),
+            "power_consumption": round(random.uniform(5, 150), 2),
+            "uptime_hours": round(random.uniform(100, 5000), 1),
+            "violations": violations,
+            "timestamp": time.time(),
+        }
+
+    def sender_thread(thread_id, per_thread_rate):
+        global total_sent, total_errors, running
+        cid = f"loadgen-{thread_id}-{uuid.uuid4().hex[:6]}"
+        client = mqtt.Client(
+            callback_api_version=CallbackAPIVersion.VERSION2,
+            client_id=cid, clean_session=True, protocol=mqtt.MQTTv311
+        )
+        try:
+            client.connect(MQTT_HOST, MQTT_PORT, keepalive=120)
+            client.loop_start()
+        except Exception as e:
+            print(f"[T{thread_id}] Connect failed: {e}", flush=True)
+            return
+        interval = 1.0 / max(per_thread_rate, 1)
+        local_sent = 0
+        while running:
+            m = random.choice(machines)
+            payload = gen_payload(m)
+            topic = f"aiot/{m['machine_type']}/{m['machine_id']}"
+            try:
+                client.publish(topic, json.dumps(payload), qos=0)
+                local_sent += 1
+                with lock:
+                    total_sent += 1
+            except Exception:
+                with lock:
+                    total_errors += 1
+            time.sleep(interval)
+        client.loop_stop()
+        client.disconnect()
+        print(f"[T{thread_id}] Done: {local_sent} msgs", flush=True)
+
+    def reporter():
+        global total_sent, total_errors, running
+        prev = 0
+        while running:
+            time.sleep(REPORT_INTERVAL)
+            with lock:
+                cur = total_sent
+                errs = total_errors
+            elapsed = time.time() - start_time
+            rate = (cur - prev) / REPORT_INTERVAL
+            avg = cur / max(elapsed, 1)
+            mins = int(elapsed) // 60
+            secs = int(elapsed) % 60
+            print(f"[LOAD] {mins:02d}:{secs:02d} | sent={cur:,} | rate={rate:.0f}/s | avg={avg:.0f}/s | err={errs}", flush=True)
+            prev = cur
+
+    def main():
+        global start_time
+        per_thread = MSG_PER_SEC // NUM_THREADS
+        print(f"=== MQTT LOAD GENERATOR 2x (CONTINUOUS) ===", flush=True)
+        print(f"Target: {MSG_PER_SEC} msg/s (unlimited duration)", flush=True)
+        print(f"Machines: {NUM_MACHINES}, Threads: {NUM_THREADS} ({per_thread}/s each)", flush=True)
+        print(f"MQTT: {MQTT_HOST}:{MQTT_PORT}", flush=True)
+        print(f"Stop: kubectl delete deploy mqtt-loadgen -n loadtest", flush=True)
+        print(f"", flush=True)
+        start_time = time.time()
+        rep = threading.Thread(target=reporter, daemon=True)
+        rep.start()
+        threads = []
+        for i in range(NUM_THREADS):
+            t = threading.Thread(target=sender_thread, args=(i, per_thread))
+            t.start()
+            threads.append(t)
+        for t in threads:
+            t.join()
+        elapsed = time.time() - start_time
+        print(f"", flush=True)
+        print(f"=== LOAD TEST STOPPED ===", flush=True)
+        print(f"Total sent: {total_sent:,}", flush=True)
+        print(f"Total errors: {total_errors}", flush=True)
+        print(f"Duration: {elapsed:.1f}s ({elapsed/60:.1f} min)", flush=True)
+        print(f"Avg rate: {total_sent/max(elapsed,1):.1f} msg/s", flush=True)
+        print(f"===========================", flush=True)
+
+    if __name__ == "__main__":
+        main()

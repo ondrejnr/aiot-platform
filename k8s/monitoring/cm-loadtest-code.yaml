@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loadtest-code
+  namespace: monitoring
+data:
+  loadtest.py: |
+    import json
+    import time
+    import random
+    import math
+    import paho.mqtt.client as mqtt
+
+    BROKER = "emqx.emqx.svc.cluster.local"
+    PORT = 1883
+    DURATION = 600
+
+    MACHINES = [
+        {"id": "turbine-01",  "type": "turbine",    "base_temp": 65,  "base_rpm": 1500, "base_vib": 0.20, "base_press": 95},
+        {"id": "turbine-02",  "type": "turbine",    "base_temp": 70,  "base_rpm": 1550, "base_vib": 0.25, "base_press": 98},
+        {"id": "turbine-03",  "type": "turbine",    "base_temp": 80,  "base_rpm": 1480, "base_vib": 0.35, "base_press": 100},
+        {"id": "pump-01",     "type": "pump",       "base_temp": 45,  "base_rpm": 800,  "base_vib": 0.10, "base_press": 120},
+        {"id": "pump-02",     "type": "pump",       "base_temp": 50,  "base_rpm": 850,  "base_vib": 0.15, "base_press": 125},
+        {"id": "motor-01",    "type": "motor",      "base_temp": 90,  "base_rpm": 3000, "base_vib": 0.40, "base_press": 50},
+        {"id": "motor-02",    "type": "motor",      "base_temp": 95,  "base_rpm": 3100, "base_vib": 0.45, "base_press": 55},
+        {"id": "conveyor-01", "type": "conveyor",   "base_temp": 35,  "base_rpm": 200,  "base_vib": 0.05, "base_press": 30},
+        {"id": "compressor-01","type": "compressor", "base_temp": 110, "base_rpm": 2500, "base_vib": 0.55, "base_press": 150},
+        {"id": "generator-01","type": "generator",  "base_temp": 85,  "base_rpm": 1800, "base_vib": 0.30, "base_press": 80},
+    ]
+
+    LOCATIONS = ["hall-A", "hall-B", "hall-C", "outdoor"]
+
+    print(f"[LOAD-TEST] Connecting to {BROKER}:{PORT}", flush=True)
+    client = mqtt.Client(client_id="loadtest-v2")
+    client.connect(BROKER, PORT, keepalive=60)
+    client.loop_start()
+    print(f"[LOAD-TEST] Connected! {len(MACHINES)} machines, {DURATION}s", flush=True)
+
+    start = time.time()
+    count = 0
+    trend = {}
+
+    while time.time() - start < DURATION:
+        elapsed = time.time() - start
+
+        for m in MACHINES:
+            mid = m["id"]
+            wave = math.sin(elapsed / 60 * math.pi)
+
+            if mid not in trend:
+                trend[mid] = 0
+            trend[mid] += random.uniform(-0.3, 0.3)
+            trend[mid] = max(-10, min(10, trend[mid]))
+
+            temp = round(m["base_temp"] + wave * 8 + trend[mid] + random.uniform(-3, 3), 1)
+            vib = round(m["base_vib"] + abs(wave) * 0.15 + random.uniform(-0.05, 0.05), 3)
+            press = round(m["base_press"] + wave * 5 + random.uniform(-2, 2), 1)
+            hum = round(55 + random.uniform(0, 25), 1)
+            rpm = int(m["base_rpm"] + wave * 50 + random.uniform(-20, 20))
+            anomaly = round(random.uniform(0, 0.15), 3)
+            status = "normal"
+            loc = LOCATIONS[hash(mid) % len(LOCATIONS)]
+
+            r = random.random()
+            if r < 0.01:
+                status = "critical"
+                anomaly = round(random.uniform(0.85, 1.0), 2)
+                temp += 25
+                vib += 0.3
+            elif r < 0.04:
+                status = "warning"
+                anomaly = round(random.uniform(0.5, 0.85), 2)
+                temp += 12
+                vib += 0.15
+
+            msg = {
+                "machine_id": mid,
+                "machine_type": m["type"],
+                "location": loc,
+                "temperature": temp,
+                "vibration": vib,
+                "pressure": press,
+                "humidity": hum,
+                "rpm": rpm,
+                "status": status,
+                "anomaly_score": anomaly,
+                "power_consumption": round(rpm * 0.05 + random.uniform(-5, 5), 1),
+                "uptime_hours": round(elapsed / 3600 + random.uniform(100, 5000), 1)
+            }
+
+            topic = f"sensors/{m['type']}/{mid}"
+            client.publish(topic, json.dumps(msg))
+            count += 1
+
+        if count % 100 == 0:
+            el = int(time.time() - start)
+            print(f"[LOAD-TEST] {count} msgs ({el}s/{DURATION}s) | {count/max(el,1):.0f} msg/s", flush=True)
+
+        time.sleep(1)
+
+    client.loop_stop()
+    client.disconnect()
+    print(f"[LOAD-TEST] DONE! {count} msgs in {int(time.time()-start)}s ({count/DURATION:.0f} msg/s)", flush=True)
+    time.sleep(120)

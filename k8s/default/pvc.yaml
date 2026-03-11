@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-pvc-piraeus
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: piraeus-storage
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-pvc-piraeus
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: piraeus-storage
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc-piraeus
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: piraeus-storage
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: www-pvc-piraeus
+  namespace: default
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: piraeus-storage
+  resources:
+    requests:
+      storage: 2Gi

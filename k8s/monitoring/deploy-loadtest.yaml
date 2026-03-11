@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadtest
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadtest
+  template:
+    metadata:
+      labels:
+        app: loadtest
+    spec:
+      nodeSelector:
+        workload-type: monitoring
+      containers:
+      - name: loadtest
+        image: python:3.11-slim
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "pip install --quiet paho-mqtt && python -u /app/loadtest.py"]
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        volumeMounts:
+        - name: code
+          mountPath: /app
+      volumes:
+      - name: code
+        configMap:
+          name: loadtest-code

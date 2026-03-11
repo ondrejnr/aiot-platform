@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: metricbeat
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: metricbeat
+  template:
+    metadata:
+      labels:
+        app: metricbeat
+    spec:
+      containers:
+      - name: metricbeat
+        image: elastic/metricbeat:8.12.0
+        volumeMounts:
+        - name: config
+          mountPath: /usr/share/metricbeat/metricbeat.yml
+          subPath: metricbeat.yml
+        - name: modules
+          mountPath: /usr/share/metricbeat/modules.d
+      volumes:
+      - name: config
+        configMap:
+          name: metricbeat-config
+      - name: modules
+        configMap:
+          name: metricbeat-modules

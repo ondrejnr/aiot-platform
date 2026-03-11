@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influx-writer
+  namespace: monitoring
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: influx-writer
+  template:
+    metadata:
+      labels:
+        app: influx-writer
+    spec:
+      nodeSelector:
+        workload-type: monitoring
+      containers:
+      - name: influx-writer
+        image: python:3.11-slim
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "pip install --quiet kafka-python-ng influxdb-client lz4 && python -u /app/influx_writer.py"]
+        env:
+        - name: INFLUX_TOKEN
+          value: aiot-influx-token-2026
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        volumeMounts:
+        - name: code
+          mountPath: /app
+      volumes:
+      - name: code
+        configMap:
+          name: influx-writer-code

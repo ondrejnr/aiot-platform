@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-accelerator-ingress
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/instance: k8s-cluster
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: ai-accelerator.34.90.168.150.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: ai-accelerator-svc
+            port:
+              number: 5000
+        path: /
+        pathType: Prefix

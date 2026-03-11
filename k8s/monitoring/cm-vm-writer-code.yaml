@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vm-writer-code
+  namespace: monitoring
+data:
+  vm_writer.py: |
+    import json, time, sys, logging
+    import requests
+    from kafka import KafkaConsumer
+
+    logging.basicConfig(level=logging.INFO)
+    log = logging.getLogger("vm-writer")
+
+    KAFKA = "redpanda.aiot.svc.cluster.local:9092"
+    VM_URL = "http://victoriametrics.monitoring.svc.cluster.local:8428/api/v1/import/prometheus"
+    TOPIC = "telemetry"
+    BATCH_SIZE = 200
+    FLUSH_INTERVAL = 2.0
+
+    log.info(f"Starting — Kafka: {KAFKA}, VM: {VM_URL}, batch={BATCH_SIZE}")
+
+    consumer = KafkaConsumer(
+        TOPIC,
+        bootstrap_servers=KAFKA,
+        value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+        auto_offset_reset="latest",
+        group_id="vm-writer-group-v3",
+        consumer_timeout_ms=-1,
+        max_poll_records=500
+    )
+    log.info("Kafka consumer connected")
+
+    count = 0
+    batch = []
+    last_flush = time.time()
+
+    for msg in consumer:
+        try:
+            data = msg.value
+            topic = data.get("topic", "unknown")
+            payload = data.get("payload", {})
+            ts_ms = int(time.time() * 1000)
+
+            count += 1
+
+            machine_id = payload.get("machine_id", payload.get("sensor_id", "unknown"))
+            machine_type = payload.get("machine_type", "sensor")
+            status = payload.get("status", "unknown")
+            location = payload.get("location", "unknown")
+            unit = payload.get("unit", "")
+
+            labels = f'machine_id="{machine_id}",machine_type="{machine_type}",topic="{topic}",status="{status}",location="{location}"'
+
+            numeric_fields = [
+                "temperature", "vibration", "pressure", "humidity",
+                "rpm", "anomaly_score", "value", "voltage",
+                "power_consumption", "uptime_hours"
+            ]
+
+            for field in numeric_fields:
+                if field in payload:
+                    val = payload[field]
+                    if isinstance(val, (int, float)):
+                        metric_name = f"iot_{field}"
+                        if unit:
+                            batch.append(f'{metric_name}{{{labels},unit="{unit}"}} {val} {ts_ms}')
+                        else:
+                            batch.append(f'{metric_name}{{{labels}}} {val} {ts_ms}')
+
+            status_map = {"normal": 1, "warning": 2, "critical": 3, "unknown": 0}
+            if "status" in payload:
+                status_val = status_map.get(str(payload["status"]), 0)
+                batch.append(f'iot_status{{{labels}}} {status_val} {ts_ms}')
+
+            now = time.time()
+            if len(batch) >= BATCH_SIZE or (now - last_flush) >= FLUSH_INTERVAL:
+                if batch:
+                    body = "\n".join(batch)
+                    r = requests.post(VM_URL, data=body, timeout=10)
+                    if count % 5000 < 10:
+                        log.info(f"Sent {len(batch)} metrics (msg #{count}) -> HTTP {r.status_code}")
+                    batch = []
+                    last_flush = now
+
+        except Exception as e:
+            log.error(f"ERROR: {e}")
+            batch = []

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb:2.7
+        ports:
+        - containerPort: 8086
+        env:
+        - name: DOCKER_INFLUXDB_INIT_MODE
+          value: setup
+        - name: DOCKER_INFLUXDB_INIT_USERNAME
+          value: admin
+        - name: DOCKER_INFLUXDB_INIT_PASSWORD
+          value: AioT2026Admin
+        - name: DOCKER_INFLUXDB_INIT_ORG
+          value: aiot
+        - name: DOCKER_INFLUXDB_INIT_BUCKET
+          value: aiot-metrics
+        - name: DOCKER_INFLUXDB_INIT_RETENTION
+          value: 720h
+        - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+          value: aiot-influx-token-2026
+        - name: INFLUXD_BOLT_PATH
+          value: /var/lib/influxdb2/influxd.bolt
+        - name: INFLUXD_ENGINE_PATH
+          value: /var/lib/influxdb2/engine
+        resources:
+          requests:
+            cpu: 250m
+            memory: 1Gi
+          limits:
+            cpu: "2"
+            memory: 2Gi
+        volumeMounts:
+        - name: influx-data
+          mountPath: /var/lib/influxdb2
+      volumes:
+      - name: influx-data
+        persistentVolumeClaim:
+          claimName: influxdb-pvc-piraeus

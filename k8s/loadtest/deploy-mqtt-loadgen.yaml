@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-loadgen
+  namespace: loadtest
+  labels:
+    app: mqtt-loadgen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-loadgen
+  template:
+    metadata:
+      labels:
+        app: mqtt-loadgen
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: loadgen
+        image: python:3.11-slim
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh", "-c"]
+        args: ["pip install --quiet paho-mqtt==2.1.0 && python3 -u /code/loadgen.py"]
+        env:
+        - name: MQTT_HOST
+          value: emqx.emqx.svc.cluster.local
+        - name: MQTT_PORT
+          value: "1883"
+        - name: NUM_MACHINES
+          value: "400"
+        - name: MSG_PER_SEC
+          value: "1000"
+        - name: NUM_THREADS
+          value: "20"
+        resources:
+          requests:
+            cpu: "1"
+            memory: 512Mi
+          limits:
+            cpu: "3"
+            memory: 1Gi
+        volumeMounts:
+        - name: code
+          mountPath: /code
+      volumes:
+      - name: code
+        configMap:
+          name: loadgen-code

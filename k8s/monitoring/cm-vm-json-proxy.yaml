@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vm-json-proxy
+  namespace: monitoring
+data:
+  nginx.conf: |
+    worker_processes auto;
+    events { worker_connections 1024; }
+    http {
+      gzip on;
+      gzip_types application/json text/plain text/html application/javascript text/css;
+      gzip_min_length 100;
+      gzip_comp_level 6;
+      gzip_proxied any;
+      gzip_vary on;
+
+      proxy_cache_path /tmp/vm-cache levels=1:2 keys_zone=vm:10m max_size=200m inactive=2m;
+
+      server {
+        listen 8080;
+
+        location / {
+          proxy_pass http://victoriametrics.monitoring.svc.cluster.local:8428;
+
+          # Cache
+          proxy_cache vm;
+          proxy_cache_valid 200 5s;
+          proxy_cache_key "$request_uri";
+          add_header X-Cache-Status $upstream_cache_status always;
+
+          # Buffering
+          proxy_buffering on;
+          proxy_buffer_size 128k;
+          proxy_buffers 16 256k;
+          proxy_busy_buffers_size 512k;
+
+          proxy_connect_timeout 5s;
+          proxy_read_timeout 30s;
+        }
+      }
+    }

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vm-writer
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vm-writer
+  template:
+    metadata:
+      labels:
+        app: vm-writer
+    spec:
+      nodeSelector:
+        workload-type: monitoring
+      containers:
+      - name: vm-writer
+        image: python:3.11-slim
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "pip install --quiet kafka-python-ng requests lz4 && python -u /app/vm_writer.py"]
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        volumeMounts:
+        - name: code
+          mountPath: /app
+      volumes:
+      - name: code
+        configMap:
+          name: vm-writer-code

@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-expires: "86400"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "86400"
+    nginx.ingress.kubernetes.io/session-cookie-name: emqx-sticky
+  name: emqx-ingress
+  namespace: emqx
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: emqx.34.90.168.150.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: emqx-dashboard
+            port:
+              number: 18083
+        path: /
+        pathType: Prefix

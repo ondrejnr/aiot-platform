@@ -1,0 +1,56 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: grafana.34.90.168.150.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: grafana-svc
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kibana-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kibana.34.90.168.150.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: kibana-svc
+            port:
+              number: 5601
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lamp-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: lamp.34.90.168.150.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: lamp-service
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
