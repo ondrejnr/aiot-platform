@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"rag-api-svc","namespace":"aiot"},"spec":{"externalTrafficPolicy":"Cluster","internalTrafficPolicy":"Cluster","ipFamilies":["IPv4"],"ipFamilyPolicy":"SingleStack","ports":[{"nodePort":31700,"port":7000,"protocol":"TCP","targetPort":7000}],"selector":{"app":"rag-worker"},"sessionAffinity":"None","type":"NodePort"},"status":{}}
+  creationTimestamp: "2026-03-05T18:45:41Z"
+  name: rag-api-svc
+  namespace: aiot
+  resourceVersion: "805098"
+  uid: 89cc6378-0c8f-4baf-a047-39b7aee17493
+spec:
+  clusterIP: 10.105.168.31
+  clusterIPs:
+  - 10.105.168.31
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: 31700
+    port: 7000
+    protocol: TCP
+    targetPort: 7000
+  selector:
+    app: rag-worker
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}

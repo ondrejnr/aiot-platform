@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "26"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"pgadmin","namespace":"aiot"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"pgadmin"}},"template":{"metadata":{"labels":{"app":"pgadmin"}},"spec":{"containers":[{"env":[{"name":"PGADMIN_DEFAULT_EMAIL","value":"admin@aiot.com"},{"name":"PGADMIN_DEFAULT_PASSWORD","value":"admin123"},{"name":"PGADMIN_SERVER_JSON_FILE","value":"/pgadmin4/servers/servers.json"},{"name":"GUNICORN_THREADS","value":"25"},{"name":"GUNICORN_ACCESS_LOGFILE","value":"-"}],"image":"dpage/pgadmin4:8.14","name":"pgadmin","ports":[{"containerPort":80}],"resources":{"limits":{"cpu":"1","memory":"4Gi"},"requests":{"cpu":"250m","memory":"1Gi"}},"volumeMounts":[{"mountPath":"/pgadmin4/servers","name":"servers","readOnly":true},{"mountPath":"/pgadmin4/config_local.py","name":"pgadmin-config","readOnly":true,"subPath":"config_local.py"},{"mountPath":"/var/lib/pgadmin","name":"pgadmin-data"}]}],"initContainers":[{"command":["sh","-c","chown -R 5050:5050 /var/lib/pgadmin"],"image":"busybox","name":"fix-permissions","volumeMounts":[{"mountPath":"/var/lib/pgadmin","name":"pgadmin-data"}]}],"volumes":[{"configMap":{"name":"pgadmin-servers"},"name":"servers"},{"configMap":{"name":"pgadmin-config"},"name":"pgadmin-config"},{"name":"pgadmin-data","persistentVolumeClaim":{"claimName":"pgadmin-data"}}]}}}}
+  creationTimestamp: "2026-03-05T16:23:58Z"
+  generation: 28
+  name: pgadmin
+  namespace: aiot
+  resourceVersion: "3397748"
+  uid: 6f05b8f3-9d54-4a16-91a1-c39ac471a2c7
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: pgadmin
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-03-11T08:47:42Z"
+      creationTimestamp: null
+      labels:
+        app: pgadmin
+    spec:
+      containers:
+      - env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: admin@aiot.com
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: admin123
+        - name: PGADMIN_SERVER_JSON_FILE
+          value: /pgadmin4/servers/servers.json
+        - name: GUNICORN_THREADS
+          value: "25"
+        - name: GUNICORN_ACCESS_LOGFILE
+          value: '-'
+        - name: GUNICORN_TIMEOUT
+          value: "86400"
+        - name: PGADMIN_CONFIG_TABLE_ROW_COUNT_THRESHOLD
+          value: "500000"
+        - name: PGADMIN_CONFIG_MAX_TABLE_COUNT
+          value: "1000000"
+        image: dpage/pgadmin4:8.14
+        imagePullPolicy: Always
+        name: pgadmin
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 4Gi
+          requests:
+            cpu: 250m
+            memory: 1Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /pgadmin4/servers
+          name: servers
+          readOnly: true
+        - mountPath: /pgadmin4/config_local.py
+          name: pgadmin-config
+          readOnly: true
+          subPath: config_local.py
+        - mountPath: /var/lib/pgadmin
+          name: pgadmin-data
+        - mountPath: /pgadmin4/config_system.py
+          name: pgadmin-config
+          readOnly: true
+          subPath: config_system.py
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R 5050:5050 /var/lib/pgadmin
+        image: busybox
+        imagePullPolicy: Always
+        name: fix-permissions
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/pgadmin
+          name: pgadmin-data
+      nodeSelector:
+        kubernetes.io/hostname: instance-20260301-125050
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: drbd.linbit.com/lost-quorum
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: pgadmin-servers
+        name: servers
+      - configMap:
+          defaultMode: 420
+          name: pgadmin-config
+        name: pgadmin-config
+      - name: pgadmin-data
+        persistentVolumeClaim:
+          claimName: pgadmin-data
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-03-14T22:51:33Z"
+    lastUpdateTime: "2026-03-14T23:03:49Z"
+    message: ReplicaSet "pgadmin-56db9b9db" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-03-15T06:54:21Z"
+    lastUpdateTime: "2026-03-15T06:54:21Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 28
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

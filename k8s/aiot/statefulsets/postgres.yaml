@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"creationTimestamp":"2026-03-10T06:35:30Z","generation":5,"name":"postgres","namespace":"aiot","uid":"d30457ea-5361-4c8b-b576-c21a64670e57"},"spec":{"persistentVolumeClaimRetentionPolicy":{"whenDeleted":"Retain","whenScaled":"Retain"},"podManagementPolicy":"OrderedReady","replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"postgres"}},"serviceName":"postgres","template":{"metadata":{"creationTimestamp":null,"labels":{"app":"postgres"}},"spec":{"containers":[{"env":[{"name":"POSTGRES_DB","value":"aiot"},{"name":"POSTGRES_USER","value":"aiot_admin"},{"name":"POSTGRES_PASSWORD","value":"AioT2026!Prod"},{"name":"PGDATA","value":"/var/lib/postgresql/data/pgdata"}],"image":"postgres:16","imagePullPolicy":"IfNotPresent","name":"postgres","ports":[{"containerPort":5432,"protocol":"TCP"}],"resources":{"limits":{"cpu":"1","memory":"512Mi"},"requests":{"cpu":"200m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/var/lib/postgresql/data","name":"postgres-data"},{"mountPath":"/docker-entrypoint-initdb.d","name":"init-sql"},{"mountPath":"/dev/shm","name":"dshm"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"name":"postgres-init"},"name":"init-sql"},{"emptyDir":{"medium":"Memory","sizeLimit":"256Mi"},"name":"dshm"},{"name":"postgres-data","persistentVolumeClaim":{"claimName":"postgres-data-piraeus"}}]}},"updateStrategy":{"rollingUpdate":{"partition":0},"type":"RollingUpdate"}}}
+  creationTimestamp: "2026-03-10T06:35:30Z"
+  generation: 10
+  name: postgres
+  namespace: aiot
+  resourceVersion: "3397797"
+  uid: d30457ea-5361-4c8b-b576-c21a64670e57
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: postgres
+  serviceName: postgres
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: aiot
+        - name: POSTGRES_USER
+          value: aiot_admin
+        - name: POSTGRES_PASSWORD
+          value: AioT2026!Prod
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        image: postgres:16
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: postgres
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-data
+        - mountPath: /docker-entrypoint-initdb.d
+          name: init-sql
+        - mountPath: /dev/shm
+          name: dshm
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/hostname: instance-20260301-125050
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: drbd.linbit.com/lost-quorum
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: postgres-init
+        name: init-sql
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 256Mi
+        name: dshm
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-data-piraeus
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+status:
+  availableReplicas: 1
+  collisionCount: 0
+  currentReplicas: 1
+  currentRevision: postgres-7f66d556df
+  observedGeneration: 10
+  readyReplicas: 1
+  replicas: 1
+  updateRevision: postgres-7f66d556df
+  updatedReplicas: 1

@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"qdrant","namespace":"aiot"},"spec":{"ports":[{"name":"http","port":6333,"targetPort":6333},{"name":"grpc","port":6334,"targetPort":6334}],"selector":{"app":"qdrant"}}}
+  creationTimestamp: "2026-03-05T18:25:45Z"
+  name: qdrant
+  namespace: aiot
+  resourceVersion: "802285"
+  uid: 0a6f351a-617b-4310-87cc-222d3e626d3a
+spec:
+  clusterIP: 10.96.99.149
+  clusterIPs:
+  - 10.96.99.149
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 6333
+    protocol: TCP
+    targetPort: 6333
+  - name: grpc
+    port: 6334
+    protocol: TCP
+    targetPort: 6334
+  selector:
+    app: qdrant
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

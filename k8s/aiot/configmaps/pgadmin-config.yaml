@@ -1,0 +1,30 @@
+apiVersion: v1
+data:
+  config_local.py: |2
+
+    # Pagination - koľko riadkov sa zobrazí na jednej stránke
+    DATA_RESULT_ROWS_PER_PAGE = 500
+
+    # Default row limit pre Query Tool (0 = no limit)
+    # Toto nastaví default dropdown v Query Tool
+    SQL_DEFAULT_LIMIT = 1000
+
+    # Max riadkov pre View/Edit Data
+    TABLE_ROW_COUNT_THRESHOLD = 10000000
+    MAX_TABLE_COUNT = 50000
+
+    # Timeouty
+    SQLITE_TIMEOUT = 5000
+    MAX_SESSION_IDLE_TIME = 120
+    SESSION_EXPIRATION_TIME = 24
+
+    # Gunicorn
+    SERVER_MODE = True
+    ENABLE_PSQL = True
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2026-03-11T08:47:42Z"
+  name: pgadmin-config
+  namespace: aiot
+  resourceVersion: "1880283"
+  uid: e7ea8b8f-3707-4958-9e9e-d8a3f51f8249

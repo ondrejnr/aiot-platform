@@ -1,0 +1,116 @@
+apiVersion: v1
+data:
+  mongo_sink.py: |
+    #!/usr/bin/env python3
+    """Mongo Sink v2 — Kafka -> Redis buffer (same pattern as pg-sink)"""
+    import os, json, time, logging
+    from datetime import datetime, timezone
+    from kafka import KafkaConsumer
+    import redis
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    log = logging.getLogger("mongo-sink")
+
+    KAFKA       = os.getenv("KAFKA_BOOTSTRAP", "redpanda.aiot.svc.cluster.local:9092")
+    TOPIC       = os.getenv("KAFKA_TOPIC", "telemetry")
+    REDIS_HOST  = os.getenv("REDIS_HOST", "redis-master.aiot.svc.cluster.local")
+    REDIS_PORT  = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_DB    = int(os.getenv("REDIS_DB", "8"))
+    QUEUE_KEY   = os.getenv("QUEUE_KEY", "mongo:write_buffer")
+    BATCH       = int(os.getenv("BATCH_SIZE", "200"))
+    FLUSH_S     = int(os.getenv("FLUSH_INTERVAL", "2"))
+    MAX_QUEUE   = int(os.getenv("MAX_QUEUE_LEN", "500000"))
+
+    def parse_msg(raw):
+        try:
+            d = json.loads(raw)
+        except Exception:
+            return None
+        payload = d.get("payload", d)
+        topic = d.get("topic", payload.get("topic", ""))
+        ts_val = d.get("timestamp", payload.get("timestamp", time.time()))
+        machine_id = payload.get("machine_id", "unknown")
+        machine_type = payload.get("machine_type", machine_id.rsplit("-", 1)[0] if "-" in machine_id else "unknown")
+        status = payload.get("status", "UNKNOWN").upper()
+        violations = payload.get("violations", [])
+        try:
+            ts = datetime.fromtimestamp(float(ts_val), tz=timezone.utc).isoformat()
+        except Exception:
+            ts = datetime.now(timezone.utc).isoformat()
+        return json.dumps({
+            "ts": ts,
+            "machine_id": machine_id,
+            "machine_type": machine_type,
+            "location": payload.get("location"),
+            "status": status,
+            "temperature": payload.get("temperature"),
+            "vibration": payload.get("vibration"),
+            "pressure": payload.get("pressure"),
+            "rpm": payload.get("rpm"),
+            "humidity": payload.get("humidity"),
+            "anomaly_score": payload.get("anomaly_score"),
+            "power_consumption": payload.get("power_consumption"),
+            "uptime_hours": payload.get("uptime_hours"),
+            "violations_count": len(violations),
+            "violations": json.dumps(violations) if violations else None,
+            "topic": topic,
+        })
+
+    def main():
+        log.info("mongo-sink v2: Kafka -> Redis buffer")
+        log.info("Kafka: %s topic=%s", KAFKA, TOPIC)
+        log.info("Redis: %s:%d db=%d key=%s", REDIS_HOST, REDIS_PORT, REDIS_DB, QUEUE_KEY)
+
+        r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+        r.ping()
+        log.info("Redis connected!")
+
+        consumer = KafkaConsumer(
+            TOPIC,
+            bootstrap_servers=KAFKA,
+            group_id="mongo-sink-v2-redis",
+            auto_offset_reset="latest",
+            value_deserializer=lambda m: m.decode("utf-8", errors="replace"),
+            consumer_timeout_ms=FLUSH_S * 1000,
+        )
+        log.info("Kafka connected!")
+
+        total = 0
+        while True:
+            batch = []
+            deadline = time.time() + FLUSH_S
+            try:
+                for msg in consumer:
+                    row = parse_msg(msg.value)
+                    if row:
+                        batch.append(row)
+                    if len(batch) >= BATCH or time.time() >= deadline:
+                        break
+            except StopIteration:
+                pass
+
+            if batch:
+                qlen = r.llen(QUEUE_KEY)
+                if qlen > MAX_QUEUE:
+                    log.warning("Queue too long (%d), dropping %d msgs", qlen, len(batch))
+                    continue
+                pipe = r.pipeline()
+                for item in batch:
+                    pipe.rpush(QUEUE_KEY, item)
+                pipe.execute()
+                total += len(batch)
+                if total % 1000 < len(batch):
+                    log.info("Buffered %d (queue: %d, total: %d)", len(batch), qlen + len(batch), total)
+
+    if __name__ == "__main__":
+        main()
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"mongo_sink.py":"#!/usr/bin/env python3\n\"\"\"Mongo Sink v2 — Kafka -\u003e Redis buffer (same pattern as pg-sink)\"\"\"\nimport os, json, time, logging\nfrom datetime import datetime, timezone\nfrom kafka import KafkaConsumer\nimport redis\n\nlogging.basicConfig(level=logging.INFO, format=\"%(asctime)s %(levelname)s %(message)s\")\nlog = logging.getLogger(\"mongo-sink\")\n\nKAFKA       = os.getenv(\"KAFKA_BOOTSTRAP\", \"redpanda.aiot.svc.cluster.local:9092\")\nTOPIC       = os.getenv(\"KAFKA_TOPIC\", \"telemetry\")\nREDIS_HOST  = os.getenv(\"REDIS_HOST\", \"redis-master.aiot.svc.cluster.local\")\nREDIS_PORT  = int(os.getenv(\"REDIS_PORT\", \"6379\"))\nREDIS_DB    = int(os.getenv(\"REDIS_DB\", \"8\"))\nQUEUE_KEY   = os.getenv(\"QUEUE_KEY\", \"mongo:write_buffer\")\nBATCH       = int(os.getenv(\"BATCH_SIZE\", \"200\"))\nFLUSH_S     = int(os.getenv(\"FLUSH_INTERVAL\", \"2\"))\nMAX_QUEUE   = int(os.getenv(\"MAX_QUEUE_LEN\", \"500000\"))\n\ndef parse_msg(raw):\n    try:\n        d = json.loads(raw)\n    except Exception:\n        return None\n    payload = d.get(\"payload\", d)\n    topic = d.get(\"topic\", payload.get(\"topic\", \"\"))\n    ts_val = d.get(\"timestamp\", payload.get(\"timestamp\", time.time()))\n    machine_id = payload.get(\"machine_id\", \"unknown\")\n    machine_type = payload.get(\"machine_type\", machine_id.rsplit(\"-\", 1)[0] if \"-\" in machine_id else \"unknown\")\n    status = payload.get(\"status\", \"UNKNOWN\").upper()\n    violations = payload.get(\"violations\", [])\n    try:\n        ts = datetime.fromtimestamp(float(ts_val), tz=timezone.utc).isoformat()\n    except Exception:\n        ts = datetime.now(timezone.utc).isoformat()\n    return json.dumps({\n        \"ts\": ts,\n        \"machine_id\": machine_id,\n        \"machine_type\": machine_type,\n        \"location\": payload.get(\"location\"),\n        \"status\": status,\n        \"temperature\": payload.get(\"temperature\"),\n        \"vibration\": payload.get(\"vibration\"),\n        \"pressure\": payload.get(\"pressure\"),\n        \"rpm\": payload.get(\"rpm\"),\n        \"humidity\": payload.get(\"humidity\"),\n        \"anomaly_score\": payload.get(\"anomaly_score\"),\n        \"power_consumption\": payload.get(\"power_consumption\"),\n        \"uptime_hours\": payload.get(\"uptime_hours\"),\n        \"violations_count\": len(violations),\n        \"violations\": json.dumps(violations) if violations else None,\n        \"topic\": topic,\n    })\n\ndef main():\n    log.info(\"mongo-sink v2: Kafka -\u003e Redis buffer\")\n    log.info(\"Kafka: %s topic=%s\", KAFKA, TOPIC)\n    log.info(\"Redis: %s:%d db=%d key=%s\", REDIS_HOST, REDIS_PORT, REDIS_DB, QUEUE_KEY)\n\n    r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)\n    r.ping()\n    log.info(\"Redis connected!\")\n\n    consumer = KafkaConsumer(\n        TOPIC,\n        bootstrap_servers=KAFKA,\n        group_id=\"mongo-sink-v2-redis\",\n        auto_offset_reset=\"latest\",\n        value_deserializer=lambda m: m.decode(\"utf-8\", errors=\"replace\"),\n        consumer_timeout_ms=FLUSH_S * 1000,\n    )\n    log.info(\"Kafka connected!\")\n\n    total = 0\n    while True:\n        batch = []\n        deadline = time.time() + FLUSH_S\n        try:\n            for msg in consumer:\n                row = parse_msg(msg.value)\n                if row:\n                    batch.append(row)\n                if len(batch) \u003e= BATCH or time.time() \u003e= deadline:\n                    break\n        except StopIteration:\n            pass\n\n        if batch:\n            qlen = r.llen(QUEUE_KEY)\n            if qlen \u003e MAX_QUEUE:\n                log.warning(\"Queue too long (%d), dropping %d msgs\", qlen, len(batch))\n                continue\n            pipe = r.pipeline()\n            for item in batch:\n                pipe.rpush(QUEUE_KEY, item)\n            pipe.execute()\n            total += len(batch)\n            if total % 1000 \u003c len(batch):\n                log.info(\"Buffered %d (queue: %d, total: %d)\", len(batch), qlen + len(batch), total)\n\nif __name__ == \"__main__\":\n    main()\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"mongo-sink-code","namespace":"aiot"}}
+  creationTimestamp: "2026-03-15T06:09:55Z"
+  name: mongo-sink-code
+  namespace: aiot
+  resourceVersion: "3387977"
+  uid: fad50f47-6b01-4bae-8bdb-2469db5d6238

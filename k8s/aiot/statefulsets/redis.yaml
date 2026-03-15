@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"name":"redis","namespace":"aiot"},"spec":{"replicas":3,"selector":{"matchLabels":{"app":"redis-ha"}},"serviceName":"redis-headless","template":{"metadata":{"labels":{"app":"redis-ha"}},"spec":{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchLabels":{"app":"redis-ha"}},"topologyKey":"kubernetes.io/hostname"},"weight":100}]}},"containers":[{"command":["/bin/sh","-c","ROLE=$(cat /data/role)\nif [ \"$ROLE\" = \"master\" ]; then\n  exec redis-server /data/redis.conf\nelse\n  # Čakaj na mastera\n  until redis-cli -h redis-0.redis-headless.aiot.svc.cluster.local ping 2\u003e/dev/null; do\n    echo \"Waiting for master...\"\n    sleep 2\n  done\n  exec redis-server /data/redis.conf\nfi\n"],"image":"redis:7-alpine","livenessProbe":{"exec":{"command":["redis-cli","ping"]},"initialDelaySeconds":15,"periodSeconds":10,"timeoutSeconds":3},"name":"redis","ports":[{"containerPort":6379}],"readinessProbe":{"exec":{"command":["redis-cli","ping"]},"initialDelaySeconds":5,"periodSeconds":5,"timeoutSeconds":3},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/data","name":"data"},{"mountPath":"/config","name":"config"}]}],"initContainers":[{"command":["/bin/sh","-c","HOSTNAME=$(hostname)\nORDINAL=${HOSTNAME##*-}\nif [ \"$ORDINAL\" = \"0\" ]; then\n  echo \"master\" \u003e /data/role\n  cp /config/redis-master.conf /data/redis.conf\nelse\n  echo \"slave\" \u003e /data/role\n  cp /config/redis-slave.conf /data/redis.conf\nfi\n"],"image":"redis:7-alpine","name":"init-role","volumeMounts":[{"mountPath":"/data","name":"data"},{"mountPath":"/config","name":"config"}]}],"volumes":[{"configMap":{"name":"redis-sentinel-config"},"name":"config"},{"emptyDir":{},"name":"data"}]}}}}
+  creationTimestamp: "2026-03-15T01:35:32Z"
+  generation: 1
+  name: redis
+  namespace: aiot
+  resourceVersion: "3395748"
+  uid: 9a265001-3f59-4b82-96cc-cd5320936375
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: redis-ha
+  serviceName: redis-headless
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: redis-ha
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: redis-ha
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          ROLE=$(cat /data/role)
+          if [ "$ROLE" = "master" ]; then
+            exec redis-server /data/redis.conf
+          else
+            # Čakaj na mastera
+            until redis-cli -h redis-0.redis-headless.aiot.svc.cluster.local ping 2>/dev/null; do
+              echo "Waiting for master..."
+              sleep 2
+            done
+            exec redis-server /data/redis.conf
+          fi
+        image: redis:7-alpine
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          failureThreshold: 3
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: redis
+        ports:
+        - containerPort: 6379
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /data
+          name: data
+        - mountPath: /config
+          name: config
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - /bin/sh
+        - -c
+        - |
+          HOSTNAME=$(hostname)
+          ORDINAL=${HOSTNAME##*-}
+          if [ "$ORDINAL" = "0" ]; then
+            echo "master" > /data/role
+            cp /config/redis-master.conf /data/redis.conf
+          else
+            echo "slave" > /data/role
+            cp /config/redis-slave.conf /data/redis.conf
+          fi
+        image: redis:7-alpine
+        imagePullPolicy: IfNotPresent
+        name: init-role
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /data
+          name: data
+        - mountPath: /config
+          name: config
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: redis-sentinel-config
+        name: config
+      - emptyDir: {}
+        name: data
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+status:
+  availableReplicas: 3
+  collisionCount: 0
+  currentReplicas: 3
+  currentRevision: redis-8588b4b64b
+  observedGeneration: 1
+  readyReplicas: 3
+  replicas: 3
+  updateRevision: redis-8588b4b64b
+  updatedReplicas: 3

@@ -1,0 +1,203 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"cloudbeaver-data","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"1Gi"}},"storageClassName":"piraeus-storage-single"}}
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: instance-worker-03
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+    creationTimestamp: "2026-03-14T08:20:12Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: cloudbeaver-data
+    namespace: aiot
+    resourceVersion: "3007800"
+    uid: e80ac123-e9d6-46f0-af86-7aa205c149e9
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: piraeus-storage-single
+    volumeMode: Filesystem
+    volumeName: pvc-e80ac123-e9d6-46f0-af86-7aa205c149e9
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: instance-worker-03
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+    creationTimestamp: "2026-03-14T22:43:21Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app: redpanda
+    name: data-redpanda-0
+    namespace: aiot
+    resourceVersion: "3376336"
+    uid: e6534284-34b8-4bbc-8d7b-8ebdb96630db
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: piraeus-storage-single
+    volumeMode: Filesystem
+    volumeName: pvc-e6534284-34b8-4bbc-8d7b-8ebdb96630db
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 20Gi
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"mongodb-data","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"5Gi"}},"storageClassName":"piraeus-storage-single"}}
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: instance-worker-02
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+    creationTimestamp: "2026-03-15T06:09:54Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: mongodb-data
+    namespace: aiot
+    resourceVersion: "3382377"
+    uid: 7dfbe5ce-5fb6-4980-ae93-642e91295852
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+    storageClassName: piraeus-storage-single
+    volumeMode: Filesystem
+    volumeName: pvc-7dfbe5ce-5fb6-4980-ae93-642e91295852
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 5Gi
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"pgadmin-data","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"1Gi"}},"storageClassName":"piraeus-storage-single"}}
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: instance-20260301-125050
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+    creationTimestamp: "2026-03-14T08:20:12Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: pgadmin-data
+    namespace: aiot
+    resourceVersion: "3004879"
+    uid: 3ed86092-275c-4b61-834d-d296ae692b6c
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: piraeus-storage-single
+    volumeMode: Filesystem
+    volumeName: pvc-3ed86092-275c-4b61-834d-d296ae692b6c
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"postgres-data-piraeus","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"10Gi"}},"storageClassName":"piraeus-storage-single"}}
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: instance-20260301-125050
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+    creationTimestamp: "2026-03-14T07:43:06Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: postgres-data-piraeus
+    namespace: aiot
+    resourceVersion: "2993780"
+    uid: 02a716af-f32d-4b3d-8ff7-0dbc93c8412d
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: piraeus-storage-single
+    volumeMode: Filesystem
+    volumeName: pvc-02a716af-f32d-4b3d-8ff7-0dbc93c8412d
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 10Gi
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"qdrant-pvc-piraeus","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"15Gi"}},"storageClassName":"piraeus-storage-single"}}
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: instance-worker-03
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+    creationTimestamp: "2026-03-14T07:43:06Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: qdrant-pvc-piraeus
+    namespace: aiot
+    resourceVersion: "3007356"
+    uid: 26911b6a-dd83-43cd-8db5-dfcb98da84d5
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 15Gi
+    storageClassName: piraeus-storage-single
+    volumeMode: Filesystem
+    volumeName: pvc-26911b6a-dd83-43cd-8db5-dfcb98da84d5
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 15Gi
+    phase: Bound
+kind: List
+metadata:
+  resourceVersion: ""

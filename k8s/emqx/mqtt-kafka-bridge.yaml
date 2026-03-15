@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "13"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"mqtt-kafka-bridge","namespace":"emqx"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"mqtt-kafka-bridge"}},"template":{"metadata":{"annotations":{"version":"v3"},"labels":{"app":"mqtt-kafka-bridge"}},"spec":{"containers":[{"args":["pip install --quiet 'paho-mqtt>=2.0.0' 'kafka-python-ng>=2.0.0' && python -u /app/bridge.py"],"command":["/bin/sh","-c"],"env":[{"name":"MQTT_HOST","value":"emqx.emqx.svc.cluster.local"},{"name":"MQTT_PORT","value":"1883"},{"name":"KAFKA_BOOTSTRAP","value":"aiot-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092"},{"name":"KAFKA_TOPIC","value":"telemetry"}],"image":"python:3.11-slim","name":"bridge","resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}},"volumeMounts":[{"mountPath":"/app","name":"code"}]}],"volumes":[{"configMap":{"name":"mqtt-kafka-bridge-code"},"name":"code"}]}}}}
+  creationTimestamp: "2026-03-05T16:47:17Z"
+  generation: 15
+  name: mqtt-kafka-bridge
+  namespace: emqx
+  resourceVersion: "3398803"
+  uid: 6f81e0d9-85ca-4765-8a42-52a0b271cad7
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: mqtt-kafka-bridge
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-03-14T08:33:18Z"
+        version: v3
+      creationTimestamp: null
+      labels:
+        app: mqtt-kafka-bridge
+    spec:
+      containers:
+      - args:
+        - |
+          pip install --quiet 'paho-mqtt>=2.0.0' 'kafka-python-ng>=2.0.0' && python -u /app/bridge.py
+        command:
+        - /bin/sh
+        - -c
+        env:
+        - name: MQTT_HOST
+          value: emqx.emqx.svc.cluster.local
+        - name: MQTT_PORT
+          value: "1883"
+        - name: KAFKA_BOOTSTRAP
+          value: redpanda.aiot.svc.cluster.local:9092
+        - name: KAFKA_TOPIC
+          value: telemetry
+        image: python:3.11-slim
+        imagePullPolicy: IfNotPresent
+        name: bridge
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /app
+          name: code
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/hostname: instance-worker-02
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: mqtt-kafka-bridge-code
+        name: code
+status:
+  availableReplicas: 2
+  conditions:
+  - lastTransitionTime: "2026-03-05T16:47:17Z"
+    lastUpdateTime: "2026-03-14T08:33:22Z"
+    message: ReplicaSet "mqtt-kafka-bridge-d85b78556" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-03-15T06:56:46Z"
+    lastUpdateTime: "2026-03-15T06:56:46Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 15
+  readyReplicas: 2
+  replicas: 2
+  updatedReplicas: 2

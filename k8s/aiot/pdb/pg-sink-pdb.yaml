@@ -1,0 +1,30 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"policy/v1","kind":"PodDisruptionBudget","metadata":{"annotations":{},"name":"pg-sink-pdb","namespace":"aiot"},"spec":{"minAvailable":1,"selector":{"matchLabels":{"app":"pg-sink"}}}}
+  creationTimestamp: "2026-03-11T17:39:31Z"
+  generation: 1
+  name: pg-sink-pdb
+  namespace: aiot
+  resourceVersion: "3399203"
+  uid: e38695d9-7cd6-4196-9d7f-f7d9d7a772b2
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: pg-sink
+status:
+  conditions:
+  - lastTransitionTime: "2026-03-14T23:55:25Z"
+    message: ""
+    observedGeneration: 1
+    reason: InsufficientPods
+    status: "False"
+    type: DisruptionAllowed
+  currentHealthy: 1
+  desiredHealthy: 1
+  disruptionsAllowed: 0
+  expectedPods: 1
+  observedGeneration: 1

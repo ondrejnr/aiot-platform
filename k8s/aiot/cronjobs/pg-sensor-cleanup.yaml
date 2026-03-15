@@ -1,0 +1,63 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"batch/v1","kind":"CronJob","metadata":{"annotations":{},"name":"pg-sensor-cleanup","namespace":"aiot"},"spec":{"failedJobsHistoryLimit":2,"jobTemplate":{"spec":{"backoffLimit":3,"template":{"spec":{"containers":[{"args":["echo \"=== Cleanup start ===\"\nPGPASSWORD=\"$PG_PASS\" psql -h postgres.aiot.svc.cluster.local -U \"$PG_USER\" -d aiot -c \"DELETE FROM sensor_data WHERE ts \u003c NOW() - INTERVAL '2 hours';\"\nPGPASSWORD=\"$PG_PASS\" psql -h postgres.aiot.svc.cluster.local -U \"$PG_USER\" -d aiot -c \"VACUUM sensor_data;\"\nPGPASSWORD=\"$PG_PASS\" psql -h postgres.aiot.svc.cluster.local -U \"$PG_USER\" -d aiot -c \"SELECT count(*) AS remaining_rows, pg_size_pretty(pg_total_relation_size('sensor_data')) AS size FROM sensor_data;\"\necho \"=== Cleanup done ===\"\n"],"command":["sh","-c"],"env":[{"name":"PG_PASS","valueFrom":{"secretKeyRef":{"key":"password","name":"pg-credentials"}}},{"name":"PG_USER","valueFrom":{"secretKeyRef":{"key":"username","name":"pg-credentials"}}}],"image":"postgres:16","name":"cleanup"}],"restartPolicy":"OnFailure"}}}},"schedule":"*/15 * * * *","successfulJobsHistoryLimit":2}}
+  creationTimestamp: "2026-03-11T17:10:48Z"
+  generation: 2
+  name: pg-sensor-cleanup
+  namespace: aiot
+  resourceVersion: "3442258"
+  uid: b881d282-4cef-429b-89c8-3308f9537a3d
+spec:
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      backoffLimit: 3
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - args:
+            - |
+              echo "=== Cleanup start ==="
+              PGPASSWORD="$PG_PASS" psql -h postgres.aiot.svc.cluster.local -U "$PG_USER" -d aiot -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '2 hours';"
+              PGPASSWORD="$PG_PASS" psql -h postgres.aiot.svc.cluster.local -U "$PG_USER" -d aiot -c "VACUUM sensor_data;"
+              PGPASSWORD="$PG_PASS" psql -h postgres.aiot.svc.cluster.local -U "$PG_USER" -d aiot -c "SELECT count(*) AS remaining_rows, pg_size_pretty(pg_total_relation_size('sensor_data')) AS size FROM sensor_data;"
+              echo "=== Cleanup done ==="
+            command:
+            - sh
+            - -c
+            env:
+            - name: PG_PASS
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: pg-credentials
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: pg-credentials
+            image: postgres:16
+            imagePullPolicy: IfNotPresent
+            name: cleanup
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  schedule: '*/5 * * * *'
+  successfulJobsHistoryLimit: 2
+  suspend: false
+status:
+  lastScheduleTime: "2026-03-15T09:15:00Z"
+  lastSuccessfulTime: "2026-03-15T09:15:11Z"

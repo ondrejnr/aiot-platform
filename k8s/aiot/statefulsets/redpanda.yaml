@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"name":"redpanda","namespace":"aiot"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"redpanda"}},"serviceName":"redpanda-headless","template":{"metadata":{"labels":{"app":"redpanda"}},"spec":{"containers":[{"args":["redpanda","start","--overprovisioned","--smp=1","--memory=256M","--reserve-memory=0M","--check=false","--kafka-addr=PLAINTEXT://0.0.0.0:9092","--advertise-kafka-addr=PLAINTEXT://redpanda-0.redpanda-headless.aiot.svc.cluster.local:9092","--pandaproxy-addr=PLAINTEXT://0.0.0.0:8082","--advertise-pandaproxy-addr=PLAINTEXT://redpanda-0.redpanda-headless.aiot.svc.cluster.local:8082"],"image":"docker.redpanda.com/redpandadata/redpanda:v24.1.1","name":"redpanda","ports":[{"containerPort":9092,"name":"kafka"},{"containerPort":9644,"name":"admin"},{"containerPort":8082,"name":"proxy"}],"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/var/lib/redpanda/data","name":"data"}]}],"initContainers":[{"command":["sh","-c","chown -R 101:101 /var/lib/redpanda/data || true"],"image":"busybox","name":"fix-permissions","volumeMounts":[{"mountPath":"/var/lib/redpanda/data","name":"data"}]}]}},"volumeClaimTemplates":[{"metadata":{"name":"data"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"10Gi"}},"storageClassName":"piraeus-storage-single"}}]}}
+  creationTimestamp: "2026-03-14T22:43:21Z"
+  generation: 3
+  name: redpanda
+  namespace: aiot
+  resourceVersion: "3398733"
+  uid: 18fef2ea-8609-4980-8fbd-ab3df21f4c23
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: redpanda
+  serviceName: redpanda-headless
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: redpanda
+    spec:
+      containers:
+      - args:
+        - redpanda
+        - start
+        - --overprovisioned
+        - --smp=1
+        - --memory=256M
+        - --reserve-memory=0M
+        - --check=false
+        - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+        - --advertise-kafka-addr=PLAINTEXT://redpanda-0.redpanda-headless.aiot.svc.cluster.local:9092
+        - --pandaproxy-addr=PLAINTEXT://0.0.0.0:8082
+        - --advertise-pandaproxy-addr=PLAINTEXT://redpanda-0.redpanda-headless.aiot.svc.cluster.local:8082
+        image: docker.redpanda.com/redpandadata/redpanda:v24.1.1
+        imagePullPolicy: IfNotPresent
+        name: redpanda
+        ports:
+        - containerPort: 9092
+          name: kafka
+          protocol: TCP
+        - containerPort: 9644
+          name: admin
+          protocol: TCP
+        - containerPort: 8082
+          name: proxy
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/redpanda/data
+          name: data
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R 101:101 /var/lib/redpanda/data || true
+        image: busybox
+        imagePullPolicy: Always
+        name: fix-permissions
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/redpanda/data
+          name: data
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: piraeus-storage-single
+      volumeMode: Filesystem
+    status:
+      phase: Pending
+status:
+  availableReplicas: 1
+  collisionCount: 0
+  currentReplicas: 1
+  currentRevision: redpanda-864b777d46
+  observedGeneration: 3
+  readyReplicas: 1
+  replicas: 1
+  updateRevision: redpanda-864b777d46
+  updatedReplicas: 1

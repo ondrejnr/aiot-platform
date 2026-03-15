@@ -1,0 +1,18 @@
+apiVersion: v1
+data:
+  production.yaml: |
+    service:
+      host: "0.0.0.0"
+    storage:
+      storage_path: /qdrant/storage
+      on_disk_payload: true
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"production.yaml":"service:\n  host: \"0.0.0.0\"\nstorage:\n  storage_path: /qdrant/storage\n  on_disk_payload: true\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"qdrant-config","namespace":"aiot"}}
+  creationTimestamp: "2026-03-11T19:53:11Z"
+  name: qdrant-config
+  namespace: aiot
+  resourceVersion: "2317446"
+  uid: 28866874-ac2f-466d-975e-aefdd05c903a

@@ -1,0 +1,54 @@
+apiVersion: v1
+data:
+  redis-master.conf: |
+    bind 0.0.0.0
+    port 6379
+    save 60 1000
+    save 300 100
+    save 900 1
+    maxmemory 400mb
+    maxmemory-policy allkeys-lru
+    appendonly yes
+    appendfsync everysec
+    min-replicas-to-write 0
+    min-replicas-max-lag 10
+  redis-slave.conf: |
+    bind 0.0.0.0
+    port 6379
+    replicaof redis-0.redis-headless.aiot.svc.cluster.local 6379
+    save 60 1000
+    save 300 100
+    maxmemory 400mb
+    maxmemory-policy allkeys-lru
+    appendonly yes
+    appendfsync everysec
+  sentinel-entrypoint.sh: |
+    #!/bin/sh
+    cp /config/sentinel.conf /tmp/sentinel.conf
+    exec redis-sentinel /tmp/sentinel.conf
+  sentinel.conf: |
+    port 26379
+    sentinel monitor mymaster redis-0.redis-headless.aiot.svc.cluster.local 6379 2
+    sentinel down-after-milliseconds mymaster 5000
+    sentinel failover-timeout mymaster 10000
+    sentinel parallel-syncs mymaster 1
+    sentinel resolve-hostnames yes
+    sentinel announce-hostnames yes
+  slave-entrypoint.sh: |
+    #!/bin/sh
+    # Počkaj kým master je ready
+    until redis-cli -h redis-0.redis-headless.aiot.svc.cluster.local ping 2>/dev/null; do
+      echo "Waiting for master..."
+      sleep 2
+    done
+    exec redis-server /config/redis-slave.conf
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"redis-master.conf":"bind 0.0.0.0\nport 6379\nsave 60 1000\nsave 300 100\nsave 900 1\nmaxmemory 400mb\nmaxmemory-policy allkeys-lru\nappendonly yes\nappendfsync everysec\nmin-replicas-to-write 0\nmin-replicas-max-lag 10\n","redis-slave.conf":"bind 0.0.0.0\nport 6379\nreplicaof redis-0.redis-headless.aiot.svc.cluster.local 6379\nsave 60 1000\nsave 300 100\nmaxmemory 400mb\nmaxmemory-policy allkeys-lru\nappendonly yes\nappendfsync everysec\n","sentinel-entrypoint.sh":"#!/bin/sh\ncp /config/sentinel.conf /tmp/sentinel.conf\nexec redis-sentinel /tmp/sentinel.conf\n","sentinel.conf":"port 26379\nsentinel monitor mymaster redis-0.redis-headless.aiot.svc.cluster.local 6379 2\nsentinel down-after-milliseconds mymaster 5000\nsentinel failover-timeout mymaster 10000\nsentinel parallel-syncs mymaster 1\nsentinel resolve-hostnames yes\nsentinel announce-hostnames yes\n","slave-entrypoint.sh":"#!/bin/sh\n# Počkaj kým master je ready\nuntil redis-cli -h redis-0.redis-headless.aiot.svc.cluster.local ping 2\u003e/dev/null; do\n  echo \"Waiting for master...\"\n  sleep 2\ndone\nexec redis-server /config/redis-slave.conf\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"redis-sentinel-config","namespace":"aiot"}}
+  creationTimestamp: "2026-03-15T01:35:31Z"
+  name: redis-sentinel-config
+  namespace: aiot
+  resourceVersion: "3297141"
+  uid: b49db87d-20f5-4c21-acc8-a08942a40940

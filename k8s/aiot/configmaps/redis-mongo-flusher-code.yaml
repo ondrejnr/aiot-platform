@@ -1,0 +1,126 @@
+apiVersion: v1
+data:
+  mongo_flusher.py: |
+    #!/usr/bin/env python3
+    """Redis -> MongoDB Flusher (same pattern as redis-pg-flusher)"""
+    import os, json, time, logging
+    from datetime import datetime, timezone
+    import redis
+    from pymongo import MongoClient, InsertOne
+    from pymongo.errors import BulkWriteError
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    log = logging.getLogger("mongo-flusher")
+
+    MONGO_URI   = os.getenv("MONGO_URI", "mongodb://aiot_admin:aiot_password@mongodb.aiot.svc.cluster.local:27017/aiot?authSource=admin")
+    MONGO_DB    = os.getenv("MONGO_DB", "aiot")
+    COLLECTION  = os.getenv("MONGO_COLLECTION", "sensor_data")
+    REDIS_HOST  = os.getenv("REDIS_HOST", "redis-master.aiot.svc.cluster.local")
+    REDIS_PORT  = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_DB    = int(os.getenv("REDIS_DB", "8"))
+    QUEUE_KEY   = os.getenv("QUEUE_KEY", "mongo:write_buffer")
+    FLUSH_INTERVAL = float(os.getenv("FLUSH_INTERVAL", "1.0"))
+    BATCH_SIZE  = int(os.getenv("BATCH_SIZE", "1000"))
+
+    def connect_mongo():
+        client = MongoClient(MONGO_URI)
+        db = client[MONGO_DB]
+        col = db[COLLECTION]
+        # Create indexes
+        col.create_index([("ts", -1)])
+        col.create_index([("machine_id", 1)])
+        col.create_index([("machine_type", 1)])
+        col.create_index([("status", 1)])
+        col.create_index([("ts", -1), ("machine_id", 1)])
+        col.create_index([("ts", 1)], expireAfterSeconds=86400, name="ttl_24h")
+        return col
+
+    def flush_batch(r, col):
+        pipe = r.pipeline()
+        pipe.lrange(QUEUE_KEY, 0, BATCH_SIZE - 1)
+        pipe.ltrim(QUEUE_KEY, BATCH_SIZE, -1)
+        results = pipe.execute()
+        items = results[0]
+        if not items:
+            return 0
+
+        ops = []
+        for raw in items:
+            try:
+                d = json.loads(raw)
+                ts_str = d.get("ts", datetime.now(timezone.utc).isoformat())
+                try:
+                    ts = datetime.fromisoformat(ts_str)
+                except:
+                    ts = datetime.now(timezone.utc)
+
+                doc = {
+                    "ts": ts,
+                    "machine_id": d.get("machine_id", ""),
+                    "machine_type": d.get("machine_type", ""),
+                    "location": d.get("location"),
+                    "status": d.get("status", ""),
+                    "temperature": d.get("temperature"),
+                    "vibration": d.get("vibration"),
+                    "pressure": d.get("pressure"),
+                    "rpm": d.get("rpm"),
+                    "humidity": d.get("humidity"),
+                    "anomaly_score": d.get("anomaly_score"),
+                    "power_consumption": d.get("power_consumption"),
+                    "uptime_hours": d.get("uptime_hours"),
+                    "violations_count": d.get("violations_count", 0),
+                    "violations": json.loads(d["violations"]) if d.get("violations") else [],
+                    "topic": d.get("topic", ""),
+                }
+                ops.append(InsertOne(doc))
+            except Exception as e:
+                log.error("Parse error: %s", e)
+
+        if ops:
+            try:
+                result = col.bulk_write(ops, ordered=False)
+                return result.inserted_count
+            except BulkWriteError as e:
+                log.warning("Bulk write error: %s", str(e)[:200])
+                return len(ops)
+        return 0
+
+    def main():
+        log.info("Redis->MongoDB Flusher starting")
+        log.info("Redis: %s:%d db=%d key=%s", REDIS_HOST, REDIS_PORT, REDIS_DB, QUEUE_KEY)
+        log.info("MongoDB: %s db=%s col=%s", MONGO_URI.split("@")[1].split("/")[0], MONGO_DB, COLLECTION)
+        log.info("Batch=%d interval=%.1fs", BATCH_SIZE, FLUSH_INTERVAL)
+
+        r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
+        col = connect_mongo()
+        log.info("Connected!")
+
+        total = 0
+        while True:
+            try:
+                qlen = r.llen(QUEUE_KEY)
+                if qlen > 0:
+                    flushed = flush_batch(r, col)
+                    total += flushed
+                    if flushed > 0:
+                        log.info("Flushed %d docs (queue: %d, total: %d)", flushed, qlen - flushed, total)
+                time.sleep(FLUSH_INTERVAL)
+            except Exception as e:
+                log.error("Flush error: %s", e)
+                try:
+                    col = connect_mongo()
+                except:
+                    time.sleep(5)
+
+    if __name__ == "__main__":
+        main()
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"mongo_flusher.py":"#!/usr/bin/env python3\n\"\"\"Redis -\u003e MongoDB Flusher (same pattern as redis-pg-flusher)\"\"\"\nimport os, json, time, logging\nfrom datetime import datetime, timezone\nimport redis\nfrom pymongo import MongoClient, InsertOne\nfrom pymongo.errors import BulkWriteError\n\nlogging.basicConfig(level=logging.INFO, format=\"%(asctime)s %(levelname)s %(message)s\")\nlog = logging.getLogger(\"mongo-flusher\")\n\nMONGO_URI   = os.getenv(\"MONGO_URI\", \"mongodb://aiot_admin:aiot_password@mongodb.aiot.svc.cluster.local:27017/aiot?authSource=admin\")\nMONGO_DB    = os.getenv(\"MONGO_DB\", \"aiot\")\nCOLLECTION  = os.getenv(\"MONGO_COLLECTION\", \"sensor_data\")\nREDIS_HOST  = os.getenv(\"REDIS_HOST\", \"redis-master.aiot.svc.cluster.local\")\nREDIS_PORT  = int(os.getenv(\"REDIS_PORT\", \"6379\"))\nREDIS_DB    = int(os.getenv(\"REDIS_DB\", \"8\"))\nQUEUE_KEY   = os.getenv(\"QUEUE_KEY\", \"mongo:write_buffer\")\nFLUSH_INTERVAL = float(os.getenv(\"FLUSH_INTERVAL\", \"1.0\"))\nBATCH_SIZE  = int(os.getenv(\"BATCH_SIZE\", \"1000\"))\n\ndef connect_mongo():\n    client = MongoClient(MONGO_URI)\n    db = client[MONGO_DB]\n    col = db[COLLECTION]\n    # Create indexes\n    col.create_index([(\"ts\", -1)])\n    col.create_index([(\"machine_id\", 1)])\n    col.create_index([(\"machine_type\", 1)])\n    col.create_index([(\"status\", 1)])\n    col.create_index([(\"ts\", -1), (\"machine_id\", 1)])\n    col.create_index([(\"ts\", 1)], expireAfterSeconds=86400, name=\"ttl_24h\")\n    return col\n\ndef flush_batch(r, col):\n    pipe = r.pipeline()\n    pipe.lrange(QUEUE_KEY, 0, BATCH_SIZE - 1)\n    pipe.ltrim(QUEUE_KEY, BATCH_SIZE, -1)\n    results = pipe.execute()\n    items = results[0]\n    if not items:\n        return 0\n\n    ops = []\n    for raw in items:\n        try:\n            d = json.loads(raw)\n            ts_str = d.get(\"ts\", datetime.now(timezone.utc).isoformat())\n            try:\n                ts = datetime.fromisoformat(ts_str)\n            except:\n                ts = datetime.now(timezone.utc)\n\n            doc = {\n                \"ts\": ts,\n                \"machine_id\": d.get(\"machine_id\", \"\"),\n                \"machine_type\": d.get(\"machine_type\", \"\"),\n                \"location\": d.get(\"location\"),\n                \"status\": d.get(\"status\", \"\"),\n                \"temperature\": d.get(\"temperature\"),\n                \"vibration\": d.get(\"vibration\"),\n                \"pressure\": d.get(\"pressure\"),\n                \"rpm\": d.get(\"rpm\"),\n                \"humidity\": d.get(\"humidity\"),\n                \"anomaly_score\": d.get(\"anomaly_score\"),\n                \"power_consumption\": d.get(\"power_consumption\"),\n                \"uptime_hours\": d.get(\"uptime_hours\"),\n                \"violations_count\": d.get(\"violations_count\", 0),\n                \"violations\": json.loads(d[\"violations\"]) if d.get(\"violations\") else [],\n                \"topic\": d.get(\"topic\", \"\"),\n            }\n            ops.append(InsertOne(doc))\n        except Exception as e:\n            log.error(\"Parse error: %s\", e)\n\n    if ops:\n        try:\n            result = col.bulk_write(ops, ordered=False)\n            return result.inserted_count\n        except BulkWriteError as e:\n            log.warning(\"Bulk write error: %s\", str(e)[:200])\n            return len(ops)\n    return 0\n\ndef main():\n    log.info(\"Redis-\u003eMongoDB Flusher starting\")\n    log.info(\"Redis: %s:%d db=%d key=%s\", REDIS_HOST, REDIS_PORT, REDIS_DB, QUEUE_KEY)\n    log.info(\"MongoDB: %s db=%s col=%s\", MONGO_URI.split(\"@\")[1].split(\"/\")[0], MONGO_DB, COLLECTION)\n    log.info(\"Batch=%d interval=%.1fs\", BATCH_SIZE, FLUSH_INTERVAL)\n\n    r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)\n    col = connect_mongo()\n    log.info(\"Connected!\")\n\n    total = 0\n    while True:\n        try:\n            qlen = r.llen(QUEUE_KEY)\n            if qlen \u003e 0:\n                flushed = flush_batch(r, col)\n                total += flushed\n                if flushed \u003e 0:\n                    log.info(\"Flushed %d docs (queue: %d, total: %d)\", flushed, qlen - flushed, total)\n            time.sleep(FLUSH_INTERVAL)\n        except Exception as e:\n            log.error(\"Flush error: %s\", e)\n            try:\n                col = connect_mongo()\n            except:\n                time.sleep(5)\n\nif __name__ == \"__main__\":\n    main()\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"redis-mongo-flusher-code","namespace":"aiot"}}
+  creationTimestamp: "2026-03-15T06:28:22Z"
+  name: redis-mongo-flusher-code
+  namespace: aiot
+  resourceVersion: "3387978"
+  uid: 1355a0b5-a3d1-4a6c-a65e-86650f4dfa12

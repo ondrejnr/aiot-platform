@@ -1,0 +1,98 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"batch/v1","kind":"CronJob","metadata":{"annotations":{},"name":"cluster-watchdog","namespace":"aiot"},"spec":{"failedJobsHistoryLimit":2,"jobTemplate":{"spec":{"activeDeadlineSeconds":120,"backoffLimit":1,"template":{"spec":{"containers":[{"args":["echo \"=========================================\"\necho \"  CLUSTER WATCHDOG $(date)\"\necho \"=========================================\"\nPG=\"psql -h postgres.aiot.svc.cluster.local -U $PG_USER -d aiot\"\n\necho \"--- sensor_data ---\"\nPGPASSWORD=\"$PG_PASS\" $PG -c \"SELECT count(*) AS rows, pg_size_pretty(pg_total_relation_size('sensor_data')) AS size, pg_size_pretty(pg_database_size('aiot')) AS db_size, min(ts) AS oldest, max(ts) AS newest FROM sensor_data;\"\n\nSIZE_BYTES=$(PGPASSWORD=\"$PG_PASS\" $PG -t -A -c \"SELECT pg_total_relation_size('sensor_data');\")\nROWS=$(PGPASSWORD=\"$PG_PASS\" $PG -t -A -c \"SELECT count(*) FROM sensor_data;\")\nCONNS=$(PGPASSWORD=\"$PG_PASS\" $PG -t -A -c \"SELECT count(*) FROM pg_stat_activity;\")\n\necho \"size_bytes=$SIZE_BYTES rows=$ROWS connections=$CONNS\"\n\nif [ \"$SIZE_BYTES\" -gt 3221225472 ] 2\u003e/dev/null; then\n  echo \"ALERT: sensor_data \u003e 3GB! Emergency cleanup!\"\n  PGPASSWORD=\"$PG_PASS\" $PG -c \"DELETE FROM sensor_data WHERE ts \u003c NOW() - INTERVAL '1 hour';\"\n  PGPASSWORD=\"$PG_PASS\" $PG -c \"VACUUM sensor_data;\"\nelse\n  echo \"OK: size under 3GB\"\nfi\n\nif [ \"$ROWS\" -gt 5000000 ] 2\u003e/dev/null; then\n  echo \"ALERT: rows \u003e 5M! Emergency cleanup!\"\n  PGPASSWORD=\"$PG_PASS\" $PG -c \"DELETE FROM sensor_data WHERE ts \u003c NOW() - INTERVAL '30 minutes';\"\n  PGPASSWORD=\"$PG_PASS\" $PG -c \"VACUUM sensor_data;\"\nelse\n  echo \"OK: rows under 5M\"\nfi\n\nif [ \"$CONNS\" -gt 80 ] 2\u003e/dev/null; then\n  echo \"ALERT: $CONNS connections (\u003e80)!\"\nelse\n  echo \"OK: $CONNS connections\"\nfi\n\necho \"=========================================\"\necho \"  WATCHDOG COMPLETE\"\necho \"=========================================\"\n"],"command":["sh","-c"],"env":[{"name":"PG_PASS","valueFrom":{"secretKeyRef":{"key":"password","name":"pg-credentials"}}},{"name":"PG_USER","valueFrom":{"secretKeyRef":{"key":"username","name":"pg-credentials"}}}],"image":"postgres:16","name":"watchdog"}],"restartPolicy":"Never"}}}},"schedule":"*/10 * * * *","successfulJobsHistoryLimit":2}}
+  creationTimestamp: "2026-03-11T17:17:00Z"
+  generation: 1
+  name: cluster-watchdog
+  namespace: aiot
+  resourceVersion: "3440746"
+  uid: 70263b23-8ad2-48c5-8b07-79565d174add
+spec:
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 1
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - args:
+            - |
+              echo "========================================="
+              echo "  CLUSTER WATCHDOG $(date)"
+              echo "========================================="
+              PG="psql -h postgres.aiot.svc.cluster.local -U $PG_USER -d aiot"
+
+              echo "--- sensor_data ---"
+              PGPASSWORD="$PG_PASS" $PG -c "SELECT count(*) AS rows, pg_size_pretty(pg_total_relation_size('sensor_data')) AS size, pg_size_pretty(pg_database_size('aiot')) AS db_size, min(ts) AS oldest, max(ts) AS newest FROM sensor_data;"
+
+              SIZE_BYTES=$(PGPASSWORD="$PG_PASS" $PG -t -A -c "SELECT pg_total_relation_size('sensor_data');")
+              ROWS=$(PGPASSWORD="$PG_PASS" $PG -t -A -c "SELECT count(*) FROM sensor_data;")
+              CONNS=$(PGPASSWORD="$PG_PASS" $PG -t -A -c "SELECT count(*) FROM pg_stat_activity;")
+
+              echo "size_bytes=$SIZE_BYTES rows=$ROWS connections=$CONNS"
+
+              if [ "$SIZE_BYTES" -gt 3221225472 ] 2>/dev/null; then
+                echo "ALERT: sensor_data > 3GB! Emergency cleanup!"
+                PGPASSWORD="$PG_PASS" $PG -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '1 hour';"
+                PGPASSWORD="$PG_PASS" $PG -c "VACUUM sensor_data;"
+              else
+                echo "OK: size under 3GB"
+              fi
+
+              if [ "$ROWS" -gt 5000000 ] 2>/dev/null; then
+                echo "ALERT: rows > 5M! Emergency cleanup!"
+                PGPASSWORD="$PG_PASS" $PG -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '30 minutes';"
+                PGPASSWORD="$PG_PASS" $PG -c "VACUUM sensor_data;"
+              else
+                echo "OK: rows under 5M"
+              fi
+
+              if [ "$CONNS" -gt 80 ] 2>/dev/null; then
+                echo "ALERT: $CONNS connections (>80)!"
+              else
+                echo "OK: $CONNS connections"
+              fi
+
+              echo "========================================="
+              echo "  WATCHDOG COMPLETE"
+              echo "========================================="
+            command:
+            - sh
+            - -c
+            env:
+            - name: PG_PASS
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: pg-credentials
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: pg-credentials
+            image: postgres:16
+            imagePullPolicy: IfNotPresent
+            name: watchdog
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  schedule: '*/10 * * * *'
+  successfulJobsHistoryLimit: 2
+  suspend: false
+status:
+  lastScheduleTime: "2026-03-15T09:10:00Z"
+  lastSuccessfulTime: "2026-03-15T09:10:35Z"

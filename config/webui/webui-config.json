@@ -1,0 +1,43 @@
+{
+  "version": 0,
+  "ui": {
+    "enable_signup": false
+  },
+  "openai": {
+    "enable": true,
+    "api_base_urls": [
+      "http://10.164.0.3:31700/v1",
+      "http://10.164.0.3:31090/v1"
+    ],
+    "api_keys": [
+      "dummy",
+      "dummy"
+    ],
+    "api_configs": {
+      "0": {
+        "enable": true,
+        "tags": [],
+        "prefix_id": "",
+        "model_ids": [],
+        "connection_type": "external",
+        "auth_type": "none"
+      },
+      "1": {
+        "enable": true,
+        "tags": [],
+        "prefix_id": "",
+        "model_ids": [],
+        "connection_type": "external",
+        "auth_type": "none"
+      }
+    }
+  },
+  "ollama": {
+    "enable": true,
+    "base_urls": [],
+    "api_configs": {}
+  },
+  "tool_server": {
+    "connections": []
+  }
+}

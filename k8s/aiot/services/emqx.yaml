@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2026-03-10T08:46:53Z"
+  labels:
+    app: emqx
+  name: emqx
+  namespace: aiot
+  resourceVersion: "1589313"
+  uid: c5796ea3-9793-4a0a-93d7-9e87152ce42d
+spec:
+  externalName: emqx.emqx.svc.cluster.local
+  selector:
+    app: emqx
+  sessionAffinity: None
+  type: ExternalName
+status:
+  loadBalancer: {}

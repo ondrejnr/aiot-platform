@@ -1,0 +1,114 @@
+apiVersion: v1
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS machines (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(64) UNIQUE NOT NULL,
+        type VARCHAR(32) NOT NULL,
+        location VARCHAR(128),
+        zone VARCHAR(32),
+        status VARCHAR(16) DEFAULT 'ok',
+        thresholds JSONB DEFAULT '{}',
+        metadata JSONB DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS alerts (
+        id SERIAL PRIMARY KEY,
+        machine_id INTEGER REFERENCES machines(id),
+        machine_name VARCHAR(64) NOT NULL,
+        severity VARCHAR(16) NOT NULL,
+        metric VARCHAR(32) NOT NULL,
+        value DOUBLE PRECISION,
+        threshold DOUBLE PRECISION,
+        message TEXT,
+        acknowledged BOOLEAN DEFAULT FALSE,
+        acknowledged_by VARCHAR(64),
+        acknowledged_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS thresholds (
+        id SERIAL PRIMARY KEY,
+        machine_type VARCHAR(32) NOT NULL,
+        metric VARCHAR(32) NOT NULL,
+        warning_value DOUBLE PRECISION NOT NULL,
+        critical_value DOUBLE PRECISION NOT NULL,
+        unit VARCHAR(16),
+        created_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(machine_type, metric)
+    );
+
+    CREATE TABLE IF NOT EXISTS maintenance_logs (
+        id SERIAL PRIMARY KEY,
+        machine_id INTEGER REFERENCES machines(id),
+        machine_name VARCHAR(64) NOT NULL,
+        action VARCHAR(128) NOT NULL,
+        performed_by VARCHAR(64),
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS escalation_rules (
+        id SERIAL PRIMARY KEY,
+        severity VARCHAR(16) NOT NULL,
+        notify_after_minutes INTEGER DEFAULT 5,
+        channel VARCHAR(32) NOT NULL,
+        recipients JSONB DEFAULT '[]',
+        enabled BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_alerts_machine ON alerts(machine_id);
+    CREATE INDEX IF NOT EXISTS idx_alerts_severity ON alerts(severity);
+    CREATE INDEX IF NOT EXISTS idx_alerts_created ON alerts(created_at);
+    CREATE INDEX IF NOT EXISTS idx_machines_type ON machines(type);
+    CREATE INDEX IF NOT EXISTS idx_machines_status ON machines(status);
+
+    INSERT INTO thresholds (machine_type, metric, warning_value, critical_value, unit) VALUES
+        ('conveyor', 'temperature', 55, 70, '°C'),
+        ('conveyor', 'voltage', 120, 140, 'V'),
+        ('conveyor', 'rpm', 1200, 1500, 'RPM'),
+        ('generator', 'rpm', 3600, 4100, 'RPM'),
+        ('generator', 'temperature', 80, 95, '°C'),
+        ('generator', 'voltage', 165, 185, 'V'),
+        ('pumpa', 'temperature', 70, 85, '°C'),
+        ('pumpa', 'voltage', 155, 175, 'V'),
+        ('pumpa', 'rpm', 3500, 4000, 'RPM'),
+        ('reaktor', 'temperature', 85, 95, '°C'),
+        ('reaktor', 'voltage', 160, 180, 'V'),
+        ('reaktor', 'rpm', 3800, 4200, 'RPM'),
+        ('valv', 'temperature', 60, 75, '°C'),
+        ('valv', 'voltage', 130, 150, 'V'),
+        ('valv', 'rpm', 1100, 1400, 'RPM')
+    ON CONFLICT DO NOTHING;
+
+    INSERT INTO machines (name, type, location, zone, status) VALUES
+        ('reaktor-01', 'reaktor', 'Hala A', 'zone-1', 'ok'),
+        ('reaktor-02', 'reaktor', 'Hala A', 'zone-1', 'ok'),
+        ('pumpa-01', 'pumpa', 'Hala B', 'zone-2', 'ok'),
+        ('pumpa-02', 'pumpa', 'Hala B', 'zone-2', 'ok'),
+        ('generator-01', 'generator', 'Hala C', 'zone-3', 'ok'),
+        ('conveyor-01', 'conveyor', 'Hala D', 'zone-4', 'ok'),
+        ('conveyor-02', 'conveyor', 'Hala D', 'zone-4', 'ok'),
+        ('valv-01', 'valv', 'Hala A', 'zone-1', 'ok'),
+        ('valv-02', 'valv', 'Hala B', 'zone-2', 'ok'),
+        ('valv-03', 'valv', 'Hala C', 'zone-3', 'ok')
+    ON CONFLICT (name) DO NOTHING;
+
+    INSERT INTO escalation_rules (severity, notify_after_minutes, channel, recipients, enabled) VALUES
+        ('warning', 5, 'email', '["technik@aiot.com"]', true),
+        ('critical', 1, 'sms', '["manager@aiot.com","technik@aiot.com"]', true),
+        ('critical', 10, 'webhook', '["https://hooks.slack.com/aiot"]', true)
+    ON CONFLICT DO NOTHING;
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"init.sql":"CREATE TABLE IF NOT EXISTS machines (\n    id SERIAL PRIMARY KEY,\n    name VARCHAR(64) UNIQUE NOT NULL,\n    type VARCHAR(32) NOT NULL,\n    location VARCHAR(128),\n    zone VARCHAR(32),\n    status VARCHAR(16) DEFAULT 'ok',\n    thresholds JSONB DEFAULT '{}',\n    metadata JSONB DEFAULT '{}',\n    created_at TIMESTAMP DEFAULT NOW(),\n    updated_at TIMESTAMP DEFAULT NOW()\n);\n\nCREATE TABLE IF NOT EXISTS alerts (\n    id SERIAL PRIMARY KEY,\n    machine_id INTEGER REFERENCES machines(id),\n    machine_name VARCHAR(64) NOT NULL,\n    severity VARCHAR(16) NOT NULL,\n    metric VARCHAR(32) NOT NULL,\n    value DOUBLE PRECISION,\n    threshold DOUBLE PRECISION,\n    message TEXT,\n    acknowledged BOOLEAN DEFAULT FALSE,\n    acknowledged_by VARCHAR(64),\n    acknowledged_at TIMESTAMP,\n    created_at TIMESTAMP DEFAULT NOW()\n);\n\nCREATE TABLE IF NOT EXISTS thresholds (\n    id SERIAL PRIMARY KEY,\n    machine_type VARCHAR(32) NOT NULL,\n    metric VARCHAR(32) NOT NULL,\n    warning_value DOUBLE PRECISION NOT NULL,\n    critical_value DOUBLE PRECISION NOT NULL,\n    unit VARCHAR(16),\n    created_at TIMESTAMP DEFAULT NOW(),\n    UNIQUE(machine_type, metric)\n);\n\nCREATE TABLE IF NOT EXISTS maintenance_logs (\n    id SERIAL PRIMARY KEY,\n    machine_id INTEGER REFERENCES machines(id),\n    machine_name VARCHAR(64) NOT NULL,\n    action VARCHAR(128) NOT NULL,\n    performed_by VARCHAR(64),\n    notes TEXT,\n    created_at TIMESTAMP DEFAULT NOW()\n);\n\nCREATE TABLE IF NOT EXISTS escalation_rules (\n    id SERIAL PRIMARY KEY,\n    severity VARCHAR(16) NOT NULL,\n    notify_after_minutes INTEGER DEFAULT 5,\n    channel VARCHAR(32) NOT NULL,\n    recipients JSONB DEFAULT '[]',\n    enabled BOOLEAN DEFAULT TRUE,\n    created_at TIMESTAMP DEFAULT NOW()\n);\n\nCREATE INDEX IF NOT EXISTS idx_alerts_machine ON alerts(machine_id);\nCREATE INDEX IF NOT EXISTS idx_alerts_severity ON alerts(severity);\nCREATE INDEX IF NOT EXISTS idx_alerts_created ON alerts(created_at);\nCREATE INDEX IF NOT EXISTS idx_machines_type ON machines(type);\nCREATE INDEX IF NOT EXISTS idx_machines_status ON machines(status);\n\nINSERT INTO thresholds (machine_type, metric, warning_value, critical_value, unit) VALUES\n    ('conveyor', 'temperature', 55, 70, '°C'),\n    ('conveyor', 'voltage', 120, 140, 'V'),\n    ('conveyor', 'rpm', 1200, 1500, 'RPM'),\n    ('generator', 'rpm', 3600, 4100, 'RPM'),\n    ('generator', 'temperature', 80, 95, '°C'),\n    ('generator', 'voltage', 165, 185, 'V'),\n    ('pumpa', 'temperature', 70, 85, '°C'),\n    ('pumpa', 'voltage', 155, 175, 'V'),\n    ('pumpa', 'rpm', 3500, 4000, 'RPM'),\n    ('reaktor', 'temperature', 85, 95, '°C'),\n    ('reaktor', 'voltage', 160, 180, 'V'),\n    ('reaktor', 'rpm', 3800, 4200, 'RPM'),\n    ('valv', 'temperature', 60, 75, '°C'),\n    ('valv', 'voltage', 130, 150, 'V'),\n    ('valv', 'rpm', 1100, 1400, 'RPM')\nON CONFLICT DO NOTHING;\n\nINSERT INTO machines (name, type, location, zone, status) VALUES\n    ('reaktor-01', 'reaktor', 'Hala A', 'zone-1', 'ok'),\n    ('reaktor-02', 'reaktor', 'Hala A', 'zone-1', 'ok'),\n    ('pumpa-01', 'pumpa', 'Hala B', 'zone-2', 'ok'),\n    ('pumpa-02', 'pumpa', 'Hala B', 'zone-2', 'ok'),\n    ('generator-01', 'generator', 'Hala C', 'zone-3', 'ok'),\n    ('conveyor-01', 'conveyor', 'Hala D', 'zone-4', 'ok'),\n    ('conveyor-02', 'conveyor', 'Hala D', 'zone-4', 'ok'),\n    ('valv-01', 'valv', 'Hala A', 'zone-1', 'ok'),\n    ('valv-02', 'valv', 'Hala B', 'zone-2', 'ok'),\n    ('valv-03', 'valv', 'Hala C', 'zone-3', 'ok')\nON CONFLICT (name) DO NOTHING;\n\nINSERT INTO escalation_rules (severity, notify_after_minutes, channel, recipients, enabled) VALUES\n    ('warning', 5, 'email', '[\"technik@aiot.com\"]', true),\n    ('critical', 1, 'sms', '[\"manager@aiot.com\",\"technik@aiot.com\"]', true),\n    ('critical', 10, 'webhook', '[\"https://hooks.slack.com/aiot\"]', true)\nON CONFLICT DO NOTHING;\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"postgres-init","namespace":"aiot"}}
+  creationTimestamp: "2026-03-05T16:23:53Z"
+  name: postgres-init
+  namespace: aiot
+  resourceVersion: "785350"
+  uid: 6975f1ad-415b-4c26-b95e-adca3ae0962b

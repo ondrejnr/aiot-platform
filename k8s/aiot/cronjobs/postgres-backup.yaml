@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"batch/v1","kind":"CronJob","metadata":{"annotations":{},"name":"postgres-backup","namespace":"aiot"},"spec":{"failedJobsHistoryLimit":2,"jobTemplate":{"spec":{"template":{"spec":{"containers":[{"command":["/bin/sh","-c","TIMESTAMP=$(date +%Y%m%d_%H%M%S)\necho \"=== Backup started: $TIMESTAMP ===\"\nPGPASSWORD=postgres pg_dumpall \\\n  -h postgres.aiot.svc.cluster.local \\\n  -U postgres --clean \\\n  \u003e /backups/pg_backup_${TIMESTAMP}.sql\nls -t /backups/pg_backup_*.sql | tail -n +6 | xargs rm -f 2\u003e/dev/null\necho \"=== Done: $(du -sh /backups/pg_backup_${TIMESTAMP}.sql | cut -f1) ===\"\n"],"image":"postgres:16","name":"pg-backup","resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"volumeMounts":[{"mountPath":"/backups","name":"backup-vol"}]}],"restartPolicy":"OnFailure","volumes":[{"hostPath":{"path":"/var/backups/postgres","type":"DirectoryOrCreate"},"name":"backup-vol"}]}}}},"schedule":"0 */6 * * *","successfulJobsHistoryLimit":3}}
+  creationTimestamp: "2026-03-15T01:35:30Z"
+  generation: 1
+  name: postgres-backup
+  namespace: aiot
+  resourceVersion: "3379323"
+  uid: b26eb2a1-4f9f-4f4a-9f83-77c715b47bd6
+spec:
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - command:
+            - /bin/sh
+            - -c
+            - |
+              TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+              echo "=== Backup started: $TIMESTAMP ==="
+              PGPASSWORD=postgres pg_dumpall \
+                -h postgres.aiot.svc.cluster.local \
+                -U postgres --clean \
+                > /backups/pg_backup_${TIMESTAMP}.sql
+              ls -t /backups/pg_backup_*.sql | tail -n +6 | xargs rm -f 2>/dev/null
+              echo "=== Done: $(du -sh /backups/pg_backup_${TIMESTAMP}.sql | cut -f1) ==="
+            image: postgres:16
+            imagePullPolicy: IfNotPresent
+            name: pg-backup
+            resources:
+              limits:
+                cpu: 500m
+                memory: 512Mi
+              requests:
+                cpu: 100m
+                memory: 256Mi
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /backups
+              name: backup-vol
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - hostPath:
+              path: /var/backups/postgres
+              type: DirectoryOrCreate
+            name: backup-vol
+  schedule: 0 */6 * * *
+  successfulJobsHistoryLimit: 3
+  suspend: false
+status:
+  lastScheduleTime: "2026-03-15T06:00:00Z"
+  lastSuccessfulTime: "2026-03-15T06:00:04Z"

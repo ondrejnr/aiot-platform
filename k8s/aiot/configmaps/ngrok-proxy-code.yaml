@@ -1,0 +1,237 @@
+apiVersion: v1
+data:
+  proxy.py: |
+    from fastapi import FastAPI, Request
+    from fastapi.responses import StreamingResponse
+    import requests as req
+    import json, hashlib, time, os, re, logging
+    import redis
+
+    logging.basicConfig(level=logging.INFO)
+    log = logging.getLogger("groq-proxy")
+
+    app = FastAPI(title="Groq AIoT Gateway v2")
+    bank = redis.Redis(host="redis-master.aiot.svc.cluster.local", port=6379, db=5, decode_responses=True)
+    cache = redis.Redis(host="redis-master.aiot.svc.cluster.local", port=6379, db=6, decode_responses=True)
+
+    GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+    GROQ_KEY = os.environ.get("GROQ_API_KEY", "")
+    GROQ_MODEL = "llama-3.1-8b-instant"
+    MODEL_NAME = "groq-aiot"
+    QDRANT_URL = "http://qdrant.aiot.svc.cluster.local:6333"
+    VECTOR_SIZE = 64
+    LLM_CACHE_TTL = 300
+    BANK_CACHE_TTL = 600
+    RATE_LIMIT_RPM = 30
+    RATE_LIMIT_KEY = "groq:rate_counter"
+
+    SIMPLE_KW = ["summary","status","overview","suhrn","prehlad","how many","kolko","pocet","total","celkom","critical","kritick","warning","varov","alarm","list","zoznam","stav","factory","tovarena","machines","stroje","show","ukaz"]
+    COMPLEX_KW = ["why","preco","cause","pricina","recommend","odporuc","predict","trend","analyze","analyz","compare","porovnaj","explain","vysvetli","what if","should","plan","optimiz","improve","suggest","navrhn","priemern","average","najvy","highest","max","min","lowest","top","worst","best","forecast","root cause"]
+    MACH_RE = re.compile(r'(pump|turbine|motor|compressor|conveyor|generator)[-_]?\d+', re.I)
+    JUNK_RE = re.compile(r'(follow.?up|suggest.*question|### task|relevant question|generate.*title|generate.*tag|broad tags)', re.I)
+
+    stats = {"queries":0,"bank_hits":0,"cache_hits":0,"llm_calls":0,"blocked":0,"start_time":time.time()}
+
+    SYSTEM_PROMPT = """You are Groq AIoT - industrial IoT assistant (Groq Cloud).
+    Factory: 6 types: pump, motor, generator, turbine, compressor, conveyor.
+    Locations: hall-A, hall-B, hall-C, basement, outdoor-1, outdoor-2.
+    Answer in SAME LANGUAGE as user. Be precise. Units: temperature=C, vibration=mm/s, pressure=bar, rpm=RPM.
+    Use ONLY the pre-calculated STATISTICS section for averages/max/min."""
+
+    FOLLOWUP_ANSWERS = ["What is the factory status?","Show me critical machines","Which machines have warnings?","How many machines are running?","Show turbine-0340 details"]
+
+    def is_junk(q): return bool(JUNK_RE.search(q))
+    def is_complex(q): return any(k in q.lower() for k in COMPLEX_KW)
+    def is_simple(q):
+        if is_complex(q): return False
+        ql = q.lower()
+        if MACH_RE.search(ql): return True
+        return any(k in ql for k in SIMPLE_KW)
+
+    def get_ck(q): return f"groq:cache:{hashlib.sha256(q.lower().strip().encode()).hexdigest()[:16]}"
+
+    def check_rate():
+        try:
+            c = cache.get(RATE_LIMIT_KEY)
+            if c and int(c) >= RATE_LIMIT_RPM: return False
+            p = cache.pipeline(); p.incr(RATE_LIMIT_KEY); p.expire(RATE_LIMIT_KEY, 60); p.execute()
+            return True
+        except: return True
+
+    def answer_from_bank(q):
+        ql = q.lower()
+        try:
+            raw = bank.get("bank:summary")
+            if not raw: return None
+            s = json.loads(raw)
+            m = MACH_RE.search(ql)
+            if m:
+                mid = m.group(0).replace("_","-")
+                mraw = bank.get(f"bank:machines:{mid}")
+                if not mraw: return f"Stroj {mid} sa nenasiel."
+                md = json.loads(mraw); mt = md.get("metrics",{})
+                lines = [f"{mid} | typ: {md.get('machine_type','-')} | stav: {md.get('status','-')}",
+                         f"Teplota: {mt.get('temperature','-')}C | Vibracie: {mt.get('vibration','-')}mm/s | Tlak: {mt.get('pressure','-')}bar | RPM: {mt.get('rpm','-')}"]
+                for v in md.get("violations",[]): lines.append(f"Porusenie: {v['metric']}={v['value']}")
+                hist = bank.lrange(f"bank:history:{mid}", 0, 4)
+                if hist:
+                    lines.append("Historia (poslednych 5):")
+                    for e in hist:
+                        d = json.loads(e); lines.append(f"  T={d.get('temperature','-')} V={d.get('vibration','-')} P={d.get('pressure','-')} [{d.get('status','-')}]")
+                return "\n".join(lines)
+            total,ok,warn,crit = s.get("total",0),s.get("ok",0),s.get("warning",0),s.get("critical",0)
+            if any(k in ql for k in ["summary","status","overview","suhrn","prehlad","total","celkom","factory","tovarena","stav"]):
+                cn = ", ".join(s.get("critical_machines",[])[:10])
+                return f"Tovarena — prehlad:\nCelkom: {total} strojov | OK: {ok} | Warning: {warn} | Critical: {crit}\nTop critical: {cn}{'...' if crit>10 else ''}"
+            if any(k in ql for k in ["critical","kritick","alarm"]):
+                return f"Kriticke stroje ({crit}):\n" + "\n".join(f"  {n}" for n in s.get("critical_machines",[])[:20])
+            if any(k in ql for k in ["warning","varov","warn"]):
+                return f"Warning stroje ({warn}):\n" + "\n".join(f"  {n}" for n in s.get("warning_machines",[])[:20])
+            if any(k in ql for k in ["how many","kolko","pocet"]):
+                return f"Celkom {total} strojov: {ok} OK, {warn} warning, {crit} critical."
+        except Exception as e: log.error(f"Bank error: {e}")
+        return None
+
+    def compute_type_stats():
+        type_data = {}
+        try:
+            all_keys = bank.keys("bank:machines:*")
+            if not all_keys: return {}
+            pipe = bank.pipeline()
+            for k in all_keys: pipe.get(k)
+            results = pipe.execute()
+            for raw_m in results:
+                if not raw_m: continue
+                try:
+                    md = json.loads(raw_m); mt = md.get("machine_type","")
+                    if mt not in type_data:
+                        type_data[mt] = {"temps":[],"vibs":[],"rpms":[],"pressures":[],"statuses":{},"count":0}
+                    td = type_data[mt]; td["count"] += 1
+                    metrics = md.get("metrics",{}); mid = md.get("machine_id","?")
+                    for key,lst in [("temperature","temps"),("vibration","vibs"),("rpm","rpms"),("pressure","pressures")]:
+                        v = metrics.get(key)
+                        if v is not None: td[lst].append((float(v), mid))
+                    st = md.get("status","OK"); td["statuses"][st] = td["statuses"].get(st,0) + 1
+                except: continue
+        except: pass
+        return type_data
+
+    def bank_context_for_llm(query):
+        ctx = []; q = query.lower()
+        try:
+            raw = bank.get("bank:summary")
+            if not raw: return "No data."
+            s = json.loads(raw)
+            ctx.append(f"FACTORY: {s.get('total',0)} machines | OK:{s.get('ok',0)} WARNING:{s.get('warning',0)} CRITICAL:{s.get('critical',0)}")
+            m = MACH_RE.search(q)
+            if m:
+                mid = m.group(0).replace("_","-")
+                mraw = bank.get(f"bank:machines:{mid}")
+                if mraw:
+                    md = json.loads(mraw); mt = md.get("metrics",{})
+                    ctx.append(f"\nMACHINE: {mid} type={md.get('machine_type','-')} status={md.get('status','-')} T={mt.get('temperature','-')} V={mt.get('vibration','-')} P={mt.get('pressure','-')} RPM={mt.get('rpm','-')}")
+                return "\n".join(ctx)
+            type_data = compute_type_stats()
+            if type_data:
+                ctx.append("\n=== STATISTICS ===")
+                for mtype in ["turbine","generator","compressor","motor","pump","conveyor"]:
+                    td = type_data.get(mtype)
+                    if not td: continue
+                    ctx.append(f"\n{mtype.upper()} ({td['count']}):")
+                    for label,lst,unit,fmt in [("Temp","temps","C",".1f"),("Vib","vibs","mm/s",".2f"),("RPM","rpms","",".0f"),("Press","pressures","bar",".1f")]:
+                        if td[lst]:
+                            vals = [t[0] for t in td[lst]]
+                            avg = sum(vals)/len(vals)
+                            mx = max(td[lst], key=lambda x: x[0])
+                            ctx.append(f"  {label}: avg={avg:{fmt}}{unit} max={mx[0]:{fmt}}{unit}({mx[1]})")
+                    ctx.append(f"  Status: {td['statuses']}")
+            crit_list = s.get("critical_machines",[])
+            if crit_list:
+                ctx.append(f"\nCRITICAL ({len(crit_list)}):")
+                for mid2 in crit_list[:10]:
+                    mraw = bank.get(f"bank:machines:{mid2}")
+                    if mraw:
+                        md = json.loads(mraw); mt = md.get("metrics",{})
+                        ctx.append(f"  {mid2} T={mt.get('temperature','-')} V={mt.get('vibration','-')} P={mt.get('pressure','-')}")
+        except Exception as e: ctx.append(f"Error: {e}")
+        return "\n".join(ctx)[:12000]
+
+    def fast_embed(text):
+        b = text.encode(); raw = b''
+        for salt in (b'\x00', b'\x01', b'\x02', b'\x03'): raw += hashlib.sha256(salt + b).digest()
+        vec = []
+        for i in range(VECTOR_SIZE): val = (raw[i*2] << 8 | raw[i*2+1]) / 65535.0 * 2 - 1; vec.append(val)
+        norm = sum(x*x for x in vec) ** 0.5
+        return [x/norm for x in vec] if norm > 0 else vec
+
+    def call_groq(context, query):
+        try:
+            r = req.post(GROQ_URL, headers={"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"},
+                json={"model":GROQ_MODEL,"messages":[{"role":"system","content":SYSTEM_PROMPT},{"role":"user","content":f"DATA:\n{context}\n\nQUESTION: {query}"}],"max_tokens":2000,"temperature":0.1}, timeout=30)
+            if r.status_code == 200: return r.json()["choices"][0]["message"]["content"]
+            elif r.status_code == 429: return "Rate limit. Skuste znova."
+            else: return f"LLM Error ({r.status_code})"
+        except Exception as e: return f"LLM Error: {e}"
+
+    def resolve_query(q):
+        ck = get_ck(q)
+        cached = cache.get(ck)
+        if cached: stats["cache_hits"] += 1; log.info(f"[CACHE] '{q[:50]}'"); return cached, "cache"
+        if is_simple(q):
+            ba = answer_from_bank(q)
+            if ba: stats["bank_hits"] += 1; cache.setex(ck, BANK_CACHE_TTL, ba); log.info(f"[BANK] '{q[:50]}' 0 tokenov"); return ba, "bank"
+        if not check_rate(): return "Rate limit 30/min.", "rate_limited"
+        stats["llm_calls"] += 1
+        ctx = bank_context_for_llm(q)
+        ans = call_groq(ctx, q)
+        if ans and "Error" not in ans: cache.setex(ck, LLM_CACHE_TTL, ans)
+        log.info(f"[LLM] '{q[:50]}' Groq API"); return ans, "llm"
+
+    def make_stream(content):
+        rid = f"groq-{int(time.time())}"
+        async def gen():
+            for i in range(0, len(content), 20):
+                chunk = content[i:i+20]
+                yield f"data: {json.dumps({'id':rid,'object':'chat.completion.chunk','model':MODEL_NAME,'choices':[{'index':0,'delta':{'content':chunk},'finish_reason':None}]})}\n\n"
+            yield f"data: {json.dumps({'id':rid,'object':'chat.completion.chunk','model':MODEL_NAME,'choices':[{'index':0,'delta':{},'finish_reason':'stop'}]})}\n\n"
+            yield "data: [DONE]\n\n"
+        return StreamingResponse(gen(), media_type="text/event-stream")
+
+    @app.get("/")
+    def root(): return {"service":"Groq AIoT v2","mode":"bank-first"}
+    @app.get("/health")
+    def health():
+        try: return {"status":"healthy","machines":len(bank.keys("bank:machines:*"))}
+        except: return {"status":"degraded"}
+    @app.get("/v1/models")
+    def models(): return {"object":"list","data":[{"id":MODEL_NAME,"object":"model","owned_by":"groq-v2"}]}
+    @app.get("/stats")
+    def stats_ep(): return {**stats,"uptime_s":int(time.time()-stats["start_time"]),"efficiency":f"{((stats['bank_hits']+stats['cache_hits'])/max(stats['queries'],1)*100):.1f}%"}
+
+    @app.post("/v1/chat/completions")
+    async def chat(request: Request):
+        body = await request.json()
+        msgs = body.get("messages",[])
+        stream = body.get("stream", False)
+        um = [m for m in msgs if m.get("role") == "user"]
+        q = um[-1]["content"].strip() if um else "summary"
+        stats["queries"] += 1
+        if is_junk(q):
+            stats["blocked"] += 1; content = "\n".join(FOLLOWUP_ANSWERS)
+            if stream: return make_stream(content)
+            return {"id":f"groq-{int(time.time())}","object":"chat.completion","model":MODEL_NAME,"choices":[{"index":0,"message":{"role":"assistant","content":content},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}
+        content, source = resolve_query(q)
+        if stream: return make_stream(content)
+        return {"id":f"groq-{int(time.time())}","object":"chat.completion","model":MODEL_NAME,"choices":[{"index":0,"message":{"role":"assistant","content":content},"finish_reason":"stop"}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}
+
+    log.info("Groq AIoT v2 started")
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"proxy.py":"from fastapi import FastAPI, Request\nfrom fastapi.responses import StreamingResponse\nimport requests as req\nimport json, hashlib, time, os, re, logging\nimport redis\n\nlogging.basicConfig(level=logging.INFO)\nlog = logging.getLogger(\"groq-proxy\")\n\napp = FastAPI(title=\"Groq AIoT Gateway v2\")\nbank = redis.Redis(host=\"redis-master.aiot.svc.cluster.local\", port=6379, db=5, decode_responses=True)\ncache = redis.Redis(host=\"redis-master.aiot.svc.cluster.local\", port=6379, db=6, decode_responses=True)\n\nGROQ_URL = \"https://api.groq.com/openai/v1/chat/completions\"\nGROQ_KEY = os.environ.get(\"GROQ_API_KEY\", \"\")\nGROQ_MODEL = \"llama-3.1-8b-instant\"\nMODEL_NAME = \"groq-aiot\"\nQDRANT_URL = \"http://qdrant.aiot.svc.cluster.local:6333\"\nVECTOR_SIZE = 64\nLLM_CACHE_TTL = 300\nBANK_CACHE_TTL = 600\nRATE_LIMIT_RPM = 30\nRATE_LIMIT_KEY = \"groq:rate_counter\"\n\nSIMPLE_KW = [\"summary\",\"status\",\"overview\",\"suhrn\",\"prehlad\",\"how many\",\"kolko\",\"pocet\",\"total\",\"celkom\",\"critical\",\"kritick\",\"warning\",\"varov\",\"alarm\",\"list\",\"zoznam\",\"stav\",\"factory\",\"tovarena\",\"machines\",\"stroje\",\"show\",\"ukaz\"]\nCOMPLEX_KW = [\"why\",\"preco\",\"cause\",\"pricina\",\"recommend\",\"odporuc\",\"predict\",\"trend\",\"analyze\",\"analyz\",\"compare\",\"porovnaj\",\"explain\",\"vysvetli\",\"what if\",\"should\",\"plan\",\"optimiz\",\"improve\",\"suggest\",\"navrhn\",\"priemern\",\"average\",\"najvy\",\"highest\",\"max\",\"min\",\"lowest\",\"top\",\"worst\",\"best\",\"forecast\",\"root cause\"]\nMACH_RE = re.compile(r'(pump|turbine|motor|compressor|conveyor|generator)[-_]?\\d+', re.I)\nJUNK_RE = re.compile(r'(follow.?up|suggest.*question|### task|relevant question|generate.*title|generate.*tag|broad tags)', re.I)\n\nstats = {\"queries\":0,\"bank_hits\":0,\"cache_hits\":0,\"llm_calls\":0,\"blocked\":0,\"start_time\":time.time()}\n\nSYSTEM_PROMPT = \"\"\"You are Groq AIoT - industrial IoT assistant (Groq Cloud).\nFactory: 6 types: pump, motor, generator, turbine, compressor, conveyor.\nLocations: hall-A, hall-B, hall-C, basement, outdoor-1, outdoor-2.\nAnswer in SAME LANGUAGE as user. Be precise. Units: temperature=C, vibration=mm/s, pressure=bar, rpm=RPM.\nUse ONLY the pre-calculated STATISTICS section for averages/max/min.\"\"\"\n\nFOLLOWUP_ANSWERS = [\"What is the factory status?\",\"Show me critical machines\",\"Which machines have warnings?\",\"How many machines are running?\",\"Show turbine-0340 details\"]\n\ndef is_junk(q): return bool(JUNK_RE.search(q))\ndef is_complex(q): return any(k in q.lower() for k in COMPLEX_KW)\ndef is_simple(q):\n    if is_complex(q): return False\n    ql = q.lower()\n    if MACH_RE.search(ql): return True\n    return any(k in ql for k in SIMPLE_KW)\n\ndef get_ck(q): return f\"groq:cache:{hashlib.sha256(q.lower().strip().encode()).hexdigest()[:16]}\"\n\ndef check_rate():\n    try:\n        c = cache.get(RATE_LIMIT_KEY)\n        if c and int(c) \u003e= RATE_LIMIT_RPM: return False\n        p = cache.pipeline(); p.incr(RATE_LIMIT_KEY); p.expire(RATE_LIMIT_KEY, 60); p.execute()\n        return True\n    except: return True\n\ndef answer_from_bank(q):\n    ql = q.lower()\n    try:\n        raw = bank.get(\"bank:summary\")\n        if not raw: return None\n        s = json.loads(raw)\n        m = MACH_RE.search(ql)\n        if m:\n            mid = m.group(0).replace(\"_\",\"-\")\n            mraw = bank.get(f\"bank:machines:{mid}\")\n            if not mraw: return f\"Stroj {mid} sa nenasiel.\"\n            md = json.loads(mraw); mt = md.get(\"metrics\",{})\n            lines = [f\"{mid} | typ: {md.get('machine_type','-')} | stav: {md.get('status','-')}\",\n                     f\"Teplota: {mt.get('temperature','-')}C | Vibracie: {mt.get('vibration','-')}mm/s | Tlak: {mt.get('pressure','-')}bar | RPM: {mt.get('rpm','-')}\"]\n            for v in md.get(\"violations\",[]): lines.append(f\"Porusenie: {v['metric']}={v['value']}\")\n            hist = bank.lrange(f\"bank:history:{mid}\", 0, 4)\n            if hist:\n                lines.append(\"Historia (poslednych 5):\")\n                for e in hist:\n                    d = json.loads(e); lines.append(f\"  T={d.get('temperature','-')} V={d.get('vibration','-')} P={d.get('pressure','-')} [{d.get('status','-')}]\")\n            return \"\\n\".join(lines)\n        total,ok,warn,crit = s.get(\"total\",0),s.get(\"ok\",0),s.get(\"warning\",0),s.get(\"critical\",0)\n        if any(k in ql for k in [\"summary\",\"status\",\"overview\",\"suhrn\",\"prehlad\",\"total\",\"celkom\",\"factory\",\"tovarena\",\"stav\"]):\n            cn = \", \".join(s.get(\"critical_machines\",[])[:10])\n            return f\"Tovarena — prehlad:\\nCelkom: {total} strojov | OK: {ok} | Warning: {warn} | Critical: {crit}\\nTop critical: {cn}{'...' if crit\u003e10 else ''}\"\n        if any(k in ql for k in [\"critical\",\"kritick\",\"alarm\"]):\n            return f\"Kriticke stroje ({crit}):\\n\" + \"\\n\".join(f\"  {n}\" for n in s.get(\"critical_machines\",[])[:20])\n        if any(k in ql for k in [\"warning\",\"varov\",\"warn\"]):\n            return f\"Warning stroje ({warn}):\\n\" + \"\\n\".join(f\"  {n}\" for n in s.get(\"warning_machines\",[])[:20])\n        if any(k in ql for k in [\"how many\",\"kolko\",\"pocet\"]):\n            return f\"Celkom {total} strojov: {ok} OK, {warn} warning, {crit} critical.\"\n    except Exception as e: log.error(f\"Bank error: {e}\")\n    return None\n\ndef compute_type_stats():\n    type_data = {}\n    try:\n        all_keys = bank.keys(\"bank:machines:*\")\n        if not all_keys: return {}\n        pipe = bank.pipeline()\n        for k in all_keys: pipe.get(k)\n        results = pipe.execute()\n        for raw_m in results:\n            if not raw_m: continue\n            try:\n                md = json.loads(raw_m); mt = md.get(\"machine_type\",\"\")\n                if mt not in type_data:\n                    type_data[mt] = {\"temps\":[],\"vibs\":[],\"rpms\":[],\"pressures\":[],\"statuses\":{},\"count\":0}\n                td = type_data[mt]; td[\"count\"] += 1\n                metrics = md.get(\"metrics\",{}); mid = md.get(\"machine_id\",\"?\")\n                for key,lst in [(\"temperature\",\"temps\"),(\"vibration\",\"vibs\"),(\"rpm\",\"rpms\"),(\"pressure\",\"pressures\")]:\n                    v = metrics.get(key)\n                    if v is not None: td[lst].append((float(v), mid))\n                st = md.get(\"status\",\"OK\"); td[\"statuses\"][st] = td[\"statuses\"].get(st,0) + 1\n            except: continue\n    except: pass\n    return type_data\n\ndef bank_context_for_llm(query):\n    ctx = []; q = query.lower()\n    try:\n        raw = bank.get(\"bank:summary\")\n        if not raw: return \"No data.\"\n        s = json.loads(raw)\n        ctx.append(f\"FACTORY: {s.get('total',0)} machines | OK:{s.get('ok',0)} WARNING:{s.get('warning',0)} CRITICAL:{s.get('critical',0)}\")\n        m = MACH_RE.search(q)\n        if m:\n            mid = m.group(0).replace(\"_\",\"-\")\n            mraw = bank.get(f\"bank:machines:{mid}\")\n            if mraw:\n                md = json.loads(mraw); mt = md.get(\"metrics\",{})\n                ctx.append(f\"\\nMACHINE: {mid} type={md.get('machine_type','-')} status={md.get('status','-')} T={mt.get('temperature','-')} V={mt.get('vibration','-')} P={mt.get('pressure','-')} RPM={mt.get('rpm','-')}\")\n            return \"\\n\".join(ctx)\n        type_data = compute_type_stats()\n        if type_data:\n            ctx.append(\"\\n=== STATISTICS ===\")\n            for mtype in [\"turbine\",\"generator\",\"compressor\",\"motor\",\"pump\",\"conveyor\"]:\n                td = type_data.get(mtype)\n                if not td: continue\n                ctx.append(f\"\\n{mtype.upper()} ({td['count']}):\")\n                for label,lst,unit,fmt in [(\"Temp\",\"temps\",\"C\",\".1f\"),(\"Vib\",\"vibs\",\"mm/s\",\".2f\"),(\"RPM\",\"rpms\",\"\",\".0f\"),(\"Press\",\"pressures\",\"bar\",\".1f\")]:\n                    if td[lst]:\n                        vals = [t[0] for t in td[lst]]\n                        avg = sum(vals)/len(vals)\n                        mx = max(td[lst], key=lambda x: x[0])\n                        ctx.append(f\"  {label}: avg={avg:{fmt}}{unit} max={mx[0]:{fmt}}{unit}({mx[1]})\")\n                ctx.append(f\"  Status: {td['statuses']}\")\n        crit_list = s.get(\"critical_machines\",[])\n        if crit_list:\n            ctx.append(f\"\\nCRITICAL ({len(crit_list)}):\")\n            for mid2 in crit_list[:10]:\n                mraw = bank.get(f\"bank:machines:{mid2}\")\n                if mraw:\n                    md = json.loads(mraw); mt = md.get(\"metrics\",{})\n                    ctx.append(f\"  {mid2} T={mt.get('temperature','-')} V={mt.get('vibration','-')} P={mt.get('pressure','-')}\")\n    except Exception as e: ctx.append(f\"Error: {e}\")\n    return \"\\n\".join(ctx)[:12000]\n\ndef fast_embed(text):\n    b = text.encode(); raw = b''\n    for salt in (b'\\x00', b'\\x01', b'\\x02', b'\\x03'): raw += hashlib.sha256(salt + b).digest()\n    vec = []\n    for i in range(VECTOR_SIZE): val = (raw[i*2] \u003c\u003c 8 | raw[i*2+1]) / 65535.0 * 2 - 1; vec.append(val)\n    norm = sum(x*x for x in vec) ** 0.5\n    return [x/norm for x in vec] if norm \u003e 0 else vec\n\ndef call_groq(context, query):\n    try:\n        r = req.post(GROQ_URL, headers={\"Authorization\": f\"Bearer {GROQ_KEY}\", \"Content-Type\": \"application/json\"},\n            json={\"model\":GROQ_MODEL,\"messages\":[{\"role\":\"system\",\"content\":SYSTEM_PROMPT},{\"role\":\"user\",\"content\":f\"DATA:\\n{context}\\n\\nQUESTION: {query}\"}],\"max_tokens\":2000,\"temperature\":0.1}, timeout=30)\n        if r.status_code == 200: return r.json()[\"choices\"][0][\"message\"][\"content\"]\n        elif r.status_code == 429: return \"Rate limit. Skuste znova.\"\n        else: return f\"LLM Error ({r.status_code})\"\n    except Exception as e: return f\"LLM Error: {e}\"\n\ndef resolve_query(q):\n    ck = get_ck(q)\n    cached = cache.get(ck)\n    if cached: stats[\"cache_hits\"] += 1; log.info(f\"[CACHE] '{q[:50]}'\"); return cached, \"cache\"\n    if is_simple(q):\n        ba = answer_from_bank(q)\n        if ba: stats[\"bank_hits\"] += 1; cache.setex(ck, BANK_CACHE_TTL, ba); log.info(f\"[BANK] '{q[:50]}' 0 tokenov\"); return ba, \"bank\"\n    if not check_rate(): return \"Rate limit 30/min.\", \"rate_limited\"\n    stats[\"llm_calls\"] += 1\n    ctx = bank_context_for_llm(q)\n    ans = call_groq(ctx, q)\n    if ans and \"Error\" not in ans: cache.setex(ck, LLM_CACHE_TTL, ans)\n    log.info(f\"[LLM] '{q[:50]}' Groq API\"); return ans, \"llm\"\n\ndef make_stream(content):\n    rid = f\"groq-{int(time.time())}\"\n    async def gen():\n        for i in range(0, len(content), 20):\n            chunk = content[i:i+20]\n            yield f\"data: {json.dumps({'id':rid,'object':'chat.completion.chunk','model':MODEL_NAME,'choices':[{'index':0,'delta':{'content':chunk},'finish_reason':None}]})}\\n\\n\"\n        yield f\"data: {json.dumps({'id':rid,'object':'chat.completion.chunk','model':MODEL_NAME,'choices':[{'index':0,'delta':{},'finish_reason':'stop'}]})}\\n\\n\"\n        yield \"data: [DONE]\\n\\n\"\n    return StreamingResponse(gen(), media_type=\"text/event-stream\")\n\n@app.get(\"/\")\ndef root(): return {\"service\":\"Groq AIoT v2\",\"mode\":\"bank-first\"}\n@app.get(\"/health\")\ndef health():\n    try: return {\"status\":\"healthy\",\"machines\":len(bank.keys(\"bank:machines:*\"))}\n    except: return {\"status\":\"degraded\"}\n@app.get(\"/v1/models\")\ndef models(): return {\"object\":\"list\",\"data\":[{\"id\":MODEL_NAME,\"object\":\"model\",\"owned_by\":\"groq-v2\"}]}\n@app.get(\"/stats\")\ndef stats_ep(): return {**stats,\"uptime_s\":int(time.time()-stats[\"start_time\"]),\"efficiency\":f\"{((stats['bank_hits']+stats['cache_hits'])/max(stats['queries'],1)*100):.1f}%\"}\n\n@app.post(\"/v1/chat/completions\")\nasync def chat(request: Request):\n    body = await request.json()\n    msgs = body.get(\"messages\",[])\n    stream = body.get(\"stream\", False)\n    um = [m for m in msgs if m.get(\"role\") == \"user\"]\n    q = um[-1][\"content\"].strip() if um else \"summary\"\n    stats[\"queries\"] += 1\n    if is_junk(q):\n        stats[\"blocked\"] += 1; content = \"\\n\".join(FOLLOWUP_ANSWERS)\n        if stream: return make_stream(content)\n        return {\"id\":f\"groq-{int(time.time())}\",\"object\":\"chat.completion\",\"model\":MODEL_NAME,\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":content},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":0,\"completion_tokens\":0,\"total_tokens\":0}}\n    content, source = resolve_query(q)\n    if stream: return make_stream(content)\n    return {\"id\":f\"groq-{int(time.time())}\",\"object\":\"chat.completion\",\"model\":MODEL_NAME,\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":content},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":0,\"completion_tokens\":0,\"total_tokens\":0}}\n\nlog.info(\"Groq AIoT v2 started\")\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"ngrok-proxy-code","namespace":"aiot"}}
+  creationTimestamp: "2026-03-08T07:35:32Z"
+  name: ngrok-proxy-code
+  namespace: aiot
+  resourceVersion: "3438680"
+  uid: df04e02c-648d-4f94-b74a-d443b3e0f965

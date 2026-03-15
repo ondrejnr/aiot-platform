@@ -1,0 +1,30 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"policy/v1","kind":"PodDisruptionBudget","metadata":{"annotations":{},"name":"ngrok-proxy-pdb","namespace":"aiot"},"spec":{"minAvailable":1,"selector":{"matchLabels":{"app":"ngrok-proxy"}}}}
+  creationTimestamp: "2026-03-15T09:12:51Z"
+  generation: 1
+  name: ngrok-proxy-pdb
+  namespace: aiot
+  resourceVersion: "3441719"
+  uid: d8ec5df6-acce-4d77-930d-36e687637d09
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: ngrok-proxy
+status:
+  conditions:
+  - lastTransitionTime: "2026-03-15T09:13:41Z"
+    message: ""
+    observedGeneration: 1
+    reason: SufficientPods
+    status: "True"
+    type: DisruptionAllowed
+  currentHealthy: 2
+  desiredHealthy: 1
+  disruptionsAllowed: 1
+  expectedPods: 2
+  observedGeneration: 1

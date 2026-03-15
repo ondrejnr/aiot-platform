@@ -1,0 +1,30 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"policy/v1","kind":"PodDisruptionBudget","metadata":{"annotations":{},"name":"redpanda-pdb","namespace":"aiot"},"spec":{"minAvailable":2,"selector":{"matchLabels":{"app":"redpanda"}}}}
+  creationTimestamp: "2026-03-11T17:39:31Z"
+  generation: 1
+  name: redpanda-pdb
+  namespace: aiot
+  resourceVersion: "3398730"
+  uid: ca5d4510-0330-4b76-ab38-3253869c4963
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: redpanda
+status:
+  conditions:
+  - lastTransitionTime: "2026-03-13T20:53:48Z"
+    message: ""
+    observedGeneration: 1
+    reason: InsufficientPods
+    status: "False"
+    type: DisruptionAllowed
+  currentHealthy: 1
+  desiredHealthy: 2
+  disruptionsAllowed: 0
+  expectedPods: 1
+  observedGeneration: 1

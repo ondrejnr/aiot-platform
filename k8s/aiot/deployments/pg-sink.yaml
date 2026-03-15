@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "29"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"pg-sink"},"name":"pg-sink","namespace":"aiot"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"pg-sink"}},"template":{"metadata":{"labels":{"app":"pg-sink"}},"spec":{"containers":[{"args":["pip install kafka-python-ng psycopg2-binary --quiet && python3 /code/pg_sink.py"],"command":["/bin/sh","-c"],"image":"python:3.11-slim-bullseye","name":"pg-sink","resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"50m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/code","name":"code"}]}],"volumes":[{"configMap":{"name":"pg-sink-code"},"name":"code"}]}}}}
+  creationTimestamp: "2026-03-05T21:26:26Z"
+  generation: 40
+  labels:
+    app: pg-sink
+  name: pg-sink
+  namespace: aiot
+  resourceVersion: "3399209"
+  uid: 6cf06819-fecb-4aa6-8732-08381fa4710b
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: pg-sink
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-03-15T01:46:14Z"
+      creationTimestamp: null
+      labels:
+        app: pg-sink
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: pg-sink
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - pip install kafka-python-ng redis lz4 --quiet && python3 /code/pg_sink.py
+        command:
+        - /bin/sh
+        - -c
+        image: python:3.11-slim-bullseye
+        imagePullPolicy: Always
+        name: pg-sink
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /code
+          name: code
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: pg-sink-code
+        name: code
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-03-05T21:26:26Z"
+    lastUpdateTime: "2026-03-15T01:46:16Z"
+    message: ReplicaSet "pg-sink-78649f5564" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-03-15T06:57:52Z"
+    lastUpdateTime: "2026-03-15T06:57:52Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 40
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

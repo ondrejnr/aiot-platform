@@ -1,0 +1,38 @@
+apiVersion: v1
+data:
+  data-sources.json: |
+    {
+      "folders": {},
+      "connections": {
+        "aiot_pg": {
+          "provider": "postgresql",
+          "driver": "postgres-jdbc",
+          "name": "AIoT PostgreSQL",
+          "description": "AIoT Production DB",
+          "url": "jdbc:postgresql://10.98.61.21:5432/aiot",
+          "configuration": {
+            "host": "10.98.61.21",
+            "port": "5432",
+            "database": "aiot",
+            "url": "jdbc:postgresql://10.98.61.21:5432/aiot",
+            "type": "dev",
+            "auth-model": "native",
+            "handlers": {}
+          },
+          "autocommit": true,
+          "savePassword": true,
+          "user": "aiot_admin",
+          "password": "AioT2026!Prod"
+        }
+      }
+    }
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"data-sources.json":"{\n  \"folders\": {},\n  \"connections\": {\n    \"aiot_pg\": {\n      \"provider\": \"postgresql\",\n      \"driver\": \"postgres-jdbc\",\n      \"name\": \"AIoT PostgreSQL\",\n      \"description\": \"AIoT Production DB\",\n      \"url\": \"jdbc:postgresql://10.98.61.21:5432/aiot\",\n      \"configuration\": {\n        \"host\": \"10.98.61.21\",\n        \"port\": \"5432\",\n        \"database\": \"aiot\",\n        \"url\": \"jdbc:postgresql://10.98.61.21:5432/aiot\",\n        \"type\": \"dev\",\n        \"auth-model\": \"native\",\n        \"handlers\": {}\n      },\n      \"autocommit\": true,\n      \"savePassword\": true,\n      \"user\": \"aiot_admin\",\n      \"password\": \"AioT2026!Prod\"\n    }\n  }\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"cloudbeaver-datasources","namespace":"aiot"}}
+  creationTimestamp: "2026-03-11T09:20:55Z"
+  name: cloudbeaver-datasources
+  namespace: aiot
+  resourceVersion: "1889039"
+  uid: 2fe4f9aa-165a-432b-9d04-57762dc192fb

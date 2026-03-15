@@ -1,0 +1,156 @@
+apiVersion: v1
+data:
+  indexer.py: |
+    import json, time, logging, hashlib, threading
+    from kafka import KafkaConsumer
+    from qdrant_client import QdrantClient
+    from qdrant_client.models import Distance, VectorParams, PointStruct, FilterSelector, Filter, FieldCondition, Range
+
+    logging.basicConfig(level=logging.INFO)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("kafka").setLevel(logging.WARNING)
+    log = logging.getLogger("qdrant-indexer")
+
+    KAFKA_BROKER = "redpanda.aiot.svc.cluster.local:9092"
+    QDRANT_URL = "http://qdrant.aiot.svc.cluster.local:6333"
+    VECTOR_SIZE = 64
+    BATCH_SIZE = 500
+    COLLECTION = "sensor_history"
+    MAX_POINTS = 500000
+    CLEANUP_INTERVAL = 300
+
+    def safe_deserialize(x):
+        try:
+            return json.loads(x.decode("utf-8"))
+        except Exception:
+            return None
+
+    def fast_embed(text):
+        b = text.encode()
+        raw = b''
+        for salt in (b'\x00', b'\x01', b'\x02', b'\x03'):
+            raw += hashlib.sha256(salt + b).digest()
+            if len(raw) >= VECTOR_SIZE * 4:
+                break
+        vec = []
+        for i in range(VECTOR_SIZE):
+            val = (raw[i*2] << 8 | raw[i*2+1]) / 65535.0 * 2 - 1
+            vec.append(val)
+        norm = sum(x*x for x in vec) ** 0.5
+        return [x/norm for x in vec] if norm > 0 else vec
+
+    qdrant = QdrantClient(url=QDRANT_URL, timeout=60, check_compatibility=False)
+
+    for attempt in range(30):
+        try:
+            collections = [c.name for c in qdrant.get_collections().collections]
+            if COLLECTION in collections:
+                log.info(f"Collection {COLLECTION} exists")
+                break
+            else:
+                log.info(f"Creating collection {COLLECTION}...")
+                qdrant.create_collection(
+                    collection_name=COLLECTION,
+                    vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE)
+                )
+                log.info(f"Collection {COLLECTION} created")
+                break
+        except Exception as e:
+            log.warning(f"Attempt {attempt+1}: {e}")
+            time.sleep(5)
+
+    def cleanup_old_points():
+        while True:
+            try:
+                time.sleep(CLEANUP_INTERVAL)
+                info = qdrant.get_collection(COLLECTION)
+                current = info.points_count
+                if current > MAX_POINTS:
+                    cutoff = time.time() - 3600
+                    qdrant.delete(
+                        collection_name=COLLECTION,
+                        points_selector=FilterSelector(
+                            filter=Filter(must=[FieldCondition(key="timestamp", range=Range(lt=cutoff))])
+                        ),
+                        wait=False
+                    )
+                    log.info(f"Cleanup: {current} points, deleted older than 1h")
+                else:
+                    log.info(f"Cleanup: {current}/{MAX_POINTS} points - OK")
+            except Exception as e:
+                log.error(f"Cleanup error: {e}")
+
+    t = threading.Thread(target=cleanup_old_points, daemon=True)
+    t.start()
+
+    consumer = KafkaConsumer(
+        "telemetry",
+        bootstrap_servers=KAFKA_BROKER,
+        value_deserializer=safe_deserialize,
+        group_id="qdrant-indexer-group4",
+        auto_offset_reset="latest",
+        consumer_timeout_ms=2000,
+    )
+
+    log.info(f"Qdrant indexer v5 — batch={BATCH_SIZE}, max_points={MAX_POINTS}")
+    point_id = int(time.time() * 1000000)
+    count = 0
+    batch_points = []
+    t0 = time.time()
+
+    while True:
+        try:
+            for msg in consumer:
+                data = msg.value
+                if data is None:
+                    continue
+                payload = data.get("payload", {})
+                topic = data.get("topic", "unknown")
+                sid = payload.get("sensor_id") or payload.get("machine_id", "unknown")
+                loc = payload.get("location") or payload.get("machine_type", "unknown")
+                val = payload.get("value") or payload.get("temperature", 0)
+                unit = payload.get("unit") or payload.get("status", "")
+
+                text = f"{sid} {loc} {val} {unit} {topic}"
+                embedding = fast_embed(text)
+
+                batch_points.append(PointStruct(
+                    id=point_id, vector=embedding,
+                    payload={"text": f"Sensor {sid} at {loc}: {val} {unit} [{topic}]",
+                             "sensor_id": sid, "topic": topic, "timestamp": time.time()}
+                ))
+                point_id += 1
+
+                if len(batch_points) >= BATCH_SIZE:
+                    qdrant.upsert(collection_name=COLLECTION, points=batch_points, wait=False)
+                    count += len(batch_points)
+                    elapsed = time.time() - t0
+                    rate = count / elapsed if elapsed > 0 else 0
+                    if count % 5000 < BATCH_SIZE:
+                        log.info(f"Indexed {count} | rate={rate:.0f}/s")
+                    batch_points = []
+
+            if batch_points:
+                qdrant.upsert(collection_name=COLLECTION, points=batch_points, wait=False)
+                count += len(batch_points)
+                log.info(f"Flushed partial {len(batch_points)} | total={count}")
+                batch_points = []
+        except StopIteration:
+            if batch_points:
+                qdrant.upsert(collection_name=COLLECTION, points=batch_points, wait=False)
+                count += len(batch_points)
+                batch_points = []
+        except Exception as e:
+            log.error(f"Error: {e}")
+            batch_points = []
+            time.sleep(2)
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"indexer.py":"import json, time, logging, hashlib, threading\nfrom kafka import KafkaConsumer\nfrom qdrant_client import QdrantClient\nfrom qdrant_client.models import Distance, VectorParams, PointStruct, FilterSelector, Filter, FieldCondition, Range\n\nlogging.basicConfig(level=logging.INFO)\nlogging.getLogger(\"httpx\").setLevel(logging.WARNING)\nlogging.getLogger(\"kafka\").setLevel(logging.WARNING)\nlog = logging.getLogger(\"qdrant-indexer\")\n\nKAFKA_BROKER = \"redpanda.aiot.svc.cluster.local:9092\"\nQDRANT_URL = \"http://qdrant.aiot.svc.cluster.local:6333\"\nVECTOR_SIZE = 64\nBATCH_SIZE = 500\nCOLLECTION = \"sensor_history\"\nMAX_POINTS = 500000\nCLEANUP_INTERVAL = 300\n\ndef safe_deserialize(x):\n    try:\n        return json.loads(x.decode(\"utf-8\"))\n    except Exception:\n        return None\n\ndef fast_embed(text):\n    b = text.encode()\n    raw = b''\n    for salt in (b'\\x00', b'\\x01', b'\\x02', b'\\x03'):\n        raw += hashlib.sha256(salt + b).digest()\n        if len(raw) \u003e= VECTOR_SIZE * 4:\n            break\n    vec = []\n    for i in range(VECTOR_SIZE):\n        val = (raw[i*2] \u003c\u003c 8 | raw[i*2+1]) / 65535.0 * 2 - 1\n        vec.append(val)\n    norm = sum(x*x for x in vec) ** 0.5\n    return [x/norm for x in vec] if norm \u003e 0 else vec\n\nqdrant = QdrantClient(url=QDRANT_URL, timeout=60, check_compatibility=False)\n\nfor attempt in range(30):\n    try:\n        collections = [c.name for c in qdrant.get_collections().collections]\n        if COLLECTION in collections:\n            log.info(f\"Collection {COLLECTION} exists\")\n            break\n        else:\n            log.info(f\"Creating collection {COLLECTION}...\")\n            qdrant.create_collection(\n                collection_name=COLLECTION,\n                vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE)\n            )\n            log.info(f\"Collection {COLLECTION} created\")\n            break\n    except Exception as e:\n        log.warning(f\"Attempt {attempt+1}: {e}\")\n        time.sleep(5)\n\ndef cleanup_old_points():\n    while True:\n        try:\n            time.sleep(CLEANUP_INTERVAL)\n            info = qdrant.get_collection(COLLECTION)\n            current = info.points_count\n            if current \u003e MAX_POINTS:\n                cutoff = time.time() - 3600\n                qdrant.delete(\n                    collection_name=COLLECTION,\n                    points_selector=FilterSelector(\n                        filter=Filter(must=[FieldCondition(key=\"timestamp\", range=Range(lt=cutoff))])\n                    ),\n                    wait=False\n                )\n                log.info(f\"Cleanup: {current} points, deleted older than 1h\")\n            else:\n                log.info(f\"Cleanup: {current}/{MAX_POINTS} points - OK\")\n        except Exception as e:\n            log.error(f\"Cleanup error: {e}\")\n\nt = threading.Thread(target=cleanup_old_points, daemon=True)\nt.start()\n\nconsumer = KafkaConsumer(\n    \"telemetry\",\n    bootstrap_servers=KAFKA_BROKER,\n    value_deserializer=safe_deserialize,\n    group_id=\"qdrant-indexer-group4\",\n    auto_offset_reset=\"latest\",\n    consumer_timeout_ms=2000,\n)\n\nlog.info(f\"Qdrant indexer v5 — batch={BATCH_SIZE}, max_points={MAX_POINTS}\")\npoint_id = int(time.time() * 1000000)\ncount = 0\nbatch_points = []\nt0 = time.time()\n\nwhile True:\n    try:\n        for msg in consumer:\n            data = msg.value\n            if data is None:\n                continue\n            payload = data.get(\"payload\", {})\n            topic = data.get(\"topic\", \"unknown\")\n            sid = payload.get(\"sensor_id\") or payload.get(\"machine_id\", \"unknown\")\n            loc = payload.get(\"location\") or payload.get(\"machine_type\", \"unknown\")\n            val = payload.get(\"value\") or payload.get(\"temperature\", 0)\n            unit = payload.get(\"unit\") or payload.get(\"status\", \"\")\n\n            text = f\"{sid} {loc} {val} {unit} {topic}\"\n            embedding = fast_embed(text)\n\n            batch_points.append(PointStruct(\n                id=point_id, vector=embedding,\n                payload={\"text\": f\"Sensor {sid} at {loc}: {val} {unit} [{topic}]\",\n                         \"sensor_id\": sid, \"topic\": topic, \"timestamp\": time.time()}\n            ))\n            point_id += 1\n\n            if len(batch_points) \u003e= BATCH_SIZE:\n                qdrant.upsert(collection_name=COLLECTION, points=batch_points, wait=False)\n                count += len(batch_points)\n                elapsed = time.time() - t0\n                rate = count / elapsed if elapsed \u003e 0 else 0\n                if count % 5000 \u003c BATCH_SIZE:\n                    log.info(f\"Indexed {count} | rate={rate:.0f}/s\")\n                batch_points = []\n\n        if batch_points:\n            qdrant.upsert(collection_name=COLLECTION, points=batch_points, wait=False)\n            count += len(batch_points)\n            log.info(f\"Flushed partial {len(batch_points)} | total={count}\")\n            batch_points = []\n    except StopIteration:\n        if batch_points:\n            qdrant.upsert(collection_name=COLLECTION, points=batch_points, wait=False)\n            count += len(batch_points)\n            batch_points = []\n    except Exception as e:\n        log.error(f\"Error: {e}\")\n        batch_points = []\n        time.sleep(2)\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"qdrant-indexer-code","namespace":"aiot"}}
+  creationTimestamp: "2026-03-05T18:45:40Z"
+  name: qdrant-indexer-code
+  namespace: aiot
+  resourceVersion: "3316088"
+  uid: 2906c364-772d-4e21-b3fd-5be74d433e3a

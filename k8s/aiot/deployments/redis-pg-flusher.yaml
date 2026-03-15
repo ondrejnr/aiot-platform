@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "12"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"redis-pg-flusher"},"name":"redis-pg-flusher","namespace":"aiot"},"spec":{"replicas":2,"selector":{"matchLabels":{"app":"redis-pg-flusher"}},"template":{"metadata":{"labels":{"app":"redis-pg-flusher"}},"spec":{"containers":[{"args":["pip install --quiet redis psycopg2-binary && python3 /code/flusher.py"],"command":["/bin/sh","-c"],"image":"python:3.11-slim","name":"flusher","resources":{"limits":{"cpu":"500m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"volumeMounts":[{"mountPath":"/code","name":"code"}]}],"volumes":[{"configMap":{"name":"redis-pg-flusher-code"},"name":"code"}]}}}}
+  creationTimestamp: "2026-03-05T22:45:46Z"
+  generation: 15
+  labels:
+    app: redis-pg-flusher
+  name: redis-pg-flusher
+  namespace: aiot
+  resourceVersion: "3399013"
+  uid: 600e13e8-05fa-489b-8b8b-8f848cfb149a
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: redis-pg-flusher
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-03-15T01:38:52Z"
+      creationTimestamp: null
+      labels:
+        app: redis-pg-flusher
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: redis-pg-flusher
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - pip install --quiet redis psycopg2-binary && python3 /code/flusher.py
+        command:
+        - /bin/sh
+        - -c
+        env:
+        - name: BATCH_SIZE
+          value: "5000"
+        - name: FLUSH_INTERVAL
+          value: "0.5"
+        image: python:3.11-slim
+        imagePullPolicy: Always
+        name: flusher
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /code
+          name: code
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: redis-pg-flusher-code
+        name: code
+status:
+  availableReplicas: 3
+  conditions:
+  - lastTransitionTime: "2026-03-05T22:45:46Z"
+    lastUpdateTime: "2026-03-15T01:38:58Z"
+    message: ReplicaSet "redis-pg-flusher-7db97cd5b8" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-03-15T06:57:15Z"
+    lastUpdateTime: "2026-03-15T06:57:15Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 15
+  readyReplicas: 3
+  replicas: 3
+  updatedReplicas: 3
