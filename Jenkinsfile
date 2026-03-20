@@ -28,7 +28,7 @@ pipeline {
           find k8s -type f \( -name '*.yaml' -o -name '*.yml' \) | sort > manifest-list.txt
           cat manifest-list.txt
           : > cluster-diff.txt
-          xargs -r -n1 /tmp/kubectl diff -f < manifest-list.txt >> cluster-diff.txt 2>&1
+          xargs -r -a manifest-list.txt -n1 /tmp/kubectl diff -f >> cluster-diff.txt 2>&1
           cat cluster-diff.txt
           exit 0
         '''
