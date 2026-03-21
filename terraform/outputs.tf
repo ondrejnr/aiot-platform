@@ -1,9 +1,9 @@
 output "project" {
-  value = "project-b1dc10c3-bdd6-4c36-b35"
+  value = var.project
 }
 
 output "region" {
-  value = "europe-west1"
+  value = var.region
 }
 
 output "master_ip" {
