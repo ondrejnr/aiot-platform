@@ -20,7 +20,6 @@ pipeline {
       set +e
       err="${SNAPSHOT_DIR}/errors/command-errors.log"; : > "$err"
       y(){ o="$1"; shift; "$@" -o yaml > "$o" 2>>"$err" || true; }
-      j(){ o="$1"; shift; "$@" -o json > "$o" 2>>"$err" || true; }
       t(){ o="$1"; shift; "$@" > "$o" 2>>"$err" || true; }
 
       t "${SNAPSHOT_DIR}/meta/cluster-info.txt" "${KUBECTL_BIN}" cluster-info
@@ -72,17 +71,17 @@ pipeline {
         echo "apiVersion: v1"
         echo "kind: List"
         echo "items:"
-        "${KUBECTL_BIN}" get secrets -A -o jsonpath='{range .items[*]}- apiVersion: v1{"\n"}  kind: Secret{"\n"}  metadata:{"\n"}    namespace: {.metadata.namespace}{"\n"}    name: {.metadata.name}{"\n"}  type: {.type}{"\n"}{end}'
-        echo
+        "${KUBECTL_BIN}" get secrets -A --no-headers -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,TYPE:.type' \
+          | awk '{print "- apiVersion: v1\n  kind: Secret\n  metadata:\n    namespace: " $1 "\n    name: " $2 "\n  type: " $3}'
       } > "${SNAPSHOT_DIR}/security/secrets-metadata.yaml" 2>>"$err" || true
 
-      "${KUBECTL_BIN}" get pods -A -o jsonpath='{range .items[*]}{.spec.nodeName}{"\t"}{.metadata.namespace}{"\t"}{.metadata.name}{"\t"}{.status.phase}{"\t"}{.status.podIP}{"\n"}{end}' \
+      "${KUBECTL_BIN}" get pods -A --no-headers -o custom-columns='NODE:.spec.nodeName,NAMESPACE:.metadata.namespace,NAME:.metadata.name,PHASE:.status.phase,PODIP:.status.podIP' \
         | sort > "${SNAPSHOT_DIR}/nodes/pods-by-node.txt" 2>>"$err" || true
 
-      "${KUBECTL_BIN}" get nodes -o jsonpath='{range .items[*]}=== {.metadata.name} ==={"\n"}{range $k,$v := .metadata.labels}{$k}={$v}{"\n"}{end}{"\n"}{end}' \
+      "${KUBECTL_BIN}" get nodes --show-labels \
         > "${SNAPSHOT_DIR}/nodes/node-labels.txt" 2>>"$err" || true
 
-      "${KUBECTL_BIN}" get nodes -o jsonpath='{range .items[*]}=== {.metadata.name} ==={"\n"}{range .spec.taints[*]}{.key}={.value}:{.effect}{"\n"}{end}{"\n"}{end}' \
+      "${KUBECTL_BIN}" describe nodes \
         > "${SNAPSHOT_DIR}/nodes/node-taints.txt" 2>>"$err" || true
 
       {
