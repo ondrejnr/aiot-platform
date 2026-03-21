@@ -66,6 +66,12 @@ EOT
     on_host_maintenance = "MIGRATE"
     preemptible         = false
   }
+
+  lifecycle {
+    ignore_changes = [
+      metadata["ssh-keys"],
+    ]
+  }
 }
 
 resource "google_compute_instance" "aiot_worker_01" {
@@ -121,6 +127,12 @@ EOT
     on_host_maintenance = "MIGRATE"
     preemptible         = false
   }
+
+  lifecycle {
+    ignore_changes = [
+      metadata["ssh-keys"],
+    ]
+  }
 }
 
 resource "google_compute_instance" "aiot_worker_02" {
@@ -175,6 +187,12 @@ EOT
     automatic_restart   = true
     on_host_maintenance = "MIGRATE"
     preemptible         = false
+  }
+
+  lifecycle {
+    ignore_changes = [
+      metadata["ssh-keys"],
+    ]
   }
 }
 
