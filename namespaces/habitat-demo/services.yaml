@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hab-sup
+  namespace: habitat-demo
+spec:
+  clusterIP: None
+  clusterIPs:
+  - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 9631
+    protocol: TCP
+    targetPort: 9631
+  - name: ctl
+    port: 9632
+    protocol: TCP
+    targetPort: 9632
+  selector:
+    app: hab-sup
+  sessionAffinity: None
+  type: ClusterIP

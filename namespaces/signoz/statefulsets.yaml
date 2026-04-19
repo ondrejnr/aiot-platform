@@ -1,0 +1,525 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    clickhouse-operator-reconcile: force-2
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: clickhouse
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/app: chop
+    clickhouse.altinity.com/chi: signoz-clickhouse
+    clickhouse.altinity.com/cluster: cluster
+    clickhouse.altinity.com/namespace: signoz
+    clickhouse.altinity.com/object-version: 9aa017000758f382506769502f7b5d289289158f
+    clickhouse.altinity.com/replica: '0'
+    clickhouse.altinity.com/shard: '0'
+    helm.sh/chart: clickhouse-24.1.18
+  name: chi-signoz-clickhouse-cluster-0-0
+  namespace: signoz
+  ownerReferences:
+  - apiVersion: clickhouse.altinity.com/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ClickHouseInstallation
+    name: signoz-clickhouse
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      clickhouse.altinity.com/app: chop
+      clickhouse.altinity.com/chi: signoz-clickhouse
+      clickhouse.altinity.com/cluster: cluster
+      clickhouse.altinity.com/namespace: signoz
+      clickhouse.altinity.com/replica: '0'
+      clickhouse.altinity.com/shard: '0'
+  serviceName: chi-signoz-clickhouse-cluster-0-0
+  template:
+    metadata:
+      annotations:
+        clickhouse-operator-reconcile: force-2
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: clickhouse
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/app: chop
+        clickhouse.altinity.com/chi: signoz-clickhouse
+        clickhouse.altinity.com/cluster: cluster
+        clickhouse.altinity.com/namespace: signoz
+        clickhouse.altinity.com/ready: 'yes'
+        clickhouse.altinity.com/replica: '0'
+        clickhouse.altinity.com/shard: '0'
+        helm.sh/chart: clickhouse-24.1.18
+      name: signoz-clickhouse
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - /usr/bin/clickhouse-server --config-file=/etc/clickhouse-server/config.xml
+        image: docker.io/clickhouse/clickhouse-server:25.5.6
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /ping
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: clickhouse
+        ports:
+        - containerPort: 8123
+          name: http
+          protocol: TCP
+        - containerPort: 9000
+          name: client
+          protocol: TCP
+        - containerPort: 9009
+          name: interserver
+          protocol: TCP
+        - containerPort: 9000
+          name: tcp
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ping
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: '2'
+            memory: 8Gi
+          requests:
+            cpu: '1'
+            memory: 3Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/clickhouse-server/config.d/
+          name: chi-signoz-clickhouse-common-configd
+        - mountPath: /etc/clickhouse-server/users.d/
+          name: chi-signoz-clickhouse-common-usersd
+        - mountPath: /etc/clickhouse-server/conf.d/
+          name: chi-signoz-clickhouse-deploy-confd-cluster-0-0
+        - mountPath: /var/lib/clickhouse
+          name: data-volumeclaim-template
+      dnsPolicy: ClusterFirst
+      hostAliases:
+      - hostnames:
+        - chi-signoz-clickhouse-cluster-0-0
+        ip: 127.0.0.1
+      nodeSelector:
+        kubernetes.io/hostname: oci-e5-node2
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 101
+        runAsGroup: 101
+        runAsUser: 101
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: chi-signoz-clickhouse-common-configd
+        name: chi-signoz-clickhouse-common-configd
+      - configMap:
+          defaultMode: 420
+          name: chi-signoz-clickhouse-common-usersd
+        name: chi-signoz-clickhouse-common-usersd
+      - configMap:
+          defaultMode: 420
+          name: chi-signoz-clickhouse-deploy-confd-cluster-0-0
+        name: chi-signoz-clickhouse-deploy-confd-cluster-0-0
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        clickhouse-operator-reconcile: force-2
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: clickhouse
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/app: chop
+        clickhouse.altinity.com/chi: signoz-clickhouse
+        clickhouse.altinity.com/cluster: cluster
+        clickhouse.altinity.com/namespace: signoz
+        clickhouse.altinity.com/replica: '0'
+        clickhouse.altinity.com/shard: '0'
+        helm.sh/chart: clickhouse-24.1.18
+      name: data-volumeclaim-template
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: local-path
+      volumeMode: Filesystem
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"signoz:signoz","ingressName":"signoz:signoz","hostname":"signoz.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: signoz
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: signoz
+    app.kubernetes.io/version: v0.117.1
+    helm.sh/chart: signoz-0.117.1
+  name: signoz
+  namespace: signoz
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: signoz
+      app.kubernetes.io/instance: signoz
+      app.kubernetes.io/name: signoz
+  serviceName: signoz
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T04:47:47Z'
+      labels:
+        app.kubernetes.io/component: signoz
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/name: signoz
+    spec:
+      containers:
+      - env:
+        - name: CLICKHOUSE_HOST
+          value: signoz-clickhouse
+        - name: CLICKHOUSE_PORT
+          value: '9000'
+        - name: CLICKHOUSE_HTTP_PORT
+          value: '8123'
+        - name: CLICKHOUSE_CLUSTER
+          value: cluster
+        - name: CLICKHOUSE_USER
+          value: admin
+        - name: CLICKHOUSE_PASSWORD
+          value: 27ff0399-0d3a-4bd8-919d-17c2181e6fb9
+        - name: CLICKHOUSE_SECURE
+          value: 'false'
+        - name: SIGNOZ_TELEMETRYSTORE_PROVIDER
+          value: clickhouse
+        - name: SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN
+          value: tcp://signoz-clickhouse:9000/?username=$(CLICKHOUSE_USER)&password=$(CLICKHOUSE_PASSWORD)
+        - name: SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER
+          value: cluster
+        - name: SIGNOZ_PROMETHEUS_ACTIVE__QUERY__TRACKER_ENABLED
+          value: 'false'
+        - name: SIGNOZ_EMAILING_ENABLED
+          value: 'false'
+        - name: SIGNOZ_ALERTMANAGER_SIGNOZ_EXTERNAL__URL
+          value: http://localhost:8080
+        - name: SIGNOZ_ALERTMANAGER_PROVIDER
+          value: signoz
+        - name: SIGNOZ_WEB_SESSION__TOKEN__EXPIRY__DURATION
+          value: 8760h
+        - name: SIGNOZ_TOKENIZER_JWT_SECRET
+          value: jMxL6iHFteGmZTWYOrag0ChQncuAw9fk
+        - name: SIGNOZ_SQLSTORE_PROVIDER
+          value: postgres
+        - name: SIGNOZ_SQLSTORE_POSTGRES_DSN
+          value: postgres://aiot:aiot123@postgres.aiot.svc:5432/signoz?sslmode=disable
+        image: docker.io/signoz/signoz:v0.117.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /api/v1/health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: signoz
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 8085
+          name: http-internal
+          protocol: TCP
+        - containerPort: 4320
+          name: opamp-internal
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /api/v1/health?live=1
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        securityContext: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/signoz/
+          name: signoz-db
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/hostname: oci-e5-node2
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: signoz
+      serviceAccountName: signoz
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: dashboards
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: signoz-db
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: local-path
+      volumeMode: Filesystem
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: zookeeper
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: zookeeper
+    helm.sh/chart: zookeeper-0.0.1
+    role: zookeeper
+  name: signoz-zookeeper
+  namespace: signoz
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: Parallel
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: zookeeper
+      app.kubernetes.io/instance: signoz
+      app.kubernetes.io/name: zookeeper
+  serviceName: signoz-zookeeper-headless
+  template:
+    metadata:
+      annotations:
+        signoz.io/path: /metrics
+        signoz.io/port: '9141'
+        signoz.io/scrape: 'true'
+      labels:
+        app.kubernetes.io/component: zookeeper
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: zookeeper
+        helm.sh/chart: zookeeper-0.0.1
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: zookeeper
+                  app.kubernetes.io/instance: signoz
+                  app.kubernetes.io/name: zookeeper
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      containers:
+      - command:
+        - /scripts/setup.sh
+        env:
+        - name: BITNAMI_DEBUG
+          value: 'false'
+        - name: ZOO_DATA_LOG_DIR
+        - name: ZOO_PORT_NUMBER
+          value: '2181'
+        - name: ZOO_TICK_TIME
+          value: '2000'
+        - name: ZOO_INIT_LIMIT
+          value: '10'
+        - name: ZOO_SYNC_LIMIT
+          value: '5'
+        - name: ZOO_PRE_ALLOC_SIZE
+          value: '65536'
+        - name: ZOO_SNAPCOUNT
+          value: '100000'
+        - name: ZOO_MAX_CLIENT_CNXNS
+          value: '60'
+        - name: ZOO_4LW_COMMANDS_WHITELIST
+          value: srvr, mntr, ruok
+        - name: ZOO_LISTEN_ALLIPS_ENABLED
+          value: 'no'
+        - name: ZOO_AUTOPURGE_INTERVAL
+          value: '1'
+        - name: ZOO_AUTOPURGE_RETAIN_COUNT
+          value: '3'
+        - name: ZOO_MAX_SESSION_TIMEOUT
+          value: '40000'
+        - name: ZOO_SERVERS
+          value: signoz-zookeeper-0.signoz-zookeeper-headless.signoz.svc.cluster.local:2888:3888::1
+        - name: ZOO_ENABLE_AUTH
+          value: 'no'
+        - name: ZOO_ENABLE_QUORUM_AUTH
+          value: 'no'
+        - name: ZOO_HEAP_SIZE
+          value: '1024'
+        - name: ZOO_LOG_LEVEL
+          value: INFO
+        - name: ALLOW_ANONYMOUS_LOGIN
+          value: 'yes'
+        - name: ZOO_ENABLE_PROMETHEUS_METRICS
+          value: 'yes'
+        - name: ZOO_PROMETHEUS_METRICS_PORT_NUMBER
+          value: '9141'
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        image: signoz/zookeeper:3.7.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - curl -s -m 2 http://localhost:8080/commands/ruok | grep ruok
+          failureThreshold: 6
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: zookeeper
+        ports:
+        - containerPort: 2181
+          name: client
+          protocol: TCP
+        - containerPort: 2888
+          name: follower
+          protocol: TCP
+        - containerPort: 3888
+          name: election
+          protocol: TCP
+        - containerPort: 9141
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - curl -s -m 2 http://localhost:8080/commands/ruok | grep error | grep
+              null
+          failureThreshold: 6
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1001
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /scripts/setup.sh
+          name: scripts
+          subPath: setup.sh
+        - mountPath: /bitnami/zookeeper
+          name: data
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/hostname: oci-e5-node1
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1001
+      serviceAccount: default
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 493
+          name: signoz-zookeeper-scripts
+        name: scripts
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      volumeMode: Filesystem

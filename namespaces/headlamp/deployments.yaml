@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"headlamp:headlamp","ingressName":"headlamp:headlamp","hostname":"headlamp.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: headlamp
+  namespace: headlamp
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: headlamp
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: headlamp
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: Exists
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - aiot-worker-01
+      containers:
+      - args:
+        - -in-cluster
+        - -plugins-dir=/headlamp/plugins
+        image: ghcr.io/headlamp-k8s/headlamp:latest
+        imagePullPolicy: Always
+        name: headlamp
+        ports:
+        - containerPort: 4466
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        node-role.kubernetes.io/worker: ''
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: headlamp
+      serviceAccountName: headlamp
+      terminationGracePeriodSeconds: 30

@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  annotations:
+    metacontroller.k8s.io/last-applied-configuration: '{"apiVersion":"networking.istio.io/v1alpha3","kind":"DestinationRule","metadata":{"labels":{"controller-uid":"741b1f16-a29c-453d-9b51-db56a7ee96ad"},"name":"ml-pipeline-visualizationserver","namespace":"kubeflow-user-example-com"},"spec":{"host":"ml-pipeline-visualizationserver","trafficPolicy":{"tls":{"mode":"ISTIO_MUTUAL"}}}}'
+  labels:
+    controller-uid: 741b1f16-a29c-453d-9b51-db56a7ee96ad
+  name: ml-pipeline-visualizationserver
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Namespace
+    name: kubeflow-user-example-com
+spec:
+  host: ml-pipeline-visualizationserver
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

@@ -1,0 +1,756 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: poddefaults
+    app.kubernetes.io/component: poddefaults
+    app.kubernetes.io/name: poddefaults
+    kustomize.component: poddefaults
+  name: admission-webhook-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.99.125.226
+  clusterIPs:
+  - 10.99.125.226
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: https-webhook
+    port: 443
+    protocol: TCP
+    targetPort: https-webhook
+  selector:
+    app: poddefaults
+    app.kubernetes.io/component: poddefaults
+    app.kubernetes.io/name: poddefaults
+    kustomize.component: poddefaults
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cache-server
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  name: cache-server
+  namespace: kubeflow
+spec:
+  clusterIP: 10.97.194.202
+  clusterIPs:
+  - 10.97.194.202
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: webhook-api
+  selector:
+    app: cache-server
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: centraldashboard
+    app.kubernetes.io/component: centraldashboard
+    app.kubernetes.io/name: centraldashboard
+    kustomize.component: centraldashboard
+  name: centraldashboard
+  namespace: kubeflow
+spec:
+  clusterIP: 10.96.36.153
+  clusterIPs:
+  - 10.96.36.153
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8082
+  selector:
+    app: centraldashboard
+    app.kubernetes.io/component: centraldashboard
+    app.kubernetes.io/name: centraldashboard
+    kustomize.component: centraldashboard
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jupyter-web-app
+    kustomize.component: jupyter-web-app
+    run: jupyter-web-app
+  name: jupyter-web-app-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.106.154.10
+  clusterIPs:
+  - 10.106.154.10
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: jupyter-web-app
+    kustomize.component: jupyter-web-app
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: '8080'
+    prometheus.io/scheme: http
+    prometheus.io/scrape: 'true'
+  labels:
+    katib.kubeflow.org/component: controller
+  name: katib-controller
+  namespace: kubeflow
+spec:
+  clusterIP: 10.99.151.87
+  clusterIPs:
+  - 10.99.151.87
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: webhook
+    port: 443
+    protocol: TCP
+    targetPort: 8443
+  - name: metrics
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: healthz
+    port: 18080
+    protocol: TCP
+    targetPort: 18080
+  selector:
+    katib.kubeflow.org/component: controller
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    katib.kubeflow.org/component: db-manager
+  name: katib-db-manager
+  namespace: kubeflow
+spec:
+  clusterIP: 10.109.187.180
+  clusterIPs:
+  - 10.109.187.180
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: api
+    port: 6789
+    protocol: TCP
+    targetPort: 6789
+  selector:
+    katib.kubeflow.org/component: db-manager
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    katib.kubeflow.org/component: mysql
+  name: katib-mysql
+  namespace: kubeflow
+spec:
+  clusterIP: 10.98.102.9
+  clusterIPs:
+  - 10.98.102.9
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: dbapi
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    katib.kubeflow.org/component: mysql
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    katib.kubeflow.org/component: ui
+  name: katib-ui
+  namespace: kubeflow
+spec:
+  clusterIP: 10.104.0.3
+  clusterIPs:
+  - 10.104.0.3
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: ui
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    katib.kubeflow.org/component: ui
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: '8443'
+    prometheus.io/scheme: https
+    prometheus.io/scrape: 'true'
+  labels:
+    app: kserve
+    app.kubernetes.io/name: kserve
+    control-plane: kserve-controller-manager
+    controller-tools.k8s.io: '1.0'
+  name: kserve-controller-manager-metrics-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.108.5.149
+  clusterIPs:
+  - 10.108.5.149
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: https
+    port: 8443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app: kserve
+    app.kubernetes.io/name: kserve
+    control-plane: kserve-controller-manager
+    controller-tools.k8s.io: '1.0'
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kserve
+    app.kubernetes.io/name: kserve
+    control-plane: kserve-controller-manager
+    controller-tools.k8s.io: '1.0'
+  name: kserve-controller-manager-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.100.215.135
+  clusterIPs:
+  - 10.100.215.135
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app: kserve
+    app.kubernetes.io/name: kserve
+    control-plane: kserve-controller-manager
+    controller-tools.k8s.io: '1.0'
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kserve
+    app.kubernetes.io/component: kserve-models-web-app
+    app.kubernetes.io/name: kserve
+    kustomize.component: kserve-models-web-app
+  name: kserve-models-web-app
+  namespace: kubeflow
+spec:
+  clusterIP: 10.108.235.237
+  clusterIPs:
+  - 10.108.235.237
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: kserve
+    app.kubernetes.io/component: kserve-models-web-app
+    app.kubernetes.io/name: kserve
+    kustomize.component: kserve-models-web-app
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kserve
+    app.kubernetes.io/name: kserve
+  name: kserve-webhook-server-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.97.223.11
+  clusterIPs:
+  - 10.97.223.11
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: webhook-server
+  selector:
+    app: kserve
+    app.kubernetes.io/name: kserve
+    control-plane: kserve-controller-manager
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kubeflow-pipelines-profile-controller
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  name: kubeflow-pipelines-profile-controller
+  namespace: kubeflow
+spec:
+  clusterIP: 10.108.106.196
+  clusterIPs:
+  - 10.108.106.196
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: kubeflow-pipelines-profile-controller
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: metadata-envoy
+    application-crd-id: kubeflow-pipelines
+  name: metadata-envoy-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.106.22.25
+  clusterIPs:
+  - 10.106.22.25
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: md-envoy
+    port: 9090
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    application-crd-id: kubeflow-pipelines
+    component: metadata-envoy
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: metadata
+    application-crd-id: kubeflow-pipelines
+  name: metadata-grpc-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.111.204.126
+  clusterIPs:
+  - 10.111.204.126
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: grpc-api
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    application-crd-id: kubeflow-pipelines
+    component: metadata-grpc-server
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    application-crd-id: kubeflow-pipelines
+  name: minio-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.104.252.72
+  clusterIPs:
+  - 10.104.252.72
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    app: minio
+    application-crd-id: kubeflow-pipelines
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: '8888'
+    prometheus.io/scheme: http
+    prometheus.io/scrape: 'true'
+  labels:
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  name: ml-pipeline
+  namespace: kubeflow
+spec:
+  clusterIP: 10.107.144.71
+  clusterIPs:
+  - 10.107.144.71
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 8888
+    protocol: TCP
+    targetPort: 8888
+  - name: grpc
+    port: 8887
+    protocol: TCP
+    targetPort: 8887
+  selector:
+    app: ml-pipeline
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ml-pipeline-ui
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  name: ml-pipeline-ui
+  namespace: kubeflow
+spec:
+  clusterIP: 10.105.96.235
+  clusterIPs:
+  - 10.105.96.235
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: ml-pipeline-ui
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  name: ml-pipeline-visualizationserver
+  namespace: kubeflow
+spec:
+  clusterIP: 10.104.129.69
+  clusterIPs:
+  - 10.104.129.69
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 8888
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    app: ml-pipeline-visualizationserver
+    app.kubernetes.io/component: ml-pipeline
+    app.kubernetes.io/name: kubeflow-pipelines
+    application-crd-id: kubeflow-pipelines
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    application-crd-id: kubeflow-pipelines
+  name: mysql
+  namespace: kubeflow
+spec:
+  clusterIP: 10.110.104.82
+  clusterIPs:
+  - 10.110.104.82
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mysql
+    application-crd-id: kubeflow-pipelines
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: notebook-controller
+    kustomize.component: notebook-controller
+  name: notebook-controller-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.107.106.145
+  clusterIPs:
+  - 10.107.106.145
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    app: notebook-controller
+    kustomize.component: notebook-controller
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    kustomize.component: profiles
+  name: profiles-kfam
+  namespace: kubeflow
+spec:
+  clusterIP: 10.104.254.93
+  clusterIPs:
+  - 10.104.254.93
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8081
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    kustomize.component: profiles
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: tensorboard-controller
+    control-plane: controller-manager
+    kustomize.component: tensorboard-controller
+  name: tensorboard-controller-controller-manager-metrics-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.100.230.105
+  clusterIPs:
+  - 10.100.230.105
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: https
+    port: 8443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app: tensorboard-controller
+    control-plane: controller-manager
+    kustomize.component: tensorboard-controller
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: tensorboards-web-app
+    kustomize.component: tensorboards-web-app
+    run: tensorboards-web-app
+  name: tensorboards-web-app-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.102.207.105
+  clusterIPs:
+  - 10.102.207.105
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: tensorboards-web-app
+    kustomize.component: tensorboards-web-app
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: '8080'
+    prometheus.io/scrape: 'true'
+  labels:
+    app: training-operator
+  name: training-operator
+  namespace: kubeflow
+spec:
+  clusterIP: 10.108.1.219
+  clusterIPs:
+  - 10.108.1.219
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: monitoring-port
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: webhook-server
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    control-plane: kubeflow-training-operator
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: volumes-web-app
+    kustomize.component: volumes-web-app
+    run: volumes-web-app
+  name: volumes-web-app-service
+  namespace: kubeflow
+spec:
+  clusterIP: 10.111.36.5
+  clusterIPs:
+  - 10.111.36.5
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: volumes-web-app
+    kustomize.component: volumes-web-app
+  sessionAffinity: None
+  type: ClusterIP

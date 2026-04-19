@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"jenkins:jenkins","ingressName":"jenkins:jenkins","hostname":"jenkins.35.241.255.137.nip.io","allNodes":false}]'
+    meta.helm.sh/release-name: jenkins
+    meta.helm.sh/release-namespace: jenkins
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '90'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '90'
+  labels:
+    app.kubernetes.io/component: jenkins-controller
+    app.kubernetes.io/instance: jenkins
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: jenkins
+    helm.sh/chart: jenkins-5.9.14
+  name: jenkins
+  namespace: jenkins
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: jenkins.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: jenkins
+            port:
+              number: 8080
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - jenkins.35.241.255.137.nip.io
+    secretName: tls-jenkins

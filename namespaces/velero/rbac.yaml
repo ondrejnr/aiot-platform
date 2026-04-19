@@ -1,0 +1,131 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    meta.helm.sh/release-name: vui
+    meta.helm.sh/release-namespace: vui
+  labels:
+    app.kubernetes.io/instance: vui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vui
+    app.kubernetes.io/version: 0.4.1
+    helm.sh/chart: vui-1.0.6
+  name: vui-velero-admin
+  namespace: velero
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - update
+  - get
+  - list
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - create
+  - update
+  - get
+  - list
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - velero.io
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - ''
+  resources:
+  - pods/log
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    meta.helm.sh/release-name: vui
+    meta.helm.sh/release-namespace: vui
+  labels:
+    app.kubernetes.io/instance: vui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vui
+    app.kubernetes.io/version: 0.4.1
+    helm.sh/chart: vui-1.0.6
+  name: vui-velero-readonly
+  namespace: velero
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - velero.io
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    meta.helm.sh/release-name: vui
+    meta.helm.sh/release-namespace: vui
+  labels:
+    app.kubernetes.io/instance: vui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vui
+    app.kubernetes.io/version: 0.4.1
+    helm.sh/chart: vui-1.0.6
+  name: vui-velero-admin-binding
+  namespace: velero
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vui-velero-admin
+subjects:
+- kind: ServiceAccount
+  name: vui-admin-sa
+  namespace: vui
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    meta.helm.sh/release-name: vui
+    meta.helm.sh/release-namespace: vui
+  labels:
+    app.kubernetes.io/instance: vui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vui
+    app.kubernetes.io/version: 0.4.1
+    helm.sh/chart: vui-1.0.6
+  name: vui-velero-readonly-binding
+  namespace: velero
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vui-velero-readonly
+subjects:
+- kind: ServiceAccount
+  name: vui-readonly-sa
+  namespace: vui

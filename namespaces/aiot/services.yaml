@@ -1,0 +1,324 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: aiot
+spec:
+  clusterIP: 10.97.203.87
+  clusterIPs:
+  - 10.97.203.87
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: api-gateway
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudbeaver
+  namespace: aiot
+spec:
+  clusterIP: 10.106.5.89
+  clusterIPs:
+  - 10.106.5.89
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8978
+    protocol: TCP
+    targetPort: 8978
+  selector:
+    app: cloudbeaver
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: digital-twin
+  namespace: aiot
+spec:
+  clusterIP: 10.110.239.193
+  clusterIPs:
+  - 10.110.239.193
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8001
+    protocol: TCP
+    targetPort: 8001
+  selector:
+    app: digital-twin
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ngrok-proxy
+  namespace: aiot
+spec:
+  clusterIP: 10.111.78.243
+  clusterIPs:
+  - 10.111.78.243
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8090
+    protocol: TCP
+    targetPort: 8090
+  selector:
+    app: ngrok-proxy
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: open-webui
+  namespace: aiot
+spec:
+  clusterIP: 10.96.164.2
+  clusterIPs:
+  - 10.96.164.2
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: open-webui
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cnpg.io/operatorVersion: 1.25.1
+  labels:
+    cnpg.io/cluster: pg-ha
+  name: pg-ha-r
+  namespace: aiot
+  ownerReferences:
+  - apiVersion: postgresql.cnpg.io/v1
+    controller: true
+    kind: Cluster
+    name: pg-ha
+spec:
+  clusterIP: 10.101.230.129
+  clusterIPs:
+  - 10.101.230.129
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    cnpg.io/cluster: pg-ha
+    cnpg.io/podRole: instance
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cnpg.io/operatorVersion: 1.25.1
+  labels:
+    cnpg.io/cluster: pg-ha
+  name: pg-ha-ro
+  namespace: aiot
+  ownerReferences:
+  - apiVersion: postgresql.cnpg.io/v1
+    controller: true
+    kind: Cluster
+    name: pg-ha
+spec:
+  clusterIP: 10.99.2.0
+  clusterIPs:
+  - 10.99.2.0
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    cnpg.io/cluster: pg-ha
+    cnpg.io/instanceRole: replica
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cnpg.io/operatorVersion: 1.25.1
+  labels:
+    cnpg.io/cluster: pg-ha
+  name: pg-ha-rw
+  namespace: aiot
+  ownerReferences:
+  - apiVersion: postgresql.cnpg.io/v1
+    controller: true
+    kind: Cluster
+    name: pg-ha
+spec:
+  clusterIP: 10.104.95.66
+  clusterIPs:
+  - 10.104.95.66
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: postgres
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    cnpg.io/cluster: pg-ha
+    cnpg.io/instanceRole: primary
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin
+  namespace: aiot
+spec:
+  clusterIP: 10.107.155.99
+  clusterIPs:
+  - 10.107.155.99
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: pgadmin
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: aiot
+spec:
+  clusterIP: 10.102.58.199
+  clusterIPs:
+  - 10.102.58.199
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    cnpg.io/cluster: pg-ha
+    role: primary
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qdrant
+  namespace: aiot
+spec:
+  clusterIP: 10.96.239.55
+  clusterIPs:
+  - 10.96.239.55
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 6333
+    protocol: TCP
+    targetPort: 6333
+  - name: grpc
+    port: 6334
+    protocol: TCP
+    targetPort: 6334
+  selector:
+    app: qdrant
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-api-svc
+  namespace: aiot
+spec:
+  clusterIP: 10.102.132.133
+  clusterIPs:
+  - 10.102.132.133
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 7000
+    protocol: TCP
+    targetPort: 7000
+  selector:
+    app: rag-worker
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  namespace: aiot
+spec:
+  clusterIP: 10.109.233.189
+  clusterIPs:
+  - 10.109.233.189
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 6379
+    protocol: TCP
+    targetPort: 6379
+  selector:
+    app: redis
+  sessionAffinity: None
+  type: ClusterIP

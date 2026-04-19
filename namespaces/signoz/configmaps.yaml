@@ -1,0 +1,935 @@
+apiVersion: v1
+data:
+  01-clickhouse-01-listen.xml: "<yandex>\n    <!-- Listen wildcard address to allow\
+    \ accepting connections from other containers and host network. -->\n    <listen_host>::</listen_host>\n\
+    \    <listen_host>0.0.0.0</listen_host>\n    <listen_try>1</listen_try>\n</yandex>\n"
+  01-clickhouse-02-logger.xml: "<yandex>\n    <logger>\n        <!-- Possible levels:\
+    \ https://github.com/pocoproject/poco/blob/devel/Foundation/include/Poco/Logger.h#L105\
+    \ -->\n        <level>information</level>\n        <formatting>\n          <type>json</type>\n\
+    \        </formatting>\n        <log>/var/log/clickhouse-server/clickhouse-server.log</log>\n\
+    \        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>\n\
+    \        <size>1000M</size>\n        <count>10</count>\n        <!-- Default behavior\
+    \ is autodetection (log to console if not daemon mode and is tty) -->\n      \
+    \  <console>1</console>\n    </logger>\n</yandex>\n"
+  01-clickhouse-03-query_log.xml: "<yandex>\n    <query_log replace=\"1\">\n     \
+    \   <database>system</database>\n        <table>query_log</table>\n        <engine>Engine\
+    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
+    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </query_log>\n</yandex>\n"
+  01-clickhouse-04-part_log.xml: "<yandex>\n    <part_log replace=\"1\">\n       \
+    \ <database>system</database>\n        <table>part_log</table>\n        <engine>Engine\
+    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
+    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </part_log>\n</yandex>\n"
+  01-clickhouse-05-trace_log.xml: "<yandex>\n    <trace_log replace=\"1\">\n     \
+    \   <database>system</database>\n        <table>trace_log</table>\n        <engine>Engine\
+    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
+    \ 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </trace_log>\n</yandex>"
+  01-clickhouse-06-asynchronous_insert_log.xml: "<yandex>\n    <asynchronous_insert_log\
+    \ replace=\"1\">\n        <database>system</database>\n        <table>asynchronous_insert_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </asynchronous_insert_log>\n</yandex>\n"
+  01-clickhouse-07-asynchronous_metric_log.xml: "<yandex>\n    <asynchronous_metric_log\
+    \ replace=\"1\">\n        <database>system</database>\n        <table>asynchronous_metric_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </asynchronous_metric_log>\n</yandex>\n"
+  01-clickhouse-08-backup_log.xml: "<yandex>\n    <backup_log replace=\"1\">\n   \
+    \     <database>system</database>\n        <table>backup_log</table>\n       \
+    \ <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date\
+    \ + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </backup_log>\n</yandex>\n"
+  01-clickhouse-09-blob_storage_log.xml: "<yandex>\n    <blob_storage_log replace=\"\
+    1\">\n        <database>system</database>\n        <table>blob_storage_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </blob_storage_log>\n</yandex>\n"
+  01-clickhouse-10-crash_log.xml: "<yandex>\n    <crash_log replace=\"1\">\n     \
+    \   <database>system</database>\n        <table>crash_log</table>\n        <engine>Engine\
+    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
+    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </crash_log>\n</yandex>\n"
+  01-clickhouse-11-metric_log.xml: "<yandex>\n    <metric_log replace=\"1\">\n   \
+    \     <database>system</database>\n        <table>metric_log</table>\n       \
+    \ <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date\
+    \ + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </metric_log>\n</yandex>\n"
+  01-clickhouse-12-query_thread_log.xml: "<yandex>\n    <query_thread_log replace=\"\
+    1\">\n        <database>system</database>\n        <table>query_thread_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </query_thread_log>\n</yandex>\n"
+  01-clickhouse-13-query_views_log.xml: "<yandex>\n    <query_views_log replace=\"\
+    1\">\n        <database>system</database>\n        <table>query_views_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 15 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </query_views_log>\n</yandex>\n"
+  01-clickhouse-14-session_log.xml: "<yandex>\n    <session_log replace=\"1\">\n \
+    \       <database>system</database>\n        <table>session_log</table>\n    \
+    \    <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL\
+    \ event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </session_log>\n</yandex>\n"
+  01-clickhouse-15-zookeeper_log.xml: "<yandex>\n    <zookeeper_log replace=\"1\"\
+    >\n        <database>system</database>\n        <table>zookeeper_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </zookeeper_log>\n</yandex>\n"
+  01-clickhouse-16-processors_profile_log.xml: "<yandex>\n    <processors_profile_log\
+    \ replace=\"1\">\n        <database>system</database>\n        <table>processors_profile_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </processors_profile_log>\n</yandex>\n"
+  chop-generated-remote_servers.xml: "<yandex>\n    <remote_servers>\n        <!--\
+    \ User-specified clusters -->\n        <cluster>\n            <shard>\n      \
+    \          <internal_replication>False</internal_replication>\n              \
+    \  <replica>\n                    <host>chi-signoz-clickhouse-cluster-0-0</host>\n\
+    \                    <port>9000</port>\n                    <secure>0</secure>\n\
+    \                </replica>\n            </shard>\n        </cluster>\n      \
+    \  <!-- Autogenerated clusters -->\n        <all-replicated>\n            <shard>\n\
+    \                <internal_replication>true</internal_replication>\n         \
+    \       <replica>\n                    <host>chi-signoz-clickhouse-cluster-0-0</host>\n\
+    \                    <port>9000</port>\n                    <secure>0</secure>\n\
+    \                </replica>\n            </shard>\n        </all-replicated>\n\
+    \        <all-sharded>\n            <shard>\n                <internal_replication>false</internal_replication>\n\
+    \                <replica>\n                    <host>chi-signoz-clickhouse-cluster-0-0</host>\n\
+    \                    <port>9000</port>\n                    <secure>0</secure>\n\
+    \                </replica>\n            </shard>\n        </all-sharded>\n  \
+    \  </remote_servers>\n</yandex>\n"
+  chop-generated-settings.xml: "<yandex>\n    <format_schema_path>/etc/clickhouse-server/config.d/</format_schema_path>\n\
+    \    <max_server_memory_usage>7516192768</max_server_memory_usage>\n    <prometheus>\n\
+    \        <endpoint>/metrics</endpoint>\n        <port>9363</port>\n    </prometheus>\n\
+    \    <user_defined_executable_functions_config>/etc/clickhouse-server/functions/custom-functions.xml</user_defined_executable_functions_config>\n\
+    \    <user_scripts_path>/var/lib/clickhouse/user_scripts/</user_scripts_path>\n\
+    </yandex>\n"
+  crash.xml: "<clickhouse>\n  <send_crash_reports replace=\"replace\">\n    <enabled>false</enabled>\n\
+    \  </send_crash_reports>\n</clickhouse>\n"
+  events.proto: "syntax = \"proto3\";\nmessage Event {\n  string uuid = 1;\n  string\
+    \ event = 2;\n  string properties = 3;\n  string timestamp = 4;\n  uint64 team_id\
+    \ = 5;\n  string distinct_id = 6;\n  string created_at = 7;\n  string elements_chain\
+    \ = 8;\n}\n    \n"
+  formatting.xml: "<clickhouse>\n  <logger>\n    <formatting replace=\"replace\">\n\
+    \      <type>json</type>\n      <names>\n        <date_time>date_time</date_time>\n\
+    \        <thread_name>thread_name</thread_name>\n        <thread_id>thread_id</thread_id>\n\
+    \        <level>level</level>\n        <query_id>query_id</query_id>\n       \
+    \ <logger_name>logger_name</logger_name>\n        <message>message</message>\n\
+    \        <source_file>source_file</source_file>\n        <source_line>source_line</source_line>\n\
+    \      </names>\n    </formatting>\n  </logger>\n</clickhouse>\n"
+  load.xml: "<clickhouse>\n  <async_load_databases replace=\"replace\">false</async_load_databases>\n\
+    </clickhouse>\n"
+  system_log.xml: "<clickhouse>\n  <text_log>\n    <ttl>event_date + INTERVAL 3 DAY\
+    \ DELETE</ttl>\n  </text_log>\n  <latency_log>\n    <ttl>event_date + INTERVAL\
+    \ 3 DAY DELETE</ttl>\n  </latency_log>\n  <error_log>\n    <ttl>event_date + INTERVAL\
+    \ 7 DAY DELETE</ttl>\n  </error_log>\n  <query_metric_log>\n    <ttl>event_date\
+    \ + INTERVAL 3 DAY DELETE</ttl>\n  </query_metric_log>\n</clickhouse>\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    clickhouse-operator-reconcile: force-2
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: clickhouse
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/ConfigMap: ChiCommon
+    clickhouse.altinity.com/app: chop
+    clickhouse.altinity.com/chi: signoz-clickhouse
+    clickhouse.altinity.com/namespace: signoz
+    clickhouse.altinity.com/object-version: 3af64c7190a4cae2396bd20c110294e02865d6c1
+    helm.sh/chart: clickhouse-24.1.18
+  name: chi-signoz-clickhouse-common-configd
+  namespace: signoz
+  ownerReferences:
+  - apiVersion: clickhouse.altinity.com/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ClickHouseInstallation
+    name: signoz-clickhouse
+---
+apiVersion: v1
+data:
+  01-clickhouse-user.xml: "<yandex>\n    <users>\n        <clickhouse_operator>\n\
+    \            <networks>\n                <ip>127.0.0.1</ip>\n            </networks>\n\
+    \            <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>\n\
+    \            <profile>clickhouse_operator</profile>\n            <quota>default</quota>\n\
+    \        </clickhouse_operator>\n    </users>\n    <profiles>\n        <clickhouse_operator>\n\
+    \            <log_queries>0</log_queries>\n            <skip_unavailable_shards>1</skip_unavailable_shards>\n\
+    \            <http_connection_timeout>10</http_connection_timeout>\n        </clickhouse_operator>\n\
+    \    </profiles>\n</yandex>\n"
+  02-clickhouse-default-profile.xml: "<yandex>\n  <profiles>\n    <default>\n    \
+    \  <log_queries>1</log_queries>\n      <connect_timeout_with_failover_ms>1000</connect_timeout_with_failover_ms>\n\
+    \      <distributed_aggregation_memory_efficient>1</distributed_aggregation_memory_efficient>\n\
+    \      <parallel_view_processing>1</parallel_view_processing>\n    </default>\n\
+    \  </profiles>\n</yandex>\n"
+  03-database-ordinary.xml: "<yandex>\n    <profiles>\n        <default>\n       \
+    \     <default_database_engine>Ordinary</default_database_engine>\n        </default>\n\
+    \    </profiles>\n</yandex>\n"
+  chop-generated-profiles.xml: "<yandex>\n    <profiles>\n        <admin>\n      \
+    \      <query_plan_max_limit_for_lazy_materialization>0</query_plan_max_limit_for_lazy_materialization>\n\
+    \            <secondary_indices_enable_bulk_filtering>0</secondary_indices_enable_bulk_filtering>\n\
+    \        </admin>\n        <default>\n            <allow_experimental_window_functions>1</allow_experimental_window_functions>\n\
+    \            <allow_nondeterministic_mutations>1</allow_nondeterministic_mutations>\n\
+    \            <query_plan_max_limit_for_lazy_materialization>0</query_plan_max_limit_for_lazy_materialization>\n\
+    \            <secondary_indices_enable_bulk_filtering>0</secondary_indices_enable_bulk_filtering>\n\
+    \        </default>\n    </profiles>\n</yandex>\n"
+  chop-generated-users.xml: "<yandex>\n    <users>\n        <admin>\n            <networks>\n\
+    \                <host_regexp>(chi-signoz-clickhouse-[^.]+\\d+-\\d+|clickhouse\\\
+    -signoz-clickhouse)\\.signoz\\.svc\\.cluster\\.local$</host_regexp>\n        \
+    \        <ip>::1</ip>\n                <ip>127.0.0.1</ip>\n                <ip>10.0.0.0/8</ip>\n\
+    \                <ip>100.64.0.0/10</ip>\n                <ip>172.16.0.0/12</ip>\n\
+    \                <ip>192.0.0.0/24</ip>\n                <ip>198.18.0.0/15</ip>\n\
+    \                <ip>192.168.0.0/16</ip>\n            </networks>\n          \
+    \  <password_sha256_hex>da90cf0836f8ac8f8a298293eafe856634b622df0c1ac2c82538f2cbe5406a6c</password_sha256_hex>\n\
+    \            <profile>default</profile>\n            <quota>default</quota>\n\
+    \        </admin>\n        <clickhouse_operator>\n            <networks>\n   \
+    \             <ip>10.244.4.155</ip>\n            </networks>\n            <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>\n\
+    \            <profile>clickhouse_operator</profile>\n        </clickhouse_operator>\n\
+    \        <default>\n            <networks>\n                <host_regexp>(chi-signoz-clickhouse-[^.]+\\\
+    d+-\\d+|clickhouse\\-signoz-clickhouse)\\.signoz\\.svc\\.cluster\\.local$</host_regexp>\n\
+    \                <ip>::1</ip>\n                <ip>127.0.0.1</ip>\n          \
+    \      <ip>10.244.4.119</ip>\n            </networks>\n            <profile>default</profile>\n\
+    \            <quota>default</quota>\n        </default>\n    </users>\n</yandex>\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    clickhouse-operator-reconcile: force-2
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: clickhouse
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/ConfigMap: ChiCommonUsers
+    clickhouse.altinity.com/app: chop
+    clickhouse.altinity.com/chi: signoz-clickhouse
+    clickhouse.altinity.com/namespace: signoz
+    clickhouse.altinity.com/object-version: ac02f39c3e06b97af3fdfa34de1054c4a7a9bc03
+    helm.sh/chart: clickhouse-24.1.18
+  name: chi-signoz-clickhouse-common-usersd
+  namespace: signoz
+  ownerReferences:
+  - apiVersion: clickhouse.altinity.com/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ClickHouseInstallation
+    name: signoz-clickhouse
+---
+apiVersion: v1
+data:
+  chop-generated-hostname-ports.xml: "<yandex>\n    <tcp_port_secure>0</tcp_port_secure>\n\
+    \    <https_port>0</https_port>\n    <interserver_http_host>chi-signoz-clickhouse-cluster-0-0</interserver_http_host>\n\
+    </yandex>\n"
+  chop-generated-macros.xml: "<yandex>\n    <macros>\n        <installation>signoz-clickhouse</installation>\n\
+    \        <all-sharded-shard>0</all-sharded-shard>\n        <cluster>cluster</cluster>\n\
+    \        <shard>0</shard>\n        <replica>chi-signoz-clickhouse-cluster-0-0</replica>\n\
+    \    </macros>\n</yandex>\n"
+  chop-generated-zookeeper.xml: "<yandex>\n    <zookeeper>\n        <node>\n     \
+    \       <host>signoz-zookeeper-0.signoz-zookeeper-headless.signoz.svc.cluster.local</host>\n\
+    \            <port>2181</port>\n        </node>\n    </zookeeper>\n    <distributed_ddl>\n\
+    \        <path>/clickhouse/signoz-clickhouse/task_queue/ddl</path>\n    </distributed_ddl>\n\
+    </yandex>\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    clickhouse-operator-reconcile: force-2
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: clickhouse
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/ConfigMap: Host
+    clickhouse.altinity.com/app: chop
+    clickhouse.altinity.com/chi: signoz-clickhouse
+    clickhouse.altinity.com/cluster: cluster
+    clickhouse.altinity.com/namespace: signoz
+    clickhouse.altinity.com/object-version: 459a7283573bdfde70614305aeb6c641eba9432c
+    clickhouse.altinity.com/replica: '0'
+    clickhouse.altinity.com/shard: '0'
+    helm.sh/chart: clickhouse-24.1.18
+  name: chi-signoz-clickhouse-deploy-confd-cluster-0-0
+  namespace: signoz
+  ownerReferences:
+  - apiVersion: clickhouse.altinity.com/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ClickHouseInstallation
+    name: signoz-clickhouse
+---
+apiVersion: v1
+data:
+  root-cert.pem: '-----BEGIN CERTIFICATE-----
+
+    MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+
+    MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+
+    MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+
+    AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+
+    j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+
+    H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+
+    v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+
+    UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+
+    ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+
+    VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+
+    XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+
+    y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+
+    nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+
+    P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+
+    y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+
+    H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+
+    -----END CERTIFICATE-----
+
+    '
+kind: ConfigMap
+metadata:
+  labels:
+    istio.io/config: 'true'
+  name: istio-ca-root-cert
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  otel-agent-config.yaml: "\nexporters:\n  otlp:\n    endpoint: ${env:OTEL_EXPORTER_OTLP_ENDPOINT}\n\
+    \    headers:\n      signoz-access-token: ${env:SIGNOZ_API_KEY}\n    tls:\n  \
+    \    insecure: true\n      insecure_skip_verify: false\nextensions:\n  health_check:\n\
+    \    endpoint: 0.0.0.0:13133\n  pprof:\n    endpoint: localhost:1777\n  zpages:\n\
+    \    endpoint: localhost:55679\nprocessors:\n  batch:\n    send_batch_size: 10000\n\
+    \    timeout: 200ms\n  k8sattributes:\n    extract:\n      annotations: []\n \
+    \     labels: []\n      metadata:\n      - k8s.namespace.name\n      - k8s.deployment.name\n\
+    \      - k8s.statefulset.name\n      - k8s.daemonset.name\n      - k8s.cronjob.name\n\
+    \      - k8s.job.name\n      - k8s.node.name\n      - k8s.node.uid\n      - k8s.pod.name\n\
+    \      - k8s.pod.uid\n      - k8s.pod.start_time\n    filter:\n      node_from_env_var:\
+    \ K8S_NODE_NAME\n    passthrough: false\n    pod_association:\n    - sources:\n\
+    \      - from: resource_attribute\n        name: k8s.pod.ip\n    - sources:\n\
+    \      - from: resource_attribute\n        name: k8s.pod.uid\n    - sources:\n\
+    \      - from: connection\n  resourcedetection:\n    detectors:\n    - k8snode\n\
+    \    - env\n    - system\n    k8snode:\n      auth_type: serviceAccount\n    \
+    \  node_from_env_var: K8S_NODE_NAME\n    override: false\n    system:\n      resource_attributes:\n\
+    \        host.id:\n          enabled: false\n        host.name:\n          enabled:\
+    \ false\n        os.type:\n          enabled: true\n    timeout: 2s\nreceivers:\n\
+    \  filelog/k8s:\n    exclude:\n    - /var/log/pods/signoz_k8s-infra*-signoz-*/*/*.log\n\
+    \    - /var/log/pods/signoz_k8s-infra*-k8s-infra-*/*/*.log\n    - /var/log/pods/kube-system_*/*/*.log\n\
+    \    - /var/log/pods/*_hotrod*_*/*/*.log\n    - /var/log/pods/*_locust*_*/*/*.log\n\
+    \    include:\n    - /var/log/pods/*/*/*.log\n    include_file_name: false\n \
+    \   include_file_path: true\n    operators:\n    - id: container-parser\n    \
+    \  type: container\n    start_at: end\n  hostmetrics:\n    collection_interval:\
+    \ 30s\n    root_path: /hostfs\n    scrapers:\n      cpu: {}\n      disk:\n   \
+    \     exclude:\n          devices:\n          - ^ram\\d+$\n          - ^zram\\\
+    d+$\n          - ^loop\\d+$\n          - ^fd\\d+$\n          - ^hd[a-z]\\d+$\n\
+    \          - ^sd[a-z]\\d+$\n          - ^vd[a-z]\\d+$\n          - ^xvd[a-z]\\\
+    d+$\n          - ^nvme\\d+n\\d+p\\d+$\n          match_type: regexp\n      filesystem:\n\
+    \        exclude_fs_types:\n          fs_types:\n          - autofs\n        \
+    \  - binfmt_misc\n          - bpf\n          - cgroup2?\n          - configfs\n\
+    \          - debugfs\n          - devpts\n          - devtmpfs\n          - fusectl\n\
+    \          - hugetlbfs\n          - iso9660\n          - mqueue\n          - nsfs\n\
+    \          - overlay\n          - proc\n          - procfs\n          - pstore\n\
+    \          - rpc_pipefs\n          - securityfs\n          - selinuxfs\n     \
+    \     - squashfs\n          - sysfs\n          - tracefs\n          match_type:\
+    \ strict\n        exclude_mount_points:\n          match_type: regexp\n      \
+    \    mount_points:\n          - /dev/*\n          - /proc/*\n          - /sys/*\n\
+    \          - /run/credentials/*\n          - /run/k3s/containerd/*\n         \
+    \ - /var/lib/docker/*\n          - /var/lib/containers/storage/*\n          -\
+    \ /var/lib/kubelet/*\n          - /snap/*\n      load: {}\n      memory: {}\n\
+    \      network:\n        exclude:\n          interfaces:\n          - ^veth.*$\n\
+    \          - ^docker.*$\n          - ^br-.*$\n          - ^flannel.*$\n      \
+    \    - ^cali.*$\n          - ^cbr.*$\n          - ^cni.*$\n          - ^dummy.*$\n\
+    \          - ^tailscale.*$\n          - ^lo$\n          match_type: regexp\n \
+    \ kubeletstats:\n    auth_type: serviceAccount\n    collection_interval: 30s\n\
+    \    endpoint: ${env:K8S_HOST_IP}:10250\n    extra_metadata_labels:\n    - container.id\n\
+    \    - k8s.volume.type\n    insecure_skip_verify: true\n    metric_groups:\n \
+    \   - container\n    - pod\n    - node\n    - volume\n    metrics:\n      container.cpu.usage:\n\
+    \        enabled: true\n      container.uptime:\n        enabled: true\n     \
+    \ k8s.container.cpu_limit_utilization:\n        enabled: true\n      k8s.container.cpu_request_utilization:\n\
+    \        enabled: true\n      k8s.container.memory_limit_utilization:\n      \
+    \  enabled: true\n      k8s.container.memory_request_utilization:\n        enabled:\
+    \ true\n      k8s.node.cpu.usage:\n        enabled: true\n      k8s.node.uptime:\n\
+    \        enabled: true\n      k8s.pod.cpu.usage:\n        enabled: true\n    \
+    \  k8s.pod.cpu_limit_utilization:\n        enabled: true\n      k8s.pod.cpu_request_utilization:\n\
+    \        enabled: true\n      k8s.pod.memory_limit_utilization:\n        enabled:\
+    \ true\n      k8s.pod.memory_request_utilization:\n        enabled: true\n   \
+    \   k8s.pod.uptime:\n        enabled: true\n  otlp:\n    protocols:\n      grpc:\n\
+    \        endpoint: 0.0.0.0:4317\n        max_recv_msg_size_mib: 4\n      http:\n\
+    \        endpoint: 0.0.0.0:4318\nservice:\n  extensions:\n  - health_check\n \
+    \ - zpages\n  - pprof\n  pipelines:\n    logs:\n      exporters:\n      - otlp\n\
+    \      processors:\n      - resourcedetection\n      - k8sattributes\n      -\
+    \ batch\n      receivers:\n      - otlp\n      - filelog/k8s\n    metrics:\n \
+    \     exporters:\n      - otlp\n      processors:\n      - resourcedetection\n\
+    \      - k8sattributes\n      - batch\n      receivers:\n      - otlp\n      -\
+    \ hostmetrics\n      - kubeletstats\n    traces:\n      exporters:\n      - otlp\n\
+    \      processors:\n      - resourcedetection\n      - k8sattributes\n      -\
+    \ batch\n      receivers:\n      - otlp\n  telemetry:\n    logs:\n      encoding:\
+    \ json"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: k8s-infra
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: otel-agent
+    app.kubernetes.io/instance: k8s-infra
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: k8s-infra
+    app.kubernetes.io/version: 0.139.0
+    helm.sh/chart: k8s-infra-0.15.0
+  name: k8s-infra-otel-agent
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  otel-deployment-config.yaml: "exporters:\n  otlp:\n    endpoint: ${env:OTEL_EXPORTER_OTLP_ENDPOINT}\n\
+    \    headers:\n      signoz-access-token: ${env:SIGNOZ_API_KEY}\n    tls:\n  \
+    \    insecure: true\n      insecure_skip_verify: false\nextensions:\n  health_check:\n\
+    \    endpoint: 0.0.0.0:13133\n  pprof:\n    endpoint: localhost:1777\n  zpages:\n\
+    \    endpoint: localhost:55679\nprocessors:\n  batch:\n    send_batch_size: 10000\n\
+    \    timeout: 1s\n  k8sattributes:\n    extract:\n      metadata:\n      - k8s.namespace.name\n\
+    \      - k8s.deployment.name\n      - k8s.statefulset.name\n      - k8s.daemonset.name\n\
+    \      - k8s.cronjob.name\n      - k8s.job.name\n      - k8s.node.name\n     \
+    \ - k8s.node.uid\n      - k8s.pod.name\n      - k8s.pod.uid\n      - k8s.pod.start_time\n\
+    \    passthrough: false\n    pod_association:\n    - sources:\n      - from: resource_attribute\n\
+    \        name: k8s.pod.ip\n    - sources:\n      - from: resource_attribute\n\
+    \        name: k8s.pod.uid\n    - sources:\n      - from: connection\n  resourcedetection:\n\
+    \    detectors:\n    - env\n    override: false\n    timeout: 2s\n  resource/clickhouse:\n\
+    \    attributes:\n    - key: host.name\n      value: signoz-clickhouse\n     \
+    \ action: upsert\nreceivers:\n  k8s_cluster:\n    allocatable_types_to_report:\n\
+    \    - cpu\n    - memory\n    collection_interval: 30s\n    metrics:\n      k8s.node.condition:\n\
+    \        enabled: true\n      k8s.pod.status_reason:\n        enabled: true\n\
+    \    node_conditions_to_report:\n    - Ready\n    - MemoryPressure\n    - DiskPressure\n\
+    \    - PIDPressure\n    - NetworkUnavailable\n    resource_attributes:\n     \
+    \ container.runtime:\n        enabled: true\n      container.runtime.version:\n\
+    \        enabled: true\n      k8s.container.status.last_terminated_reason:\n \
+    \       enabled: true\n      k8s.kubelet.version:\n        enabled: true\n   \
+    \   k8s.pod.qos_class:\n        enabled: true\n  k8s_events:\n    auth_type: serviceAccount\n\
+    \  prometheus:\n    config:\n      scrape_configs:\n      - job_name: clickhouse\n\
+    \        scrape_interval: 30s\n        static_configs:\n        - targets:\n \
+    \         - chi-signoz-clickhouse-cluster-0-0-0.chi-signoz-clickhouse-cluster-0-0.signoz.svc.cluster.local:9363\n\
+    service:\n  extensions:\n  - health_check\n  - zpages\n  - pprof\n  pipelines:\n\
+    \    logs:\n      exporters:\n      - otlp\n      processors:\n      - k8sattributes\n\
+    \      - resourcedetection\n      - batch\n      receivers:\n      - k8s_events\n\
+    \    metrics/internal:\n      exporters:\n      - otlp\n      processors:\n  \
+    \    - k8sattributes\n      - resourcedetection\n      - batch\n      receivers:\n\
+    \      - k8s_cluster\n    metrics/clickhouse:\n      exporters:\n      - otlp\n\
+    \      processors:\n      - resource/clickhouse\n      - batch\n      receivers:\n\
+    \      - prometheus\n  telemetry:\n    logs:\n      encoding: json"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: k8s-infra
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: otel-deployment
+    app.kubernetes.io/instance: k8s-infra
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: k8s-infra
+    app.kubernetes.io/version: 0.139.0
+    helm.sh/chart: k8s-infra-0.15.0
+  name: k8s-infra-otel-deployment
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  ca.crt: '-----BEGIN CERTIFICATE-----
+
+    MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+
+    AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+
+    EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+
+    AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+
+    HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+
+    0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+
+    CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+
+    k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+
+    1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+
+    BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+
+    BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+
+    4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+
+    46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+
+    qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+
+    fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+
+    PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+
+    szTc1uZpUffa
+
+    -----END CERTIFICATE-----
+
+    '
+kind: ConfigMap
+metadata:
+  annotations:
+    kubernetes.io/description: Contains a CA bundle that can be used to verify the
+      kube-apiserver when using internal endpoints such as the internal service IP
+      or kubernetes.default.svc. No other usage is guaranteed across distributions
+      of Kubernetes clusters.
+  name: kube-root-ca.crt
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  custom-functions.xml: "<functions>\n    <function>\n        <type>executable</type>\n\
+    \        <name>histogramQuantile</name>\n        <return_type>Float64</return_type>\n\
+    \        <argument>\n            <type>Array(Float64)</type>\n            <name>buckets</name>\n\
+    \        </argument>\n        <argument>\n            <type>Array(Float64)</type>\n\
+    \            <name>counts</name>\n        </argument>\n        <argument>\n  \
+    \          <type>Float64</type>\n            <name>quantile</name>\n        </argument>\n\
+    \        <format>CSV</format>\n        <command>./histogramQuantile</command>\n\
+    \    </function>\n</functions>\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: clickhouse
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    helm.sh/chart: clickhouse-24.1.18
+  name: signoz-clickhouse-custom-functions
+  namespace: signoz
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/chop: 0.21.2
+    helm.sh/chart: clickhouse-24.1.18
+  name: signoz-clickhouse-operator-etc-confd-files
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  01-clickhouse-01-listen.xml: "<yandex>\n    <!-- Listen wildcard address to allow\
+    \ accepting connections from other containers and host network. -->\n    <listen_host>::</listen_host>\n\
+    \    <listen_host>0.0.0.0</listen_host>\n    <listen_try>1</listen_try>\n</yandex>\n"
+  01-clickhouse-02-logger.xml: "<yandex>\n    <logger>\n        <!-- Possible levels:\
+    \ https://github.com/pocoproject/poco/blob/devel/Foundation/include/Poco/Logger.h#L105\
+    \ -->\n        <level>information</level>\n        <formatting>\n          <type>json</type>\n\
+    \        </formatting>\n        <log>/var/log/clickhouse-server/clickhouse-server.log</log>\n\
+    \        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>\n\
+    \        <size>1000M</size>\n        <count>10</count>\n        <!-- Default behavior\
+    \ is autodetection (log to console if not daemon mode and is tty) -->\n      \
+    \  <console>1</console>\n    </logger>\n</yandex>\n"
+  01-clickhouse-03-query_log.xml: "<yandex>\n    <query_log replace=\"1\">\n     \
+    \   <database>system</database>\n        <table>query_log</table>\n        <engine>Engine\
+    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
+    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </query_log>\n</yandex>\n"
+  01-clickhouse-04-part_log.xml: "<yandex>\n    <part_log replace=\"1\">\n       \
+    \ <database>system</database>\n        <table>part_log</table>\n        <engine>Engine\
+    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
+    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </part_log>\n</yandex>\n"
+  01-clickhouse-05-trace_log.xml: "<yandex>\n    <trace_log replace=\"1\">\n     \
+    \   <database>system</database>\n        <table>trace_log</table>\n        <engine>Engine\
+    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
+    \ 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </trace_log>\n</yandex>"
+  01-clickhouse-06-asynchronous_insert_log.xml: "<yandex>\n    <asynchronous_insert_log\
+    \ replace=\"1\">\n        <database>system</database>\n        <table>asynchronous_insert_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </asynchronous_insert_log>\n</yandex>\n"
+  01-clickhouse-07-asynchronous_metric_log.xml: "<yandex>\n    <asynchronous_metric_log\
+    \ replace=\"1\">\n        <database>system</database>\n        <table>asynchronous_metric_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </asynchronous_metric_log>\n</yandex>\n"
+  01-clickhouse-08-backup_log.xml: "<yandex>\n    <backup_log replace=\"1\">\n   \
+    \     <database>system</database>\n        <table>backup_log</table>\n       \
+    \ <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date\
+    \ + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </backup_log>\n</yandex>\n"
+  01-clickhouse-09-blob_storage_log.xml: "<yandex>\n    <blob_storage_log replace=\"\
+    1\">\n        <database>system</database>\n        <table>blob_storage_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </blob_storage_log>\n</yandex>\n"
+  01-clickhouse-10-crash_log.xml: "<yandex>\n    <crash_log replace=\"1\">\n     \
+    \   <database>system</database>\n        <table>crash_log</table>\n        <engine>Engine\
+    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
+    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </crash_log>\n</yandex>\n"
+  01-clickhouse-11-metric_log.xml: "<yandex>\n    <metric_log replace=\"1\">\n   \
+    \     <database>system</database>\n        <table>metric_log</table>\n       \
+    \ <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date\
+    \ + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </metric_log>\n</yandex>\n"
+  01-clickhouse-12-query_thread_log.xml: "<yandex>\n    <query_thread_log replace=\"\
+    1\">\n        <database>system</database>\n        <table>query_thread_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </query_thread_log>\n</yandex>\n"
+  01-clickhouse-13-query_views_log.xml: "<yandex>\n    <query_views_log replace=\"\
+    1\">\n        <database>system</database>\n        <table>query_views_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 15 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </query_views_log>\n</yandex>\n"
+  01-clickhouse-14-session_log.xml: "<yandex>\n    <session_log replace=\"1\">\n \
+    \       <database>system</database>\n        <table>session_log</table>\n    \
+    \    <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL\
+    \ event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </session_log>\n</yandex>\n"
+  01-clickhouse-15-zookeeper_log.xml: "<yandex>\n    <zookeeper_log replace=\"1\"\
+    >\n        <database>system</database>\n        <table>zookeeper_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </zookeeper_log>\n</yandex>\n"
+  01-clickhouse-16-processors_profile_log.xml: "<yandex>\n    <processors_profile_log\
+    \ replace=\"1\">\n        <database>system</database>\n        <table>processors_profile_log</table>\n\
+    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
+    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
+    \    </processors_profile_log>\n</yandex>\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/chop: 0.21.2
+    helm.sh/chart: clickhouse-24.1.18
+  name: signoz-clickhouse-operator-etc-configd-files
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  config.yaml: "#\n# Template parameters available:\n#   WATCH_NAMESPACES=\n#   CH_USERNAME_PLAIN=\n\
+    #   CH_PASSWORD_PLAIN=\n#   CH_CREDENTIALS_SECRET_NAMESPACE=\n#   CH_CREDENTIALS_SECRET_NAME=clickhouse-operator\n\
+    \n################################################\n##\n## Watch Section\n##\n\
+    ################################################\nwatch:\n  # List of namespaces\
+    \ where clickhouse-operator watches for events.\n  # Concurrently running operators\
+    \ should watch on different namespaces.\n  #namespaces: [\"dev\", \"test\"]\n\
+    \  namespaces: []\n\nclickhouse:\n  configuration:\n    ################################################\n\
+    \    ##\n    ## Configuration Files Section\n    ##\n    ################################################\n\
+    \    file:\n      path:\n        # Path to the folder where ClickHouse configuration\
+    \ files common for all instances within a CHI are located.\n        common: config.d\n\
+    \        # Path to the folder where ClickHouse configuration files unique for\
+    \ each instance (host) within a CHI are located.\n        host: conf.d\n     \
+    \   # Path to the folder where ClickHouse configuration files with users' settings\
+    \ are located.\n        # Files are common for all instances within a CHI.\n \
+    \       user: users.d\n    ################################################\n\
+    \    ##\n    ## Configuration Users Section\n    ##\n    ################################################\n\
+    \    user:\n      # Default settings for user accounts, created by the operator.\n\
+    \      # NB. These are not access credentials or settings for 'default' user account,\n\
+    \      # it is a template for filling out missing fields for all user accounts\
+    \ to be created by the operator, except:\n      # 1. 'default' account, which\
+    \ DOES NOT use provided password, but uses all the rest of the fields\n      #\
+    \ Password for 'default' account as to be provided explicitly, if to be used\n\
+    \      # 2. CHOP account, which DOES NOT use profile, quota, password and regexp,\
+    \ but uses network IPs - extending them\n      # Password for CHOP account is\
+    \ used from `clickhouse.access.password` section\n      default:\n        # Default\
+    \ values for ClickHouse user configuration\n        # 1. user/profile - string\n\
+    \        # 2. user/quota - string\n        # 3. user/networks/ip - multiple strings\n\
+    \        # 4. user/password - string\n        profile: \"default\"\n        quota:\
+    \ \"default\"\n        networksIP:\n          - \"::1\"\n          - \"127.0.0.1\"\
+    \n        password: \"default\"\n    ################################################\n\
+    \    ##\n    ## Configuration Network Section\n    ##\n    ################################################\n\
+    \    network:\n      # Default host_regexp to limit network connectivity from\
+    \ outside\n      hostRegexpTemplate: \"(chi-{chi}-[^.]+\\\\d+-\\\\d+|clickhouse\\\
+    \\-{chi})\\\\.{namespace}\\\\.svc\\\\.cluster\\\\.local$\"\n\n  ################################################\n\
+    \  ##\n  ## Configuration Restart Policy Section\n  ## Configuration restart policy\
+    \ describes what configuration changes require ClickHouse restart\n  ##\n  ################################################\n\
+    \  configurationRestartPolicy:\n    rules:\n      - version: \"*\"\n        rules:\n\
+    \          - settings/*: \"yes\"\n          - settings/dictionaries_config: \"\
+    no\"\n          - settings/logger: \"no\"\n          - settings/macros/*: \"no\"\
+    \n          - settings/max_server_memory_*: \"no\"\n          - settings/max_*_to_drop:\
+    \ \"no\"\n          - settings/max_concurrent_queries: \"no\"\n          - settings/models_config:\
+    \ \"no\"\n          - settings/user_defined_executable_functions_config: \"no\"\
+    \n\n          - zookeeper/*: \"yes\"\n\n          - files/config.d/*.xml: \"yes\"\
+    \n          - files/config.d/*dict*.xml: \"no\"\n\n          - profiles/default/background_*_pool_size:\
+    \ \"yes\"\n          - profiles/default/max_*_for_server: \"yes\"\n      - version:\
+    \ \"21.*\"\n        rules:\n          - settings/logger: \"yes\"\n\n  #################################################\n\
+    \  ##\n  ## Access to ClickHouse instances\n  ##\n  ################################################\n\
+    \  access:\n    # Possible values for `scheme` are:\n    # 1. http\n    # 2. https\n\
+    \    scheme: \"\"\n    # ClickHouse credentials (username, password and port)\
+    \ to be used by the operator to connect to ClickHouse instances.\n    # Used for:\n\
+    \    # 1. Metrics requests\n    # 2. Schema maintenance\n    # 3. DROP DNS CACHE\n\
+    \    # User with these credentials can be specified in additional ClickHouse .xml\
+    \ config files,\n    # located in `clickhouse.configuration.file.path.user` folder\n\
+    \    username: \"\"\n    password: \"\"\n    rootCA: \"\"\n\n    # Location of\
+    \ the k8s Secret with username and password to be used by the operator to connect\
+    \ to ClickHouse instances.\n    # Can be used instead of explicitly specified\
+    \ username and password which are:\n    # clickhouse.access.username\n    # clickhouse.access.password\n\
+    \    # Secret should have two keys:\n    # 1. username\n    # 2. password\n  \
+    \  secret:\n      # Empty `namespace` means that k8s secret would be looked in\
+    \ the same namespace where operator's pod is running.\n      namespace: \"\"\n\
+    \      # Empty `name` means no k8s Secret would be looked for\n      name: \"\
+    signoz-clickhouse-operator\"\n    # Port where to connect to ClickHouse instances\
+    \ to\n    port: 8123\n\n    # Timeouts used to limit connection and queries from\
+    \ the operator to ClickHouse instances\n    # Specified in seconds.\n    timeouts:\n\
+    \      connect: 2\n      query: 5\n\n  metrics:\n    timeouts:\n      collect:\
+    \ 9\n\n################################################\n##\n## Templates Section\n\
+    ##\n################################################\ntemplate:\n  chi:\n    #\
+    \ Path to the folder where ClickHouseInstallation .yaml manifests are located.\n\
+    \    # Manifests are applied in sorted alpha-numeric order.\n    path: templates.d\n\
+    \n################################################\n##\n## Reconcile Section\n\
+    ##\n################################################\nreconcile:\n  runtime:\n\
+    \    # Max number of concurrent CHI reconciles in progress\n    reconcileCHIsThreadsNumber:\
+    \ 10\n    # Max number of concurrent shard reconciles in progress\n    reconcileShardsThreadsNumber:\
+    \ 1\n    # The maximum percentage of cluster shards that may be reconciled in\
+    \ parallel\n    reconcileShardsMaxConcurrencyPercent: 50\n\n  statefulSet:\n \
+    \   create:\n      # What to do in case created StatefulSet is not in 'Ready'\
+    \ after `reconcile.statefulSet.update.timeout` seconds\n      # Possible options:\n\
+    \      # 1. abort - do nothing, just break the process and wait for an admin to\
+    \ assist\n      # 2. delete - delete newly created problematic StatefulSet\n \
+    \     # 3. ignore - ignore an error, pretend nothing happened and move on to the\
+    \ next StatefulSet\n      onFailure: ignore\n\n    update:\n      # How many seconds\
+    \ to wait for created/updated StatefulSet to be 'Ready'\n      timeout: 900\n\
+    \      # How many seconds to wait between checks/polls for created/updated StatefulSet\
+    \ status\n      pollInterval: 5\n      # What to do in case updated StatefulSet\
+    \ is not in 'Ready' after `reconcile.statefulSet.update.timeout` seconds\n   \
+    \   # Possible options:\n      # 1. abort - do nothing, just break the process\
+    \ and wait for an admin to assist\n      # 2. rollback - delete Pod and rollback\
+    \ StatefulSet to previous Generation.\n      # Pod would be recreated by StatefulSet\
+    \ based on rollback-ed configuration\n      # 3. ignore - ignore an error, pretend\
+    \ nothing happened and move on to the next StatefulSet\n      onFailure: abort\n\
+    \n  host:\n    # Whether reconciler should wait for a host:\n    # - to be excluded\
+    \ from a cluster\n    # OR\n    # - to be included into a cluster\n    # respectfully\n\
+    \    wait:\n      exclude: true\n      include: false\n\n################################################\n\
+    ##\n## Annotations management\n##\n################################################\n\
+    annotation:\n  # Applied when:\n  #  1. Propagating annotations from the CHI's\
+    \ `metadata.annotations` to child objects' `metadata.annotations`,\n  #  2. Propagating\
+    \ annotations from the CHI Template's `metadata.annotations` to CHI's `metadata.annotations`,\n\
+    \  # Include annotations from the following list:\n  # Applied only when not empty.\
+    \ Empty list means \"include all, no selection\"\n  include: []\n  # Exclude annotations\
+    \ from the following list:\n  exclude: []\n\n################################################\n\
+    ##\n## Labels management\n##\n################################################\n\
+    label:\n  # Applied when:\n  #  1. Propagating labels from the CHI's `metadata.labels`\
+    \ to child objects' `metadata.labels`,\n  #  2. Propagating labels from the CHI\
+    \ Template's `metadata.labels` to CHI's `metadata.labels`,\n  # Include labels\
+    \ from the following list:\n  # Applied only when not empty. Empty list means\
+    \ \"include all, no selection\"\n  include: []\n  # Exclude labels from the following\
+    \ list:\n  # Applied only when not empty. Empty list means \"nothing to exclude,\
+    \ no selection\"\n  exclude: []\n  # Whether to append *Scope* labels to StatefulSet\
+    \ and Pod.\n  # Full list of available *scope* labels check in 'labeler.go'\n\
+    \  #  LabelShardScopeIndex\n  #  LabelReplicaScopeIndex\n  #  LabelCHIScopeIndex\n\
+    \  #  LabelCHIScopeCycleSize\n  #  LabelCHIScopeCycleIndex\n  #  LabelCHIScopeCycleOffset\n\
+    \  #  LabelClusterScopeIndex\n  #  LabelClusterScopeCycleSize\n  #  LabelClusterScopeCycleIndex\n\
+    \  #  LabelClusterScopeCycleOffset\n  appendScope: \"no\"\n\n################################################\n\
+    ##\n## StatefulSet management\n##\n################################################\n\
+    statefulSet:\n  revisionHistoryLimit: 0\n\n################################################\n\
+    ##\n## Pod management\n##\n################################################\n\
+    pod:\n  # Grace period for Pod termination.\n  # How many seconds to wait between\
+    \ sending\n  # SIGTERM and SIGKILL during Pod termination process.\n  # Increase\
+    \ this number is case of slow shutdown.\n  terminationGracePeriod: 30\n\n################################################\n\
+    ##\n## Log parameters\n##\n################################################\n\
+    logger:\n  logtostderr: \"true\"\n  alsologtostderr: \"false\"\n  v: \"1\"\n \
+    \ stderrthreshold: \"\"\n  vmodule: \"\"\n  log_backtrace_at: \"\"\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/chop: 0.21.2
+    helm.sh/chart: clickhouse-24.1.18
+  name: signoz-clickhouse-operator-etc-files
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  001-templates.json.example: "{\n  \"apiVersion\": \"clickhouse.altinity.com/v1\"\
+    ,\n  \"kind\": \"ClickHouseInstallationTemplate\",\n  \"metadata\": {\n    \"\
+    name\": \"01-default-volumeclaimtemplate\"\n  },\n  \"spec\": {\n    \"templates\"\
+    : {\n      \"volumeClaimTemplates\": [\n        {\n          \"name\": \"chi-default-volume-claim-template\"\
+    ,\n          \"spec\": {\n            \"accessModes\": [\n              \"ReadWriteOnce\"\
+    \n            ],\n            \"resources\": {\n              \"requests\": {\n\
+    \                \"storage\": \"2Gi\"\n              }\n            }\n      \
+    \    }\n        }\n      ],\n      \"podTemplates\": [\n        {\n          \"\
+    name\": \"chi-default-oneperhost-pod-template\",\n          \"distribution\":\
+    \ \"OnePerHost\",\n          \"spec\": {\n            \"containers\" : [\n   \
+    \           {\n                \"name\": \"clickhouse\",\n                \"image\"\
+    : \"clickhouse/clickhouse-server:22.3\",\n                \"ports\": [\n     \
+    \             {\n                    \"name\": \"http\",\n                   \
+    \ \"containerPort\": 8123\n                  },\n                  {\n       \
+    \             \"name\": \"client\",\n                    \"containerPort\": 9000\n\
+    \                  },\n                  {\n                    \"name\": \"interserver\"\
+    ,\n                    \"containerPort\": 9009\n                  }\n        \
+    \        ]\n              }\n            ]\n          }\n        }\n      ]\n\
+    \    }\n  }\n}\n"
+  default-pod-template.yaml.example: "apiVersion: \"clickhouse.altinity.com/v1\"\n\
+    kind: \"ClickHouseInstallationTemplate\"\nmetadata:\n  name: \"default-oneperhost-pod-template\"\
+    \nspec:\n  templates:\n    podTemplates:\n      - name: default-oneperhost-pod-template\n\
+    \        distribution: \"OnePerHost\"\n"
+  default-storage-template.yaml.example: "apiVersion: \"clickhouse.altinity.com/v1\"\
+    \nkind: \"ClickHouseInstallationTemplate\"\nmetadata:\n  name: \"default-storage-template-2Gi\"\
+    \nspec:\n  templates:\n    volumeClaimTemplates:\n      - name: default-storage-template-2Gi\n\
+    \        spec:\n          accessModes:\n            - ReadWriteOnce\n        \
+    \  resources:\n            requests:\n              storage: 2Gi\n"
+  readme: Templates in this folder are packaged with an operator and available via
+    'useTemplate'
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/chop: 0.21.2
+    helm.sh/chart: clickhouse-24.1.18
+  name: signoz-clickhouse-operator-etc-templatesd-files
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  01-clickhouse-user.xml: "<yandex>\n    <users>\n        <clickhouse_operator>\n\
+    \            <networks>\n                <ip>127.0.0.1</ip>\n            </networks>\n\
+    \            <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>\n\
+    \            <profile>clickhouse_operator</profile>\n            <quota>default</quota>\n\
+    \        </clickhouse_operator>\n    </users>\n    <profiles>\n        <clickhouse_operator>\n\
+    \            <log_queries>0</log_queries>\n            <skip_unavailable_shards>1</skip_unavailable_shards>\n\
+    \            <http_connection_timeout>10</http_connection_timeout>\n        </clickhouse_operator>\n\
+    \    </profiles>\n</yandex>\n"
+  02-clickhouse-default-profile.xml: "<yandex>\n  <profiles>\n    <default>\n    \
+    \  <log_queries>1</log_queries>\n      <connect_timeout_with_failover_ms>1000</connect_timeout_with_failover_ms>\n\
+    \      <distributed_aggregation_memory_efficient>1</distributed_aggregation_memory_efficient>\n\
+    \      <parallel_view_processing>1</parallel_view_processing>\n    </default>\n\
+    \  </profiles>\n</yandex>\n"
+  03-database-ordinary.xml: "<yandex>\n    <profiles>\n        <default>\n       \
+    \     <default_database_engine>Ordinary</default_database_engine>\n        </default>\n\
+    \    </profiles>\n</yandex>\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/chop: 0.21.2
+    helm.sh/chart: clickhouse-24.1.18
+  name: signoz-clickhouse-operator-etc-usersd-files
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  wait-until-ready.sh: "#!/bin/bash\n\n# Delay between attempts in seconds\nDELAY=10\n\
+    # Default host and port\nHOST=\"localhost\"\nPORT=\"8123\"\n\necho \"Waiting for\
+    \ Clickhouse to become ready...\"\n\nwhile true; do\n    response=$(wget --spider\
+    \ -S \"http://${HOST}:${PORT}/ping\" 2>&1)\n    exit_code=$?\n    \n    if [ $exit_code\
+    \ -eq 0 ]; then\n        echo \"Clickhouse is ready!\"\n        exit 0\n    else\n\
+    \        echo \"Clickhouse is not ready yet. Retrying in ${DELAY} seconds...\"\
+    \n        sleep $DELAY\n    fi\ndone\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: clickhouse
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    helm.sh/chart: clickhouse-24.1.18
+  name: signoz-clickhouse-scripts
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  otel-collector-config.yaml: "extensions:\n  health_check:\n    endpoint: 0.0.0.0:13133\n\
+    \nreceivers:\n  otlp:\n    protocols:\n      grpc:\n        endpoint: 0.0.0.0:4317\n\
+    \      http:\n        endpoint: 0.0.0.0:4318\n  jaeger:\n    protocols:\n    \
+    \  grpc:\n        endpoint: 0.0.0.0:14250\n      thrift_http:\n        endpoint:\
+    \ 0.0.0.0:14268\n\nexporters:\n  clickhousetraces:\n    datasource: tcp://signoz-clickhouse:9000/?database=signoz_traces&username=admin&password=27ff0399-0d3a-4bd8-919d-17c2181e6fb9&max_execution_time=120&dial_timeout=30s\n\
+    \    timeout: 120s\n  signozclickhousemetrics:\n    dsn: tcp://signoz-clickhouse:9000/?database=signoz_metrics&username=admin&password=27ff0399-0d3a-4bd8-919d-17c2181e6fb9&max_execution_time=120&dial_timeout=30s\n\
+    \    timeout: 120s\n  clickhouselogsexporter:\n    dsn: tcp://signoz-clickhouse:9000/?database=signoz_logs&username=admin&password=27ff0399-0d3a-4bd8-919d-17c2181e6fb9&max_execution_time=120&dial_timeout=30s\n\
+    \    timeout: 120s\n\nprocessors:\n  batch:\n    send_batch_size: 500\n    send_batch_max_size:\
+    \ 1000\n    timeout: 10s\n\nservice:\n  extensions: [health_check]\n  pipelines:\n\
+    \    traces:\n      receivers: [otlp, jaeger]\n      processors: [batch]\n   \
+    \   exporters: [clickhousetraces]\n    metrics:\n      receivers: [otlp]\n   \
+    \   processors: [batch]\n      exporters: [signozclickhousemetrics]\n    logs:\n\
+    \      receivers: [otlp]\n      processors: [batch]\n      exporters: [clickhouselogsexporter]\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  name: signoz-otel-collector
+  namespace: signoz
+---
+apiVersion: v1
+data:
+  init-certs.sh: '#!/bin/bash'
+  setup.sh: "#!/bin/bash\n\n# Execute entrypoint as usual after obtaining ZOO_SERVER_ID\n\
+    # check ZOO_SERVER_ID in persistent volume via myid\n# if not present, set based\
+    \ on POD hostname\nif [[ -f \"/bitnami/zookeeper/data/myid\" ]]; then\n    export\
+    \ ZOO_SERVER_ID=\"$(cat /bitnami/zookeeper/data/myid)\"\nelse\n    HOSTNAME=\"\
+    $(hostname -s)\"\n    if [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]]; then\n        ORD=${BASH_REMATCH[2]}\n\
+    \        export ZOO_SERVER_ID=\"$((ORD + 1 ))\"\n    else\n        echo \"Failed\
+    \ to get index from hostname $HOSTNAME\"\n        exit 1\n    fi\nfi\nexec /entrypoint.sh\
+    \ /run.sh"
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: zookeeper
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: zookeeper
+    helm.sh/chart: zookeeper-0.0.1
+  name: signoz-zookeeper-scripts
+  namespace: signoz

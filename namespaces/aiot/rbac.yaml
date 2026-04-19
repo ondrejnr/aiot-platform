@@ -1,0 +1,156 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    cnpg.io/operatorVersion: 1.25.1
+  labels:
+    cnpg.io/cluster: pg-ha
+  name: pg-ha
+  namespace: aiot
+  ownerReferences:
+  - apiVersion: postgresql.cnpg.io/v1
+    controller: true
+    kind: Cluster
+    name: pg-ha
+rules:
+- apiGroups:
+  - ''
+  resourceNames:
+  - cnpg-default-monitoring
+  - pg-ha
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - watch
+- apiGroups:
+  - ''
+  resourceNames:
+  - pg-ha-app
+  - pg-ha-ca
+  - pg-ha-replication
+  - pg-ha-server
+  - pg-ha-superuser
+  resources:
+  - secrets
+  verbs:
+  - get
+  - watch
+- apiGroups:
+  - postgresql.cnpg.io
+  resourceNames:
+  - pg-ha
+  resources:
+  - clusters
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - postgresql.cnpg.io
+  resourceNames:
+  - pg-ha
+  resources:
+  - clusters/status
+  verbs:
+  - get
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - postgresql.cnpg.io
+  resources:
+  - backups
+  verbs:
+  - list
+  - get
+  - delete
+- apiGroups:
+  - postgresql.cnpg.io
+  resources:
+  - backups/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - postgresql.cnpg.io
+  resources:
+  - databases
+  verbs:
+  - get
+  - update
+  - list
+  - watch
+- apiGroups:
+  - postgresql.cnpg.io
+  resources:
+  - databases/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - postgresql.cnpg.io
+  resources:
+  - publications
+  verbs:
+  - get
+  - update
+  - list
+  - watch
+- apiGroups:
+  - postgresql.cnpg.io
+  resources:
+  - publications/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - postgresql.cnpg.io
+  resources:
+  - subscriptions
+  verbs:
+  - get
+  - update
+  - list
+  - watch
+- apiGroups:
+  - postgresql.cnpg.io
+  resources:
+  - subscriptions/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    cnpg.io/operatorVersion: 1.25.1
+  labels:
+    cnpg.io/cluster: pg-ha
+  name: pg-ha
+  namespace: aiot
+  ownerReferences:
+  - apiVersion: postgresql.cnpg.io/v1
+    controller: true
+    kind: Cluster
+    name: pg-ha
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pg-ha
+subjects:
+- kind: ServiceAccount
+  name: pg-ha
+  namespace: aiot

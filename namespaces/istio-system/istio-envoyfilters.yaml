@@ -1,0 +1,61 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: force-xfp-https
+  namespace: istio-system
+spec:
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: GATEWAY
+      listener:
+        filterChain:
+          filter:
+            name: envoy.filters.network.http_connection_manager
+            subFilter:
+              name: envoy.filters.http.router
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.lua.force-xfp-https
+        typed_config:
+          '@type': type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+          inline_code: "function envoy_on_request(request_handle)\n  request_handle:headers():replace(\"\
+            x-forwarded-proto\", \"https\")\nend\n"
+  workloadSelector:
+    labels:
+      istio: ingressgateway
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: kubeflow-userid-header
+  namespace: istio-system
+spec:
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: GATEWAY
+      listener:
+        filterChain:
+          filter:
+            name: envoy.filters.network.http_connection_manager
+            subFilter:
+              name: envoy.filters.http.router
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.lua.kubeflow-userid
+        typed_config:
+          '@type': type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+          inline_code: "function envoy_on_request(request_handle)\n  local email =\
+            \ request_handle:headers():get(\"x-auth-request-email\")\n  local existing\
+            \ = request_handle:headers():get(\"kubeflow-userid\")\n  request_handle:logInfo(\"\
+            LUA kubeflow-userid-header: x-auth-request-email=\" .. tostring(email)\
+            \ .. \" existing-kubeflow-userid=\" .. tostring(existing))\n  if email\
+            \ and not existing then\n    request_handle:headers():add(\"kubeflow-userid\"\
+            , email)\n    request_handle:logInfo(\"LUA: Set kubeflow-userid=\" ..\
+            \ email)\n  end\nend\n"
+  workloadSelector:
+    labels:
+      istio: ingressgateway

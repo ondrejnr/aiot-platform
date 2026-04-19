@@ -1,0 +1,13 @@
+apiVersion: v1
+data:
+  ClusterConfiguration: "apiServer:\n  certSANs:\n  - 35.241.255.137\napiVersion:\
+    \ kubeadm.k8s.io/v1beta4\ncaCertificateValidityPeriod: 87600h0m0s\ncertificateValidityPeriod:\
+    \ 8760h0m0s\ncertificatesDir: /etc/kubernetes/pki\nclusterName: kubernetes\ncontrollerManager:\
+    \ {}\ndns: {}\nencryptionAlgorithm: RSA-2048\netcd:\n  local:\n    dataDir: /var/lib/etcd\n\
+    imageRepository: registry.k8s.io\nkind: ClusterConfiguration\nkubernetesVersion:\
+    \ v1.32.13\nnetworking:\n  dnsDomain: cluster.local\n  podSubnet: 10.244.0.0/16\n\
+    \  serviceSubnet: 10.96.0.0/12\nproxy: {}\nscheduler: {}\n"
+kind: ConfigMap
+metadata:
+  name: kubeadm-config
+  namespace: kube-system

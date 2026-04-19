@@ -1,0 +1,1195 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: aiot-default-kopia-rfvcn
+  name: aiot-default-kopia-rfvcn-maintain-job-1776532846036
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: c94fe56c-4e8e-4ebf-8345-443da8cdb4c0
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: c94fe56c-4e8e-4ebf-8345-443da8cdb4c0
+        batch.kubernetes.io/job-name: aiot-default-kopia-rfvcn-maintain-job-1776532846036
+        component: velero
+        controller-uid: c94fe56c-4e8e-4ebf-8345-443da8cdb4c0
+        deploy: velero
+        job-name: aiot-default-kopia-rfvcn-maintain-job-1776532846036
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=aiot
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: chef-webhook-default-kopia-z2jrf
+  name: chef-webhook-default-kopia-z2jrf-maintain-job-1776533009716
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 25186b5d-dcca-4626-b523-7c9808e729a9
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: 25186b5d-dcca-4626-b523-7c9808e729a9
+        batch.kubernetes.io/job-name: chef-webhook-default-kopia-z2jrf-maintain-job-1776533009716
+        component: velero
+        controller-uid: 25186b5d-dcca-4626-b523-7c9808e729a9
+        deploy: velero
+        job-name: chef-webhook-default-kopia-z2jrf-maintain-job-1776533009716
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=chef-webhook
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: cnpg-system-default-kopia-kdvv5
+  name: cnpg-system-default-kopia-kdvv5-maintain-job-1776532911407
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: ac0389b6-33bc-45a4-8cc5-f0820818f141
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: ac0389b6-33bc-45a4-8cc5-f0820818f141
+        batch.kubernetes.io/job-name: cnpg-system-default-kopia-kdvv5-maintain-job-1776532911407
+        component: velero
+        controller-uid: ac0389b6-33bc-45a4-8cc5-f0820818f141
+        deploy: velero
+        job-name: cnpg-system-default-kopia-kdvv5-maintain-job-1776532911407
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=cnpg-system
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: inference-default-kopia-9d9b7
+  name: inference-default-kopia-9d9b7-maintain-job-1776611745991
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 2411f415-e4aa-417e-8543-4417bdcf208c
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: 2411f415-e4aa-417e-8543-4417bdcf208c
+        batch.kubernetes.io/job-name: inference-default-kopia-9d9b7-maintain-job-1776611745991
+        component: velero
+        controller-uid: 2411f415-e4aa-417e-8543-4417bdcf208c
+        deploy: velero
+        job-name: inference-default-kopia-9d9b7-maintain-job-1776611745991
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=inference
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: inference-default-kopia-9d9b7
+  name: inference-default-kopia-9d9b7-maintain-job-1776612045991
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 78934d05-058b-4226-a672-a5ae1dad828d
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: 78934d05-058b-4226-a672-a5ae1dad828d
+        batch.kubernetes.io/job-name: inference-default-kopia-9d9b7-maintain-job-1776612045991
+        component: velero
+        controller-uid: 78934d05-058b-4226-a672-a5ae1dad828d
+        deploy: velero
+        job-name: inference-default-kopia-9d9b7-maintain-job-1776612045991
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=inference
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: inference-default-kopia-9d9b7
+  name: inference-default-kopia-9d9b7-maintain-job-1776612345992
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 25b3308e-b96a-4b49-bad4-487e5f0114d1
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: 25b3308e-b96a-4b49-bad4-487e5f0114d1
+        batch.kubernetes.io/job-name: inference-default-kopia-9d9b7-maintain-job-1776612345992
+        component: velero
+        controller-uid: 25b3308e-b96a-4b49-bad4-487e5f0114d1
+        deploy: velero
+        job-name: inference-default-kopia-9d9b7-maintain-job-1776612345992
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=inference
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: istio-system-default-kopia-hphxm
+  name: istio-system-default-kopia-hphxm-maintain-job-1776533018784
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 66640516-68fb-4069-8ea3-bc456d4699ef
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: 66640516-68fb-4069-8ea3-bc456d4699ef
+        batch.kubernetes.io/job-name: istio-system-default-kopia-hphxm-maintain-job-1776533018784
+        component: velero
+        controller-uid: 66640516-68fb-4069-8ea3-bc456d4699ef
+        deploy: velero
+        job-name: istio-system-default-kopia-hphxm-maintain-job-1776533018784
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=istio-system
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: jenkins-default-kopia-stt2m
+  name: jenkins-default-kopia-stt2m-maintain-job-1776533032883
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: bcec0135-a28b-4f4f-8873-042dcb6992f9
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: bcec0135-a28b-4f4f-8873-042dcb6992f9
+        batch.kubernetes.io/job-name: jenkins-default-kopia-stt2m-maintain-job-1776533032883
+        component: velero
+        controller-uid: bcec0135-a28b-4f4f-8873-042dcb6992f9
+        deploy: velero
+        job-name: jenkins-default-kopia-stt2m-maintain-job-1776533032883
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=jenkins
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: k8sgpt-default-kopia-hvcvv
+  name: k8sgpt-default-kopia-hvcvv-maintain-job-1776533059995
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: e2d73aaa-ca88-4cc7-b602-85ddca6afcaa
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: e2d73aaa-ca88-4cc7-b602-85ddca6afcaa
+        batch.kubernetes.io/job-name: k8sgpt-default-kopia-hvcvv-maintain-job-1776533059995
+        component: velero
+        controller-uid: e2d73aaa-ca88-4cc7-b602-85ddca6afcaa
+        deploy: velero
+        job-name: k8sgpt-default-kopia-hvcvv-maintain-job-1776533059995
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=k8sgpt
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: kubeflow-default-kopia-49vc4
+  name: kubeflow-default-kopia-49vc4-maintain-job-1776532921385
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 50738384-e6be-4693-b04d-d3c5b61b73be
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: 50738384-e6be-4693-b04d-d3c5b61b73be
+        batch.kubernetes.io/job-name: kubeflow-default-kopia-49vc4-maintain-job-1776532921385
+        component: velero
+        controller-uid: 50738384-e6be-4693-b04d-d3c5b61b73be
+        deploy: velero
+        job-name: kubeflow-default-kopia-49vc4-maintain-job-1776532921385
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=kubeflow
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: mlflow-default-kopia-56wcj
+  name: mlflow-default-kopia-56wcj-maintain-job-1776532995684
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 0d4ec4b5-94fd-433b-8bb0-baaa13dfae76
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: 0d4ec4b5-94fd-433b-8bb0-baaa13dfae76
+        batch.kubernetes.io/job-name: mlflow-default-kopia-56wcj-maintain-job-1776532995684
+        component: velero
+        controller-uid: 0d4ec4b5-94fd-433b-8bb0-baaa13dfae76
+        deploy: velero
+        job-name: mlflow-default-kopia-56wcj-maintain-job-1776532995684
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=mlflow
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: n8n-default-kopia-8n5c9
+  name: n8n-default-kopia-8n5c9-maintain-job-1776533002685
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 2eeb8782-6ce9-47cd-aea6-5a7ea195da2b
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: 2eeb8782-6ce9-47cd-aea6-5a7ea195da2b
+        batch.kubernetes.io/job-name: n8n-default-kopia-8n5c9-maintain-job-1776533002685
+        component: velero
+        controller-uid: 2eeb8782-6ce9-47cd-aea6-5a7ea195da2b
+        deploy: velero
+        job-name: n8n-default-kopia-8n5c9-maintain-job-1776533002685
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=n8n
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    velero.io/repo-name: kubeflow-user-example-com-default-kopia-ddrpx
+  name: repo-maintain-job-1776532978584
+  namespace: velero
+spec:
+  backoffLimit: 0
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 61988769-fbde-4875-bf3a-071fd185e4de
+  suspend: false
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-04-17T17:13:30Z'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8085'
+        prometheus.io/scrape: 'true'
+      labels:
+        batch.kubernetes.io/controller-uid: 61988769-fbde-4875-bf3a-071fd185e4de
+        batch.kubernetes.io/job-name: repo-maintain-job-1776532978584
+        component: velero
+        controller-uid: 61988769-fbde-4875-bf3a-071fd185e4de
+        deploy: velero
+        job-name: repo-maintain-job-1776532978584
+      name: velero-repo-maintenance-pod
+    spec:
+      containers:
+      - args:
+        - repo-maintenance
+        - --repo-name=kubeflow-user-example-com
+        - --repo-type=kopia
+        - --backup-storage-location=default
+        - --log-level=info
+        - --log-format=text
+        command:
+        - /velero
+        env:
+        - name: VELERO_SCRATCH_DIR
+          value: /scratch
+        - name: VELERO_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: LD_LIBRARY_PATH
+          value: /plugins
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /credentials/cloud
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: AZURE_CREDENTIALS_FILE
+          value: /credentials/cloud
+        - name: ALIBABA_CLOUD_CREDENTIALS_FILE
+          value: /credentials/cloud
+        image: velero/velero:v1.14.1
+        imagePullPolicy: IfNotPresent
+        name: velero-repo-maintenance-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /plugins
+          name: plugins
+        - mountPath: /scratch
+          name: scratch
+        - mountPath: /credentials
+          name: cloud-credentials
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: velero
+      serviceAccountName: velero
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: plugins
+      - emptyDir: {}
+        name: scratch
+      - name: cloud-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloud-credentials

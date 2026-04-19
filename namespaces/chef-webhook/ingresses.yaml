@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"chef-webhook:webhook-receiver","ingressName":"chef-webhook:webhook-ingress","hostname":"webhook.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: webhook-ingress
+  namespace: chef-webhook
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: webhook.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: webhook-receiver
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - webhook.35.241.255.137.nip.io
+    secretName: tls-webhook

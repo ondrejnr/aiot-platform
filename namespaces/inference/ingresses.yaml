@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"inference:aiot-inference","ingressName":"inference:inference","hostname":"inference.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: inference
+  namespace: inference
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: inference.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: aiot-inference
+            port:
+              number: 8000
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - inference.35.241.255.137.nip.io
+    secretName: tls-inference

@@ -1,0 +1,54 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    cattle.io/creator: norman
+  name: cluster-owner
+  namespace: p-sqf5p
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - '*'
+- apiGroups:
+  - management.cattle.io
+  resources:
+  - projectroletemplatebindings
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    cattle.io/creator: norman
+    local_local-fleet-local-owner: crtb-in-project-binding-owner
+  name: local-fleet-local-owner-cluster-owner
+  namespace: p-sqf5p
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cluster-owner
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: u-mo773yttt4
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    cattle.io/creator: norman
+    local_u-b4qkhsnliz-admin: crtb-in-project-binding-owner
+  name: u-b4qkhsnliz-admin-cluster-owner
+  namespace: p-sqf5p
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cluster-owner
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: u-b4qkhsnliz

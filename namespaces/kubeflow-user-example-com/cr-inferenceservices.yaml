@@ -1,0 +1,72 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  annotations:
+    reconcile-trigger: '1776337432'
+    sidecar.istio.io/inject: 'false'
+  finalizers:
+  - inferenceservice.finalizers
+  name: maintenance-predictor
+  namespace: kubeflow-user-example-com
+spec:
+  predictor:
+    containers:
+    - env:
+      - name: MLFLOW_TRACKING_URI
+        value: http://mlflow-server.mlflow.svc.cluster.local:5000
+      - name: MODEL_NAME
+        value: maintenance-predictor
+      - name: MODEL_STAGE
+        value: Production
+      - name: DB_HOST
+        value: postgres.aiot.svc.cluster.local
+      - name: DB_NAME
+        value: aiot
+      - name: DB_USER
+        value: aiot
+      - name: DB_PASSWORD
+        value: aiot123
+      image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+      name: kserve-container
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      resources:
+        limits:
+          cpu: '1'
+          memory: 1Gi
+        requests:
+          cpu: 200m
+          memory: 512Mi
+      volumeMounts:
+      - mountPath: /app/serve.py
+        name: serve-py
+        subPath: serve.py
+      - mountPath: /mlflow
+        name: mlflow-data
+        readOnly: true
+    dnsConfig:
+      nameservers:
+      - 10.96.0.10
+      options:
+      - name: ndots
+        value: '5'
+      searches:
+      - kubeflow-user-example-com.svc.cluster.local
+      - svc.cluster.local
+      - cluster.local
+    dnsPolicy: None
+    nodeSelector:
+      kubernetes.io/hostname: oci-test-node1
+    tolerations:
+    - effect: NoSchedule
+      key: dedicated
+      operator: Equal
+      value: ml-training
+    volumes:
+    - configMap:
+        name: serve-py
+      name: serve-py
+    - name: mlflow-data
+      persistentVolumeClaim:
+        claimName: mlflow-artifacts-lp

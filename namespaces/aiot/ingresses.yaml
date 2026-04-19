@@ -1,0 +1,219 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:api-gateway","ingressName":"aiot:api-gateway","hostname":"api.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: api-gateway
+  namespace: aiot
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: api-gateway
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - api.35.241.255.137.nip.io
+    secretName: tls-api-gateway
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:cloudbeaver","ingressName":"aiot:cloudbeaver","hostname":"cloudbeaver.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: cloudbeaver
+  namespace: aiot
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: cloudbeaver.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: cloudbeaver
+            port:
+              number: 8978
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - cloudbeaver.35.241.255.137.nip.io
+    secretName: tls-cloudbeaver
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:digital-twin","ingressName":"aiot:digital-twin","hostname":"twin.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: digital-twin
+  namespace: aiot
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: twin.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: digital-twin
+            port:
+              number: 8001
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - twin.35.241.255.137.nip.io
+    secretName: tls-digital-twin
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:ngrok-proxy","ingressName":"aiot:ngrok-proxy","hostname":"ngrok.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '300'
+  name: ngrok-proxy
+  namespace: aiot
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: ngrok.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: ngrok-proxy
+            port:
+              number: 8090
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - ngrok.35.241.255.137.nip.io
+    secretName: tls-ngrok-proxy
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:open-webui","ingressName":"aiot:open-webui","hostname":"chat.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: open-webui
+  namespace: aiot
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: chat.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: open-webui
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - chat.35.241.255.137.nip.io
+    secretName: tls-open-webui
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:pgadmin","ingressName":"aiot:pgadmin","hostname":"pgadmin.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/configuration-snippet: proxy_set_header X-Scheme https;
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: '60'
+    nginx.ingress.kubernetes.io/proxy-cookie-path: / /
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '300'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '300'
+    nginx.ingress.kubernetes.io/session-cookie-change-on-failure: 'true'
+    nginx.ingress.kubernetes.io/session-cookie-max-age: '2592000'
+    nginx.ingress.kubernetes.io/session-cookie-name: PGADMIN_AFFINITY
+  name: pgadmin
+  namespace: aiot
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: pgadmin.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: pgadmin
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - pgadmin.35.241.255.137.nip.io
+    secretName: tls-pgadmin
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:qdrant","ingressName":"aiot:qdrant","hostname":"qdrant.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: qdrant
+  namespace: aiot
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: qdrant.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: qdrant
+            port:
+              number: 6333
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - qdrant.35.241.255.137.nip.io
+    secretName: tls-qdrant
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:rag-api-svc","ingressName":"aiot:rag","hostname":"rag.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: rag
+  namespace: aiot
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: rag.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: rag-api-svc
+            port:
+              number: 7000
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - rag.35.241.255.137.nip.io
+    secretName: tls-rag

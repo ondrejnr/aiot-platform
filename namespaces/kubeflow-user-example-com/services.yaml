@@ -1,0 +1,405 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aiot-tb
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: tensorboard.kubeflow.org/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Tensorboard
+    name: aiot-tb
+spec:
+  clusterIP: 10.97.253.145
+  clusterIPs:
+  - 10.97.253.145
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http-aiot-tb
+    port: 80
+    protocol: TCP
+    targetPort: 6006
+  selector:
+    app: aiot-tb
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: maintenance-predictor
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: serving.kserve.io/v1beta1
+    blockOwnerDeletion: true
+    controller: true
+    kind: InferenceService
+    name: maintenance-predictor
+spec:
+  externalName: knative-local-gateway.istio-system.svc.cluster.local
+  sessionAffinity: None
+  type: ExternalName
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+    serving.knative.dev/lastModifier: system:serviceaccount:kubeflow:kserve-controller-manager
+  labels:
+    component: predictor
+    serving.knative.dev/route: maintenance-predictor-predictor
+    serving.knative.dev/service: maintenance-predictor-predictor
+    serving.kserve.io/inferenceservice: maintenance-predictor
+  name: maintenance-predictor-predictor
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: serving.knative.dev/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Route
+    name: maintenance-predictor-predictor
+spec:
+  externalName: knative-local-gateway.istio-system.svc.cluster.local
+  ports:
+  - name: http2
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  sessionAffinity: None
+  type: ExternalName
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+    autoscaling.knative.dev/min-scale: '1'
+    reconcile-trigger: '1776337432'
+    serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+    sidecar.istio.io/inject: 'false'
+  labels:
+    app: maintenance-predictor-predictor-00001
+    component: predictor
+    networking.internal.knative.dev/serverlessservice: maintenance-predictor-predictor-00001
+    networking.internal.knative.dev/serviceType: Public
+    serving.knative.dev/configuration: maintenance-predictor-predictor
+    serving.knative.dev/configurationGeneration: '1'
+    serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+    serving.knative.dev/revision: maintenance-predictor-predictor-00001
+    serving.knative.dev/revisionUID: 92f0a97c-c43e-492c-a057-7c44cd181028
+    serving.knative.dev/service: maintenance-predictor-predictor
+    serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+    serving.kserve.io/inferenceservice: maintenance-predictor
+  name: maintenance-predictor-predictor-00001
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: networking.internal.knative.dev/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ServerlessService
+    name: maintenance-predictor-predictor-00001
+spec:
+  clusterIP: 10.98.76.104
+  clusterIPs:
+  - 10.98.76.104
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8012
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 8112
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+    autoscaling.knative.dev/min-scale: '1'
+    reconcile-trigger: '1776337432'
+    serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+    sidecar.istio.io/inject: 'false'
+  labels:
+    app: maintenance-predictor-predictor-00001
+    component: predictor
+    networking.internal.knative.dev/serverlessservice: maintenance-predictor-predictor-00001
+    networking.internal.knative.dev/serviceType: Private
+    serving.knative.dev/configuration: maintenance-predictor-predictor
+    serving.knative.dev/configurationGeneration: '1'
+    serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+    serving.knative.dev/revision: maintenance-predictor-predictor-00001
+    serving.knative.dev/revisionUID: 92f0a97c-c43e-492c-a057-7c44cd181028
+    serving.knative.dev/service: maintenance-predictor-predictor
+    serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+    serving.kserve.io/inferenceservice: maintenance-predictor
+  name: maintenance-predictor-predictor-00001-private
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: networking.internal.knative.dev/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ServerlessService
+    name: maintenance-predictor-predictor-00001
+spec:
+  clusterIP: 10.105.79.65
+  clusterIPs:
+  - 10.105.79.65
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8012
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 8112
+  - name: http-autometric
+    port: 9090
+    protocol: TCP
+    targetPort: http-autometric
+  - name: http-usermetric
+    port: 9091
+    protocol: TCP
+    targetPort: http-usermetric
+  - name: http-queueadm
+    port: 8022
+    protocol: TCP
+    targetPort: 8022
+  - name: http-istio
+    port: 8012
+    protocol: TCP
+    targetPort: 8012
+  selector:
+    serving.knative.dev/revisionUID: 92f0a97c-c43e-492c-a057-7c44cd181028
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+    autoscaling.knative.dev/min-scale: '1'
+    reconcile-trigger: '1776337432'
+    serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+    sidecar.istio.io/inject: 'false'
+  labels:
+    app: maintenance-predictor-predictor-00002
+    component: predictor
+    networking.internal.knative.dev/serverlessservice: maintenance-predictor-predictor-00002
+    networking.internal.knative.dev/serviceType: Public
+    serving.knative.dev/configuration: maintenance-predictor-predictor
+    serving.knative.dev/configurationGeneration: '2'
+    serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+    serving.knative.dev/revision: maintenance-predictor-predictor-00002
+    serving.knative.dev/revisionUID: 162d10a6-4f60-46da-b595-b74cd956ea23
+    serving.knative.dev/service: maintenance-predictor-predictor
+    serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+    serving.kserve.io/inferenceservice: maintenance-predictor
+  name: maintenance-predictor-predictor-00002
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: networking.internal.knative.dev/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ServerlessService
+    name: maintenance-predictor-predictor-00002
+spec:
+  clusterIP: 10.99.195.153
+  clusterIPs:
+  - 10.99.195.153
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8012
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 8112
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+    autoscaling.knative.dev/min-scale: '1'
+    reconcile-trigger: '1776337432'
+    serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+    sidecar.istio.io/inject: 'false'
+  labels:
+    app: maintenance-predictor-predictor-00002
+    component: predictor
+    networking.internal.knative.dev/serverlessservice: maintenance-predictor-predictor-00002
+    networking.internal.knative.dev/serviceType: Private
+    serving.knative.dev/configuration: maintenance-predictor-predictor
+    serving.knative.dev/configurationGeneration: '2'
+    serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+    serving.knative.dev/revision: maintenance-predictor-predictor-00002
+    serving.knative.dev/revisionUID: 162d10a6-4f60-46da-b595-b74cd956ea23
+    serving.knative.dev/service: maintenance-predictor-predictor
+    serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+    serving.kserve.io/inferenceservice: maintenance-predictor
+  name: maintenance-predictor-predictor-00002-private
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: networking.internal.knative.dev/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ServerlessService
+    name: maintenance-predictor-predictor-00002
+spec:
+  clusterIP: 10.109.132.93
+  clusterIPs:
+  - 10.109.132.93
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8012
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 8112
+  - name: http-autometric
+    port: 9090
+    protocol: TCP
+    targetPort: http-autometric
+  - name: http-usermetric
+    port: 9091
+    protocol: TCP
+    targetPort: http-usermetric
+  - name: http-queueadm
+    port: 8022
+    protocol: TCP
+    targetPort: 8022
+  - name: http-istio
+    port: 8012
+    protocol: TCP
+    targetPort: 8012
+  selector:
+    serving.knative.dev/revisionUID: 162d10a6-4f60-46da-b595-b74cd956ea23
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    metacontroller.k8s.io/last-applied-configuration: '{"apiVersion":"v1","kind":"Service","metadata":{"labels":{"app":"ml-pipeline-ui-artifact","controller-uid":"741b1f16-a29c-453d-9b51-db56a7ee96ad"},"name":"ml-pipeline-ui-artifact","namespace":"kubeflow-user-example-com"},"spec":{"ports":[{"name":"http","port":80,"protocol":"TCP","targetPort":3000}],"selector":{"app":"ml-pipeline-ui-artifact"}}}'
+  labels:
+    app: ml-pipeline-ui-artifact
+    controller-uid: 741b1f16-a29c-453d-9b51-db56a7ee96ad
+  name: ml-pipeline-ui-artifact
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Namespace
+    name: kubeflow-user-example-com
+spec:
+  clusterIP: 10.105.194.48
+  clusterIPs:
+  - 10.105.194.48
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: ml-pipeline-ui-artifact
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    metacontroller.k8s.io/last-applied-configuration: '{"apiVersion":"v1","kind":"Service","metadata":{"labels":{"controller-uid":"741b1f16-a29c-453d-9b51-db56a7ee96ad"},"name":"ml-pipeline-visualizationserver","namespace":"kubeflow-user-example-com"},"spec":{"ports":[{"name":"http","port":8888,"protocol":"TCP","targetPort":8888}],"selector":{"app":"ml-pipeline-visualizationserver"}}}'
+  labels:
+    controller-uid: 741b1f16-a29c-453d-9b51-db56a7ee96ad
+  name: ml-pipeline-visualizationserver
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Namespace
+    name: kubeflow-user-example-com
+spec:
+  clusterIP: 10.98.17.106
+  clusterIPs:
+  - 10.98.17.106
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 8888
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    app: ml-pipeline-visualizationserver
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-workshop
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: kubeflow.org/v1beta1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Notebook
+    name: ml-workshop
+spec:
+  clusterIP: 10.108.78.225
+  clusterIPs:
+  - 10.108.78.225
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http-ml-workshop
+    port: 80
+    protocol: TCP
+    targetPort: 8888
+  selector:
+    statefulset: ml-workshop
+  sessionAffinity: None
+  type: ClusterIP

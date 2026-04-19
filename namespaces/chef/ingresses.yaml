@@ -1,0 +1,55 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"chef:chef-automate","ingressName":"chef:chef","hostname":"chef.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: 'false'
+  name: chef
+  namespace: chef
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: chef.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: chef-automate
+            port:
+              number: 8443
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - chef.35.241.255.137.nip.io
+    secretName: tls-chef
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"chef:pe-console","ingressName":"chef:pe-console","hostname":"pe.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/ssl-passthrough: 'false'
+  name: pe-console
+  namespace: chef
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: pe.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: pe-console
+            port:
+              number: 4443
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - pe.35.241.255.137.nip.io
+    secretName: tls-pe-console

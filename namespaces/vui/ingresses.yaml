@@ -1,0 +1,49 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"vui:vui-ui-clusterip-svc","ingressName":"vui:vui-ingress","hostname":"vui.35.241.255.137.nip.io","path":"/","allNodes":false},{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"vui:vui-api-clusterip-svc","ingressName":"vui:vui-ingress","hostname":"vui.35.241.255.137.nip.io","path":"/api","allNodes":false},{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"vui:vui-api-clusterip-svc","ingressName":"vui:vui-ingress","hostname":"vui.35.241.255.137.nip.io","path":"/ws","allNodes":false}]'
+    meta.helm.sh/release-name: vui
+    meta.helm.sh/release-namespace: vui
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '3600'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '3600'
+  labels:
+    app.kubernetes.io/instance: vui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: vui
+    app.kubernetes.io/version: 0.4.1
+    helm.sh/chart: vui-1.0.6
+  name: vui-ingress
+  namespace: vui
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: vui.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: vui-ui-clusterip-svc
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: vui-api-clusterip-svc
+            port:
+              number: 80
+        path: /api
+        pathType: Prefix
+      - backend:
+          service:
+            name: vui-api-clusterip-svc
+            port:
+              number: 80
+        path: /ws
+        pathType: Prefix
+  tls:
+  - hosts:
+    - vui.35.241.255.137.nip.io
+    secretName: vui-tls

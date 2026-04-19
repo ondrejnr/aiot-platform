@@ -1,0 +1,169 @@
+apiVersion: v1
+kind: Node
+metadata:
+  name: aiot-master
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: aiot-master
+    kubernetes.io/os: linux
+    node-role.kubernetes.io/control-plane: ''
+    node.kubernetes.io/exclude-from-external-load-balancers: ''
+  annotations:
+    flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"2a:4a:65:62:7e:2d"}'
+    flannel.alpha.coreos.com/backend-type: vxlan
+    flannel.alpha.coreos.com/kube-subnet-manager: 'true'
+    flannel.alpha.coreos.com/public-ip: 10.132.0.2
+    kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+    management.cattle.io/pod-limits: '{"cpu":"2500m","memory":"2518Mi"}'
+    management.cattle.io/pod-requests: '{"cpu":"1160m","memory":"960Mi","pods":"12"}'
+    node.alpha.kubernetes.io/ttl: '0'
+    volumes.kubernetes.io/controller-managed-attach-detach: 'true'
+spec:
+  podCIDR: 10.244.0.0/24
+  podCIDRs:
+  - 10.244.0.0/24
+  taints:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: aiot-worker-01
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: aiot-worker-01
+    kubernetes.io/os: linux
+    node-role.kubernetes.io/worker: ''
+  annotations:
+    flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"c2:d5:10:6d:8d:c7"}'
+    flannel.alpha.coreos.com/backend-type: vxlan
+    flannel.alpha.coreos.com/kube-subnet-manager: 'true'
+    flannel.alpha.coreos.com/public-ip: 10.132.0.3
+    kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+    management.cattle.io/pod-limits: '{"cpu":"1","memory":"2816Mi"}'
+    management.cattle.io/pod-requests: '{"cpu":"1250m","memory":"2390Mi","pods":"17"}'
+    node.alpha.kubernetes.io/ttl: '0'
+    volumes.kubernetes.io/controller-managed-attach-detach: 'true'
+spec:
+  podCIDR: 10.244.1.0/24
+  podCIDRs:
+  - 10.244.1.0/24
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: aiot-worker-02
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: aiot-worker-02
+    kubernetes.io/os: linux
+    node-role.kubernetes.io/worker: ''
+  annotations:
+    flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"86:3b:9d:76:60:f8"}'
+    flannel.alpha.coreos.com/backend-type: vxlan
+    flannel.alpha.coreos.com/kube-subnet-manager: 'true'
+    flannel.alpha.coreos.com/public-ip: 10.132.0.4
+    kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+    management.cattle.io/pod-limits: '{"cpu":"18200m","memory":"17126Mi"}'
+    management.cattle.io/pod-requests: '{"cpu":"3885m","memory":"8976Mi","pods":"40"}'
+    node.alpha.kubernetes.io/ttl: '0'
+    volumes.kubernetes.io/controller-managed-attach-detach: 'true'
+spec:
+  podCIDR: 10.244.2.0/24
+  podCIDRs:
+  - 10.244.2.0/24
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: oci-e5-node1
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    cloud: oci
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: oci-e5-node1
+    kubernetes.io/os: linux
+    node-role.kubernetes.io/worker: ''
+    topology.kubernetes.io/zone: oci-frankfurt
+  annotations:
+    flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"42:d6:1c:3f:58:78"}'
+    flannel.alpha.coreos.com/backend-type: vxlan
+    flannel.alpha.coreos.com/kube-subnet-manager: 'true'
+    flannel.alpha.coreos.com/public-ip: 172.16.200.10
+    kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+    management.cattle.io/pod-limits: '{"cpu":"14500m","memory":"11776Mi"}'
+    management.cattle.io/pod-requests: '{"cpu":"2520m","memory":"4682Mi","pods":"25"}'
+    node.alpha.kubernetes.io/ttl: '0'
+    volumes.kubernetes.io/controller-managed-attach-detach: 'true'
+spec:
+  podCIDR: 10.244.3.0/24
+  podCIDRs:
+  - 10.244.3.0/24
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: oci-e5-node2
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    cloud: oci
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: oci-e5-node2
+    kubernetes.io/os: linux
+    node-role.kubernetes.io/worker: ''
+    topology.kubernetes.io/zone: oci-frankfurt
+  annotations:
+    flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"16:54:0e:22:4b:41"}'
+    flannel.alpha.coreos.com/backend-type: vxlan
+    flannel.alpha.coreos.com/kube-subnet-manager: 'true'
+    flannel.alpha.coreos.com/public-ip: 172.16.200.11
+    kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+    management.cattle.io/pod-limits: '{"cpu":"35300m","memory":"28960Mi"}'
+    management.cattle.io/pod-requests: '{"cpu":"3845m","memory":"7366Mi","pods":"47"}'
+    node.alpha.kubernetes.io/ttl: '0'
+    volumes.kubernetes.io/controller-managed-attach-detach: 'true'
+spec:
+  podCIDR: 10.244.4.0/24
+  podCIDRs:
+  - 10.244.4.0/24
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: oci-test-node1
+  labels:
+    beta.kubernetes.io/arch: amd64
+    beta.kubernetes.io/os: linux
+    cloud: oci
+    kubernetes.io/arch: amd64
+    kubernetes.io/hostname: oci-test-node1
+    kubernetes.io/os: linux
+    node-role.kubernetes.io/ml-training: ''
+    topology.kubernetes.io/zone: oci-frankfurt
+  annotations:
+    flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"7e:58:56:97:4a:96"}'
+    flannel.alpha.coreos.com/backend-type: vxlan
+    flannel.alpha.coreos.com/kube-subnet-manager: 'true'
+    flannel.alpha.coreos.com/public-ip: 172.16.200.12
+    kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+    management.cattle.io/pod-limits: '{"cpu":"3500m","memory":"2304Mi"}'
+    management.cattle.io/pod-requests: '{"cpu":"725m","memory":"1302Mi","pods":"7"}'
+    node.alpha.kubernetes.io/ttl: '0'
+    volumes.kubernetes.io/controller-managed-attach-detach: 'true'
+spec:
+  podCIDR: 10.244.5.0/24
+  podCIDRs:
+  - 10.244.5.0/24
+  taints:
+  - effect: NoSchedule
+    key: dedicated
+    value: ml-training

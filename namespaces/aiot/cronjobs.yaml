@@ -1,0 +1,244 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-partition-mgr
+  namespace: aiot
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata: {}
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 2
+      template:
+        metadata: {}
+        spec:
+          containers:
+          - command:
+            - /bin/bash
+            - -c
+            - "set -e\nH=\"postgres.aiot.svc.cluster.local\"\nU=\"aiot_admin\"\nD=\"\
+              aiot\"\necho \"=== Partition manager ===\"\n# Drop partitions older\
+              \ than 2 hours\npsql -h \"$H\" -U \"$U\" -d \"$D\" -t -A -c \"\n  SELECT\
+              \ tablename FROM pg_tables\n  WHERE schemaname='public'\n    AND tablename\
+              \ ~ '^sensor_data_20'\n  ORDER BY tablename;\" | while read -r part;\
+              \ do\n  ts=$(echo \"$part\" | sed 's/sensor_data_//' | sed 's/_/ /g'\
+              \ | head -c13)\n  if [ -n \"$ts\" ]; then\n    cutoff=$(date -u -d '2\
+              \ hours ago' '+%Y %m %d %H')\n    if [[ \"$ts\" < \"$cutoff\" ]]; then\n\
+              \      echo \"DROP $part\"\n      psql -h \"$H\" -U \"$U\" -d \"$D\"\
+              \ -c \"DROP TABLE IF EXISTS $part;\"\n    fi\n  fi\ndone\n# Create 4\
+              \ future hourly partitions\nfor i in 0 1 2 3; do\n  start=$(date -u\
+              \ -d \"+${i} hours\" '+%Y-%m-%d %H:00:00')\n  end=$(date -u -d \"+$((i+1))\
+              \ hours\" '+%Y-%m-%d %H:00:00')\n  name=\"sensor_data_$(date -u -d \"\
+              +${i} hours\" '+%Y_%m_%d_%H')\"\n  psql -h \"$H\" -U \"$U\" -d \"$D\"\
+              \ -c \"\n    CREATE TABLE IF NOT EXISTS $name\n    PARTITION OF sensor_data\n\
+              \    FOR VALUES FROM ('$start') TO ('$end');\" 2>/dev/null || true\n\
+              \  echo \"Ensured partition $name\"\ndone\necho \"=== Done ===\"\n"
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: PGPASSWORD
+                  name: pg-credentials
+            - name: PGOPTIONS
+              value: -c statement_timeout=0
+            image: postgres:16
+            imagePullPolicy: IfNotPresent
+            name: partition
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  schedule: 5 * * * *
+  successfulJobsHistoryLimit: 3
+  suspend: false
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-sensor-cleanup
+  namespace: aiot
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    metadata: {}
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 1
+      template:
+        metadata: {}
+        spec:
+          containers:
+          - command:
+            - /bin/bash
+            - -c
+            - 'set -e
+
+              H="postgres.aiot.svc.cluster.local"
+
+              U="aiot_admin"
+
+              D="aiot"
+
+              echo "Deleting sensor_data older than 10 days..."
+
+              psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts <
+              NOW() - INTERVAL ''10 days'';"
+
+              echo "VACUUM..."
+
+              psql -h "$H" -U "$U" -d "$D" -c "VACUUM sensor_data;"
+
+              echo "Done"
+
+              '
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: PGPASSWORD
+                  name: pg-credentials
+            image: postgres:16
+            imagePullPolicy: IfNotPresent
+            name: cleanup
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  schedule: 0 */4 * * *
+  successfulJobsHistoryLimit: 2
+  suspend: false
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: aiot
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata: {}
+    spec:
+      activeDeadlineSeconds: 3600
+      backoffLimit: 1
+      template:
+        metadata: {}
+        spec:
+          containers:
+          - command:
+            - /bin/bash
+            - -c
+            - "set -e\nTS=$(date -u +%Y-%m-%d-%H%M%S)\nDBS=\"aiot mlflow n8n open_webui\
+              \ grafana mattermost\"\nfor DB in $DBS; do\n  mkdir -p \"$BACKUP_DIR/$DB\"\
+              \n  echo \"==> Dumping $DB\"\n  pg_dump -Fc -Z6 -d \"postgresql://$PGUSER:$PGPASSWORD@$PGHOST:5432/$DB\"\
+              \ -f \"$BACKUP_DIR/$DB/$DB-$TS.dump\"\n  ls -lh \"$BACKUP_DIR/$DB/$DB-$TS.dump\"\
+              \ndone\necho \"==> Pruning >${RETENTION_DAYS}d\"\nfind \"$BACKUP_DIR\"\
+              \ -type f -name '*.dump' -mtime +${RETENTION_DAYS} -print -delete\n\
+              echo \"==> Disk usage:\"\ndu -sh \"$BACKUP_DIR\"/*\necho \"==> Backup\
+              \ complete\"\n"
+            env:
+            - name: PGHOST
+              value: postgres.aiot.svc.cluster.local
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: pg-ha-superuser
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: pg-ha-superuser
+            - name: RETENTION_DAYS
+              value: '30'
+            - name: BACKUP_DIR
+              value: /backups
+            image: postgres:16
+            imagePullPolicy: IfNotPresent
+            name: backup
+            resources:
+              limits:
+                cpu: '1'
+                memory: 1Gi
+              requests:
+                cpu: 100m
+                memory: 256Mi
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /backups
+              name: backups
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - name: backups
+            persistentVolumeClaim:
+              claimName: postgres-backup-data
+  schedule: 0 3 * * *
+  successfulJobsHistoryLimit: 3
+  suspend: false
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sensor-data-retention
+  namespace: aiot
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    metadata: {}
+    spec:
+      activeDeadlineSeconds: 1800
+      backoffLimit: 1
+      template:
+        metadata: {}
+        spec:
+          containers:
+          - command:
+            - python3
+            - -c
+            - "import psycopg2, os\nconn = psycopg2.connect(host=os.environ['PG_HOST'],\
+              \ user=os.environ['PG_USER'],\n                         password=os.environ['PG_PASS'],\
+              \ dbname='aiot')\nconn.autocommit = True\ncur = conn.cursor()\nfor t\
+              \ in ['sensor_data','predictions']:\n    cur.execute(f\"DELETE FROM\
+              \ {t} WHERE ts < NOW() - INTERVAL '14 days'\")\n    print(f\"Cleaned\
+              \ {t}: {cur.rowcount} rows\")\ncur.close(); conn.close()\n"
+            env:
+            - name: PG_HOST
+              value: postgres.aiot.svc.cluster.local
+            - name: PG_USER
+              value: aiot_admin
+            - name: PG_PASS
+              valueFrom:
+                secretKeyRef:
+                  key: PG_PASS
+                  name: pg-credentials
+            image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+            imagePullPolicy: Always
+            name: retention
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  schedule: 0 */6 * * *
+  successfulJobsHistoryLimit: 2
+  suspend: false

@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opentelemetry-operator
+    meta.helm.sh/release-namespace: opentelemetry-operator-system
+  labels:
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/instance: opentelemetry-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opentelemetry-operator
+    app.kubernetes.io/part-of: opentelemetry-operator
+    app.kubernetes.io/version: 0.148.0
+    helm.sh/chart: opentelemetry-operator-0.109.2
+  name: opentelemetry-operator
+  namespace: opentelemetry-operator-system
+spec:
+  clusterIP: 10.96.67.183
+  clusterIPs:
+  - 10.96.67.183
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: https
+    port: 8443
+    protocol: TCP
+    targetPort: https
+  - name: metrics
+    port: 8080
+    protocol: TCP
+    targetPort: metrics
+  selector:
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/name: opentelemetry-operator
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opentelemetry-operator
+    meta.helm.sh/release-namespace: opentelemetry-operator-system
+  labels:
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/instance: opentelemetry-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opentelemetry-operator
+    app.kubernetes.io/part-of: opentelemetry-operator
+    app.kubernetes.io/version: 0.148.0
+    helm.sh/chart: opentelemetry-operator-0.109.2
+  name: opentelemetry-operator-webhook
+  namespace: opentelemetry-operator-system
+spec:
+  clusterIP: 10.107.156.180
+  clusterIPs:
+  - 10.107.156.180
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: webhook-server
+  selector:
+    app.kubernetes.io/component: controller-manager
+    app.kubernetes.io/name: opentelemetry-operator
+  sessionAffinity: None
+  type: ClusterIP

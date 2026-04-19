@@ -1,0 +1,171 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: '4'
+    field.cattle.io/publicEndpoints: '[{"nodeName":":oci-test-node1","addresses":["172.16.200.12"],"port":13133,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-dbrc6","allNodes":false},{"nodeName":":oci-test-node1","addresses":["172.16.200.12"],"port":8888,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-dbrc6","allNodes":false},{"nodeName":":oci-test-node1","addresses":["172.16.200.12"],"port":4317,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-dbrc6","allNodes":false},{"nodeName":":oci-test-node1","addresses":["172.16.200.12"],"port":4318,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-dbrc6","allNodes":false},{"nodeName":":aiot-master","addresses":["10.132.0.2"],"port":13133,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-x4nxt","allNodes":false},{"nodeName":":aiot-master","addresses":["10.132.0.2"],"port":8888,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-x4nxt","allNodes":false},{"nodeName":":aiot-master","addresses":["10.132.0.2"],"port":4317,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-x4nxt","allNodes":false},{"nodeName":":aiot-master","addresses":["10.132.0.2"],"port":4318,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-x4nxt","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":13133,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-9fpff","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":8888,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-9fpff","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":4317,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-9fpff","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":4318,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-9fpff","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":13133,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-qjn9d","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":8888,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-qjn9d","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":4317,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-qjn9d","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":4318,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-qjn9d","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":13133,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-qpdj8","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":8888,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-qpdj8","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":4317,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-qpdj8","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":4318,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-qpdj8","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":13133,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-w6vpx","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":8888,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-w6vpx","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":4317,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-w6vpx","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":4318,"protocol":"TCP","podName":"signoz:k8s-infra-otel-agent-w6vpx","allNodes":false}]'
+    meta.helm.sh/release-name: k8s-infra
+    meta.helm.sh/release-namespace: signoz
+  labels:
+    app.kubernetes.io/component: otel-agent
+    app.kubernetes.io/instance: k8s-infra
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: k8s-infra
+    app.kubernetes.io/version: 0.139.0
+    helm.sh/chart: k8s-infra-0.15.0
+  name: k8s-infra-otel-agent
+  namespace: signoz
+spec:
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: otel-agent
+      app.kubernetes.io/instance: k8s-infra
+      app.kubernetes.io/name: k8s-infra
+  template:
+    metadata:
+      annotations:
+        checksum/config: 3fa22bdcdb7390fd9f5c3650494fc8828121bb30e23fa65a07cd3bb51a7b7c50
+      labels:
+        app.kubernetes.io/component: otel-agent
+        app.kubernetes.io/instance: k8s-infra
+        app.kubernetes.io/name: k8s-infra
+    spec:
+      containers:
+      - args:
+        - --config=/conf/otel-agent-config.yaml
+        command:
+        - /otelcol-contrib
+        env:
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://signoz-otel-collector.signoz.svc.cluster.local:4317
+        - name: OTEL_SECRETS_PATH
+          value: /secrets
+        - name: K8S_CLUSTER_NAME
+          value: aiot-cluster
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: K8S_POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: K8S_HOST_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: K8S_POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: SIGNOZ_COMPONENT
+          value: otel-agent
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: signoz.component=$(SIGNOZ_COMPONENT),k8s.cluster.name=$(K8S_CLUSTER_NAME),k8s.node.name=$(K8S_NODE_NAME),host.name=$(K8S_NODE_NAME)
+        image: docker.io/otel/opentelemetry-collector-contrib:0.139.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /
+            port: 13133
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: k8s-infra-otel-agent
+        ports:
+        - containerPort: 13133
+          hostPort: 13133
+          name: health-check
+          protocol: TCP
+        - containerPort: 8888
+          hostPort: 8888
+          name: metrics
+          protocol: TCP
+        - containerPort: 4317
+          hostPort: 4317
+          name: otlp
+          protocol: TCP
+        - containerPort: 4318
+          hostPort: 4318
+          name: otlp-http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /
+            port: 13133
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        securityContext: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /conf
+          name: otel-agent-config-vol
+        - mountPath: /var/log
+          name: varlog
+          readOnly: true
+        - mountPath: /var/lib/docker/containers
+          name: varlibdockercontainers
+          readOnly: true
+        - mountPath: /hostfs
+          mountPropagation: HostToContainer
+          name: hostfs
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: k8s-infra-otel-agent
+      serviceAccountName: k8s-infra-otel-agent
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - operator: Exists
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: k8s-infra-otel-agent
+        name: otel-agent-config-vol
+      - hostPath:
+          path: /var/log
+          type: ''
+        name: varlog
+      - hostPath:
+          path: /var/lib/docker/containers
+          type: ''
+        name: varlibdockercontainers
+      - hostPath:
+          path: /
+          type: ''
+        name: hostfs
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate

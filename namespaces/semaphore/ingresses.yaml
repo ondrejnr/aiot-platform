@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: if ($request_uri = "/auth/login")
+      { return 302 /api/auth/oidc/dex/login; }
+    nginx.ingress.kubernetes.io/proxy-body-size: 10m
+  name: semaphore
+  namespace: semaphore
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: semaphore.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: semaphore
+            port:
+              number: 80
+        path: /
+        pathType: Prefix

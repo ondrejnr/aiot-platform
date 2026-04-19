@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    pv.kubernetes.io/bind-completed: 'yes'
+    pv.kubernetes.io/bound-by-controller: 'yes'
+    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+    volume.kubernetes.io/selected-node: oci-e5-node1
+    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    app.kubernetes.io/component: zookeeper
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/name: zookeeper
+    velero.io/exclude-from-backup: 'true'
+  name: data-signoz-zookeeper-0
+  namespace: signoz
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: local-path
+  volumeMode: Filesystem
+  volumeName: pvc-86e45553-462a-4c50-8e12-b0123ad60cf9
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    clickhouse-operator-reconcile: force-2
+    meta.helm.sh/release-name: signoz
+    meta.helm.sh/release-namespace: signoz
+    pv.kubernetes.io/bind-completed: 'yes'
+    pv.kubernetes.io/bound-by-controller: 'yes'
+    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+    volume.kubernetes.io/selected-node: oci-e5-node2
+    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    app.kubernetes.io/component: clickhouse
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: clickhouse
+    app.kubernetes.io/version: 24.1.2
+    clickhouse.altinity.com/app: chop
+    clickhouse.altinity.com/chi: signoz-clickhouse
+    clickhouse.altinity.com/cluster: cluster
+    clickhouse.altinity.com/namespace: signoz
+    clickhouse.altinity.com/object-version: 78642b1a2afccaa918a80589817a0e81dd0455c4
+    clickhouse.altinity.com/reclaimPolicy: Retain
+    clickhouse.altinity.com/replica: '0'
+    clickhouse.altinity.com/shard: '0'
+    helm.sh/chart: clickhouse-24.1.18
+    velero.io/exclude-from-backup: 'true'
+  name: data-volumeclaim-template-chi-signoz-clickhouse-cluster-0-0-0
+  namespace: signoz
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: local-path
+  volumeMode: Filesystem
+  volumeName: pvc-95e8ba2b-0d89-4267-97aa-357609edb79f
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    pv.kubernetes.io/bind-completed: 'yes'
+    pv.kubernetes.io/bound-by-controller: 'yes'
+    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+    volume.kubernetes.io/selected-node: oci-e5-node2
+    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    app.kubernetes.io/component: signoz
+    app.kubernetes.io/instance: signoz
+    app.kubernetes.io/name: signoz
+    velero.io/exclude-from-backup: 'true'
+  name: signoz-db-signoz-0
+  namespace: signoz
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-path
+  volumeMode: Filesystem
+  volumeName: pvc-6ed60744-019e-49a0-9408-3d8739cfc441

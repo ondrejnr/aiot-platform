@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: '2'
+    field.cattle.io/publicEndpoints: '[{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":80,"protocol":"TCP","podName":"default:ingress-nginx-controller-zxb9k","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":443,"protocol":"TCP","podName":"default:ingress-nginx-controller-zxb9k","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":1883,"protocol":"TCP","podName":"default:ingress-nginx-controller-zxb9k","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":8083,"protocol":"TCP","podName":"default:ingress-nginx-controller-zxb9k","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":80,"protocol":"TCP","podName":"default:ingress-nginx-controller-zxf56","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":443,"protocol":"TCP","podName":"default:ingress-nginx-controller-zxf56","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":1883,"protocol":"TCP","podName":"default:ingress-nginx-controller-zxf56","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":8083,"protocol":"TCP","podName":"default:ingress-nginx-controller-zxf56","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":80,"protocol":"TCP","podName":"default:ingress-nginx-controller-87sn5","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":443,"protocol":"TCP","podName":"default:ingress-nginx-controller-87sn5","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":1883,"protocol":"TCP","podName":"default:ingress-nginx-controller-87sn5","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":8083,"protocol":"TCP","podName":"default:ingress-nginx-controller-87sn5","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":80,"protocol":"TCP","podName":"default:ingress-nginx-controller-sq22j","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":443,"protocol":"TCP","podName":"default:ingress-nginx-controller-sq22j","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":1883,"protocol":"TCP","podName":"default:ingress-nginx-controller-sq22j","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":8083,"protocol":"TCP","podName":"default:ingress-nginx-controller-sq22j","allNodes":false}]'
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/name: ingress-nginx
+  name: ingress-nginx-controller
+  namespace: default
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/name: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: ingress-nginx
+    spec:
+      containers:
+      - args:
+        - /nginx-ingress-controller
+        - --election-id=ingress-nginx-leader
+        - --controller-class=k8s.io/ingress-nginx
+        - --ingress-class=nginx
+        - --configmap=default/ingress-nginx-ingress-nginx-controller
+        - --tcp-services-configmap=default/tcp-services
+        - --publish-status-address=35.241.255.137
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/ingress-nginx/controller:v1.12.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: controller
+        ports:
+        - containerPort: 80
+          hostPort: 80
+          name: http
+          protocol: TCP
+        - containerPort: 443
+          hostPort: 443
+          name: https
+          protocol: TCP
+        - containerPort: 1883
+          hostPort: 1883
+          name: mqtt
+          protocol: TCP
+        - containerPort: 8083
+          hostPort: 8083
+          name: mqtt-ws
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      nodeSelector:
+        node-role.kubernetes.io/worker: ''
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: ingress-nginx-ingress-nginx
+      serviceAccountName: ingress-nginx-ingress-nginx
+      terminationGracePeriodSeconds: 30
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate

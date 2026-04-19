@@ -1,0 +1,101 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-snapshot
+  namespace: etcd-backup
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata: {}
+    spec:
+      backoffLimit: 2
+      template:
+        metadata: {}
+        spec:
+          containers:
+          - args:
+            - 'set -e
+
+              TS=$(date +%Y%m%d-%H%M%S)
+
+              mc alias set r2 "$AWS_ENDPOINT" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
+
+              SIZE=$(stat -c %s /work/etcd-snapshot.db)
+
+              echo "Snapshot size: $SIZE bytes"
+
+              mc cp /work/etcd-snapshot.db "r2/$AWS_BUCKET/etcd-snapshots/etcd-${TS}.db"
+
+              echo "--- cleanup older than 7d ---"
+
+              mc find "r2/$AWS_BUCKET/etcd-snapshots/" --older-than 7d --exec "mc
+              rm {}" || true
+
+              echo "--- current snapshots ---"
+
+              mc ls "r2/$AWS_BUCKET/etcd-snapshots/"
+
+              '
+            command:
+            - /bin/sh
+            - -c
+            envFrom:
+            - secretRef:
+                name: r2-credentials
+            image: minio/mc:latest
+            imagePullPolicy: Always
+            name: upload
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /work
+              name: work
+          dnsPolicy: ClusterFirst
+          hostNetwork: true
+          initContainers:
+          - args:
+            - --endpoints=https://127.0.0.1:2379
+            - --cacert=/etc/etcd/ca.crt
+            - --cert=/etc/etcd/healthcheck-client.crt
+            - --key=/etc/etcd/healthcheck-client.key
+            - snapshot
+            - save
+            - /work/etcd-snapshot.db
+            command:
+            - /usr/local/bin/etcdctl
+            env:
+            - name: ETCDCTL_API
+              value: '3'
+            image: registry.k8s.io/etcd:3.5.16-0
+            imagePullPolicy: IfNotPresent
+            name: snapshot
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /etc/etcd
+              name: etcd-certs
+              readOnly: true
+            - mountPath: /work
+              name: work
+          nodeSelector:
+            node-role.kubernetes.io/control-plane: ''
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/control-plane
+          volumes:
+          - hostPath:
+              path: /etc/kubernetes/pki/etcd
+              type: Directory
+            name: etcd-certs
+          - emptyDir: {}
+            name: work
+  schedule: 30 2 * * *
+  successfulJobsHistoryLimit: 2
+  suspend: false

@@ -1,0 +1,75 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    meta.helm.sh/release-name: k8sgpt-operator
+    meta.helm.sh/release-namespace: k8sgpt
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: k8sgpt-operator
+    app.kubernetes.io/instance: k8sgpt-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: k8sgpt-operator
+    app.kubernetes.io/part-of: k8sgpt-operator
+    app.kubernetes.io/version: 0.2.25
+    helm.sh/chart: k8sgpt-operator-0.2.27
+  name: k8sgpt-operator-leader-election-role
+  namespace: k8sgpt
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    meta.helm.sh/release-name: k8sgpt-operator
+    meta.helm.sh/release-namespace: k8sgpt
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: k8sgpt-operator
+    app.kubernetes.io/instance: k8sgpt-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: k8sgpt-operator
+    app.kubernetes.io/part-of: k8sgpt-operator
+    app.kubernetes.io/version: 0.2.25
+    helm.sh/chart: k8sgpt-operator-0.2.27
+  name: k8sgpt-operator-leader-election-rolebinding
+  namespace: k8sgpt
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: k8sgpt-operator-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: k8sgpt-operator-controller-manager
+  namespace: k8sgpt

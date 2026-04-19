@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-receiver
+  namespace: chef-webhook
+spec:
+  clusterIP: 10.110.225.109
+  clusterIPs:
+  - 10.110.225.109
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: webhook-receiver
+  sessionAffinity: None
+  type: ClusterIP

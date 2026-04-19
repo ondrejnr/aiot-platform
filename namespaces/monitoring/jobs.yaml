@@ -1,0 +1,277 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-17T06:00:00Z'
+    revisions: '{"1":{"status":"failed","reasons":["DeadlineExceeded"],"messages":["Job
+      was active longer than specified deadline"],"desire":1,"failed":1,"uid":"c0dd500a-cd9b-44a2-b0af-a0b7fdab971f","start-time":"2026-04-17T06:00:00Z","completion-time":"0001-01-01T00:00:00Z"}}'
+  labels:
+    batch.kubernetes.io/controller-uid: c0dd500a-cd9b-44a2-b0af-a0b7fdab971f
+    batch.kubernetes.io/job-name: cluster-metrics-collector-29606760
+    controller-uid: c0dd500a-cd9b-44a2-b0af-a0b7fdab971f
+    job-name: cluster-metrics-collector-29606760
+  name: cluster-metrics-collector-29606760
+  namespace: monitoring
+  ownerReferences:
+  - apiVersion: batch/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: CronJob
+    name: cluster-metrics-collector
+spec:
+  activeDeadlineSeconds: 120
+  backoffLimit: 1
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: c0dd500a-cd9b-44a2-b0af-a0b7fdab971f
+  suspend: false
+  template:
+    metadata:
+      labels:
+        batch.kubernetes.io/controller-uid: c0dd500a-cd9b-44a2-b0af-a0b7fdab971f
+        batch.kubernetes.io/job-name: cluster-metrics-collector-29606760
+        controller-uid: c0dd500a-cd9b-44a2-b0af-a0b7fdab971f
+        job-name: cluster-metrics-collector-29606760
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - apk add --no-cache postgresql-client >/dev/null 2>&1 && python3 /scripts/collect.py
+        image: python:3.11-alpine
+        imagePullPolicy: IfNotPresent
+        name: collector
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /scripts
+          name: script
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 493
+          name: metrics-collector-script
+        name: script
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T15:15:00Z'
+  labels:
+    batch.kubernetes.io/controller-uid: 7753a1f7-3aa3-42e5-a283-e4a9d1665157
+    batch.kubernetes.io/job-name: cluster-metrics-collector-29610195
+    controller-uid: 7753a1f7-3aa3-42e5-a283-e4a9d1665157
+    job-name: cluster-metrics-collector-29610195
+  name: cluster-metrics-collector-29610195
+  namespace: monitoring
+  ownerReferences:
+  - apiVersion: batch/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: CronJob
+    name: cluster-metrics-collector
+spec:
+  activeDeadlineSeconds: 120
+  backoffLimit: 1
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 7753a1f7-3aa3-42e5-a283-e4a9d1665157
+  suspend: false
+  template:
+    metadata:
+      labels:
+        batch.kubernetes.io/controller-uid: 7753a1f7-3aa3-42e5-a283-e4a9d1665157
+        batch.kubernetes.io/job-name: cluster-metrics-collector-29610195
+        controller-uid: 7753a1f7-3aa3-42e5-a283-e4a9d1665157
+        job-name: cluster-metrics-collector-29610195
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - apk add --no-cache postgresql-client >/dev/null 2>&1 && python3 /scripts/collect.py
+        image: python:3.11-alpine
+        imagePullPolicy: IfNotPresent
+        name: collector
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /scripts
+          name: script
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 493
+          name: metrics-collector-script
+        name: script
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T15:20:00Z'
+  labels:
+    batch.kubernetes.io/controller-uid: 8eb753b0-b6ed-4111-b6d4-302e0235e8a2
+    batch.kubernetes.io/job-name: cluster-metrics-collector-29610200
+    controller-uid: 8eb753b0-b6ed-4111-b6d4-302e0235e8a2
+    job-name: cluster-metrics-collector-29610200
+  name: cluster-metrics-collector-29610200
+  namespace: monitoring
+  ownerReferences:
+  - apiVersion: batch/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: CronJob
+    name: cluster-metrics-collector
+spec:
+  activeDeadlineSeconds: 120
+  backoffLimit: 1
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: 8eb753b0-b6ed-4111-b6d4-302e0235e8a2
+  suspend: false
+  template:
+    metadata:
+      labels:
+        batch.kubernetes.io/controller-uid: 8eb753b0-b6ed-4111-b6d4-302e0235e8a2
+        batch.kubernetes.io/job-name: cluster-metrics-collector-29610200
+        controller-uid: 8eb753b0-b6ed-4111-b6d4-302e0235e8a2
+        job-name: cluster-metrics-collector-29610200
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - apk add --no-cache postgresql-client >/dev/null 2>&1 && python3 /scripts/collect.py
+        image: python:3.11-alpine
+        imagePullPolicy: IfNotPresent
+        name: collector
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /scripts
+          name: script
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 493
+          name: metrics-collector-script
+        name: script
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T15:25:00Z'
+  labels:
+    batch.kubernetes.io/controller-uid: f2f4708f-5352-4b9b-9f24-c70cc4aa6142
+    batch.kubernetes.io/job-name: cluster-metrics-collector-29610205
+    controller-uid: f2f4708f-5352-4b9b-9f24-c70cc4aa6142
+    job-name: cluster-metrics-collector-29610205
+  name: cluster-metrics-collector-29610205
+  namespace: monitoring
+  ownerReferences:
+  - apiVersion: batch/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: CronJob
+    name: cluster-metrics-collector
+spec:
+  activeDeadlineSeconds: 120
+  backoffLimit: 1
+  completionMode: NonIndexed
+  completions: 1
+  manualSelector: false
+  parallelism: 1
+  podReplacementPolicy: TerminatingOrFailed
+  selector:
+    matchLabels:
+      batch.kubernetes.io/controller-uid: f2f4708f-5352-4b9b-9f24-c70cc4aa6142
+  suspend: false
+  template:
+    metadata:
+      labels:
+        batch.kubernetes.io/controller-uid: f2f4708f-5352-4b9b-9f24-c70cc4aa6142
+        batch.kubernetes.io/job-name: cluster-metrics-collector-29610205
+        controller-uid: f2f4708f-5352-4b9b-9f24-c70cc4aa6142
+        job-name: cluster-metrics-collector-29610205
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - apk add --no-cache postgresql-client >/dev/null 2>&1 && python3 /scripts/collect.py
+        image: python:3.11-alpine
+        imagePullPolicy: IfNotPresent
+        name: collector
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /scripts
+          name: script
+      dnsPolicy: ClusterFirst
+      restartPolicy: Never
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 493
+          name: metrics-collector-script
+        name: script

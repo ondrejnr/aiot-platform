@@ -1,0 +1,70 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    metacontroller.k8s.io/last-applied-configuration: '{"apiVersion":"security.istio.io/v1beta1","kind":"AuthorizationPolicy","metadata":{"labels":{"controller-uid":"741b1f16-a29c-453d-9b51-db56a7ee96ad"},"name":"ml-pipeline-visualizationserver","namespace":"kubeflow-user-example-com"},"spec":{"rules":[{"from":[{"source":{"principals":["cluster.local/ns/kubeflow/sa/ml-pipeline"]}}]}],"selector":{"matchLabels":{"app":"ml-pipeline-visualizationserver"}}}}'
+  labels:
+    controller-uid: 741b1f16-a29c-453d-9b51-db56a7ee96ad
+  name: ml-pipeline-visualizationserver
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Namespace
+    name: kubeflow-user-example-com
+spec:
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/kubeflow/sa/ml-pipeline
+  selector:
+    matchLabels:
+      app: ml-pipeline-visualizationserver
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    role: admin
+    user: user@example.com
+  name: ns-owner-access-istio
+  namespace: kubeflow-user-example-com
+  ownerReferences:
+  - apiVersion: kubeflow.org/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Profile
+    name: kubeflow-user-example-com
+spec:
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
+        - cluster.local/ns/kubeflow/sa/ml-pipeline-ui
+    when:
+    - key: request.headers[kubeflow-userid]
+      values:
+      - user@example.com
+  - when:
+    - key: source.namespace
+      values:
+      - kubeflow-user-example-com
+  - to:
+    - operation:
+        paths:
+        - /healthz
+        - /metrics
+        - /wait-for-drain
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/kubeflow/sa/notebook-controller-service-account
+    to:
+    - operation:
+        methods:
+        - GET
+        paths:
+        - '*/api/kernels'

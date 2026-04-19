@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"emqx:emqx","ingressName":"emqx:emqx","hostname":"emqx.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: emqx
+  namespace: emqx
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: emqx.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: emqx
+            port:
+              number: 18083
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - emqx.35.241.255.137.nip.io
+    secretName: tls-emqx

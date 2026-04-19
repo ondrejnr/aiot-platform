@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"n8n:n8n","ingressName":"n8n:n8n","hostname":"n8n.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: n8n
+  namespace: n8n
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: n8n.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: n8n
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - n8n.35.241.255.137.nip.io
+    secretName: tls-n8n

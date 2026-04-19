@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"headlamp:headlamp","ingressName":"headlamp:headlamp","hostname":"headlamp.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+  name: headlamp
+  namespace: headlamp
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: headlamp.35.241.255.137.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: headlamp
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - headlamp.35.241.255.137.nip.io
+    secretName: tls-headlamp
