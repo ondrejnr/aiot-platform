@@ -1,19 +1,33 @@
 # aiot-platform
 
-> **AIoT cluster snapshot** — live manifests and configuration of an end-to-end platform for **industrial IoT data ingestion, AI/ML processing, and observability**. Exported from the running cluster as a source of truth for disaster recovery, audits, and documentation.
+> **Industrial AIoT platform** — an end-to-end system for **collecting, storing, and evaluating industrial sensor data with AI and large language models (LLMs)**. Field devices stream telemetry over MQTT, data is persisted and indexed, ML pipelines train and serve predictive-maintenance models, and a RAG-enabled LLM interface lets operators **ask questions about production data in natural language**.
 
----
+The platform was built to answer practical questions from the shop floor — *"Which machine is drifting out of spec?"*, *"What caused yesterday's anomaly?"*, *"Predict the remaining useful life of pump #12"* — by combining classical ML (trained in Kubeflow, served via KServe) with an LLM layer (Open-WebUI + Qdrant RAG) grounded in the platform's own operational data.
 
-## Purpose
+## Why this platform exists
 
-This repository is a **versioned, sanitized export** of the Kubernetes cluster that powers the AIoT platform.  
-It captures **everything** needed to rebuild the control plane and workloads on new infrastructure — manifests, CRDs, Helm releases, ingress topology, configuration management playbooks and cookbooks, backup definitions — while secrets and dynamic data are intentionally excluded (see [What is *not* here](#what-is-not-here)).
+Industrial data is useless unless it becomes a **decision**. AIoT is designed around that chain:
 
-The platform itself is designed around three pillars:
+1. **Collect** — MQTT ingestion from sensors and PLCs, retained in a time-series–friendly Postgres (CloudNativePG)
+2. **Enrich** — digital-twin service aligns raw telemetry with asset metadata; embeddings stored in Qdrant for semantic retrieval
+3. **Learn** — Kubeflow Pipelines train forward-looking models (predictive maintenance v2) on a weekly schedule; MLflow versions every experiment
+4. **Serve** — the best model is promoted and served by KServe/Knative with zero-downtime rollout
+5. **Ask** — operators and engineers interact with the whole system through an LLM chat (Open-WebUI) that uses RAG over platform data and can call the inference service as a tool
 
-1. **Edge → Cloud data pipeline** — MQTT ingestion, stream processing, time-series storage, digital twin
-2. **AI / ML stack** — model training (Kubeflow), experiment tracking (MLflow), inference serving (KServe), RAG (Qdrant + Open-WebUI + LLM)
-3. **Configuration & lifecycle management** — Chef Automate, Puppet Enterprise, Ansible/Semaphore, Jenkins CI, Velero DR
+Everything runs on a self-hosted, multi-cloud Kubernetes cluster (GCP + OCI), with **Chef Automate**, **Puppet Enterprise**, and **Ansible/Semaphore** keeping hosts and agents in a known state, and **Velero** guaranteeing disaster recovery to Cloudflare R2.
+
+## Self-operating cluster — K8sGPT
+
+A unique property of this platform is that the cluster **monitors and reasons about itself**. Namespace **`k8sgpt`** runs:
+
+- **K8sGPT Operator** — continuously analyses every namespace for misconfigurations, failing pods, broken probes, stuck PVCs, CrashLoopBackOff patterns, and RBAC gaps
+- **LLM-backed diagnostics** — findings are explained in plain English through an LLM (local or Groq), so an alert reads *"pod X is restarting because liveness probe targets an unreachable port — check service `Y`"* instead of a raw Kubernetes event
+- **Anomaly detector** (`k8sgpt-anomaly-detector`) — ML-based trend detection over metrics and logs
+- **Mattermost bot** (`k8sgpt-mm-bot`) — posts high-severity findings to the `#k8s` channel in Mattermost; engineers reply in the thread and the bot can run follow-up diagnostics
+- **Robusta bridge** (`k8sgpt-robusta-bridge`) — forwards events to Robusta for automated playbook execution (restart, scale, cordon, notify) when the diagnosis matches a known remediation
+- **Scheduled reports** — `ai-health-report` and `ai-log-analyzer` CronJobs produce daily summaries of cluster health; `monitoring-watchdog` keeps the pipeline itself alive
+
+The result is an **AI-supervised cluster**: the same LLM technology that answers operator questions about production data also watches the Kubernetes control plane and workloads, flags regressions, and can auto-remediate common issues.
 
 ---
 
