@@ -1,0 +1,50 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-04-17T17:29:04Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: vui
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: vui
+      app.kubernetes.io/version: 0.4.1
+      helm.sh/chart: vui-1.0.6
+    name: vui-tls
+    namespace: vui
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: vui-ingress
+      uid: 2bc1999d-a580-4779-abc7-33dfe270efa1
+    resourceVersion: "2541436"
+    uid: a85e6c88-0256-4d89-ad9d-c7263cf0738f
+  spec:
+    dnsNames:
+    - vui.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: vui-tls
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-17T17:29:53Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-16T16:31:20Z"
+    notBefore: "2026-04-17T16:31:21Z"
+    renewalTime: "2026-06-16T16:31:20Z"
+    revision: 1
+kind: List
+metadata:
+  resourceVersion: ""

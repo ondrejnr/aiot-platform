@@ -1,0 +1,83 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-04-14T09:51:17Z"
+    generation: 1
+    name: tls-chef
+    namespace: chef
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: chef
+      uid: de3707ce-a20b-4db1-9a7f-30cf82b61c02
+    resourceVersion: "274997"
+    uid: 2d1ebe17-513b-4e23-9fc4-adf69f9dbe24
+  spec:
+    dnsNames:
+    - chef.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-chef
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:29Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:57Z"
+    notBefore: "2026-04-14T08:53:58Z"
+    renewalTime: "2026-06-13T08:53:57Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-04-14T17:28:25Z"
+    generation: 1
+    name: tls-pe-console
+    namespace: chef
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: pe-console
+      uid: a5fa3785-d78d-47f3-9cd7-d785b1f5eb36
+    resourceVersion: "534338"
+    uid: e70c321d-2c51-4d81-8b9a-9f539c3a9f33
+  spec:
+    dnsNames:
+    - pe.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-pe-console
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T17:28:52Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T16:30:20Z"
+    notBefore: "2026-04-14T16:30:21Z"
+    renewalTime: "2026-06-13T16:30:20Z"
+    revision: 1
+kind: List
+metadata:
+  resourceVersion: ""

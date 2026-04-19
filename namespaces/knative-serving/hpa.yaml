@@ -1,0 +1,117 @@
+apiVersion: v1
+items:
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"activator","app.kubernetes.io/name":"knative-serving","app.kubernetes.io/version":"1.12.4"},"name":"activator","namespace":"knative-serving"},"spec":{"maxReplicas":20,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":100,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"activator"}}}
+    creationTimestamp: "2026-04-14T02:25:15Z"
+    labels:
+      app.kubernetes.io/component: activator
+      app.kubernetes.io/name: knative-serving
+      app.kubernetes.io/version: 1.12.4
+    name: activator
+    namespace: knative-serving
+    resourceVersion: "2843386"
+    uid: ff5b93a1-2c73-42f2-80c7-15bb6696546d
+  spec:
+    maxReplicas: 20
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 100
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: activator
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:25:30Z"
+      message: recommended size matches current size
+      reason: ReadyForNewScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-04-18T05:08:43Z"
+      message: the HPA was able to successfully calculate a replica count from cpu
+        resource utilization (percentage of request)
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-04-18T05:13:13Z"
+      message: the desired replica count is less than the minimum replica count
+      reason: TooFewReplicas
+      status: "True"
+      type: ScalingLimited
+    currentMetrics:
+    - resource:
+        current:
+          averageUtilization: 0
+          averageValue: 1m
+        name: cpu
+      type: Resource
+    currentReplicas: 1
+    desiredReplicas: 1
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"webhook","app.kubernetes.io/name":"knative-serving","app.kubernetes.io/version":"1.12.4"},"name":"webhook","namespace":"knative-serving"},"spec":{"maxReplicas":5,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":100,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"webhook"}}}
+    creationTimestamp: "2026-04-14T02:25:15Z"
+    labels:
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/name: knative-serving
+      app.kubernetes.io/version: 1.12.4
+    name: webhook
+    namespace: knative-serving
+    resourceVersion: "3733179"
+    uid: ac4f92c0-ea40-4e51-83aa-0359ca6a4768
+  spec:
+    maxReplicas: 5
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 100
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: webhook
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:25:30Z"
+      message: recommended size matches current size
+      reason: ReadyForNewScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-04-18T05:08:43Z"
+      message: the HPA was able to successfully calculate a replica count from cpu
+        resource utilization (percentage of request)
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-04-14T20:01:05Z"
+      message: the desired count is within the acceptable range
+      reason: DesiredWithinRange
+      status: "False"
+      type: ScalingLimited
+    currentMetrics:
+    - resource:
+        current:
+          averageUtilization: 3
+          averageValue: 3m
+        name: cpu
+      type: Resource
+    currentReplicas: 1
+    desiredReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,44 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-04-19T04:02:18Z"
+    generation: 1
+    name: tls-gitea
+    namespace: gitea
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: gitea
+      uid: c8fcfe17-a00c-412e-ad07-e501762f8516
+    resourceVersion: "3426627"
+    uid: 2a20b59a-a08a-43f2-bd7d-f9220b51a5b8
+  spec:
+    dnsNames:
+    - gitea.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-gitea
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-19T04:02:46Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-18T03:04:13Z"
+    notBefore: "2026-04-19T03:04:14Z"
+    renewalTime: "2026-06-18T03:04:13Z"
+    revision: 1
+kind: List
+metadata:
+  resourceVersion: ""

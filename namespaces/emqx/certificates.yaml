@@ -1,0 +1,44 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-04-14T09:51:18Z"
+    generation: 1
+    name: tls-emqx
+    namespace: emqx
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: emqx
+      uid: b546cebc-7188-46b6-8987-96263febb26f
+    resourceVersion: "274729"
+    uid: 5bbafbf8-5187-4923-8b21-69444eda5bfe
+  spec:
+    dnsNames:
+    - emqx.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-emqx
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:11Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:40Z"
+    notBefore: "2026-04-14T08:53:41Z"
+    renewalTime: "2026-06-13T08:53:40Z"
+    revision: 1
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,73 @@
+apiVersion: v1
+items:
+- apiVersion: policy/v1
+  kind: PodDisruptionBudget
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"policy/v1","kind":"PodDisruptionBudget","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"activator","app.kubernetes.io/name":"knative-serving","app.kubernetes.io/version":"1.12.4"},"name":"activator-pdb","namespace":"knative-serving"},"spec":{"minAvailable":"80%","selector":{"matchLabels":{"app":"activator"}}}}
+    creationTimestamp: "2026-04-14T02:25:15Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: activator
+      app.kubernetes.io/name: knative-serving
+      app.kubernetes.io/version: 1.12.4
+    name: activator-pdb
+    namespace: knative-serving
+    resourceVersion: "2831034"
+    uid: 0c6c1138-184f-4cc7-9f1e-99bc7879dfe9
+  spec:
+    minAvailable: 80%
+    selector:
+      matchLabels:
+        app: activator
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T21:22:20Z"
+      message: ""
+      observedGeneration: 1
+      reason: InsufficientPods
+      status: "False"
+      type: DisruptionAllowed
+    currentHealthy: 1
+    desiredHealthy: 1
+    disruptionsAllowed: 0
+    expectedPods: 1
+    observedGeneration: 1
+- apiVersion: policy/v1
+  kind: PodDisruptionBudget
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"policy/v1","kind":"PodDisruptionBudget","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"webhook","app.kubernetes.io/name":"knative-serving","app.kubernetes.io/version":"1.12.4"},"name":"webhook-pdb","namespace":"knative-serving"},"spec":{"minAvailable":"80%","selector":{"matchLabels":{"app":"webhook"}}}}
+    creationTimestamp: "2026-04-14T02:25:15Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/name: knative-serving
+      app.kubernetes.io/version: 1.12.4
+    name: webhook-pdb
+    namespace: knative-serving
+    resourceVersion: "2831022"
+    uid: 215a970c-9a24-4139-bb97-ab23128c2876
+  spec:
+    minAvailable: 80%
+    selector:
+      matchLabels:
+        app: webhook
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T20:15:38Z"
+      message: ""
+      observedGeneration: 1
+      reason: InsufficientPods
+      status: "False"
+      type: DisruptionAllowed
+    currentHealthy: 1
+    desiredHealthy: 1
+    disruptionsAllowed: 0
+    expectedPods: 1
+    observedGeneration: 1
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,44 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-04-14T09:44:59Z"
+    generation: 1
+    name: tls-headlamp
+    namespace: headlamp
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: headlamp
+      uid: 4810c08d-84b7-43b7-99f1-13c7bce9ca0d
+    resourceVersion: "270188"
+    uid: 019daa61-925e-4564-9bc6-ba586fe9246c
+  spec:
+    dnsNames:
+    - headlamp.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-headlamp
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:46:22Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:47:50Z"
+    notBefore: "2026-04-14T08:47:51Z"
+    renewalTime: "2026-06-13T08:47:50Z"
+    revision: 1
+kind: List
+metadata:
+  resourceVersion: ""

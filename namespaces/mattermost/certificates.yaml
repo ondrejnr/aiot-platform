@@ -1,0 +1,44 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    creationTimestamp: "2026-04-14T09:51:19Z"
+    generation: 1
+    name: tls-mattermost
+    namespace: mattermost
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: mattermost
+      uid: d10c912e-d336-4f99-a57c-a9a39f93c1ae
+    resourceVersion: "274981"
+    uid: 961c128e-04b9-430b-9277-b42820bd7173
+  spec:
+    dnsNames:
+    - mm.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-mattermost
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:29Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:57Z"
+    notBefore: "2026-04-14T08:53:58Z"
+    renewalTime: "2026-06-13T08:53:57Z"
+    revision: 1
+kind: List
+metadata:
+  resourceVersion: ""

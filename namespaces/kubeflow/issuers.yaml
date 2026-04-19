@@ -1,0 +1,99 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Issuer
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Issuer","metadata":{"annotations":{},"labels":{"app":"poddefaults","app.kubernetes.io/component":"poddefaults","app.kubernetes.io/name":"poddefaults","kustomize.component":"poddefaults"},"name":"admission-webhook-selfsigned-issuer","namespace":"kubeflow"},"spec":{"selfSigned":{}}}
+    creationTimestamp: "2026-04-14T02:30:29Z"
+    generation: 1
+    labels:
+      app: poddefaults
+      app.kubernetes.io/component: poddefaults
+      app.kubernetes.io/name: poddefaults
+      kustomize.component: poddefaults
+    name: admission-webhook-selfsigned-issuer
+    namespace: kubeflow
+    resourceVersion: "17319"
+    uid: ce72b47a-a9cb-49d9-9346-851095800364
+  spec:
+    selfSigned: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:30:29Z"
+      observedGeneration: 1
+      reason: IsReady
+      status: "True"
+      type: Ready
+- apiVersion: cert-manager.io/v1
+  kind: Issuer
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Issuer","metadata":{"annotations":{},"name":"katib-selfsigned-issuer","namespace":"kubeflow"},"spec":{"selfSigned":{}}}
+    creationTimestamp: "2026-04-14T02:30:28Z"
+    generation: 1
+    name: katib-selfsigned-issuer
+    namespace: kubeflow
+    resourceVersion: "17203"
+    uid: 737daf06-5835-4afc-bb22-097021784bd7
+  spec:
+    selfSigned: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:30:28Z"
+      observedGeneration: 1
+      reason: IsReady
+      status: "True"
+      type: Ready
+- apiVersion: cert-manager.io/v1
+  kind: Issuer
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Issuer","metadata":{"annotations":{},"labels":{"app":"cache-server-cert-manager"},"name":"kfp-cache-selfsigned-issuer","namespace":"kubeflow"},"spec":{"selfSigned":{}}}
+    creationTimestamp: "2026-04-14T02:26:43Z"
+    generation: 1
+    labels:
+      app: cache-server-cert-manager
+    name: kfp-cache-selfsigned-issuer
+    namespace: kubeflow
+    resourceVersion: "15162"
+    uid: 6081b188-9429-4dd2-a70d-c4e35c5b1521
+  spec:
+    selfSigned: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:26:43Z"
+      observedGeneration: 1
+      reason: IsReady
+      status: "True"
+      type: Ready
+- apiVersion: cert-manager.io/v1
+  kind: Issuer
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Issuer","metadata":{"annotations":{},"labels":{"app":"kserve","app.kubernetes.io/name":"kserve"},"name":"selfsigned-issuer","namespace":"kubeflow"},"spec":{"selfSigned":{}}}
+    creationTimestamp: "2026-04-14T02:27:24Z"
+    generation: 1
+    labels:
+      app: kserve
+      app.kubernetes.io/name: kserve
+    name: selfsigned-issuer
+    namespace: kubeflow
+    resourceVersion: "15695"
+    uid: 647288a1-743e-4d58-ab85-f3da0eaf3180
+  spec:
+    selfSigned: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:27:24Z"
+      observedGeneration: 1
+      reason: IsReady
+      status: "True"
+      type: Ready
+kind: List
+metadata:
+  resourceVersion: ""
