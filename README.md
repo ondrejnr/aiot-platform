@@ -1,5 +1,14 @@
 # aiot-platform
 
+![Kubernetes](https://img.shields.io/badge/kubernetes-v1.32.13-326ce5?logo=kubernetes&logoColor=white)
+![Nodes](https://img.shields.io/badge/nodes-6%20(3%20GCP%20%2B%203%20OCI)-success)
+![Namespaces](https://img.shields.io/badge/namespaces-41-blue)
+![Backup](https://img.shields.io/badge/velero-Cloudflare%20R2-f38020?logo=cloudflare&logoColor=white)
+![LLM](https://img.shields.io/badge/LLM-Open--WebUI%20%2B%20RAG-ff6f00)
+![K8sGPT](https://img.shields.io/badge/self--monitoring-K8sGPT-purple)
+![Config](https://img.shields.io/badge/config-Chef%20%7C%20Puppet%20%7C%20Ansible-red)
+![Status](https://img.shields.io/badge/status-production-brightgreen)
+
 > **Industrial AIoT platform** — an end-to-end system for **collecting, storing, and evaluating industrial sensor data with AI and large language models (LLMs)**. Field devices stream telemetry over MQTT, data is persisted and indexed, ML pipelines train and serve predictive-maintenance models, and a RAG-enabled LLM interface lets operators **ask questions about production data in natural language**.
 
 The platform was built to answer practical questions from the shop floor — *"Which machine is drifting out of spec?"*, *"What caused yesterday's anomaly?"*, *"Predict the remaining useful life of pump #12"* — by combining classical ML (trained in Kubeflow, served via KServe) with an LLM layer (Open-WebUI + Qdrant RAG) grounded in the platform's own operational data.
@@ -29,42 +38,149 @@ A unique property of this platform is that the cluster **monitors and reasons ab
 
 The result is an **AI-supervised cluster**: the same LLM technology that answers operator questions about production data also watches the Kubernetes control plane and workloads, flags regressions, and can auto-remediate common issues.
 
+```mermaid
+flowchart LR
+    subgraph K8S["☸️ Kubernetes cluster"]
+        EV[/"Events · Logs<br/>Metrics · Probes"/]
+    end
+
+    EV --> OP
+    subgraph K8SGPT["🤖 K8sGPT namespace"]
+        OP["K8sGPT Operator<br/>scans all namespaces"]
+        AN["Anomaly Detector<br/>ML on metrics"]
+        LLM{{"🧠 LLM<br/>Groq / local"}}
+        BR["Robusta bridge<br/>auto-remediation"]
+        BOT["Mattermost bot<br/>#k8s channel"]
+        RPT["Scheduled reports<br/>ai-health · ai-log"]
+    end
+
+    OP --> LLM
+    AN --> LLM
+    LLM -->|plain English<br/>diagnosis| BOT
+    LLM -->|match playbook| BR
+    LLM --> RPT
+    BR -.restart · scale · cordon.-> K8S
+    BOT <==>|human replies| ENG(["👷 Engineers"])
+
+    classDef k8s fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
+    classDef gpt fill:#f3e8ff,stroke:#7e22ce,color:#581c87
+    classDef llm fill:#fef2f2,stroke:#dc2626,color:#7f1d1d
+    class EV k8s
+    class OP,AN,BR,BOT,RPT gpt
+    class LLM llm
+```
+
 ---
 
 ## Platform at a glance
 
-```
-                      ┌───────────────────────────────────────────────┐
-                      │           Public entry (35.241.255.137)        │
-                      │       HAProxy (SNI → nginx-ingress on workers) │
-                      └───────────────────────────────────────────────┘
-                                             │
-         ┌──────────────────┬─────────────────┴──────────────────┬──────────────────┐
-         ▼                  ▼                                    ▼                  ▼
-  ┌────────────┐   ┌─────────────────┐            ┌────────────────────────┐  ┌──────────────┐
-  │ IoT layer  │   │  AI / ML layer  │            │   Platform services    │  │  Observability│
-  │            │   │                 │            │                        │  │              │
-  │  EMQX      │──▶│  Kubeflow       │            │  Chef Automate         │  │  SigNoz      │
-  │  (MQTT)    │   │  MLflow         │            │  Puppet Enterprise     │  │  Grafana     │
-  │  n8n       │   │  KServe         │            │  Jenkins + Gitea       │  │  Prometheus  │
-  │  pg-sink   │   │  Qdrant (RAG)   │            │  Semaphore (Ansible)   │  │  VictoriaM.  │
-  │  Digital   │   │  Open-WebUI     │            │  Velero (→ Cloudflare R2)│  │  ClickHouse │
-  │  Twin      │   │  Inference svc  │            │  Headlamp, Mattermost  │  │              │
-  └────────────┘   └─────────────────┘            └────────────────────────┘  └──────────────┘
-         │                  │                                    │                  │
-         └──────────────────┴────────────────────────────────────┴──────────────────┘
-                                             │
-                              ┌──────────────▼──────────────┐
-                              │   CloudNativePG (pg-ha)     │
-                              │   shared Postgres cluster   │
-                              │   aiot · mlflow · n8n       │
-                              │   mattermost · signoz · …   │
-                              └─────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph EDGE["🏭 EDGE / FIELD"]
+        S1[("📡<br/>Sensors<br/>PLCs")]
+        S2[("⚙️<br/>Simulator<br/>(aiot)")]
+    end
+
+    subgraph INGEST["📥 INGESTION"]
+        MQ[("EMQX<br/>MQTT broker")]
+        N8[("n8n<br/>flows")]
+        SINK[["pg-sink"]]
+    end
+
+    subgraph STORE["🗄️ STORAGE LAYER"]
+        PG[("CloudNativePG<br/>pg-ha · 3 replicas")]
+        QD[("Qdrant<br/>vectors / RAG")]
+    end
+
+    subgraph AI["🧠 AI / ML"]
+        KF[["Kubeflow Pipelines<br/>aiot-forward-maintenance-v2"]]
+        ML[("MLflow<br/>registry")]
+        KS[["KServe<br/>InferenceService"]]
+    end
+
+    subgraph LLM["💬 LLM LAYER"]
+        OW[["Open-WebUI<br/>chat"]]
+        RAG[["rag-worker<br/>+ indexer"]]
+    end
+
+    subgraph OPS["🛡️ SELF-OPERATING"]
+        KG{{"K8sGPT<br/>AI-supervised cluster"}}
+        MM[["Mattermost<br/>#k8s"]]
+    end
+
+    S1 & S2 -->|MQTT| MQ
+    MQ --> SINK
+    N8 --> SINK
+    SINK --> PG
+    PG --> KF
+    KF --> ML
+    ML --> KS
+    PG --> RAG
+    RAG --> QD
+    QD --> OW
+    KS -.tools.-> OW
+
+    KG -.watches.-> INGEST
+    KG -.watches.-> STORE
+    KG -.watches.-> AI
+    KG -.watches.-> LLM
+    KG ==alerts==> MM
+
+    classDef edge fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef ingest fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    classDef store fill:#e0e7ff,stroke:#4f46e5,color:#312e81
+    classDef ai fill:#fce7f3,stroke:#db2777,color:#831843
+    classDef llm fill:#fef2f2,stroke:#dc2626,color:#7f1d1d
+    classDef ops fill:#ecfdf5,stroke:#059669,color:#064e3b
+    class S1,S2 edge
+    class MQ,N8,SINK ingest
+    class PG,QD store
+    class KF,ML,KS ai
+    class OW,RAG llm
+    class KG,MM ops
 ```
 
 ---
 
 ## Cluster topology
+
+```mermaid
+flowchart TB
+    USER(["🌐 Internet users<br/>*.35.241.255.137.nip.io"])
+
+    subgraph GCP["☁️ GCP · europe-west1-b"]
+        HA{{"HAProxy<br/>SNI router"}}
+        M["🎛️ aiot-master<br/>control-plane<br/>10.132.0.2"]
+        W1["⚙️ aiot-worker-01<br/>10.132.0.3<br/>Chef · Puppet · PE"]
+        W2["⚙️ aiot-worker-02<br/>10.132.0.4<br/>pg-ha · storage"]
+    end
+
+    subgraph OCI["🔶 OCI · eu-frankfurt-1"]
+        O1["⚙️ oci-e5-node1<br/>172.16.200.10"]
+        O2["⚙️ oci-e5-node2<br/>172.16.200.11<br/>SigNoz · ClickHouse"]
+        O3["🧪 oci-test-node1<br/>172.16.200.12<br/>ML training"]
+    end
+
+    WG{{"🔐 WireGuard mesh"}}
+
+    USER --> HA
+    HA -->|80/443 SNI| W1
+    HA -->|80/443 SNI| W2
+    HA -->|SSH fallback| M
+
+    M <-.-> W1 & W2
+    M <==> WG
+    WG <==> O1 & O2 & O3
+
+    classDef gcp fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e
+    classDef oci fill:#fef3c7,stroke:#ea580c,color:#7c2d12
+    classDef tun fill:#f3e8ff,stroke:#9333ea,color:#581c87
+    classDef ext fill:#f3f4f6,stroke:#6b7280
+    class M,W1,W2,HA gcp
+    class O1,O2,O3 oci
+    class WG tun
+    class USER ext
+```
 
 | Node             | Role           | IP (internal)         | OS                | Location              |
 | ---------------- | -------------- | --------------------- | ----------------- | --------------------- |
@@ -122,6 +238,44 @@ The AIoT workflow moves sensor data from the edge all the way to trained, versio
 
 ## Configuration management
 
+```mermaid
+flowchart TB
+    subgraph HOSTS["🖥️ All 6 cluster nodes"]
+        H[" "]
+    end
+
+    subgraph PUPPET["🎩 Puppet Enterprise (desired state)"]
+        direction LR
+        P1["Packages · kernel<br/>sysctl · systemd"]
+        P2["Agents: noop=true<br/>Patch Mgmt group"]
+    end
+
+    subgraph CHEF["🍴 Chef Automate (compliance)"]
+        direction LR
+        C1["InSpec scans<br/>Automate reporting"]
+        C2["chef-webhook<br/>→ Mattermost + Grafana"]
+    end
+
+    subgraph ANS["🟣 Ansible via Semaphore (operations)"]
+        direction LR
+        A1["Health · uptime · disk"]
+        A2["Firewall audit<br/>Reboot planner<br/>Cert check"]
+    end
+
+    PUPPET -->|host-level state| H
+    CHEF -->|compliance + events| H
+    ANS -->|ad-hoc operations| H
+
+    classDef p fill:#fef2f2,stroke:#dc2626,color:#7f1d1d
+    classDef c fill:#fff7ed,stroke:#ea580c,color:#7c2d12
+    classDef a fill:#faf5ff,stroke:#9333ea,color:#581c87
+    classDef h fill:#f1f5f9,stroke:#475569
+    class P1,P2 p
+    class C1,C2 c
+    class A1,A2 a
+    class H h
+```
+
 ### Chef Automate — `chef`, `chef-webhook`
 
 - **Chef Automate** runs **outside Kubernetes**, as a systemd service (`chef-automate.service`) on `aiot-worker-01`, exposed on port `8443` and published under `chef.35.241.255.137.nip.io`
@@ -157,6 +311,35 @@ The AIoT workflow moves sensor data from the edge all the way to trained, versio
 ## Backup & disaster recovery — `velero`, `vui`, `etcd-backup`
 
 Backup is a **first-class concern** because `local-path` storage has no replication.
+
+```mermaid
+flowchart LR
+    CL["☸️ Cluster<br/>manifests + PVCs"]
+    V[["Velero<br/>daily 03:00"]]
+    KOPIA[["Kopia<br/>FS backup"]]
+    ETCD[["etcd-backup<br/>CronJob"]]
+    R2[("☁️ Cloudflare R2<br/>s3://aiot-velero")]
+    VUI{{"Velero UI<br/>vui.*"}}
+
+    CL --> V
+    CL --> KOPIA
+    CL --> ETCD
+    V --> R2
+    KOPIA --> R2
+    ETCD --> R2
+    VUI -.browse.-> R2
+
+    R2 ==restore==> NEW["🆕 New cluster<br/>rebuilt from this repo"]
+
+    classDef src fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    classDef tool fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef store fill:#ffedd5,stroke:#ea580c,color:#7c2d12
+    classDef new fill:#dcfce7,stroke:#16a34a,color:#14532d
+    class CL src
+    class V,KOPIA,ETCD,VUI tool
+    class R2 store
+    class NEW new
+```
 
 ### Velero
 
