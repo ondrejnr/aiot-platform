@@ -24,15 +24,6 @@ spec:
       labels:
         app: mattermost
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: In
-                values:
-                - oci-e5-node1
       containers:
       - env:
         - name: MM_SQLSETTINGS_DRIVERNAME
