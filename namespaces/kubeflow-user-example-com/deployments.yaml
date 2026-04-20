@@ -718,14 +718,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - aiot-worker-01
-                - aiot-worker-02
-            weight: 100
+                - oci-e5-node1
       containers:
       - image: gcr.io/ml-pipeline/visualization-server:2.3.0
         imagePullPolicy: IfNotPresent

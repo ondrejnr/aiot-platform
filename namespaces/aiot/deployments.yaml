@@ -68,6 +68,16 @@ spec:
           defaultMode: 420
           name: api-gateway-code
         name: code
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aiot-worker-02
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -219,6 +229,16 @@ spec:
           defaultMode: 420
           name: digital-twin-code
         name: code
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aiot-worker-02
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -387,6 +407,16 @@ spec:
           defaultMode: 420
           name: ngrok-proxy-code
         name: code
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aiot-worker-02
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -784,6 +814,16 @@ spec:
           defaultMode: 420
           name: qdrant-indexer-code
         name: code
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aiot-worker-02
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -915,3 +955,13 @@ spec:
           defaultMode: 420
           name: sensor-sim
         name: code
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aiot-worker-02

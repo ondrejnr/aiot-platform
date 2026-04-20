@@ -63,6 +63,16 @@ spec:
       serviceAccount: meta-controller-service
       serviceAccountName: meta-controller-service
       terminationGracePeriodSeconds: 30
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - oci-e5-node1
   updateStrategy:
     rollingUpdate:
       partition: 0

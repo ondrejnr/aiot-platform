@@ -690,14 +690,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - args:
         - --port=8080
@@ -769,14 +768,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - args:
         - --metrics-addr=127.0.0.1:8080
@@ -901,14 +899,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - envFrom:
         - configMapRef:
@@ -1258,14 +1255,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - env:
         - name: NAMESPACE_TO_WATCH
@@ -1558,6 +1554,16 @@ spec:
       serviceAccount: ml-pipeline
       serviceAccountName: ml-pipeline
       terminationGracePeriodSeconds: 30
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - oci-e5-node1
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1672,14 +1678,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - env:
         - name: NAMESPACE
@@ -1875,14 +1880,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - env:
         - name: NAMESPACE
@@ -1941,14 +1945,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - image: gcr.io/ml-pipeline/visualization-server:2.3.0
         imagePullPolicy: IfNotPresent
@@ -2094,14 +2097,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - command:
         - /manager
@@ -2205,14 +2207,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - command:
         - /access-management
@@ -2338,14 +2339,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - args:
         - --health-probe-bind-address=:8081
@@ -2452,14 +2452,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - env:
         - name: APP_PREFIX
@@ -2621,14 +2620,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
                 - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
       containers:
       - env:
         - name: APP_PREFIX
