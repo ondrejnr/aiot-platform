@@ -639,14 +639,13 @@ spec:
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
+          - weight: 100
+            preference:
               matchExpressions:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - aiot-worker-01
                 - aiot-worker-02
-            weight: 100
       containers:
       - env:
         - name: MINIO_ACCESS_KEY

@@ -77,7 +77,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - aiot-worker-02
+                - aiot-worker-01
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -238,7 +238,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - aiot-worker-02
+                - aiot-worker-01
 ---
 apiVersion: apps/v1
 kind: Deployment

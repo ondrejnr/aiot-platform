@@ -774,7 +774,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - oci-e5-node1
+                - oci-e5-node2
       containers:
       - args:
         - --metrics-addr=127.0.0.1:8080
@@ -905,7 +905,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - oci-e5-node1
+                - oci-e5-node2
       containers:
       - envFrom:
         - configMapRef:
@@ -1840,6 +1840,16 @@ spec:
           defaultMode: 420
           name: ml-pipeline-ui-configmap
         name: config-volume
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aiot-worker-02
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1886,7 +1896,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - oci-e5-node1
+                - oci-e5-node2
       containers:
       - env:
         - name: NAMESPACE
@@ -2103,7 +2113,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - oci-e5-node1
+                - oci-e5-node2
       containers:
       - command:
         - /manager
@@ -2345,7 +2355,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - oci-e5-node1
+                - oci-e5-node2
       containers:
       - args:
         - --health-probe-bind-address=:8081
@@ -2458,7 +2468,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - oci-e5-node1
+                - oci-e5-node2
       containers:
       - env:
         - name: APP_PREFIX
@@ -2626,7 +2636,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - oci-e5-node1
+                - oci-e5-node2
       containers:
       - env:
         - name: APP_PREFIX
