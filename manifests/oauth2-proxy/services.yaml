@@ -1,0 +1,32 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"oauth2-proxy","namespace":"oauth2-proxy"},"spec":{"ports":[{"name":"http","port":80,"targetPort":"http"}],"publishNotReadyAddresses":true,"selector":{"app.kubernetes.io/name":"oauth2-proxy"},"type":"ClusterIP"}}
+    name: oauth2-proxy
+    namespace: oauth2-proxy
+  spec:
+    clusterIP: 10.106.31.143
+    clusterIPs:
+    - 10.106.31.143
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    publishNotReadyAddresses: true
+    selector:
+      app.kubernetes.io/name: oauth2-proxy
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:

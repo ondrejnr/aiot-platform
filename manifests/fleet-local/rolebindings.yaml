@@ -1,0 +1,84 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      cluster.cattle.io/name: local
+      cluster.cattle.io/namespace: fleet-local
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/5yST4+bMBDFv0o1Z0wbyF+kXtpDD71F7anqYWwG4sbYyB6omojvXhmIhLTJKrtHxHt+83szV2iIsURGKK6A1jpG1s6G+KlMF5h8qpDZUKrdR4sNQQHGKTSQPBCEFlVUVYaIxU3r5B9SHIhTr93CoUsoADs+ida7XvSZUJ6l8M6Q1LbUtn7F7P5a8qLuz1BAgxZrasjyQtDnyYfv2pafv06jHp2hH9S0Bpm+PPn8ElosoMT4+yn7rZKpjCEBg5LMWHJEv6QvmxxbmBLek33CcIICaJNt90qqVb5W1Wq3yTEnpVBWinKkw/bwKVtvKqriTDOn8reMB6ki874vt662EibXvY0PCcQdHqkaKVv9zbuuhQK8RJVGauf1ZTy29LwPqXaQwFnbeA5xS3BnoLmlGX5IIHQTPhS/3prxM4z9zRmdaNxul/9j5jUMv4f/AQAA//9KJNohGAMAAA
+      objectset.rio.cattle.io/id: auth-prov-v2-crtb-rolebinding
+      objectset.rio.cattle.io/owner-gvk: management.cattle.io/v3, Kind=ClusterRoleTemplateBinding
+      objectset.rio.cattle.io/owner-name: local-fleet-local-owner
+      objectset.rio.cattle.io/owner-namespace: local
+    finalizers:
+    - wrangler.cattle.io/auth-prov-v2-rb
+    labels:
+      authz.cluster.cattle.io/crtb-owner: local-fleet-local-owner
+      objectset.rio.cattle.io/hash: e5268cbc134cf1753a3eccabfce3ae9690245fef
+    name: crt-local-local-fleet-local-owner-2rrvd6ognb
+    namespace: fleet-local
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: crt-local-cluster-owner
+  subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: u-mo773yttt4
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      cluster.cattle.io/name: local
+      cluster.cattle.io/namespace: fleet-local
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/5SSQY+bMBSE/0r1zpiSkIQEqZf20ENvUXuqenjYD3AxNrUNbRPx31cGoo2U7Co5Is143nzDGVryKNAj5GdArY1HL4124ZOr3nmyMUfvFcXSfNTYEuSgDEcF0RsC1yEPqlIReXbRmuI3ce/Ix1aaK4cUkAP2vmadNQMb1oxbXzBrFBVSC6mrd8zmrybLqqGBHFrUWFFL2l8JhjT68E1q8enLfOrRKPpObafQ0+cHn19K96zY/Glqp5U8MRSt1A85LzRmDmMECgtSE9/Q+hTfQpwATC88G1ujqyEHflhlh4PIRJryndhu9tlW7BJKBKWISbIut1m6KfkqnLO043aZit0GMvPvvxRV7dMBZsO9iccIwmhHKqdunfxqTd9BDrZAHoeuxsrT9HfFzd7F0kAEjdRh/zAL3LllYbPAGCNw/dwc8p/PZvxwZF8zrlvC+Gt8CQAA//9o9mw+CQMAAA
+      objectset.rio.cattle.io/id: auth-prov-v2-crtb-rolebinding
+      objectset.rio.cattle.io/owner-gvk: management.cattle.io/v3, Kind=ClusterRoleTemplateBinding
+      objectset.rio.cattle.io/owner-name: u-b4qkhsnliz-admin
+      objectset.rio.cattle.io/owner-namespace: local
+    finalizers:
+    - wrangler.cattle.io/auth-prov-v2-rb
+    labels:
+      authz.cluster.cattle.io/crtb-owner: u-b4qkhsnliz-admin
+      objectset.rio.cattle.io/hash: c91799d7d33c6d54875d60e0de3aa002f5734fc1
+    name: crt-local-u-b4qkhsnliz-admin-oxyidght3v
+    namespace: fleet-local
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: crt-local-cluster-owner
+  subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: u-b4qkhsnliz
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/5RTTavUMBT9K3LXbe0007624EIUXLgQRnAjLm6S05k4maQm6SgO89+lfR88xcq4KTThnHs+bi50QmLNiam/EDvnEyfjXZx/vfwKlSJSEYwvFKdkURj/0mjqSdkpJoQ8YG9iCguKslWM/+4Q8v35SD0NFkjP7s4btuOBN9mL98bpV2/umXf/Q+z4BOop4NuEmPJzXVU/bgLFkRUeNeXWK7Z0zciyhF1C+FPsiR3vMSeQwoR/zDhwPFBP3Ay6FCXkpoSUSqIUuqq56dpa6Fa3jWhVvVVinrriYk1nRouPHQYEOIVI/ecL8Wg+IcQ5tfWoKSNpvTp+mAnewmJJuR/YRmSkvEvBW4vwdHQ0bvb8925WdE/LorS1ACvU+V1ZId/qcpvzoGTeaFF1nS6FUC1dv1wzCt5ih2HZxNG8C34aZ1bJquApHXwwP5eJxbGNhfH0pGrnLdZkXDOK031FSzwPkI8IZ6PwWik/ubQCzm/S/ntBj+/iWVEP3w0L3dzpktuumw3/CgAA//8JdL93fAMAAA
+      objectset.rio.cattle.io/id: cluster-registration
+      objectset.rio.cattle.io/owner-gvk: fleet.cattle.io/v1alpha1, Kind=ClusterRegistration
+      objectset.rio.cattle.io/owner-name: request-v522x
+      objectset.rio.cattle.io/owner-namespace: fleet-local
+    labels:
+      fleet.cattle.io/managed: "true"
+      objectset.rio.cattle.io/hash: a6fd030eb10ebbcbe03d25a69853d8d8638c54c3
+    name: request-v522x
+    namespace: fleet-local
+    ownerReferences:
+    - apiVersion: fleet.cattle.io/v1alpha1
+      blockOwnerDeletion: false
+      controller: false
+      kind: ClusterRegistration
+      name: request-v522x
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: request-v522x
+  subjects:
+  - kind: ServiceAccount
+    name: request-v522x-853eace5-702e-4d04-afcb-6d3299d033c8
+    namespace: cluster-fleet-local-local-1a3d67d0a899
+kind: List
+metadata:

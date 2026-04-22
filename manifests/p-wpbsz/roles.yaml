@@ -1,0 +1,24 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: cluster-owner
+    namespace: p-wpbsz
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projectroletemplatebindings
+    verbs:
+    - '*'
+  - apiGroups:
+    - ""
+    resources:
+    - secrets
+    verbs:
+    - '*'
+kind: List
+metadata:

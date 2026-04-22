@@ -1,0 +1,313 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      internal.kpt.dev/upstream-identifier: rbac.authorization.k8s.io|RoleBinding|default|argo-binding
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{"internal.kpt.dev/upstream-identifier":"rbac.authorization.k8s.io|RoleBinding|default|argo-binding"},"labels":{"application-crd-id":"kubeflow-pipelines"},"name":"argo-binding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"argo-role"},"subjects":[{"kind":"ServiceAccount","name":"argo","namespace":"kubeflow"}]}
+    labels:
+      application-crd-id: kubeflow-pipelines
+    name: argo-binding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: argo-role
+  subjects:
+  - kind: ServiceAccount
+    name: argo
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app":"centraldashboard","app.kubernetes.io/component":"centraldashboard","app.kubernetes.io/name":"centraldashboard","kustomize.component":"centraldashboard"},"name":"centraldashboard","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"centraldashboard"},"subjects":[{"kind":"ServiceAccount","name":"centraldashboard","namespace":"kubeflow"}]}
+    labels:
+      app: centraldashboard
+      app.kubernetes.io/component: centraldashboard
+      app.kubernetes.io/name: centraldashboard
+      kustomize.component: centraldashboard
+    name: centraldashboard
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: centraldashboard
+  subjects:
+  - kind: ServiceAccount
+    name: centraldashboard
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app":"jupyter-web-app","kustomize.component":"jupyter-web-app"},"name":"jupyter-web-app-jupyter-notebook-role-binding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"jupyter-web-app-jupyter-notebook-role"},"subjects":[{"kind":"ServiceAccount","name":"jupyter-notebook"}]}
+    labels:
+      app: jupyter-web-app
+      kustomize.component: jupyter-web-app
+    name: jupyter-web-app-jupyter-notebook-role-binding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: jupyter-web-app-jupyter-notebook-role
+  subjects:
+  - kind: ServiceAccount
+    name: jupyter-notebook
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app":"kserve","app.kubernetes.io/name":"kserve"},"name":"kserve-leader-election-rolebinding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"kserve-leader-election-role"},"subjects":[{"kind":"ServiceAccount","name":"kserve-controller-manager","namespace":"kubeflow"}]}
+    labels:
+      app: kserve
+      app.kubernetes.io/name: kserve
+    name: kserve-leader-election-rolebinding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: kserve-leader-election-role
+  subjects:
+  - kind: ServiceAccount
+    name: kserve-controller-manager
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app":"cache-server","app.kubernetes.io/component":"ml-pipeline","app.kubernetes.io/name":"kubeflow-pipelines","application-crd-id":"kubeflow-pipelines"},"name":"kubeflow-pipelines-cache-binding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"kubeflow-pipelines-cache-role"},"subjects":[{"kind":"ServiceAccount","name":"kubeflow-pipelines-cache","namespace":"kubeflow"}]}
+    labels:
+      app: cache-server
+      app.kubernetes.io/component: ml-pipeline
+      app.kubernetes.io/name: kubeflow-pipelines
+      application-crd-id: kubeflow-pipelines
+    name: kubeflow-pipelines-cache-binding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: kubeflow-pipelines-cache-role
+  subjects:
+  - kind: ServiceAccount
+    name: kubeflow-pipelines-cache
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"ml-pipeline","app.kubernetes.io/name":"kubeflow-pipelines","application-crd-id":"kubeflow-pipelines"},"name":"kubeflow-pipelines-metadata-writer-binding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"kubeflow-pipelines-metadata-writer-role"},"subjects":[{"kind":"ServiceAccount","name":"kubeflow-pipelines-metadata-writer","namespace":"kubeflow"}]}
+    labels:
+      app.kubernetes.io/component: ml-pipeline
+      app.kubernetes.io/name: kubeflow-pipelines
+      application-crd-id: kubeflow-pipelines
+    name: kubeflow-pipelines-metadata-writer-binding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: kubeflow-pipelines-metadata-writer-role
+  subjects:
+  - kind: ServiceAccount
+    name: kubeflow-pipelines-metadata-writer
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app":"ml-pipeline","app.kubernetes.io/component":"ml-pipeline","app.kubernetes.io/name":"kubeflow-pipelines","application-crd-id":"kubeflow-pipelines"},"name":"ml-pipeline","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"ml-pipeline"},"subjects":[{"kind":"ServiceAccount","name":"ml-pipeline","namespace":"kubeflow"}]}
+    labels:
+      app: ml-pipeline
+      app.kubernetes.io/component: ml-pipeline
+      app.kubernetes.io/name: kubeflow-pipelines
+      application-crd-id: kubeflow-pipelines
+    name: ml-pipeline
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: ml-pipeline
+  subjects:
+  - kind: ServiceAccount
+    name: ml-pipeline
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"ml-pipeline","app.kubernetes.io/name":"kubeflow-pipelines","application-crd-id":"kubeflow-pipelines"},"name":"ml-pipeline-persistenceagent-binding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"ml-pipeline-persistenceagent-role"},"subjects":[{"kind":"ServiceAccount","name":"ml-pipeline-persistenceagent","namespace":"kubeflow"}]}
+    labels:
+      app.kubernetes.io/component: ml-pipeline
+      app.kubernetes.io/name: kubeflow-pipelines
+      application-crd-id: kubeflow-pipelines
+    name: ml-pipeline-persistenceagent-binding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: ml-pipeline-persistenceagent-role
+  subjects:
+  - kind: ServiceAccount
+    name: ml-pipeline-persistenceagent
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"ml-pipeline","app.kubernetes.io/name":"kubeflow-pipelines","application-crd-id":"kubeflow-pipelines"},"name":"ml-pipeline-scheduledworkflow-binding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"ml-pipeline-scheduledworkflow-role"},"subjects":[{"kind":"ServiceAccount","name":"ml-pipeline-scheduledworkflow","namespace":"kubeflow"}]}
+    labels:
+      app.kubernetes.io/component: ml-pipeline
+      app.kubernetes.io/name: kubeflow-pipelines
+      application-crd-id: kubeflow-pipelines
+    name: ml-pipeline-scheduledworkflow-binding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: ml-pipeline-scheduledworkflow-role
+  subjects:
+  - kind: ServiceAccount
+    name: ml-pipeline-scheduledworkflow
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app":"ml-pipeline-ui","app.kubernetes.io/component":"ml-pipeline","app.kubernetes.io/name":"kubeflow-pipelines","application-crd-id":"kubeflow-pipelines"},"name":"ml-pipeline-ui","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"ml-pipeline-ui"},"subjects":[{"kind":"ServiceAccount","name":"ml-pipeline-ui","namespace":"kubeflow"}]}
+    labels:
+      app: ml-pipeline-ui
+      app.kubernetes.io/component: ml-pipeline
+      app.kubernetes.io/name: kubeflow-pipelines
+      application-crd-id: kubeflow-pipelines
+    name: ml-pipeline-ui
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: ml-pipeline-ui
+  subjects:
+  - kind: ServiceAccount
+    name: ml-pipeline-ui
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"ml-pipeline","app.kubernetes.io/name":"kubeflow-pipelines","application-crd-id":"kubeflow-pipelines"},"name":"ml-pipeline-viewer-crd-binding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"ml-pipeline-viewer-controller-role"},"subjects":[{"kind":"ServiceAccount","name":"ml-pipeline-viewer-crd-service-account","namespace":"kubeflow"}]}
+    labels:
+      app.kubernetes.io/component: ml-pipeline
+      app.kubernetes.io/name: kubeflow-pipelines
+      application-crd-id: kubeflow-pipelines
+    name: ml-pipeline-viewer-crd-binding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: ml-pipeline-viewer-controller-role
+  subjects:
+  - kind: ServiceAccount
+    name: ml-pipeline-viewer-crd-service-account
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app":"notebook-controller","kustomize.component":"notebook-controller"},"name":"notebook-controller-leader-election-rolebinding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"notebook-controller-leader-election-role"},"subjects":[{"kind":"ServiceAccount","name":"notebook-controller-service-account","namespace":"kubeflow"}]}
+    labels:
+      app: notebook-controller
+      kustomize.component: notebook-controller
+    name: notebook-controller-leader-election-rolebinding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: notebook-controller-leader-election-role
+  subjects:
+  - kind: ServiceAccount
+    name: notebook-controller-service-account
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"ml-pipeline","app.kubernetes.io/name":"kubeflow-pipelines","application-crd-id":"kubeflow-pipelines"},"name":"pipeline-runner-binding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"pipeline-runner"},"subjects":[{"kind":"ServiceAccount","name":"pipeline-runner","namespace":"kubeflow"}]}
+    labels:
+      app.kubernetes.io/component: ml-pipeline
+      app.kubernetes.io/name: kubeflow-pipelines
+      application-crd-id: kubeflow-pipelines
+    name: pipeline-runner-binding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: pipeline-runner
+  subjects:
+  - kind: ServiceAccount
+    name: pipeline-runner
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    name: pod-executor-namespaced
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: k8up-executor
+  subjects:
+  - kind: ServiceAccount
+    name: pod-executor
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"kustomize.component":"profiles"},"name":"profiles-leader-election-rolebinding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"profiles-leader-election-role"},"subjects":[{"kind":"ServiceAccount","name":"profiles-controller-service-account","namespace":"kubeflow"}]}
+    labels:
+      kustomize.component: profiles
+    name: profiles-leader-election-rolebinding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: profiles-leader-election-role
+  subjects:
+  - kind: ServiceAccount
+    name: profiles-controller-service-account
+    namespace: kubeflow
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app":"tensorboard-controller","kustomize.component":"tensorboard-controller"},"name":"tensorboard-controller-leader-election-rolebinding","namespace":"kubeflow"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"tensorboard-controller-leader-election-role"},"subjects":[{"kind":"ServiceAccount","name":"tensorboard-controller-controller-manager","namespace":"kubeflow"}]}
+    labels:
+      app: tensorboard-controller
+      kustomize.component: tensorboard-controller
+    name: tensorboard-controller-leader-election-rolebinding
+    namespace: kubeflow
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: tensorboard-controller-leader-election-role
+  subjects:
+  - kind: ServiceAccount
+    name: tensorboard-controller-controller-manager
+    namespace: kubeflow
+kind: List
+metadata:

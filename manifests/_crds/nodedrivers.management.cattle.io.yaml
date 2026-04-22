@@ -1,0 +1,598 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      io.cattle.nodedriver/ui-field-hints: '{"sshKeyContents":{"type":"multiline"},"userdata":{"type":"multiline"}}'
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      nodedriver.cattle.io/file-to-field-aliases: sshKeyContents:sshKeypath,userdata:userdata
+      privateCredentialFields: secretKey
+      publicCredentialFields: accessKey
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: amazonec2
+  spec:
+    active: true
+    addCloudCredential: true
+    builtin: true
+    displayName: amazonec2
+    url: local://
+    whitelistDomains:
+    - iam.amazonaws.com
+    - iam.us-gov.amazonaws.com
+    - iam.%.amazonaws.com.cn
+    - iam.global.api.aws
+    - ec2.%.amazonaws.com
+    - ec2.%.amazonaws.com.cn
+    - ec2.%.api.aws
+    - eks.%.amazonaws.com
+    - eks.%.amazonaws.com.cn
+    - eks.%.api.aws
+    - kms.%.amazonaws.com
+    - kms.%.amazonaws.com.cn
+    - kms.%.api.aws
+  status:
+    appliedDockerMachineVersion: |
+      rancher-machine version v0.15.0-rancher137, build 89f3079
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:15Z"
+      status: "True"
+      type: Downloaded
+    - lastUpdateTime: "2026-04-19T20:51:15Z"
+      status: "True"
+      type: Installed
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      io.cattle.nodedriver/ui-field-hints: '{"customData":{"type":"multiline"}}'
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      nodedriver.cattle.io/file-to-field-aliases: customData:customData
+      optionalCredentialFields: tenantId
+      privateCredentialFields: clientSecret
+      publicCredentialFields: clientId,subscriptionId,tenantId,environment
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: azure
+  spec:
+    active: true
+    addCloudCredential: true
+    builtin: true
+    displayName: azure
+    url: local://
+  status:
+    appliedDockerMachineVersion: |
+      rancher-machine version v0.15.0-rancher137, build 89f3079
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: Downloaded
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: Installed
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: cloudca
+  spec:
+    active: false
+    checksum: 1757e2b807b0fea4a38eade4e961bcc609853986a44a99a4e86a37ccea1f7679
+    displayName: cloudca
+    uiUrl: https://objects-east.cloud.ca/v1/5ef827605f884961b94881e928e7a250/ui-driver-cloudca/v2.1.2/component.js
+    url: https://github.com/cloud-ca/docker-machine-driver-cloudca/files/2446837/docker-machine-driver-cloudca_v2.0.0_linux-amd64.zip
+    whitelistDomains:
+    - objects-east.cloud.ca
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: cloudscale
+  spec:
+    active: false
+    checksum: e33fbd6c2f87b1c470bcb653cc8aa50baf914a9d641a2f18f86a07c398cfb544
+    displayName: cloudscale
+    uiUrl: https://objects.rma.cloudscale.ch/cloudscale-rancher-v2-ui-driver/component.js
+    url: https://github.com/cloudscale-ch/docker-machine-driver-cloudscale/releases/download/v1.2.0/docker-machine-driver-cloudscale_v1.2.0_linux_amd64.tar.gz
+    whitelistDomains:
+    - objects.rma.cloudscale.ch
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      io.cattle.nodedriver/ui-field-hints: '{"sshKeyContents":{"type":"multiline"},"userdata":{"type":"multiline"}}'
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      nodedriver.cattle.io/file-to-field-aliases: sshKeyContents:sshKeyPath,userdata:userdata
+      privateCredentialFields: accessToken
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: digitalocean
+  spec:
+    active: true
+    builtin: true
+    displayName: digitalocean
+    url: local://
+    whitelistDomains:
+    - api.digitalocean.com
+  status:
+    appliedDockerMachineVersion: |
+      rancher-machine version v0.15.0-rancher137, build 89f3079
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:15Z"
+      status: "True"
+      type: Downloaded
+    - lastUpdateTime: "2026-04-19T20:51:15Z"
+      status: "True"
+      type: Installed
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      nodedriver.cattle.io/file-to-field-aliases: sshKey:sshKey,userdata:userdata
+      privateCredentialFields: apiSecretKey
+      publicCredentialFields: apiKey
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: exoscale
+  spec:
+    active: false
+    builtin: true
+    displayName: exoscale
+    url: local://
+    whitelistDomains:
+    - api.exoscale.ch
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      io.cattle.nodedriver/ui-field-hints: '{"authEncodedJson":{"type":"multiline"},"userdata":{"type":"multiline"}}'
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      nodedriver.cattle.io/file-to-field-aliases: authEncodedJson:authEncodedJson,userdata:userdata
+      privateCredentialFields: authEncodedJson
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: google
+  spec:
+    active: false
+    addCloudCredential: true
+    builtin: true
+    displayName: google
+    url: local://
+  status:
+    appliedDockerMachineVersion: |
+      rancher-machine version v0.15.0-rancher137, build 89f3079
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:15Z"
+      status: "True"
+      type: Downloaded
+    - lastUpdateTime: "2026-04-19T20:51:15Z"
+      status: "True"
+      type: Installed
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      defaults: clusterType:imported
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      optionalCredentialFields: clusterId
+      privateCredentialFields: kubeconfigContent
+      publicCredentialFields: clusterType,clusterId
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: harvester
+  spec:
+    active: true
+    builtin: true
+    checksum: 60a23fe77af75ceca84a0217e17e97a39ffa039c54c3f7871f3609159abe070e
+    displayName: harvester
+    url: https://github.com/harvester/docker-machine-driver-harvester/releases/download/v1.0.4/docker-machine-driver-harvester-amd64.tar.gz
+    whitelistDomains:
+    - github.com
+  status:
+    appliedDockerMachineVersion: |
+      rancher-machine version v0.15.0-rancher137, build 89f3079
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: Downloaded
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: Installed
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      passwordFields: rootPass
+      privateCredentialFields: token
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: linode
+  spec:
+    active: true
+    builtin: true
+    checksum: 26a71dbbc2f5249a66716cad586c3b4048d3cd9e67c0527442c374dd5dcf1c41
+    displayName: linode
+    uiUrl: /assets/rancher-ui-driver-linode/component.js
+    url: https://github.com/linode/docker-machine-driver-linode/releases/download/v0.1.15/docker-machine-driver-linode_linux-amd64.zip
+    whitelistDomains:
+    - api.linode.com
+  status:
+    appliedDockerMachineVersion: |
+      rancher-machine version v0.15.0-rancher137, build 89f3079
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:10Z"
+      status: "True"
+      type: Downloaded
+    - lastUpdateTime: "2026-04-19T20:51:10Z"
+      status: "True"
+      type: Installed
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      privateCredentialFields: password
+      publicCredentialFields: endpoint,username,port
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: nutanix
+  spec:
+    active: false
+    checksum: ad18a0150f37e6cf0aef99a529f9541be72daa9e6dc3dad835d095d44e600f6a
+    displayName: nutanix
+    uiUrl: https://nutanix.github.io/rancher-ui-driver/v3.8.0/component.js
+    url: https://github.com/nutanix/docker-machine/releases/download/v3.8.0/docker-machine-driver-nutanix
+    whitelistDomains:
+    - nutanix.github.io
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      passwordFields: privateKeyPassphrase
+      privateCredentialFields: privateKeyContents
+      publicCredentialFields: tenancyId,userId,fingerprint
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: oci
+  spec:
+    active: false
+    checksum: 0a1afa6a0af85ecf3d77cc554960e36e1be5fd12b22b0155717b9289669e4021
+    displayName: oci
+    url: https://github.com/rancher-plugins/rancher-machine-driver-oci/releases/download/v1.3.0/docker-machine-driver-oci-linux
+    whitelistDomains:
+    - '*.oraclecloud.com'
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      nodedriver.cattle.io/file-to-field-aliases: cacert:cacert,privateKeyFile:privateKeyFile,userDataFile:userDataFile
+      privateCredentialFields: password
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: openstack
+  spec:
+    active: false
+    builtin: true
+    displayName: openstack
+    url: local://
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      nodedriver.cattle.io/file-to-field-aliases: privateKeyFile:privateKeyFile
+      privateCredentialFields: secretKey,password,token
+      publicCredentialFields: accessKey,username
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: otc
+  spec:
+    active: false
+    checksum: 2151670a96e3ee71aedcfb5a1b73804a4772c3f9ca7f714f2a572d3868a648d1
+    displayName: otc
+    uiUrl: https://otc-rancher.obs.eu-de.otc.t-systems.com/node/ui/1.0.2/component.js
+    url: https://otc-rancher.obs.eu-de.otc.t-systems.com/node/driver/0.3.3/docker-machine-driver-otc_0.3.3_linux_amd64.tar.gz
+    whitelistDomains:
+    - '*.otc.t-systems.com'
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      privateCredentialFields: secretKey
+      publicCredentialFields: accessKey,region
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: outscale
+  spec:
+    active: false
+    checksum: bb539ed4e2b0f1a1083b29cbdbab59bde3efed0a3145fefc0b2f47026c48bfe0
+    displayName: outscale
+    uiUrl: https://oos.eu-west-2.outscale.com/rancher-ui-driver-outscale/v0.2.0/component.js
+    url: https://github.com/outscale/docker-machine-driver-outscale/releases/download/v0.2.0/docker-machine-driver-outscale_0.2.0_linux_amd64.zip
+    whitelistDomains:
+    - oos.eu-west-2.outscale.com
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      nodedriver.cattle.io/file-to-field-aliases: userdata:userdata
+      privateCredentialFields: apiKey
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: packet
+  spec:
+    active: false
+    checksum: fad5e551a35d2ef2db742b07ca6d61bb9c9b574d322d3000f0c557d5fb90a734
+    displayName: packet
+    uiUrl: https://rancher-drivers.equinixmetal.net/1.0.2/component.js
+    url: https://github.com/equinix/docker-machine-driver-metal/releases/download/v0.6.0/docker-machine-driver-metal_linux-amd64.zip
+    whitelistDomains:
+    - api.packet.net
+    - api.equinix.com
+    - rancher-drivers.equinixmetal.net
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      privateCredentialFields: clientSecret
+      publicCredentialFields: clientIdentifier
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: pnap
+  spec:
+    active: false
+    checksum: 5847599c24c137975fd190747a15ad4db9529ae35059b60e5f8bc9a470d55229
+    displayName: pnap
+    url: https://github.com/phoenixnap/docker-machine-driver-pnap/releases/download/v0.5.1/docker-machine-driver-pnap_0.5.1_linux_amd64.zip
+    whitelistDomains:
+    - api.securedservers.com
+    - api.phoenixnap.com
+    - auth.phoenixnap.com
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      privateCredentialFields: apiKey
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: rackspace
+  spec:
+    active: false
+    builtin: true
+    displayName: rackspace
+    url: local://
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      privateCredentialFields: apiKey
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: softlayer
+  spec:
+    active: false
+    builtin: true
+    displayName: softlayer
+    url: local://
+  status:
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+- apiVersion: management.cattle.io/v3
+  kind: NodeDriver
+  metadata:
+    annotations:
+      defaults: vcenterPort:443
+      io.cattle.nodedriver/ui-field-hints: '{"cloudConfig":{"type":"multiline"}}'
+      lifecycle.cattle.io/create.node-driver-controller: "true"
+      nodedriver.cattle.io/file-to-field-aliases: cloudConfig:cloud-config
+      privateCredentialFields: password
+      publicCredentialFields: username,vcenter,vcenterPort
+    finalizers:
+    - controller.cattle.io/node-driver-controller
+    labels:
+      cattle.io/creator: norman
+    name: vmwarevsphere
+  spec:
+    active: true
+    builtin: true
+    displayName: vmwarevsphere
+    url: local://
+  status:
+    appliedDockerMachineVersion: |
+      rancher-machine version v0.15.0-rancher137, build 89f3079
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:15Z"
+      status: "True"
+      type: Downloaded
+    - lastUpdateTime: "2026-04-19T20:51:15Z"
+      status: "True"
+      type: Installed
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Active
+    - lastUpdateTime: "2026-04-19T20:51:16Z"
+      status: "True"
+      type: Inactive
+kind: List
+metadata:

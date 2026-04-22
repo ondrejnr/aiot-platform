@@ -1,0 +1,79 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"monitoring:prometheus-kube-prometheus-prometheus","ingressName":"monitoring:prometheus","hostname":"prometheus.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{},"name":"prometheus","namespace":"monitoring"},"spec":{"ingressClassName":"nginx","rules":[{"host":"prometheus.35.241.255.137.nip.io","http":{"paths":[{"backend":{"service":{"name":"prometheus-kube-prometheus-prometheus","port":{"number":9090}}},"path":"/","pathType":"Prefix"}]}}]}}
+    name: prometheus
+    namespace: monitoring
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: prometheus.35.241.255.137.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: prometheus-kube-prometheus-prometheus
+              port:
+                number: 9090
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - prometheus.35.241.255.137.nip.io
+      secretName: tls-prometheus
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 35.241.255.137
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"monitoring:prometheus-grafana","ingressName":"monitoring:prometheus-grafana","hostname":"grafana.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"grafana","app.kubernetes.io/version":"12.4.2","helm.sh/chart":"grafana-11.6.0"},"name":"prometheus-grafana","namespace":"monitoring"},"spec":{"ingressClassName":"nginx","rules":[{"host":"grafana.35.241.255.137.nip.io","http":{"paths":[{"backend":{"service":{"name":"prometheus-grafana","port":{"number":80}}},"path":"/","pathType":"Prefix"}]}}]}}
+      meta.helm.sh/release-name: prometheus
+      meta.helm.sh/release-namespace: monitoring
+      nginx.ingress.kubernetes.io/proxy-body-size: 50m
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/server-snippet: location = /login { return 302 /;
+        }
+    labels:
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/version: 12.4.2
+      helm.sh/chart: grafana-11.6.0
+    name: prometheus-grafana
+    namespace: monitoring
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: grafana.35.241.255.137.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: prometheus-grafana
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - grafana.35.241.255.137.nip.io
+      secretName: tls-grafana
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 35.241.255.137
+kind: List
+metadata:

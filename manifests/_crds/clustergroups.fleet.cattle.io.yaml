@@ -1,0 +1,54 @@
+apiVersion: v1
+items:
+- apiVersion: fleet.cattle.io/v1alpha1
+  kind: ClusterGroup
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4yQTY7bMAyFr1Jo7aR182cb6KLIsl3NDRiJjjmRSUOiEwSB7z6Qncn8YDLIjiK/9/ioi2lRwYGCqS4GmEVBSTimp+ye0WpEnQeSuQVVj3OSn+RMZWqPqDPr+6gYTHYXlhNjmO2PB1OZLsiRIgkT798hxzz78Y/Y/dk+6MbQoqmMFwv+ITh2YPEWetINmfGwQ//tqQ3EJul+QwFlWZZQrDDP67pYrFdLXOcW7QI2Rb7clPWu3iTTaziHNfRezdS4EyB2aNP6iB6tSkh1C2qb/7dkH24dhiRS0H6cXX9/Kz2rqX5lxlHsPJxNdUlBhJ8Q3Hn7mQoYpQ8Wx85o5DBSQDfiI9JSjMT7qRZHNaEbHyz6RknoGuDrJNzaPR9YTjzWJyD923V+0qf0fdtCOH+59dViGIaXAAAA//8lXw3tmQIAAA
+      objectset.rio.cattle.io/id: fleet-cluster
+      objectset.rio.cattle.io/owner-gvk: provisioning.cattle.io/v1, Kind=Cluster
+      objectset.rio.cattle.io/owner-name: local
+      objectset.rio.cattle.io/owner-namespace: fleet-local
+    labels:
+      objectset.rio.cattle.io/hash: f2a8a9999a85e11ff83654e61cec3a781479fbf7
+    name: default
+    namespace: fleet-local
+  spec:
+    selector:
+      matchLabels:
+        name: local
+  status:
+    clusterCount: 1
+    conditions:
+    - lastUpdateTime: "2026-04-19T21:46:57Z"
+      message: WaitApplied(1) [Bundle fleet-agent-local]
+      status: "False"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:51:08Z"
+      status: "True"
+      type: Processed
+    display:
+      readyBundles: 0/1
+      readyClusters: 0/1 (local)
+      state: WaitApplied
+    nonReadyClusterCount: 1
+    nonReadyClusters:
+    - local
+    resourceCounts:
+      desiredReady: 0
+      missing: 0
+      modified: 0
+      notReady: 0
+      orphaned: 0
+      ready: 0
+      unknown: 0
+      waitApplied: 0
+    summary:
+      desiredReady: 1
+      nonReadyResources:
+      - bundleState: WaitApplied
+        name: fleet-agent-local
+      ready: 0
+      waitApplied: 1
+kind: List
+metadata:

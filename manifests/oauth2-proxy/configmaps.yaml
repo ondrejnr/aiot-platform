@@ -1,0 +1,161 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: oauth2-proxy
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: oauth2-proxy
+- apiVersion: v1
+  data:
+    oauth2_proxy.cfg: |
+      provider = "oidc"
+      oidc_issuer_url = "https://kubeflow.35.241.255.137.nip.io/dex"
+      scope = "profile email groups openid"
+      email_domains = [ "*" ]
+
+      upstreams = [ "static://200" ]
+
+      skip_auth_routes = [
+        "^/dex/",
+      ]
+
+      api_routes = [
+        "/api/",
+        "/apis/",
+        "^/ml_metadata",
+      ]
+
+      skip_oidc_discovery = true
+      login_url = "/dex/auth"
+      redeem_url = "http://dex.auth.svc.cluster.local:5556/dex/token"
+      oidc_jwks_url = "http://dex.auth.svc.cluster.local:5556/dex/keys"
+
+      # CHANGED: false = ext-authz deny redirects to /oauth2/sign_in (no CSRF cookie in ext-authz response)
+      # then /oauth2/start sets CSRF cookie via normal VirtualService route (more reliable)
+      skip_provider_button = false
+
+      provider_display_name = "Dex"
+      custom_sign_in_logo = "/custom-theme/kubeflow-logo.svg"
+      banner = "-"
+      footer = "-"
+
+      prompt = "none"
+
+      set_authorization_header = true
+      set_xauthrequest = true
+
+      cookie_name = "oauth2_proxy_kubeflow"
+      cookie_expire = "24h"
+      cookie_refresh = 0
+
+      code_challenge_method = "S256"
+
+      # Unique CSRF cookie per auth flow to prevent collision
+      cookie_csrf_per_request = false
+      cookie_csrf_expire = "15m"
+
+      redirect_url = "/oauth2/callback"
+      relative_redirect_url = true
+      reverse_proxy = true
+      cookie_secure = true
+      cookie_samesite = "lax"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"oauth2_proxy.cfg":"provider = \"oidc\"\noidc_issuer_url = \"https://kubeflow.35.241.255.137.nip.io/dex\"\nscope = \"profile email groups openid\"\nemail_domains = [ \"*\" ]\n\nupstreams = [ \"static://200\" ]\n\nskip_auth_routes = [\n  \"^/dex/\",\n]\n\napi_routes = [\n  \"/api/\",\n  \"/apis/\",\n  \"^/ml_metadata\",\n]\n\nskip_oidc_discovery = true\nlogin_url = \"/dex/auth\"\nredeem_url = \"http://dex.auth.svc.cluster.local:5556/dex/token\"\noidc_jwks_url = \"http://dex.auth.svc.cluster.local:5556/dex/keys\"\n\n# CHANGED: false = ext-authz deny redirects to /oauth2/sign_in (no CSRF cookie in ext-authz response)\n# then /oauth2/start sets CSRF cookie via normal VirtualService route (more reliable)\nskip_provider_button = false\n\nprovider_display_name = \"Dex\"\ncustom_sign_in_logo = \"/custom-theme/kubeflow-logo.svg\"\nbanner = \"-\"\nfooter = \"-\"\n\nprompt = \"none\"\n\nset_authorization_header = true\nset_xauthrequest = true\n\ncookie_name = \"oauth2_proxy_kubeflow\"\ncookie_expire = \"24h\"\ncookie_refresh = 0\n\ncode_challenge_method = \"S256\"\n\n# Unique CSRF cookie per auth flow to prevent collision\ncookie_csrf_per_request = false\ncookie_csrf_expire = \"15m\"\n\nredirect_url = \"/oauth2/callback\"\nrelative_redirect_url = true\nreverse_proxy = true\ncookie_secure = true\ncookie_samesite = \"lax\"\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":"2026-04-14T02:31:36Z","name":"oauth2-proxy-hk55gm96k4","namespace":"oauth2-proxy","resourceVersion":"3120303","uid":"cd6682f7-bd9e-4fda-a895-8fd3c1538444"}}
+    name: oauth2-proxy-hk55gm96k4
+    namespace: oauth2-proxy
+- apiVersion: v1
+  data:
+    ALLOW_SELF_SIGNED_ISSUER: "true"
+    ENABLE_M2M_TOKENS: "true"
+    EXTRA_JWT_ISSUERS: ""
+    FORCE_HTTPS: "true"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"ALLOW_SELF_SIGNED_ISSUER":"true","ENABLE_M2M_TOKENS":"true","EXTRA_JWT_ISSUERS":"","FORCE_HTTPS":"false"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"oauth2-proxy-parameters-74659b6648","namespace":"oauth2-proxy"}}
+    name: oauth2-proxy-parameters-74659b6648
+    namespace: oauth2-proxy
+- apiVersion: v1
+  data:
+    kubeflow-logo.svg: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <svg width="256" height="256" version="1.1" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+       <g transform="matrix(.85002 0 0 .85002 10.306 11.309)" data-name="Layer 2">
+        <g data-name="Layer 1">
+         <path d="m95.9 62.15 4.1 102.1 73.75-94.12a6.79 6.79 0 0 1 9.6-1.11l46 36.92-15-65.61z" fill="#4279f4"/>
+         <path d="m102.55 182.98h65.42l-40.17-32.23z" fill="#0028aa"/>
+         <path d="m180.18 83.92-44 56.14 46.88 37.61 44.47-55.76z" fill="#014bd1"/>
+         <path d="m83.56 52.3 0.01-0.01 38.69-48.52-62.39 30.05-15.41 67.51z" fill="#bedcff"/>
+         <path d="m45.32 122.05 41.44 51.96-3.95-98.98z" fill="#6ca1ff"/>
+         <path d="m202.31 28.73-59.66-28.73-37.13 46.56z" fill="#a1c3ff"/>
+         <path d="m1.6 272v-44.78h5.74v23.41l20.48-23.41h6.4l-17.39 19.7 19 25.07h-6.73l-15.92-20.8-5.84 6.65v14.16zm40.02-9.79v-22.21h5.43v22.39a4.67 4.67 0 0 0 2.35 4.19 11 11 0 0 0 11 0 4.69 4.69 0 0 0 2.33-4.19v-22.39h5.43v22.19a9.08 9.08 0 0 1-4.1 7.87 16.2 16.2 0 0 1-18.37 0 9.07 9.07 0 0 1-4.07-7.85zm35.84 9.79v-48h5.43v16.81a29.29 29.29 0 0 1 9.32-1.73 13.1 13.1 0 0 1 6.2 1.41 10.71 10.71 0 0 1 4.18 3.74 18.07 18.07 0 0 1 2.23 5.06 21.26 21.26 0 0 1 0.73 5.58q0 8.43-4.38 12.79t-13.82 4.34zm5.43-4.87h4.55q6.77 0 9.72-2.95t3-9.51a14.21 14.21 0 0 0-2-7.52 6.55 6.55 0 0 0-6-3.22 24.73 24.73 0 0 0-9.25 1.54zm29.47-11.19q0-7.71 4.09-12.3a13.75 13.75 0 0 1 10.8-4.59q13.35 0 13.36 18.86h-22.82a12.3 12.3 0 0 0 2.9 7.07q2.59 3.11 7.9 3.1a24.92 24.92 0 0 0 10.55-2v5a27.74 27.74 0 0 1-9.86 1.87 19.83 19.83 0 0 1-7.7-1.37 13.31 13.31 0 0 1-5.28-3.76 16.21 16.21 0 0 1-3-5.38 20.84 20.84 0 0 1-0.94-6.5zm5.62-2.12h17.26a14.91 14.91 0 0 0-2.37-7.12 6.44 6.44 0 0 0-5.62-2.78 8.2 8.2 0 0 0-6.21 2.72 12.07 12.07 0 0 0-3.04 7.18z" fill="#4279f4" stroke="#4279f4" stroke-miterlimit="10" stroke-width="3.2"/>
+         <path d="m147.32 244.89v-4.89h5v-7.59a8.14 8.14 0 0 1 2.31-6.05 7.79 7.79 0 0 1 5.69-2.28h7.86v4.92h-5c-2.21 0-3.67 0.45-4.37 1.34s-1.06 2.55-1.06 5v4.66h8.46v4.87h-8.46v27.13h-5.44v-27.1zm27.94 27.11v-48h5.43v48zm19.15-3.95a17.86 17.86 0 1 1 12.33 4.9 16.57 16.57 0 0 1-12.33-4.9zm3.84-20.65a13.16 13.16 0 0 0 0 17.2 12.07 12.07 0 0 0 17 0 13.09 13.09 0 0 0 0-17.2 12.07 12.07 0 0 0-17 0zm30.2-7.4h5.75l7.3 25.32 7.43-25.32h5.36l7.34 25.34 7.37-25.34h5.74l-10.04 32h-6.12l-6.83-24.58-6.75 24.58h-6.47z" fill="#0028aa" stroke="#0028aa" stroke-miterlimit="10" stroke-width="3.2"/>
+        </g>
+       </g>
+      </svg>
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"kubeflow-logo.svg":"\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\n\u003csvg width=\"256\" height=\"256\" version=\"1.1\" viewBox=\"0 0 256 256\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n \u003cg transform=\"matrix(.85002 0 0 .85002 10.306 11.309)\" data-name=\"Layer 2\"\u003e\n  \u003cg data-name=\"Layer 1\"\u003e\n   \u003cpath d=\"m95.9 62.15 4.1 102.1 73.75-94.12a6.79 6.79 0 0 1 9.6-1.11l46 36.92-15-65.61z\" fill=\"#4279f4\"/\u003e\n   \u003cpath d=\"m102.55 182.98h65.42l-40.17-32.23z\" fill=\"#0028aa\"/\u003e\n   \u003cpath d=\"m180.18 83.92-44 56.14 46.88 37.61 44.47-55.76z\" fill=\"#014bd1\"/\u003e\n   \u003cpath d=\"m83.56 52.3 0.01-0.01 38.69-48.52-62.39 30.05-15.41 67.51z\" fill=\"#bedcff\"/\u003e\n   \u003cpath d=\"m45.32 122.05 41.44 51.96-3.95-98.98z\" fill=\"#6ca1ff\"/\u003e\n   \u003cpath d=\"m202.31 28.73-59.66-28.73-37.13 46.56z\" fill=\"#a1c3ff\"/\u003e\n   \u003cpath d=\"m1.6 272v-44.78h5.74v23.41l20.48-23.41h6.4l-17.39 19.7 19 25.07h-6.73l-15.92-20.8-5.84 6.65v14.16zm40.02-9.79v-22.21h5.43v22.39a4.67 4.67 0 0 0 2.35 4.19 11 11 0 0 0 11 0 4.69 4.69 0 0 0 2.33-4.19v-22.39h5.43v22.19a9.08 9.08 0 0 1-4.1 7.87 16.2 16.2 0 0 1-18.37 0 9.07 9.07 0 0 1-4.07-7.85zm35.84 9.79v-48h5.43v16.81a29.29 29.29 0 0 1 9.32-1.73 13.1 13.1 0 0 1 6.2 1.41 10.71 10.71 0 0 1 4.18 3.74 18.07 18.07 0 0 1 2.23 5.06 21.26 21.26 0 0 1 0.73 5.58q0 8.43-4.38 12.79t-13.82 4.34zm5.43-4.87h4.55q6.77 0 9.72-2.95t3-9.51a14.21 14.21 0 0 0-2-7.52 6.55 6.55 0 0 0-6-3.22 24.73 24.73 0 0 0-9.25 1.54zm29.47-11.19q0-7.71 4.09-12.3a13.75 13.75 0 0 1 10.8-4.59q13.35 0 13.36 18.86h-22.82a12.3 12.3 0 0 0 2.9 7.07q2.59 3.11 7.9 3.1a24.92 24.92 0 0 0 10.55-2v5a27.74 27.74 0 0 1-9.86 1.87 19.83 19.83 0 0 1-7.7-1.37 13.31 13.31 0 0 1-5.28-3.76 16.21 16.21 0 0 1-3-5.38 20.84 20.84 0 0 1-0.94-6.5zm5.62-2.12h17.26a14.91 14.91 0 0 0-2.37-7.12 6.44 6.44 0 0 0-5.62-2.78 8.2 8.2 0 0 0-6.21 2.72 12.07 12.07 0 0 0-3.04 7.18z\" fill=\"#4279f4\" stroke=\"#4279f4\" stroke-miterlimit=\"10\" stroke-width=\"3.2\"/\u003e\n   \u003cpath d=\"m147.32 244.89v-4.89h5v-7.59a8.14 8.14 0 0 1 2.31-6.05 7.79 7.79 0 0 1 5.69-2.28h7.86v4.92h-5c-2.21 0-3.67 0.45-4.37 1.34s-1.06 2.55-1.06 5v4.66h8.46v4.87h-8.46v27.13h-5.44v-27.1zm27.94 27.11v-48h5.43v48zm19.15-3.95a17.86 17.86 0 1 1 12.33 4.9 16.57 16.57 0 0 1-12.33-4.9zm3.84-20.65a13.16 13.16 0 0 0 0 17.2 12.07 12.07 0 0 0 17 0 13.09 13.09 0 0 0 0-17.2 12.07 12.07 0 0 0-17 0zm30.2-7.4h5.75l7.3 25.32 7.43-25.32h5.36l7.34 25.34 7.37-25.34h5.74l-10.04 32h-6.12l-6.83-24.58-6.75 24.58h-6.47z\" fill=\"#0028aa\" stroke=\"#0028aa\" stroke-miterlimit=\"10\" stroke-width=\"3.2\"/\u003e\n  \u003c/g\u003e\n \u003c/g\u003e\n\u003c/svg\u003e\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"oauth2-proxy-theme-5t624ft8b8","namespace":"oauth2-proxy"}}
+    name: oauth2-proxy-theme-5t624ft8b8
+    namespace: oauth2-proxy
+kind: List
+metadata:

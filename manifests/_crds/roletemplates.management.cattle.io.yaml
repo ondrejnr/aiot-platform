@@ -1,0 +1,1984 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Kubernetes admin
+  external: true
+  hidden: true
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: admin
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: Manage Cluster Backups
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: backups-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - etcdbackups
+    verbs:
+    - '*'
+- administrative: true
+  apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: Kubernetes cluster-admin
+  external: true
+  hidden: true
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: cluster-admin
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: Cluster Member
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: cluster-member
+  rules:
+  - apiGroups:
+    - ui.cattle.io
+    resources:
+    - navlinks
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusterroletemplatebindings
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projects
+    verbs:
+    - create
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - nodes
+    - nodepools
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - nodes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - storage.k8s.io
+    resources:
+    - storageclasses
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - apiregistration.k8s.io
+    resources:
+    - apiservices
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusterevents
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - clusterrepos
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resourceNames:
+    - local
+    resources:
+    - clusters
+    verbs:
+    - get
+  - apiGroups:
+    - cluster.x-k8s.io
+    resources:
+    - machines
+    verbs:
+    - get
+    - watch
+  - apiGroups:
+    - cluster.x-k8s.io
+    resources:
+    - machinedeployments
+    verbs:
+    - get
+    - watch
+  - apiGroups:
+    - rke-machine-config.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - get
+    - watch
+  - apiGroups:
+    - rke-machine.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - get
+    - watch
+  - apiGroups:
+    - metrics.k8s.io
+    resources:
+    - nodemetrics
+    - nodes
+    verbs:
+    - get
+    - list
+    - watch
+- administrative: true
+  apiVersion: management.cattle.io/v3
+  builtin: true
+  clusterCreatorDefault: true
+  context: cluster
+  description: ""
+  displayName: Cluster Owner
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      authz.management.cattle.io/bootstrapped-role: "true"
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: cluster-owner
+  rules:
+  - apiGroups:
+    - '*'
+    resources:
+    - '*'
+    verbs:
+    - '*'
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusters
+    verbs:
+    - own
+  - apiGroups:
+    - provisioning.cattle.io
+    resources:
+    - clusters
+    verbs:
+    - '*'
+  - apiGroups:
+    - rke.cattle.io
+    resources:
+    - etcdsnapshots
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - cluster.x-k8s.io
+    resources:
+    - machines
+    verbs:
+    - '*'
+  - apiGroups:
+    - rke-machine-config.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - '*'
+  - apiGroups:
+    - rke-machine.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - '*'
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projects
+    verbs:
+    - updatepsa
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusterproxyconfigs
+    verbs:
+    - '*'
+  - nonResourceURLs:
+    - '*'
+    verbs:
+    - '*'
+- administrative: true
+  apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: Manage Cluster Catalogs
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: clustercatalogs-manage
+  rules:
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - clusterrepos
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: View Cluster Catalogs
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: clustercatalogs-view
+  rules:
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - clusterrepos
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: Manage Cluster Members
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: clusterroletemplatebindings-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusterroletemplatebindings
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: View Cluster Members
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: clusterroletemplatebindings-view
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusterroletemplatebindings
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Manage Config Maps
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: configmaps-manage
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - configmaps
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Config Maps
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: configmaps-view
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - configmaps
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Create Namespaces
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: create-ns
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - namespaces
+    verbs:
+    - create
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Kubernetes edit
+  external: true
+  hidden: true
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: edit
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Manage Ingress
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: ingress-manage
+  rules:
+  - apiGroups:
+    - extensions
+    resources:
+    - ingresses
+    verbs:
+    - '*'
+  - apiGroups:
+    - networking.k8s.io
+    resources:
+    - ingresses
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Ingress
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: ingress-view
+  rules:
+  - apiGroups:
+    - extensions
+    resources:
+    - ingresses
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - networking.k8s.io
+    resources:
+    - ingresses
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Monitoring
+  external: true
+  externalRules:
+  - apiGroups:
+    - ""
+    resourceNames:
+    - http:rancher-monitoring-prometheus:9090
+    - https:rancher-monitoring-prometheus:9090
+    - http:rancher-monitoring-alertmanager:9093
+    - https:rancher-monitoring-alertmanager:9093
+    - http:rancher-monitoring-grafana:80
+    - https:rancher-monitoring-grafana:80
+    resources:
+    - services/proxy
+    verbs:
+    - get
+    - create
+  - apiGroups:
+    - ""
+    resourceNames:
+    - rancher-monitoring-prometheus
+    - rancher-monitoring-alertmanager
+    - rancher-monitoring-grafana
+    resources:
+    - endpoints
+    verbs:
+    - list
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: monitoring-ui-view
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: Manage Navlinks
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: navlinks-manage
+  rules:
+  - apiGroups:
+    - ui.cattle.io
+    resources:
+    - navlinks
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Navlinks
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: navlinks-view
+  rules:
+  - apiGroups:
+    - ui.cattle.io
+    resources:
+    - navlinks
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: Manage Nodes
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: nodes-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - nodes
+    - nodepools
+    verbs:
+    - '*'
+  - apiGroups:
+    - ""
+    resources:
+    - nodes
+    verbs:
+    - '*'
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clustermonitorgraphs
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - cluster.x-k8s.io
+    resources:
+    - machines
+    verbs:
+    - '*'
+  - apiGroups:
+    - cluster.x-k8s.io
+    resources:
+    - machinedeployments
+    verbs:
+    - '*'
+  - apiGroups:
+    - rke-machine-config.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - '*'
+  - apiGroups:
+    - rke-machine.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: View Nodes
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: nodes-view
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - nodes
+    - nodepools
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - nodes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clustermonitorgraphs
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - cluster.x-k8s.io
+    resources:
+    - machines
+    verbs:
+    - get
+    - watch
+  - apiGroups:
+    - cluster.x-k8s.io
+    resources:
+    - machinedeployments
+    verbs:
+    - get
+    - watch
+  - apiGroups:
+    - rke-machine-config.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - get
+    - watch
+  - apiGroups:
+    - rke-machine.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - get
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Manage Volumes
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: persistentvolumeclaims-manage
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - storage.k8s.io
+    resources:
+    - storageclasses
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumeclaims
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Volumes
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: persistentvolumeclaims-view
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - storage.k8s.io
+    resources:
+    - storageclasses
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumeclaims
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Project Member
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: project-member
+  roleTemplateNames:
+  - edit
+  rules:
+  - apiGroups:
+    - ui.cattle.io
+    resources:
+    - navlinks
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projectroletemplatebindings
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - namespaces
+    verbs:
+    - create
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - storage.k8s.io
+    resources:
+    - storageclasses
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - apiregistration.k8s.io
+    resources:
+    - apiservices
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumeclaims
+    verbs:
+    - '*'
+  - apiGroups:
+    - metrics.k8s.io
+    resources:
+    - pods
+    verbs:
+    - '*'
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusterevents
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - monitoring.coreos.com
+    resources:
+    - prometheuses
+    - prometheusrules
+    - servicemonitors
+    verbs:
+    - '*'
+  - apiGroups:
+    - networking.istio.io
+    resources:
+    - destinationrules
+    - envoyfilters
+    - gateways
+    - serviceentries
+    - sidecars
+    - virtualservices
+    verbs:
+    - '*'
+  - apiGroups:
+    - config.istio.io
+    resources:
+    - apikeys
+    - authorizations
+    - checknothings
+    - circonuses
+    - deniers
+    - fluentds
+    - handlers
+    - kubernetesenvs
+    - kuberneteses
+    - listcheckers
+    - listentries
+    - logentries
+    - memquotas
+    - metrics
+    - opas
+    - prometheuses
+    - quotas
+    - quotaspecbindings
+    - quotaspecs
+    - rbacs
+    - reportnothings
+    - rules
+    - solarwindses
+    - stackdrivers
+    - statsds
+    - stdios
+    verbs:
+    - '*'
+  - apiGroups:
+    - authentication.istio.io
+    resources:
+    - policies
+    verbs:
+    - '*'
+  - apiGroups:
+    - rbac.istio.io
+    resources:
+    - rbacconfigs
+    - serviceroles
+    - servicerolebindings
+    verbs:
+    - '*'
+  - apiGroups:
+    - security.istio.io
+    resources:
+    - authorizationpolicies
+    verbs:
+    - '*'
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - clusterrepos
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - operations
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - releases
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - apps
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resourceNames:
+    - local
+    resources:
+    - clusters
+    verbs:
+    - get
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Project Monitoring View Role
+  external: false
+  hidden: true
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: project-monitoring-readonly
+  roleTemplateNames:
+  - view
+  rules:
+  - apiGroups:
+    - monitoring.cattle.io
+    resources:
+    - prometheus
+    verbs:
+    - view
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Project Owner
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      authz.management.cattle.io/bootstrapped-role: "true"
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: project-owner
+  projectCreatorDefault: true
+  roleTemplateNames:
+  - admin
+  rules:
+  - apiGroups:
+    - ui.cattle.io
+    resources:
+    - navlinks
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - nodes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projectroletemplatebindings
+    verbs:
+    - '*'
+  - apiGroups:
+    - ""
+    resources:
+    - namespaces
+    verbs:
+    - create
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - storage.k8s.io
+    resources:
+    - storageclasses
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - apiregistration.k8s.io
+    resources:
+    - apiservices
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumeclaims
+    verbs:
+    - '*'
+  - apiGroups:
+    - metrics.k8s.io
+    resources:
+    - pods
+    verbs:
+    - '*'
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusterevents
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - monitoring.coreos.com
+    resources:
+    - prometheuses
+    - prometheusrules
+    - servicemonitors
+    verbs:
+    - '*'
+  - apiGroups:
+    - networking.istio.io
+    resources:
+    - destinationrules
+    - envoyfilters
+    - gateways
+    - serviceentries
+    - sidecars
+    - virtualservices
+    verbs:
+    - '*'
+  - apiGroups:
+    - config.istio.io
+    resources:
+    - apikeys
+    - authorizations
+    - checknothings
+    - circonuses
+    - deniers
+    - fluentds
+    - handlers
+    - kubernetesenvs
+    - kuberneteses
+    - listcheckers
+    - listentries
+    - logentries
+    - memquotas
+    - metrics
+    - opas
+    - prometheuses
+    - quotas
+    - quotaspecbindings
+    - quotaspecs
+    - rbacs
+    - reportnothings
+    - rules
+    - solarwindses
+    - stackdrivers
+    - statsds
+    - stdios
+    verbs:
+    - '*'
+  - apiGroups:
+    - authentication.istio.io
+    resources:
+    - policies
+    verbs:
+    - '*'
+  - apiGroups:
+    - rbac.istio.io
+    resources:
+    - rbacconfigs
+    - serviceroles
+    - servicerolebindings
+    verbs:
+    - '*'
+  - apiGroups:
+    - security.istio.io
+    resources:
+    - authorizationpolicies
+    verbs:
+    - '*'
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projects
+    verbs:
+    - own
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - clusterrepos
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - operations
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - releases
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - apps
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resourceNames:
+    - local
+    resources:
+    - clusters
+    verbs:
+    - get
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Manage Project Members
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: projectroletemplatebindings-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projectroletemplatebindings
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Project Members
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: projectroletemplatebindings-view
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projectroletemplatebindings
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: Create Projects
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: projects-create
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projects
+    verbs:
+    - create
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: View All Projects
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: projects-view
+  roleTemplateNames:
+  - view
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projects
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projectroletemplatebindings
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - namespaces
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - storage.k8s.io
+    resources:
+    - storageclasses
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumeclaims
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusterevents
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Read-only
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: read-only
+  roleTemplateNames:
+  - view
+  rules:
+  - apiGroups:
+    - ui.cattle.io
+    resources:
+    - navlinks
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - projectroletemplatebindings
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - storage.k8s.io
+    resources:
+    - storageclasses
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - apiregistration.k8s.io
+    resources:
+    - apiservices
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumeclaims
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - metrics.k8s.io
+    resources:
+    - pods
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusterevents
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - monitoring.coreos.com
+    resources:
+    - prometheuses
+    - prometheusrules
+    - servicemonitors
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - networking.istio.io
+    resources:
+    - destinationrules
+    - envoyfilters
+    - gateways
+    - serviceentries
+    - sidecars
+    - virtualservices
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - config.istio.io
+    resources:
+    - apikeys
+    - authorizations
+    - checknothings
+    - circonuses
+    - deniers
+    - fluentds
+    - handlers
+    - kubernetesenvs
+    - kuberneteses
+    - listcheckers
+    - listentries
+    - logentries
+    - memquotas
+    - metrics
+    - opas
+    - prometheuses
+    - quotas
+    - quotaspecbindings
+    - quotaspecs
+    - rbacs
+    - reportnothings
+    - rules
+    - solarwindses
+    - stackdrivers
+    - statsds
+    - stdios
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - authentication.istio.io
+    resources:
+    - policies
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - rbac.istio.io
+    resources:
+    - rbacconfigs
+    - serviceroles
+    - servicerolebindings
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - security.istio.io
+    resources:
+    - authorizationpolicies
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - clusterrepos
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - operations
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - releases
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - apps
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resourceNames:
+    - local
+    resources:
+    - clusters
+    verbs:
+    - get
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Manage Secrets
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: secrets-manage
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - secrets
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Secrets
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: secrets-view
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - secrets
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Manage Service Accounts
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: serviceaccounts-manage
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - serviceaccounts
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Service Accounts
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: serviceaccounts-view
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - serviceaccounts
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Manage Services
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: services-manage
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - services
+    - services/proxy
+    - endpoints
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Services
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: services-view
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - services
+    - endpoints
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: cluster
+  description: ""
+  displayName: Manage Storage
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: storage-manage
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumes
+    verbs:
+    - '*'
+  - apiGroups:
+    - storage.k8s.io
+    resources:
+    - storageclasses
+    verbs:
+    - '*'
+  - apiGroups:
+    - ""
+    resources:
+    - persistentvolumeclaims
+    verbs:
+    - '*'
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Kubernetes view
+  external: true
+  hidden: true
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: view
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: Manage Workloads
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: workloads-manage
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    - pods/attach
+    - pods/exec
+    - pods/portforward
+    - pods/proxy
+    - replicationcontrollers
+    - replicationcontrollers/scale
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - deletecollection
+    - patch
+    - update
+  - apiGroups:
+    - apps
+    resources:
+    - daemonsets
+    - deployments
+    - deployments/scale
+    - replicasets
+    - replicasets/scale
+    - statefulsets
+    - statefulsets/scale
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - deletecollection
+    - patch
+    - update
+  - apiGroups:
+    - apps
+    resources:
+    - deployments/rollback
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - patch
+    - update
+  - apiGroups:
+    - autoscaling
+    resources:
+    - horizontalpodautoscalers
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - deletecollection
+    - patch
+    - update
+  - apiGroups:
+    - batch
+    resources:
+    - cronjobs
+    - jobs
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - deletecollection
+    - patch
+    - update
+  - apiGroups:
+    - ""
+    resources:
+    - limitranges
+    - pods/log
+    - pods/status
+    - replicationcontrollers/status
+    - resourcequotas
+    - resourcequotas/status
+    - bindings
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  context: project
+  description: ""
+  displayName: View Workloads
+  external: false
+  hidden: false
+  kind: RoleTemplate
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+    labels:
+      authz.management.cattle.io/bootstrapping: default-roletemplate
+    name: workloads-view
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    - replicationcontrollers
+    - replicationcontrollers/scale
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - apps
+    resources:
+    - daemonsets
+    - deployments
+    - deployments/rollback
+    - deployments/scale
+    - replicasets
+    - replicasets/scale
+    - statefulsets
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - autoscaling
+    resources:
+    - horizontalpodautoscalers
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - batch
+    resources:
+    - cronjobs
+    - jobs
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - limitranges
+    - pods/log
+    - pods/status
+    - replicationcontrollers/status
+    - resourcequotas
+    - resourcequotas/status
+    - bindings
+    verbs:
+    - get
+    - list
+    - watch
+kind: List
+metadata:

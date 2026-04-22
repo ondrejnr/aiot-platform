@@ -1,0 +1,79 @@
+apiVersion: v1
+items:
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: zabbix
+      meta.helm.sh/release-namespace: zabbix
+    labels:
+      app.kubernetes.io/instance: zabbix
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: zabbix
+      app.kubernetes.io/version: 7.0.16
+      helm.sh/chart: zabbix-7.0.12
+    name: zabbix-nodesclean
+    namespace: zabbix
+  spec:
+    concurrencyPolicy: Replace
+    failedJobsHistoryLimit: 1
+    jobTemplate:
+      metadata:
+      spec:
+        template:
+          metadata:
+          spec:
+            containers:
+            - command:
+              - /bin/bash
+              - -c
+              - echo "deleting all stopped and unavailable HANodes older than 3600
+                seconds..." && psql -c "delete from ha_node where status in (1,2)
+                and extract(epoch from now())-lastaccess>3600"
+              env:
+              - name: PGHOST
+                value: postgres.aiot.svc
+              - name: PGPORT
+                value: "5432"
+              - name: PGUSER
+                valueFrom:
+                  secretKeyRef:
+                    key: user
+                    name: zabbix-db-access
+                    optional: true
+              - name: PGPASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    key: password
+                    name: zabbix-db-access
+              - name: PGDATABASE
+                value: zabbix
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: hanodes-autoclean
+              resources: {}
+              securityContext: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+            dnsPolicy: ClusterFirst
+            nodeSelector:
+              kubernetes.io/hostname: aiot-master
+            restartPolicy: OnFailure
+            schedulerName: default-scheduler
+            securityContext: {}
+            serviceAccount: zabbix
+            serviceAccountName: zabbix
+            terminationGracePeriodSeconds: 30
+            tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/control-plane
+              operator: Exists
+        ttlSecondsAfterFinished: 86400
+    schedule: 0 1 * * *
+    successfulJobsHistoryLimit: 3
+    suspend: false
+  status:
+    lastScheduleTime: "2026-04-22T01:00:00Z"
+    lastSuccessfulTime: "2026-04-22T04:10:35Z"
+kind: List
+metadata:

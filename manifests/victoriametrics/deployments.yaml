@@ -1,0 +1,87 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"victoriametrics","namespace":"victoriametrics"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"victoriametrics"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"labels":{"app":"victoriametrics"}},"spec":{"containers":[{"args":["-storageDataPath=/data","-retentionPeriod=30d"],"image":"victoriametrics/victoria-metrics:v1.113.0","imagePullPolicy":"IfNotPresent","name":"vm","ports":[{"containerPort":8428,"protocol":"TCP"}],"resources":{"requests":{"cpu":"100m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/data","name":"data"}]}],"dnsConfig":{"nameservers":["10.96.0.10"],"options":[{"name":"ndots","value":"2"}],"searches":["victoriametrics.svc.cluster.local","svc.cluster.local","cluster.local"]},"dnsPolicy":"None","nodeSelector":{"kubernetes.io/hostname":"oci-e5-node1","node-role.kubernetes.io/worker":""},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"victoriametrics-data"}}]}}}}
+    name: victoriametrics
+    namespace: victoriametrics
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: victoriametrics
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: victoriametrics
+      spec:
+        containers:
+        - args:
+          - -storageDataPath=/data
+          - -retentionPeriod=30d
+          image: victoriametrics/victoria-metrics:v1.113.0
+          imagePullPolicy: IfNotPresent
+          name: vm
+          ports:
+          - containerPort: 8428
+            protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data
+        dnsConfig:
+          nameservers:
+          - 10.96.0.10
+          options:
+          - name: ndots
+            value: "2"
+          searches:
+          - victoriametrics.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        dnsPolicy: None
+        nodeSelector:
+          kubernetes.io/hostname: oci-e5-node1
+          node-role.kubernetes.io/worker: ""
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: victoriametrics-data
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:41:13Z"
+      lastUpdateTime: "2026-04-19T21:41:20Z"
+      message: ReplicaSet "victoriametrics-856bc8df6" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-20T12:00:42Z"
+      lastUpdateTime: "2026-04-20T12:00:42Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:

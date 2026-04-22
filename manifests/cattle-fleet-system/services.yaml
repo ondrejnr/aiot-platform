@@ -1,0 +1,101 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"gitjob","namespace":"cattle-fleet-system"},"spec":{"ports":[{"name":"http-80","port":80,"protocol":"TCP","targetPort":8080}],"selector":{"app":"gitjob"}}}
+      meta.helm.sh/release-name: fleet
+      meta.helm.sh/release-namespace: cattle-fleet-system
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: gitjob
+    namespace: cattle-fleet-system
+  spec:
+    clusterIP: 10.97.144.93
+    clusterIPs:
+    - 10.97.144.93
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-80
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: gitjob
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"fleet-controller"},"name":"monitoring-fleet-controller","namespace":"cattle-fleet-system"},"spec":{"ports":[{"name":"metrics","port":8080,"protocol":"TCP","targetPort":8080}],"selector":{"app":"fleet-controller","fleet.cattle.io/shard-default":"true"},"type":"ClusterIP"}}
+      meta.helm.sh/release-name: fleet
+      meta.helm.sh/release-namespace: cattle-fleet-system
+    labels:
+      app: fleet-controller
+      app.kubernetes.io/managed-by: Helm
+    name: monitoring-fleet-controller
+    namespace: cattle-fleet-system
+  spec:
+    clusterIP: 10.104.45.151
+    clusterIPs:
+    - 10.104.45.151
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: metrics
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: fleet-controller
+      fleet.cattle.io/shard-default: "true"
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"gitjob"},"name":"monitoring-gitjob","namespace":"cattle-fleet-system"},"spec":{"ports":[{"name":"metrics","port":8081,"protocol":"TCP","targetPort":8081}],"selector":{"app":"gitjob","fleet.cattle.io/shard-default":"true"},"type":"ClusterIP"}}
+      meta.helm.sh/release-name: fleet
+      meta.helm.sh/release-namespace: cattle-fleet-system
+    labels:
+      app: gitjob
+      app.kubernetes.io/managed-by: Helm
+    name: monitoring-gitjob
+    namespace: cattle-fleet-system
+  spec:
+    clusterIP: 10.106.139.83
+    clusterIPs:
+    - 10.106.139.83
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: metrics
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+    selector:
+      app: gitjob
+      fleet.cattle.io/shard-default: "true"
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:

@@ -1,0 +1,539 @@
+apiVersion: v1
+items:
+- apiVersion: kubeflow.org/v1beta1
+  kind: Suggestion
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"kubeflow.org/v1beta1","kind":"Experiment","metadata":{"annotations":{},"name":"maintenance-bayesian","namespace":"kubeflow-user-example-com"},"spec":{"algorithm":{"algorithmName":"bayesianoptimization","algorithmSettings":[{"name":"base_estimator","value":"GP"},{"name":"acq_func","value":"gp_hedge"},{"name":"random_state","value":"42"}]},"maxFailedTrialCount":5,"maxTrialCount":30,"metricsCollectorSpec":{"collector":{"kind":"StdOut"}},"objective":{"additionalMetricNames":["roc_auc"],"goal":0.95,"objectiveMetricName":"f1_score","type":"maximize"},"parallelTrialCount":3,"parameters":[{"feasibleSpace":{"list":["RandomForest","XGBoost","LightGBM"]},"name":"model_type","parameterType":"categorical"},{"feasibleSpace":{"max":"500","min":"50"},"name":"n_estimators","parameterType":"int"},{"feasibleSpace":{"max":"25","min":"3"},"name":"max_depth","parameterType":"int"},{"feasibleSpace":{"max":"20","min":"2"},"name":"min_samples_split","parameterType":"int"},{"feasibleSpace":{"list":["sqrt","log2","0.5","0.8"]},"name":"max_features","parameterType":"categorical"},{"feasibleSpace":{"max":"0.3","min":"0.01"},"name":"learning_rate","parameterType":"double"},{"feasibleSpace":{"max":"1.0","min":"0.5"},"name":"subsample","parameterType":"double"}],"trialTemplate":{"primaryContainerName":"training","trialParameters":[{"description":"Model type","name":"modelType","reference":"model_type"},{"description":"Number of estimators","name":"nEstimators","reference":"n_estimators"},{"description":"Max depth","name":"maxDepth","reference":"max_depth"},{"description":"Min samples split","name":"minSamplesSplit","reference":"min_samples_split"},{"description":"Max features","name":"maxFeatures","reference":"max_features"},{"description":"Learning rate","name":"learningRate","reference":"learning_rate"},{"description":"Subsample ratio","name":"subsample","reference":"subsample"}],"trialSpec":{"apiVersion":"batch/v1","kind":"Job","spec":{"template":{"metadata":{"annotations":{"sidecar.istio.io/inject":"false"}},"spec":{"containers":[{"args":["--model_type=${trialParameters.modelType}","--n_estimators=${trialParameters.nEstimators}","--max_depth=${trialParameters.maxDepth}","--min_samples_split=${trialParameters.minSamplesSplit}","--max_features=${trialParameters.maxFeatures}","--learning_rate=${trialParameters.learningRate}","--subsample=${trialParameters.subsample}"],"command":["python","/app/train.py"],"env":[{"name":"MLFLOW_TRACKING_URI","value":"http://mlflow-server.mlflow:5000"},{"name":"PG_HOST","value":"pg-ha-rw.aiot"},{"name":"PG_PORT","value":"5432"},{"name":"PG_DB","value":"aiot"},{"name":"PG_USER","value":"aiot"},{"name":"PG_PASS","value":"aiot123"}],"image":"172.16.200.1:30500/ml-trainer:v3","name":"training","resources":{"limits":{"cpu":"1500m","memory":"4Gi"},"requests":{"cpu":"500m","memory":"1Gi"}}}],"nodeSelector":{"kubernetes.io/hostname":"oci-test-node1"},"restartPolicy":"Never","tolerations":[{"effect":"NoSchedule","key":"dedicated","operator":"Equal","value":"ml-training"}]}}}}}}}
+    name: maintenance-bayesian
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: kubeflow.org/v1beta1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Experiment
+      name: maintenance-bayesian
+  spec:
+    algorithm:
+      algorithmName: bayesianoptimization
+      algorithmSettings:
+      - name: base_estimator
+        value: GP
+      - name: acq_func
+        value: gp_hedge
+      - name: random_state
+        value: "42"
+    requests: 30
+    resumePolicy: Never
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-15T16:14:54Z"
+      lastUpdateTime: "2026-04-15T16:14:54Z"
+      message: Suggestion is created
+      reason: SuggestionCreated
+      status: "True"
+      type: Created
+    - lastTransitionTime: "2026-04-15T16:24:40Z"
+      lastUpdateTime: "2026-04-15T16:24:40Z"
+      message: Suggestion is not running
+      reason: Suggestion is succeeded
+      status: "False"
+      type: Running
+    - lastTransitionTime: "2026-04-15T16:24:40Z"
+      lastUpdateTime: "2026-04-15T16:24:40Z"
+      message: Deployment is not ready
+      reason: Suggestion is succeeded
+      status: "False"
+      type: DeploymentReady
+    - lastTransitionTime: "2026-04-15T16:24:40Z"
+      lastUpdateTime: "2026-04-15T16:24:40Z"
+      message: Suggestion is succeeded, can't be restarted
+      reason: Experiment is succeeded
+      status: "True"
+      type: Succeeded
+    startTime: "2026-04-15T16:14:54Z"
+    suggestionCount: 30
+    suggestions:
+    - name: maintenance-bayesian-nc2nj4p8
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "377"
+      - name: max_depth
+        value: "24"
+      - name: min_samples_split
+        value: "8"
+      - name: max_features
+        value: "0.5"
+      - name: learning_rate
+        value: "0.040898128395536054"
+      - name: subsample
+        value: "0.6376918441602301"
+    - name: maintenance-bayesian-qx46qngp
+      parameterAssignments:
+      - name: model_type
+        value: LightGBM
+      - name: n_estimators
+        value: "187"
+      - name: max_depth
+        value: "17"
+      - name: min_samples_split
+        value: "12"
+      - name: max_features
+        value: sqrt
+      - name: learning_rate
+        value: "0.018325318897836135"
+      - name: subsample
+        value: "0.7749072935085796"
+    - name: maintenance-bayesian-gbrwjrl6
+      parameterAssignments:
+      - name: model_type
+        value: RandomForest
+      - name: n_estimators
+        value: "350"
+      - name: max_depth
+        value: "18"
+      - name: min_samples_split
+        value: "16"
+      - name: max_features
+        value: sqrt
+      - name: learning_rate
+        value: "0.2848581931887178"
+      - name: subsample
+        value: "0.6865172050333846"
+    - name: maintenance-bayesian-d2ttnlnq
+      parameterAssignments:
+      - name: model_type
+        value: LightGBM
+      - name: n_estimators
+        value: "447"
+      - name: max_depth
+        value: "10"
+      - name: min_samples_split
+        value: "19"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.012360720018249961"
+      - name: subsample
+        value: "0.5503069820920089"
+    - name: maintenance-bayesian-s55dblnm
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "463"
+      - name: max_depth
+        value: "5"
+      - name: min_samples_split
+        value: "10"
+      - name: max_features
+        value: sqrt
+      - name: learning_rate
+        value: "0.04678630222109972"
+      - name: subsample
+        value: "0.5568837321946701"
+    - name: maintenance-bayesian-hrfct62r
+      parameterAssignments:
+      - name: model_type
+        value: LightGBM
+      - name: n_estimators
+        value: "127"
+      - name: max_depth
+        value: "16"
+      - name: min_samples_split
+        value: "16"
+      - name: max_features
+        value: "0.5"
+      - name: learning_rate
+        value: "0.01383562133272884"
+      - name: subsample
+        value: "0.8442841485409516"
+    - name: maintenance-bayesian-254q9xg8
+      parameterAssignments:
+      - name: model_type
+        value: LightGBM
+      - name: n_estimators
+        value: "247"
+      - name: max_depth
+        value: "15"
+      - name: min_samples_split
+        value: "15"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.11458874254788823"
+      - name: subsample
+        value: "0.6709039172857192"
+    - name: maintenance-bayesian-l2gldjdj
+      parameterAssignments:
+      - name: model_type
+        value: LightGBM
+      - name: n_estimators
+        value: "473"
+      - name: max_depth
+        value: "7"
+      - name: min_samples_split
+        value: "5"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.03550957783747027"
+      - name: subsample
+        value: "0.6873060263320387"
+    - name: maintenance-bayesian-hxlrb4pb
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "399"
+      - name: max_depth
+        value: "11"
+      - name: min_samples_split
+        value: "18"
+      - name: max_features
+        value: "0.5"
+      - name: learning_rate
+        value: "0.07556590575722869"
+      - name: subsample
+        value: "0.7839195498391404"
+    - name: maintenance-bayesian-gswqv6xp
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "464"
+      - name: max_depth
+        value: "14"
+      - name: min_samples_split
+        value: "17"
+      - name: max_features
+        value: log2
+      - name: learning_rate
+        value: "0.011899588302291222"
+      - name: subsample
+        value: "0.7426620700912737"
+    - name: maintenance-bayesian-pkg8gkk5
+      parameterAssignments:
+      - name: model_type
+        value: LightGBM
+      - name: n_estimators
+        value: "365"
+      - name: max_depth
+        value: "22"
+      - name: min_samples_split
+        value: "9"
+      - name: max_features
+        value: log2
+      - name: learning_rate
+        value: "0.02052506481761148"
+      - name: subsample
+        value: "0.5000211590262351"
+    - name: maintenance-bayesian-rgv49pfk
+      parameterAssignments:
+      - name: model_type
+        value: RandomForest
+      - name: n_estimators
+        value: "418"
+      - name: max_depth
+        value: "19"
+      - name: min_samples_split
+        value: "7"
+      - name: max_features
+        value: "0.5"
+      - name: learning_rate
+        value: "0.025455822978607663"
+      - name: subsample
+        value: "0.6210749589588561"
+    - name: maintenance-bayesian-jhmjmt5s
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "365"
+      - name: max_depth
+        value: "16"
+      - name: min_samples_split
+        value: "10"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.2991963182484793"
+      - name: subsample
+        value: "0.5954834429260726"
+    - name: maintenance-bayesian-kftkjmjh
+      parameterAssignments:
+      - name: model_type
+        value: RandomForest
+      - name: n_estimators
+        value: "356"
+      - name: max_depth
+        value: "4"
+      - name: min_samples_split
+        value: "20"
+      - name: max_features
+        value: "0.5"
+      - name: learning_rate
+        value: "0.012712942835013877"
+      - name: subsample
+        value: "0.7790380204778519"
+    - name: maintenance-bayesian-nghm9chw
+      parameterAssignments:
+      - name: model_type
+        value: LightGBM
+      - name: n_estimators
+        value: "187"
+      - name: max_depth
+        value: "19"
+      - name: min_samples_split
+        value: "4"
+      - name: max_features
+        value: "0.5"
+      - name: learning_rate
+        value: "0.29999999999999993"
+      - name: subsample
+        value: "0.8895957698575129"
+    - name: maintenance-bayesian-h4sjjkc6
+      parameterAssignments:
+      - name: model_type
+        value: RandomForest
+      - name: n_estimators
+        value: "243"
+      - name: max_depth
+        value: "12"
+      - name: min_samples_split
+        value: "18"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.010120463444873152"
+      - name: subsample
+        value: "0.5763977239603411"
+    - name: maintenance-bayesian-8p86n5sb
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "100"
+      - name: max_depth
+        value: "9"
+      - name: min_samples_split
+        value: "15"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.010051231752183172"
+      - name: subsample
+        value: "0.7944533077862765"
+    - name: maintenance-bayesian-ctl7hlml
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "358"
+      - name: max_depth
+        value: "25"
+      - name: min_samples_split
+        value: "8"
+      - name: max_features
+        value: sqrt
+      - name: learning_rate
+        value: "0.010461083699199021"
+      - name: subsample
+        value: "0.8979083453727279"
+    - name: maintenance-bayesian-kx248mmn
+      parameterAssignments:
+      - name: model_type
+        value: LightGBM
+      - name: n_estimators
+        value: "414"
+      - name: max_depth
+        value: "3"
+      - name: min_samples_split
+        value: "2"
+      - name: max_features
+        value: sqrt
+      - name: learning_rate
+        value: "0.010875442899528766"
+      - name: subsample
+        value: "0.6519448160502019"
+    - name: maintenance-bayesian-5tgkvdlf
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "422"
+      - name: max_depth
+        value: "4"
+      - name: min_samples_split
+        value: "2"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.012899727666677605"
+      - name: subsample
+        value: "0.658115036865215"
+    - name: maintenance-bayesian-jqnw4hr9
+      parameterAssignments:
+      - name: model_type
+        value: RandomForest
+      - name: n_estimators
+        value: "401"
+      - name: max_depth
+        value: "25"
+      - name: min_samples_split
+        value: "4"
+      - name: max_features
+        value: sqrt
+      - name: learning_rate
+        value: "0.06333353266067672"
+      - name: subsample
+        value: "0.8292879963461555"
+    - name: maintenance-bayesian-rz47bb97
+      parameterAssignments:
+      - name: model_type
+        value: RandomForest
+      - name: n_estimators
+        value: "412"
+      - name: max_depth
+        value: "3"
+      - name: min_samples_split
+        value: "14"
+      - name: max_features
+        value: sqrt
+      - name: learning_rate
+        value: "0.13981010950433695"
+      - name: subsample
+        value: "1.0"
+    - name: maintenance-bayesian-l52rcvcs
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "404"
+      - name: max_depth
+        value: "25"
+      - name: min_samples_split
+        value: "16"
+      - name: max_features
+        value: sqrt
+      - name: learning_rate
+        value: "0.1266681101196383"
+      - name: subsample
+        value: "0.9949799479387709"
+    - name: maintenance-bayesian-gcnrxdlp
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "495"
+      - name: max_depth
+        value: "3"
+      - name: min_samples_split
+        value: "8"
+      - name: max_features
+        value: sqrt
+      - name: learning_rate
+        value: "0.29999999999999993"
+      - name: subsample
+        value: "0.5237351575346338"
+    - name: maintenance-bayesian-5nmpkhsp
+      parameterAssignments:
+      - name: model_type
+        value: RandomForest
+      - name: n_estimators
+        value: "221"
+      - name: max_depth
+        value: "21"
+      - name: min_samples_split
+        value: "20"
+      - name: max_features
+        value: "0.5"
+      - name: learning_rate
+        value: "0.14184007281648012"
+      - name: subsample
+        value: "0.5029321842358869"
+    - name: maintenance-bayesian-bsb8npf8
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "121"
+      - name: max_depth
+        value: "8"
+      - name: min_samples_split
+        value: "13"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.06781390790352348"
+      - name: subsample
+        value: "0.8312456358606655"
+    - name: maintenance-bayesian-58tqk7hx
+      parameterAssignments:
+      - name: model_type
+        value: XGBoost
+      - name: n_estimators
+        value: "344"
+      - name: max_depth
+        value: "25"
+      - name: min_samples_split
+        value: "13"
+      - name: max_features
+        value: log2
+      - name: learning_rate
+        value: "0.2802870785910858"
+      - name: subsample
+        value: "0.8522944824347058"
+    - name: maintenance-bayesian-mqq7nxm2
+      parameterAssignments:
+      - name: model_type
+        value: RandomForest
+      - name: n_estimators
+        value: "415"
+      - name: max_depth
+        value: "10"
+      - name: min_samples_split
+        value: "7"
+      - name: max_features
+        value: "0.5"
+      - name: learning_rate
+        value: "0.29999999999999993"
+      - name: subsample
+        value: "0.6249724862645597"
+    - name: maintenance-bayesian-2pkhcw7h
+      parameterAssignments:
+      - name: model_type
+        value: LightGBM
+      - name: n_estimators
+        value: "50"
+      - name: max_depth
+        value: "3"
+      - name: min_samples_split
+        value: "15"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.01"
+      - name: subsample
+        value: "0.5276494006645162"
+    - name: maintenance-bayesian-t6tdr6zr
+      parameterAssignments:
+      - name: model_type
+        value: RandomForest
+      - name: n_estimators
+        value: "206"
+      - name: max_depth
+        value: "21"
+      - name: min_samples_split
+        value: "9"
+      - name: max_features
+        value: "0.8"
+      - name: learning_rate
+        value: "0.2685442276286766"
+      - name: subsample
+        value: "0.8603386125316809"
+kind: List
+metadata:

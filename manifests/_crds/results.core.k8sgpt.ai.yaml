@@ -1,0 +1,139 @@
+apiVersion: v1
+items:
+- apiVersion: core.k8sgpt.ai/v1alpha1
+  kind: Result
+  metadata:
+    labels:
+      k8sgpts.k8sgpt.ai/backend: openai
+      k8sgpts.k8sgpt.ai/name: k8sgpt
+      k8sgpts.k8sgpt.ai/namespace: k8sgpt
+    name: kubeflowmetacontroller
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: core.k8sgpt.ai/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: K8sGPT
+      name: k8sgpt
+  spec:
+    autoRemediationStatus: {}
+    backend: openai
+    details: |-
+      Error: StatefulSet uses non-existent service kubeflow.
+      Solution: 1. Create kubeflow service. 2. Apply config.
+    error:
+    - sensitive:
+      - masked: aEN4QyQhNWs=
+        unmasked: kubeflow
+      - {}
+      text: StatefulSet uses the service kubeflow/ which does not exist.
+    kind: StatefulSet
+    name: kubeflow/metacontroller
+    parentObject: ""
+  status:
+    contentHash: 19ffcb5906b7c1d52b097cbb9360ac7f77091cf56dff55368d85f709dd3f62c6
+    lifecycle: historical
+- apiVersion: core.k8sgpt.ai/v1alpha1
+  kind: Result
+  metadata:
+    labels:
+      k8sgpts.k8sgpt.ai/backend: openai
+      k8sgpts.k8sgpt.ai/name: k8sgpt
+      k8sgpts.k8sgpt.ai/namespace: k8sgpt
+    name: kubeflowuserexamplecommaintenancepredictorpredictor00002private
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: core.k8sgpt.ai/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: K8sGPT
+      name: k8sgpt
+  spec:
+    autoRemediationStatus: {}
+    backend: openai
+    details: |-
+      Error: Service has no endpoints.
+      Solution: 1. Check pod status. 2. Verify labels. 3. Restart service.
+    error:
+    - sensitive:
+      - masked: PzNTQTImKyxpV3pFIS5HVmQjYlE/YjtUfFdbdkInMw==
+        unmasked: serving.knative.dev/revisionUID
+      - masked: WHtELDMhSXJ4I3dHYyRqI0hPLUgkSnpNOnM0c2xfQnR6NmZP
+        unmasked: 162d10a6-4f60-46da-b595-b74cd956ea23
+      text: Service has no endpoints, expected label serving.knative.dev/revisionUID=162d10a6-4f60-46da-b595-b74cd956ea23
+    kind: Service
+    name: kubeflow-user-example-com/maintenance-predictor-predictor-00002-private
+    parentObject: ""
+  status:
+    contentHash: 5d06f675b633ef4a0e6e87f2e0b38c7d1310125d85887e56ee8bc3f7666d9760
+    lifecycle: historical
+- apiVersion: core.k8sgpt.ai/v1alpha1
+  kind: Result
+  metadata:
+    labels:
+      k8sgpts.k8sgpt.ai/backend: openai
+      k8sgpts.k8sgpt.ai/name: k8sgpt
+      k8sgpts.k8sgpt.ai/namespace: k8sgpt
+    name: kubeflowuserexamplecommaintenancepredictorpredictor00003private
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: core.k8sgpt.ai/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: K8sGPT
+      name: k8sgpt
+  spec:
+    autoRemediationStatus: {}
+    backend: openai
+    details: |-
+      Error: Service has no endpoints.
+      Solution: 1. Check revisionUID, 2. Verify pod status, 3. Reapply configuration.
+    error:
+    - sensitive:
+      - masked: MlJqczBoIXgoU0RAJT5VVG1qJT5uQCc2amdkTlctNA==
+        unmasked: serving.knative.dev/revisionUID
+      - masked: dTNxNHg8WkpRbjF1JSM3T2ZwTmFeY0l0Xjc8bjE0OShoPjdP
+        unmasked: a3f034b2-4612-4514-a36e-9ab8294e2477
+      text: Service has no endpoints, expected label serving.knative.dev/revisionUID=a3f034b2-4612-4514-a36e-9ab8294e2477
+    kind: Service
+    name: kubeflow-user-example-com/maintenance-predictor-predictor-00003-private
+    parentObject: ""
+  status:
+    contentHash: a9d945afb1fbcd8a1f6936d6dd9823600543d6218eba14d95eeb9f70fb68354c
+    lifecycle: historical
+- apiVersion: core.k8sgpt.ai/v1alpha1
+  kind: Result
+  metadata:
+    labels:
+      k8sgpts.k8sgpt.ai/backend: openai
+      k8sgpts.k8sgpt.ai/name: k8sgpt
+      k8sgpts.k8sgpt.ai/namespace: k8sgpt
+    name: kubeflowuserexamplecommlworkshop
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: core.k8sgpt.ai/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: K8sGPT
+      name: k8sgpt
+  spec:
+    autoRemediationStatus: {}
+    backend: openai
+    details: |-
+      Error: StatefulSet uses a non-existent service.
+      Solution: 1. Create service. 2. Apply config.
+    error:
+    - sensitive:
+      - masked: Z01FNXlzN2F6eChUe3I0STZvQiNEbT9SUw==
+        unmasked: kubeflow-user-example-com
+      - {}
+      text: StatefulSet uses the service kubeflow-user-example-com/ which does not
+        exist.
+    kind: StatefulSet
+    name: kubeflow-user-example-com/ml-workshop
+    parentObject: ""
+  status:
+    contentHash: 26a7586f7515b2b83feccb9c4f2f9a9024dcc27512ca1855891f91450ce4c97f
+    lifecycle: historical
+kind: List
+metadata:

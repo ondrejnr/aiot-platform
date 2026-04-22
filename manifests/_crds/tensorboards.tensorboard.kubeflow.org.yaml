@@ -1,0 +1,23 @@
+apiVersion: v1
+items:
+- apiVersion: tensorboard.kubeflow.org/v1alpha1
+  kind: Tensorboard
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"tensorboard.kubeflow.org/v1alpha1","kind":"Tensorboard","metadata":{"annotations":{},"name":"maintenance-tb","namespace":"kubeflow-user-example-com"},"spec":{"logspath":"pvc://mlflow-artifacts-lp/tensorboard/"}}
+    name: maintenance-tb
+    namespace: kubeflow-user-example-com
+  spec:
+    logspath: pvc://mlflow-artifacts-lp/tensorboard/
+  status:
+    conditions:
+    - deploymentState: Progressing
+      lastProbeTime: "2026-04-20T04:30:13Z"
+    - deploymentState: Available
+      lastProbeTime: "2026-04-20T04:30:13Z"
+    - deploymentState: Progressing
+      lastProbeTime: "2026-04-20T04:30:23Z"
+    readyReplicas: 1
+kind: List
+metadata:

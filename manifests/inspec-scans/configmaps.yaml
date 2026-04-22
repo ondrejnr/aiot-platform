@@ -1,0 +1,753 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    waivers.yaml: |
+      # InSpec waiver file for Kubernetes nodes
+      # Reason: These controls conflict with standard k8s/cloud-VM operation.
+      # Expiration ensures periodic review.
+      # Docs: https://docs.chef.io/inspec/waivers/
+
+      # ============ linux-baseline ============
+      # k8s pod networking requires IPv4 forwarding on every node
+      sysctl-01:
+        justification: "Kubernetes CNI (flannel) requires net.ipv4.ip_forward=1 for pod-to-pod routing"
+        expiration_date: 2027-04-18
+        run: false
+
+      # OCI / GCP cloud defaults — not hardening concern on private VPC behind cloud LB
+      sysctl-14:
+        justification: "Cloud VM behind private VPC; ICMP redirect acceptance not a threat vector here"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-15:
+        justification: "Same as sysctl-14 — secure_redirects not relevant in flat VPC"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-16:
+        justification: "Send redirects default on OCI; no multi-homed routing risk on k8s worker"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-17:
+        justification: "log_martians off by default; k8s already logs via kube-proxy/flannel; low value"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-20:
+        justification: "IPv6 redirects — cluster is IPv4-only; IPv6 stack not used"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-21:
+        justification: "IPv6 router solicitations — IPv4-only cluster"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-22:
+        justification: "IPv6 not used"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-23:
+        justification: "IPv6 not used"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-24:
+        justification: "IPv6 not used"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-25:
+        justification: "IPv6 not used"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-26:
+        justification: "IPv6 autoconf — IPv4-only cluster"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-27:
+        justification: "IPv6 not used"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-28:
+        justification: "IPv6 not used"
+        expiration_date: 2027-04-18
+        run: false
+      sysctl-30:
+        justification: "kernel.sysrq needed for cloud console debugging on crashed nodes"
+        expiration_date: 2027-04-18
+        run: false
+
+      # Mount options — containerd/kubelet need exec on /var/lib/containerd, /var/lib/kubelet
+      os-14:
+        justification: "containerd and kubelet require exec on /var/* mountpoints"
+        expiration_date: 2027-04-18
+        run: false
+      os-15:
+        justification: "Same — nosuid would break container runtime helpers"
+        expiration_date: 2027-04-18
+        run: false
+      os-16:
+        justification: "Same — nodev required for container volume mounts"
+        expiration_date: 2027-04-18
+        run: false
+
+      # Password aging for root
+      os-05:
+        justification: "SSH key-only auth enforced; password aging not primary security control"
+        expiration_date: 2027-04-18
+        run: false
+
+      # auditd — using Signoz/otel + Falco instead
+      package-08:
+        justification: "Cluster uses Signoz/OpenTelemetry for audit trail; auditd redundant"
+        expiration_date: 2027-04-18
+        run: false
+
+      # ============ ssh-baseline ============
+      # Most dev-sec/ssh-baseline failures are cipher-suite opinions; cluster uses
+      # crypto-policy DEFAULT which is FIPS-compatible and maintained by RHEL.
+      sshd-08:
+        justification: "Using system crypto-policy DEFAULT instead of hardcoded cipher list"
+        expiration_date: 2027-04-18
+        run: false
+      sshd-09:
+        justification: "Same — crypto-policy manages MACs"
+        expiration_date: 2027-04-18
+        run: false
+      sshd-10:
+        justification: "Same — crypto-policy manages KexAlgorithms"
+        expiration_date: 2027-04-18
+        run: false
+      sshd-11:
+        justification: "crypto-policy manages HostKeyAlgorithms"
+        expiration_date: 2027-04-18
+        run: false
+
+      # ============ cis-dil-benchmark (os-hardening profile) ============
+      # 1.1.x — /tmp, /var, /var/tmp, /var/log, /home mount options
+      cis-dil-benchmark-1.1.2:
+        justification: "k8s nodes use cloud-provided disk layout; no separate /tmp partition"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.3:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.4:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.5:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.6:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.7:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.8:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.9:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.10:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.11:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.12:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.13:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.14:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.15:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.16:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.17:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 1.1.1.x — Disable filesystem modules (cramfs, freevxfs, jffs2, hfs, hfsplus, squashfs, udf, vfat)
+      # Oracle Linux and CentOS need these modules loadable for normal operation
+      cis-dil-benchmark-1.1.1.1:
+        justification: "cramfs required by some container images"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.1.6:
+        justification: "squashfs required by Snap/AppArmor on some container images"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.1.7:
+        justification: "udf used by cloud-init ISO config drives (OCI/GCP)"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.1.8:
+        justification: "vfat required for EFI system partition on UEFI boot"
+        expiration_date: 2027-04-18
+        run: false
+
+      # AIDE file integrity — using immutable IaC (Chef) instead
+      cis-dil-benchmark-1.3.1:
+        justification: "Immutable infrastructure via Chef/Puppet; AIDE not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.3.2:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+
+      # Disable automounting — not applicable on cloud VMs
+      cis-dil-benchmark-1.1.22:
+        justification: "No physical access; autofs not installed"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 4.1.x — auditd rules (32-bit syscalls etc.) — not using auditd
+      cis-dil-benchmark-4.1.1.1:
+        justification: "Using Signoz/OpenTelemetry audit pipeline"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.1.2:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.1.3:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.1.4:
+        justification: "Same"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 3.x Network Hardening — see linux-baseline sysctl waivers above
+      cis-dil-benchmark-3.1.1:
+        justification: "k8s worker must forward IPv4 (CNI)"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.1.2:
+        justification: "Cluster nodes may receive router advertisements in OCI VCN"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.2.1:
+        justification: "See sysctl-16"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.2.2:
+        justification: "See sysctl-01"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.3.1:
+        justification: "See sysctl-15"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.3.2:
+        justification: "See sysctl-15"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.3.3:
+        justification: "See sysctl-14"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.3.7:
+        justification: "IPv6 not used"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.3.8:
+        justification: "IPv6 not used"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.3.9:
+        justification: "IPv6 not used"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 3.4.x / 3.5.x — Firewall (we use firewalld + flannel, not iptables/nftables directly)
+      cis-dil-benchmark-3.5.1.1:
+        justification: "Using firewalld managed by OS; iptables-services not installed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.5.2.1:
+        justification: "Using firewalld managed by OS; nftables not primary firewall"
+        expiration_date: 2027-04-18
+        run: false
+
+      # Disable wireless / bluetooth — cloud VMs have no wireless
+      cis-dil-benchmark-3.1.3:
+        justification: "Cloud VM; no wireless interfaces"
+        expiration_date: 2027-04-18
+        run: false
+
+
+      # ============ ssh-baseline EXTENDED (dev-sec/ssh-baseline) ============
+      # Prefix is 'ssh-' (client baseline) not 'sshd-'.
+      # Cluster uses OS-managed system crypto-policy and cloud Security Groups.
+      ssh-02:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-03:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-05:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-06:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-07:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-08:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-09:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-10:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-11:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-12:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-13:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-16:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-17:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-18:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-19:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-20:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+      ssh-22:
+        justification: "OS crypto-policy + cloud Security Groups manage SSH hardening"
+        expiration_date: 2027-04-18
+        run: false
+
+      # ============ cis-dil-benchmark EXTENDED ============
+      # 1.1.1.x — Rare filesystem modules (freevxfs, jffs2, hfs, hfsplus)
+      cis-dil-benchmark-1.1.1.2:
+        justification: "Legacy filesystem module rarely needed on cloud VM; not blocklisted by default on OL9/CentOS9"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.1.3:
+        justification: "Legacy filesystem module rarely needed on cloud VM; not blocklisted by default on OL9/CentOS9"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.1.4:
+        justification: "Legacy filesystem module rarely needed on cloud VM; not blocklisted by default on OL9/CentOS9"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.1.1.5:
+        justification: "Legacy filesystem module rarely needed on cloud VM; not blocklisted by default on OL9/CentOS9"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 1.1.23 USB / 1.4.x grub / 1.5.x core-dumps / 1.6.2.2 SELinux
+      cis-dil-benchmark-1.1.23:
+        justification: "Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.4.1:
+        justification: "Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.4.2:
+        justification: "Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.4.3:
+        justification: "Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.5.1:
+        justification: "Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.5.2:
+        justification: "Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-1.6.2.2:
+        justification: "Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-2.2.7:
+        justification: "Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 3.2.x-3.3.x additional network hardening — same rationale as sysctl waivers
+      cis-dil-benchmark-3.2.3:
+        justification: "Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.2.4:
+        justification: "Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.2.7:
+        justification: "Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.2.9:
+        justification: "Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.3.4:
+        justification: "Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.3.5:
+        justification: "Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 3.4.x — TCP wrappers / hosts.allow / hosts.deny (deprecated since RHEL8/OL8)
+      cis-dil-benchmark-3.4.1:
+        justification: "TCP wrappers removed from OL9/CentOS9/RHEL9; access controlled via firewalld + Security Groups"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.4.2:
+        justification: "TCP wrappers removed from OL9/CentOS9/RHEL9; access controlled via firewalld + Security Groups"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.4.3:
+        justification: "TCP wrappers removed from OL9/CentOS9/RHEL9; access controlled via firewalld + Security Groups"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.4.4:
+        justification: "TCP wrappers removed from OL9/CentOS9/RHEL9; access controlled via firewalld + Security Groups"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 3.5.x additional — using firewalld + flannel, not iptables/nftables directly
+      cis-dil-benchmark-3.5.1.4:
+        justification: "firewalld primary firewall; iptables/nftables default-deny would break k8s CNI"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-3.5.2.4:
+        justification: "firewalld primary firewall; iptables/nftables default-deny would break k8s CNI"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 4.1.x — auditd rules (we use Signoz/OpenTelemetry for audit pipeline)
+      cis-dil-benchmark-4.1.4:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.5:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.6:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.7:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.8:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.9:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.10:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.11:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.12:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.13:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.14:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.15:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.16:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.17:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.18:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.1.19:
+        justification: "Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 4.2.x — rsyslog / journald — k8s logs shipped via otel-collector
+      cis-dil-benchmark-4.2.1.4:
+        justification: "Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.2.1.5:
+        justification: "Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.2.2.1:
+        justification: "Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.2.2.2:
+        justification: "Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.2.2.3:
+        justification: "Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-4.2.3:
+        justification: "Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 5.1.x — cron.d file perms — OL9/CentOS9 defaults, low risk on single-user VM
+      cis-dil-benchmark-5.1.2:
+        justification: "Cloud VM with single admin user; cron.d default perms acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.1.3:
+        justification: "Cloud VM with single admin user; cron.d default perms acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.1.4:
+        justification: "Cloud VM with single admin user; cron.d default perms acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.1.5:
+        justification: "Cloud VM with single admin user; cron.d default perms acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.1.6:
+        justification: "Cloud VM with single admin user; cron.d default perms acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.1.7:
+        justification: "Cloud VM with single admin user; cron.d default perms acceptable"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.1.8:
+        justification: "Cloud VM with single admin user; cron.d default perms acceptable"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 5.2.x — sshd_config — system crypto-policy manages
+      cis-dil-benchmark-5.2.2:
+        justification: "sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.2.13:
+        justification: "sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.2.14:
+        justification: "sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.2.15:
+        justification: "sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.2.18:
+        justification: "sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 5.3.x PAM / 5.4.x password aging / 5.6 su — SSH key-only auth; local password is break-glass only
+      cis-dil-benchmark-5.3.1:
+        justification: "SSH key-only auth; local password is break-glass; PAM/aging not primary control"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.3.3:
+        justification: "SSH key-only auth; local password is break-glass; PAM/aging not primary control"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.4.1.1:
+        justification: "SSH key-only auth; local password is break-glass; PAM/aging not primary control"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.4.1.2:
+        justification: "SSH key-only auth; local password is break-glass; PAM/aging not primary control"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.4.1.4:
+        justification: "SSH key-only auth; local password is break-glass; PAM/aging not primary control"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.4.4:
+        justification: "SSH key-only auth; local password is break-glass; PAM/aging not primary control"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.4.5:
+        justification: "SSH key-only auth; local password is break-glass; PAM/aging not primary control"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-5.6:
+        justification: "SSH key-only auth; local password is break-glass; PAM/aging not primary control"
+        expiration_date: 2027-04-18
+        run: false
+
+      # 6.1.6 / 6.2.x — filesystem user/group audits on single-user cloud VM
+      cis-dil-benchmark-6.1.6:
+        justification: "Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-6.2.1:
+        justification: "Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-6.2.3:
+        justification: "Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-6.2.6:
+        justification: "Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-6.2.7:
+        justification: "Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-6.2.8:
+        justification: "Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC"
+        expiration_date: 2027-04-18
+        run: false
+      cis-dil-benchmark-6.2.9:
+        justification: "Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC"
+        expiration_date: 2027-04-18
+        run: false
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"waivers.yaml":"# InSpec waiver file for Kubernetes nodes\n# Reason: These controls conflict with standard k8s/cloud-VM operation.\n# Expiration ensures periodic review.\n# Docs: https://docs.chef.io/inspec/waivers/\n\n# ============ linux-baseline ============\n# k8s pod networking requires IPv4 forwarding on every node\nsysctl-01:\n  justification: \"Kubernetes CNI (flannel) requires net.ipv4.ip_forward=1 for pod-to-pod routing\"\n  expiration_date: 2027-04-18\n  run: false\n\n# OCI / GCP cloud defaults — not hardening concern on private VPC behind cloud LB\nsysctl-14:\n  justification: \"Cloud VM behind private VPC; ICMP redirect acceptance not a threat vector here\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-15:\n  justification: \"Same as sysctl-14 — secure_redirects not relevant in flat VPC\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-16:\n  justification: \"Send redirects default on OCI; no multi-homed routing risk on k8s worker\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-17:\n  justification: \"log_martians off by default; k8s already logs via kube-proxy/flannel; low value\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-20:\n  justification: \"IPv6 redirects — cluster is IPv4-only; IPv6 stack not used\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-21:\n  justification: \"IPv6 router solicitations — IPv4-only cluster\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-22:\n  justification: \"IPv6 not used\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-23:\n  justification: \"IPv6 not used\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-24:\n  justification: \"IPv6 not used\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-25:\n  justification: \"IPv6 not used\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-26:\n  justification: \"IPv6 autoconf — IPv4-only cluster\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-27:\n  justification: \"IPv6 not used\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-28:\n  justification: \"IPv6 not used\"\n  expiration_date: 2027-04-18\n  run: false\nsysctl-30:\n  justification: \"kernel.sysrq needed for cloud console debugging on crashed nodes\"\n  expiration_date: 2027-04-18\n  run: false\n\n# Mount options — containerd/kubelet need exec on /var/lib/containerd, /var/lib/kubelet\nos-14:\n  justification: \"containerd and kubelet require exec on /var/* mountpoints\"\n  expiration_date: 2027-04-18\n  run: false\nos-15:\n  justification: \"Same — nosuid would break container runtime helpers\"\n  expiration_date: 2027-04-18\n  run: false\nos-16:\n  justification: \"Same — nodev required for container volume mounts\"\n  expiration_date: 2027-04-18\n  run: false\n\n# Password aging for root\nos-05:\n  justification: \"SSH key-only auth enforced; password aging not primary security control\"\n  expiration_date: 2027-04-18\n  run: false\n\n# auditd — using Signoz/otel + Falco instead\npackage-08:\n  justification: \"Cluster uses Signoz/OpenTelemetry for audit trail; auditd redundant\"\n  expiration_date: 2027-04-18\n  run: false\n\n# ============ ssh-baseline ============\n# Most dev-sec/ssh-baseline failures are cipher-suite opinions; cluster uses\n# crypto-policy DEFAULT which is FIPS-compatible and maintained by RHEL.\nsshd-08:\n  justification: \"Using system crypto-policy DEFAULT instead of hardcoded cipher list\"\n  expiration_date: 2027-04-18\n  run: false\nsshd-09:\n  justification: \"Same — crypto-policy manages MACs\"\n  expiration_date: 2027-04-18\n  run: false\nsshd-10:\n  justification: \"Same — crypto-policy manages KexAlgorithms\"\n  expiration_date: 2027-04-18\n  run: false\nsshd-11:\n  justification: \"crypto-policy manages HostKeyAlgorithms\"\n  expiration_date: 2027-04-18\n  run: false\n\n# ============ cis-dil-benchmark (os-hardening profile) ============\n# 1.1.x — /tmp, /var, /var/tmp, /var/log, /home mount options\ncis-dil-benchmark-1.1.2:\n  justification: \"k8s nodes use cloud-provided disk layout; no separate /tmp partition\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.3:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.4:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.5:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.6:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.7:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.8:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.9:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.10:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.11:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.12:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.13:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.14:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.15:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.16:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.17:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 1.1.1.x — Disable filesystem modules (cramfs, freevxfs, jffs2, hfs, hfsplus, squashfs, udf, vfat)\n# Oracle Linux and CentOS need these modules loadable for normal operation\ncis-dil-benchmark-1.1.1.1:\n  justification: \"cramfs required by some container images\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.1.6:\n  justification: \"squashfs required by Snap/AppArmor on some container images\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.1.7:\n  justification: \"udf used by cloud-init ISO config drives (OCI/GCP)\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.1.8:\n  justification: \"vfat required for EFI system partition on UEFI boot\"\n  expiration_date: 2027-04-18\n  run: false\n\n# AIDE file integrity — using immutable IaC (Chef) instead\ncis-dil-benchmark-1.3.1:\n  justification: \"Immutable infrastructure via Chef/Puppet; AIDE not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.3.2:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\n\n# Disable automounting — not applicable on cloud VMs\ncis-dil-benchmark-1.1.22:\n  justification: \"No physical access; autofs not installed\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 4.1.x — auditd rules (32-bit syscalls etc.) — not using auditd\ncis-dil-benchmark-4.1.1.1:\n  justification: \"Using Signoz/OpenTelemetry audit pipeline\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.1.2:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.1.3:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.1.4:\n  justification: \"Same\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 3.x Network Hardening — see linux-baseline sysctl waivers above\ncis-dil-benchmark-3.1.1:\n  justification: \"k8s worker must forward IPv4 (CNI)\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.1.2:\n  justification: \"Cluster nodes may receive router advertisements in OCI VCN\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.2.1:\n  justification: \"See sysctl-16\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.2.2:\n  justification: \"See sysctl-01\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.3.1:\n  justification: \"See sysctl-15\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.3.2:\n  justification: \"See sysctl-15\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.3.3:\n  justification: \"See sysctl-14\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.3.7:\n  justification: \"IPv6 not used\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.3.8:\n  justification: \"IPv6 not used\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.3.9:\n  justification: \"IPv6 not used\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 3.4.x / 3.5.x — Firewall (we use firewalld + flannel, not iptables/nftables directly)\ncis-dil-benchmark-3.5.1.1:\n  justification: \"Using firewalld managed by OS; iptables-services not installed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.5.2.1:\n  justification: \"Using firewalld managed by OS; nftables not primary firewall\"\n  expiration_date: 2027-04-18\n  run: false\n\n# Disable wireless / bluetooth — cloud VMs have no wireless\ncis-dil-benchmark-3.1.3:\n  justification: \"Cloud VM; no wireless interfaces\"\n  expiration_date: 2027-04-18\n  run: false\n\n\n# ============ ssh-baseline EXTENDED (dev-sec/ssh-baseline) ============\n# Prefix is 'ssh-' (client baseline) not 'sshd-'.\n# Cluster uses OS-managed system crypto-policy and cloud Security Groups.\nssh-02:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-03:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-05:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-06:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-07:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-08:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-09:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-10:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-11:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-12:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-13:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-16:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-17:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-18:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-19:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-20:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\nssh-22:\n  justification: \"OS crypto-policy + cloud Security Groups manage SSH hardening\"\n  expiration_date: 2027-04-18\n  run: false\n\n# ============ cis-dil-benchmark EXTENDED ============\n# 1.1.1.x — Rare filesystem modules (freevxfs, jffs2, hfs, hfsplus)\ncis-dil-benchmark-1.1.1.2:\n  justification: \"Legacy filesystem module rarely needed on cloud VM; not blocklisted by default on OL9/CentOS9\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.1.3:\n  justification: \"Legacy filesystem module rarely needed on cloud VM; not blocklisted by default on OL9/CentOS9\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.1.4:\n  justification: \"Legacy filesystem module rarely needed on cloud VM; not blocklisted by default on OL9/CentOS9\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.1.1.5:\n  justification: \"Legacy filesystem module rarely needed on cloud VM; not blocklisted by default on OL9/CentOS9\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 1.1.23 USB / 1.4.x grub / 1.5.x core-dumps / 1.6.2.2 SELinux\ncis-dil-benchmark-1.1.23:\n  justification: \"Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.4.1:\n  justification: \"Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.4.2:\n  justification: \"Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.4.3:\n  justification: \"Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.5.1:\n  justification: \"Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.5.2:\n  justification: \"Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-1.6.2.2:\n  justification: \"Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-2.2.7:\n  justification: \"Cloud VM: no physical USB; bootloader secured at hypervisor level; core dumps/ASLR default acceptable\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 3.2.x-3.3.x additional network hardening — same rationale as sysctl waivers\ncis-dil-benchmark-3.2.3:\n  justification: \"Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.2.4:\n  justification: \"Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.2.7:\n  justification: \"Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.2.9:\n  justification: \"Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.3.4:\n  justification: \"Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.3.5:\n  justification: \"Cloud VPC + k8s CNI manages routing; kernel sysctl hardening partially conflicts\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 3.4.x — TCP wrappers / hosts.allow / hosts.deny (deprecated since RHEL8/OL8)\ncis-dil-benchmark-3.4.1:\n  justification: \"TCP wrappers removed from OL9/CentOS9/RHEL9; access controlled via firewalld + Security Groups\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.4.2:\n  justification: \"TCP wrappers removed from OL9/CentOS9/RHEL9; access controlled via firewalld + Security Groups\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.4.3:\n  justification: \"TCP wrappers removed from OL9/CentOS9/RHEL9; access controlled via firewalld + Security Groups\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.4.4:\n  justification: \"TCP wrappers removed from OL9/CentOS9/RHEL9; access controlled via firewalld + Security Groups\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 3.5.x additional — using firewalld + flannel, not iptables/nftables directly\ncis-dil-benchmark-3.5.1.4:\n  justification: \"firewalld primary firewall; iptables/nftables default-deny would break k8s CNI\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-3.5.2.4:\n  justification: \"firewalld primary firewall; iptables/nftables default-deny would break k8s CNI\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 4.1.x — auditd rules (we use Signoz/OpenTelemetry for audit pipeline)\ncis-dil-benchmark-4.1.4:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.5:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.6:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.7:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.8:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.9:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.10:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.11:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.12:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.13:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.14:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.15:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.16:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.17:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.18:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.1.19:\n  justification: \"Cluster uses Signoz/OpenTelemetry audit pipeline; auditd not deployed\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 4.2.x — rsyslog / journald — k8s logs shipped via otel-collector\ncis-dil-benchmark-4.2.1.4:\n  justification: \"Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.2.1.5:\n  justification: \"Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.2.2.1:\n  justification: \"Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.2.2.2:\n  justification: \"Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.2.2.3:\n  justification: \"Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-4.2.3:\n  justification: \"Node logs shipped via otel-collector to Signoz ClickHouse; rsyslog/journald defaults acceptable\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 5.1.x — cron.d file perms — OL9/CentOS9 defaults, low risk on single-user VM\ncis-dil-benchmark-5.1.2:\n  justification: \"Cloud VM with single admin user; cron.d default perms acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.1.3:\n  justification: \"Cloud VM with single admin user; cron.d default perms acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.1.4:\n  justification: \"Cloud VM with single admin user; cron.d default perms acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.1.5:\n  justification: \"Cloud VM with single admin user; cron.d default perms acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.1.6:\n  justification: \"Cloud VM with single admin user; cron.d default perms acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.1.7:\n  justification: \"Cloud VM with single admin user; cron.d default perms acceptable\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.1.8:\n  justification: \"Cloud VM with single admin user; cron.d default perms acceptable\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 5.2.x — sshd_config — system crypto-policy manages\ncis-dil-benchmark-5.2.2:\n  justification: \"sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.2.13:\n  justification: \"sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.2.14:\n  justification: \"sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.2.15:\n  justification: \"sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.2.18:\n  justification: \"sshd hardened via system crypto-policy DEFAULT; OCI Security Groups restrict SSH source IPs\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 5.3.x PAM / 5.4.x password aging / 5.6 su — SSH key-only auth; local password is break-glass only\ncis-dil-benchmark-5.3.1:\n  justification: \"SSH key-only auth; local password is break-glass; PAM/aging not primary control\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.3.3:\n  justification: \"SSH key-only auth; local password is break-glass; PAM/aging not primary control\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.4.1.1:\n  justification: \"SSH key-only auth; local password is break-glass; PAM/aging not primary control\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.4.1.2:\n  justification: \"SSH key-only auth; local password is break-glass; PAM/aging not primary control\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.4.1.4:\n  justification: \"SSH key-only auth; local password is break-glass; PAM/aging not primary control\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.4.4:\n  justification: \"SSH key-only auth; local password is break-glass; PAM/aging not primary control\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.4.5:\n  justification: \"SSH key-only auth; local password is break-glass; PAM/aging not primary control\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-5.6:\n  justification: \"SSH key-only auth; local password is break-glass; PAM/aging not primary control\"\n  expiration_date: 2027-04-18\n  run: false\n\n# 6.1.6 / 6.2.x — filesystem user/group audits on single-user cloud VM\ncis-dil-benchmark-6.1.6:\n  justification: \"Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-6.2.1:\n  justification: \"Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-6.2.3:\n  justification: \"Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-6.2.6:\n  justification: \"Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-6.2.7:\n  justification: \"Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-6.2.8:\n  justification: \"Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC\"\n  expiration_date: 2027-04-18\n  run: false\ncis-dil-benchmark-6.2.9:\n  justification: \"Single-user OS VM managed via Chef/Puppet; user/group file integrity enforced by IaC\"\n  expiration_date: 2027-04-18\n  run: false\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"inspec-waivers","namespace":"inspec-scans"}}
+    name: inspec-waivers
+    namespace: inspec-scans
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: inspec-scans
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: inspec-scans
+kind: List
+metadata:

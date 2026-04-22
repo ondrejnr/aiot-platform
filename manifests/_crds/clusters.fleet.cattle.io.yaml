@@ -1,0 +1,88 @@
+apiVersion: v1
+items:
+- apiVersion: fleet.cattle.io/v1alpha1
+  kind: Cluster
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4xSTW/bMAz9KwPPTresX4mBHYqu2IoBHdAeix4Yiba1yJQgUUmNwP99kN1kbtcWvUnke+R7T9pBS4IaBaHcATI7QTGOY7661R9SEkmOgnFHCkUsHRn32WgoobJEMlM2RaEAxZtgt2UKs3qzhhJ8cBsTjWPD9QSymReffhnW3y4/OI2xJSjBOoX2Q+DoUdFB9MjrC7C4IjtYbZGxppZYJvwnczNtorfYvVz7LucF9oOKG4xNlvkVF7hcLpe4OKX5vKoWx2enJ3Q2V6SO8XwxPzlfVqvqPHt4ZdEbbqMnNbxyTSwXVWXYSJcL7DRN7z5QRSGQ/p6C4fpONaSTNVxf1+wO5atHUin/FSjv9xzivDjHKaq5evSBYhx/0/0O1tTtRU0sD2pyJJ4CigtQwjVDARu0iTIRJCSCh/6hL2BLpm4Eynn/0PfF6ORm4ngcO5sYn8UuCrVQwDqt6NJxZeo7UoFkH9osN9TQeAV1806egpLiIdF8sBjljoih5GTt89fIFE3RBNK3hLr7YeSWvItQfnne+Em2/e2f6uPXg3LXFxD+o4WX+EDRpaDo0iWWQdt08gBpTYyG6/HstKkM6eHCTv6hXPAN8lMnHMqJ1+y2PJy3aOTCezvycyCpbTF0r27dj+j7/m8AAAD//8ShLNx0BAAA
+      objectset.rio.cattle.io/id: fleet-cluster
+      objectset.rio.cattle.io/owner-gvk: provisioning.cattle.io/v1, Kind=Cluster
+      objectset.rio.cattle.io/owner-name: local
+      objectset.rio.cattle.io/owner-namespace: fleet-local
+    finalizers:
+    - fleet.cattle.io/cluster-finalizer
+    labels:
+      management.cattle.io/cluster-display-name: local
+      management.cattle.io/cluster-name: local
+      name: local
+      objectset.rio.cattle.io/hash: f2a8a9999a85e11ff83654e61cec3a781479fbf7
+    name: local
+    namespace: fleet-local
+  spec:
+    agentAffinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - preference:
+            matchExpressions:
+            - key: fleet.cattle.io/agent
+              operator: In
+              values:
+              - "true"
+          weight: 1
+    agentNamespace: cattle-fleet-local-system
+    clientID: xqhvr6xb6mql9dlvc4cbdv7xhwhxnvq8jcwxtvkqp4pgd5v58gkmgg
+    kubeConfigSecret: local-kubeconfig
+    kubeConfigSecretNamespace: fleet-local
+  status:
+    agent:
+      lastSeen: null
+      namespace: cattle-fleet-local-system
+    agentAffinityHash: f50425c0999a8e18c2d104cdb8cb063762763f232f538b5a7c8bdb61
+    agentDeployedGeneration: 0
+    agentMigrated: true
+    agentNamespaceMigrated: true
+    agentTLSMode: strict
+    apiServerCAHash: 68329cfa096e99653f006264fe476ecadc4b4a3a4bb0b36760c7ed6d
+    apiServerURL: https://10.96.0.1:443
+    cattleNamespaceMigrated: true
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:51:58Z"
+      status: "True"
+      type: Processed
+    - lastUpdateTime: "2026-04-19T21:46:57Z"
+      message: WaitApplied(1) [Bundle fleet-agent-local]
+      status: "False"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:52:01Z"
+      status: "True"
+      type: Imported
+    - lastUpdateTime: "2026-04-19T20:52:01Z"
+      status: "True"
+      type: Reconciled
+    desiredReadyGitRepos: 0
+    desiredReadyHelmOps: 0
+    display:
+      readyBundles: 0/1
+      state: WaitCheckIn
+    garbageCollectionInterval: 15m0s
+    namespace: cluster-fleet-local-local-1a3d67d0a899
+    readyGitRepos: 0
+    readyHelmOps: 0
+    resourceCounts:
+      desiredReady: 0
+      missing: 0
+      modified: 0
+      notReady: 0
+      orphaned: 0
+      ready: 0
+      unknown: 0
+      waitApplied: 0
+    summary:
+      desiredReady: 1
+      nonReadyResources:
+      - bundleState: WaitApplied
+        name: fleet-agent-local
+      ready: 0
+      waitApplied: 1
+kind: List
+metadata:

@@ -1,0 +1,23 @@
+apiVersion: v1
+items:
+- apiVersion: fleet.cattle.io/v1alpha1
+  kind: ClusterRegistration
+  metadata:
+    generateName: request-
+    name: request-v522x
+    namespace: fleet-local
+    ownerReferences:
+    - apiVersion: fleet.cattle.io/v1alpha1
+      kind: Cluster
+      name: local
+  spec:
+    clientID: xqhvr6xb6mql9dlvc4cbdv7xhwhxnvq8jcwxtvkqp4pgd5v58gkmgg
+    clientRandom: tl88p5w9lpfmjs86gnncdr7jmmtvckvvtv9grrjjdbk2bz64qlqnc6
+    clusterLabels:
+      fleet.cattle.io/created-by-agent-pod: fleet-agent-84984749c5-blp4b
+      name: local
+  status:
+    clusterName: local
+    granted: true
+kind: List
+metadata:

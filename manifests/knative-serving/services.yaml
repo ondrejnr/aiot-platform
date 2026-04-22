@@ -1,0 +1,233 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"activator","app.kubernetes.io/component":"activator","app.kubernetes.io/name":"knative-serving","app.kubernetes.io/version":"1.12.4"},"name":"activator-service","namespace":"knative-serving"},"spec":{"ports":[{"name":"http-metrics","port":9090,"targetPort":9090},{"name":"http-profiling","port":8008,"targetPort":8008},{"name":"http","port":80,"targetPort":8012},{"name":"http2","port":81,"targetPort":8013},{"name":"https","port":443,"targetPort":8112}],"selector":{"app":"activator"},"type":"ClusterIP"}}
+    labels:
+      app: activator
+      app.kubernetes.io/component: activator
+      app.kubernetes.io/name: knative-serving
+      app.kubernetes.io/version: 1.12.4
+    name: activator-service
+    namespace: knative-serving
+  spec:
+    clusterIP: 10.102.118.34
+    clusterIPs:
+    - 10.102.118.34
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-metrics
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+    - name: http-profiling
+      port: 8008
+      protocol: TCP
+      targetPort: 8008
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8012
+    - name: http2
+      port: 81
+      protocol: TCP
+      targetPort: 8013
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 8112
+    selector:
+      app: activator
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"autoscaler","app.kubernetes.io/component":"autoscaler","app.kubernetes.io/name":"knative-serving","app.kubernetes.io/version":"1.12.4"},"name":"autoscaler","namespace":"knative-serving"},"spec":{"ports":[{"name":"http-metrics","port":9090,"targetPort":9090},{"name":"http-profiling","port":8008,"targetPort":8008},{"name":"http","port":8080,"targetPort":8080}],"selector":{"app":"autoscaler"}}}
+    labels:
+      app: autoscaler
+      app.kubernetes.io/component: autoscaler
+      app.kubernetes.io/name: knative-serving
+      app.kubernetes.io/version: 1.12.4
+    name: autoscaler
+    namespace: knative-serving
+  spec:
+    clusterIP: 10.96.23.5
+    clusterIPs:
+    - 10.96.23.5
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-metrics
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+    - name: http-profiling
+      port: 8008
+      protocol: TCP
+      targetPort: 8008
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: autoscaler
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: autoscaler-bucket-00-of-01
+    namespace: knative-serving
+  spec:
+    clusterIP: 10.109.117.241
+    clusterIPs:
+    - 10.109.117.241
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"controller","app.kubernetes.io/component":"controller","app.kubernetes.io/name":"knative-serving","app.kubernetes.io/version":"1.12.4"},"name":"controller","namespace":"knative-serving"},"spec":{"ports":[{"name":"http-metrics","port":9090,"targetPort":9090},{"name":"http-profiling","port":8008,"targetPort":8008}],"selector":{"app":"controller"}}}
+    labels:
+      app: controller
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/name: knative-serving
+      app.kubernetes.io/version: 1.12.4
+    name: controller
+    namespace: knative-serving
+  spec:
+    clusterIP: 10.110.126.227
+    clusterIPs:
+    - 10.110.126.227
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-metrics
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+    - name: http-profiling
+      port: 8008
+      protocol: TCP
+      targetPort: 8008
+    selector:
+      app: controller
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"net-istio","app.kubernetes.io/name":"knative-serving","app.kubernetes.io/version":"1.12.3","networking.knative.dev/ingress-provider":"istio","role":"net-istio-webhook"},"name":"net-istio-webhook","namespace":"knative-serving"},"spec":{"ports":[{"name":"http-metrics","port":9090,"targetPort":"metrics"},{"name":"http-profiling","port":8008,"targetPort":"profiling"},{"name":"https-webhook","port":443,"targetPort":"https-webhook"}],"selector":{"app":"net-istio-webhook"}}}
+    labels:
+      app.kubernetes.io/component: net-istio
+      app.kubernetes.io/name: knative-serving
+      app.kubernetes.io/version: 1.12.3
+      networking.knative.dev/ingress-provider: istio
+      role: net-istio-webhook
+    name: net-istio-webhook
+    namespace: knative-serving
+  spec:
+    clusterIP: 10.107.16.182
+    clusterIPs:
+    - 10.107.16.182
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-metrics
+      port: 9090
+      protocol: TCP
+      targetPort: metrics
+    - name: http-profiling
+      port: 8008
+      protocol: TCP
+      targetPort: profiling
+    - name: https-webhook
+      port: 443
+      protocol: TCP
+      targetPort: https-webhook
+    selector:
+      app: net-istio-webhook
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"webhook","app.kubernetes.io/component":"webhook","app.kubernetes.io/name":"knative-serving","app.kubernetes.io/version":"1.12.4","role":"webhook"},"name":"webhook","namespace":"knative-serving"},"spec":{"ports":[{"name":"http-metrics","port":9090,"targetPort":9090},{"name":"http-profiling","port":8008,"targetPort":8008},{"name":"https-webhook","port":443,"targetPort":8443}],"selector":{"app":"webhook","role":"webhook"}}}
+    labels:
+      app: webhook
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/name: knative-serving
+      app.kubernetes.io/version: 1.12.4
+      role: webhook
+    name: webhook
+    namespace: knative-serving
+  spec:
+    clusterIP: 10.96.111.115
+    clusterIPs:
+    - 10.96.111.115
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-metrics
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+    - name: http-profiling
+      port: 8008
+      protocol: TCP
+      targetPort: 8008
+    - name: https-webhook
+      port: 443
+      protocol: TCP
+      targetPort: 8443
+    selector:
+      app: webhook
+      role: webhook
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:

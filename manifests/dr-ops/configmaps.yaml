@@ -1,0 +1,184 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    backup.sh: |
+      #!/bin/sh
+      set -eu
+      REPO_URL="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/ondrejnr/aiot-platform.git"
+      WORK=/tmp/repo
+      rm -rf "$WORK"
+      git clone --depth 1 "$REPO_URL" "$WORK"
+      cd "$WORK"
+      git config user.email "$GITHUB_EMAIL"
+      git config user.name  "dr-dns-bot"
+
+      OUT="$WORK/cloudflare/dns"
+      rm -rf "$OUT"
+      mkdir -p "$OUT"
+
+      CF="https://api.cloudflare.com/client/v4"
+      AUTH="Authorization: Bearer ${CF_TOKEN}"
+
+      # Verify token
+      curl -fsS -H "$AUTH" "$CF/user/tokens/verify" > "$OUT/_token-status.json"
+
+      # List zones (paginate up to 1000)
+      curl -fsS -H "$AUTH" "$CF/zones?per_page=50" > /tmp/zones.json
+      ZONES=$(jq -r '.result[] | "\(.id) \(.name)"' /tmp/zones.json)
+
+      if [ -z "$ZONES" ]; then
+        echo "WARN: no zones visible to this token"
+      fi
+
+      echo "$ZONES" | while read ZID ZNAME; do
+        [ -z "$ZID" ] && continue
+        echo "[zone] $ZNAME ($ZID)"
+        ZDIR="$OUT/$ZNAME"
+        mkdir -p "$ZDIR"
+        # Full zone JSON (records)
+        curl -fsS -H "$AUTH" "$CF/zones/$ZID/dns_records?per_page=1000" \
+          | jq '.result' > "$ZDIR/records.json"
+        # BIND export (canonical)
+        curl -fsS -H "$AUTH" "$CF/zones/$ZID/dns_records/export" \
+          > "$ZDIR/zone.bind" || true
+        # Zone settings
+        curl -fsS -H "$AUTH" "$CF/zones/$ZID" | jq '.result' > "$ZDIR/zone.json"
+      done
+
+      git add -A cloudflare/
+      if git diff --cached --quiet; then
+        echo "No DNS changes"
+        exit 0
+      fi
+      STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+      git commit -m "auto: cloudflare DNS snapshot $STAMP"
+      git push origin HEAD:main
+      echo "Pushed DNS snapshot $STAMP"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"backup.sh":"#!/bin/sh\nset -eu\nREPO_URL=\"https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/ondrejnr/aiot-platform.git\"\nWORK=/tmp/repo\nrm -rf \"$WORK\"\ngit clone --depth 1 \"$REPO_URL\" \"$WORK\"\ncd \"$WORK\"\ngit config user.email \"$GITHUB_EMAIL\"\ngit config user.name  \"dr-dns-bot\"\n\nOUT=\"$WORK/cloudflare/dns\"\nrm -rf \"$OUT\"\nmkdir -p \"$OUT\"\n\nCF=\"https://api.cloudflare.com/client/v4\"\nAUTH=\"Authorization: Bearer ${CF_TOKEN}\"\n\n# Verify token\ncurl -fsS -H \"$AUTH\" \"$CF/user/tokens/verify\" \u003e \"$OUT/_token-status.json\"\n\n# List zones (paginate up to 1000)\ncurl -fsS -H \"$AUTH\" \"$CF/zones?per_page=50\" \u003e /tmp/zones.json\nZONES=$(jq -r '.result[] | \"\\(.id) \\(.name)\"' /tmp/zones.json)\n\nif [ -z \"$ZONES\" ]; then\n  echo \"WARN: no zones visible to this token\"\nfi\n\necho \"$ZONES\" | while read ZID ZNAME; do\n  [ -z \"$ZID\" ] \u0026\u0026 continue\n  echo \"[zone] $ZNAME ($ZID)\"\n  ZDIR=\"$OUT/$ZNAME\"\n  mkdir -p \"$ZDIR\"\n  # Full zone JSON (records)\n  curl -fsS -H \"$AUTH\" \"$CF/zones/$ZID/dns_records?per_page=1000\" \\\n    | jq '.result' \u003e \"$ZDIR/records.json\"\n  # BIND export (canonical)\n  curl -fsS -H \"$AUTH\" \"$CF/zones/$ZID/dns_records/export\" \\\n    \u003e \"$ZDIR/zone.bind\" || true\n  # Zone settings\n  curl -fsS -H \"$AUTH\" \"$CF/zones/$ZID\" | jq '.result' \u003e \"$ZDIR/zone.json\"\ndone\n\ngit add -A cloudflare/\nif git diff --cached --quiet; then\n  echo \"No DNS changes\"\n  exit 0\nfi\nSTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)\ngit commit -m \"auto: cloudflare DNS snapshot $STAMP\"\ngit push origin HEAD:main\necho \"Pushed DNS snapshot $STAMP\"\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"dns-backup-script","namespace":"dr-ops"}}
+    name: dns-backup-script
+    namespace: dr-ops
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: dr-ops
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: dr-ops
+- apiVersion: v1
+  data:
+    backup.sh: |
+      #!/bin/sh
+      set -eu
+      REPO_URL="https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/ondrejnr/aiot-platform.git"
+      WORK=/tmp/repo
+      rm -rf "$WORK"
+      git clone --depth 1 "$REPO_URL" "$WORK"
+      cd "$WORK"
+      git config user.email "$GITHUB_EMAIL"
+      git config user.name  "dr-manifest-bot"
+
+      OUT="$WORK/manifests"
+      rm -rf "$OUT"
+      mkdir -p "$OUT/_cluster"
+
+      # cluster-scoped resources
+      for K in namespaces nodes persistentvolumes storageclasses clusterroles clusterrolebindings ingressclasses customresourcedefinitions; do
+        echo "[cluster] $K"
+        kubectl get "$K" -o yaml > "$OUT/_cluster/${K}.yaml" 2>/dev/null || true
+      done
+
+      NS_LIST=$(kubectl get ns -o jsonpath='{.items[*].metadata.name}')
+      NS_KINDS="deployments statefulsets daemonsets cronjobs jobs services ingresses configmaps persistentvolumeclaims serviceaccounts roles rolebindings networkpolicies horizontalpodautoscalers poddisruptionbudgets"
+
+      for NS in $NS_LIST; do
+        mkdir -p "$OUT/$NS"
+        for K in $NS_KINDS; do
+          DATA=$(kubectl -n "$NS" get "$K" -o yaml 2>/dev/null || true)
+          # skip if empty list
+          if echo "$DATA" | grep -q "^items: \[\]$"; then
+            continue
+          fi
+          if [ -n "$DATA" ]; then
+            echo "$DATA" > "$OUT/$NS/${K}.yaml"
+          fi
+        done
+        # secrets: only names + types, NEVER values
+        kubectl -n "$NS" get secrets -o custom-columns=NAME:.metadata.name,TYPE:.type --no-headers 2>/dev/null \
+          > "$OUT/$NS/_secrets.list" || true
+      done
+
+      # CRDs instances per group (best-effort, common ones)
+      mkdir -p "$OUT/_crds"
+      for CRD in $(kubectl get crd -o jsonpath='{.items[*].metadata.name}'); do
+        SCOPE=$(kubectl get crd "$CRD" -o jsonpath='{.spec.scope}')
+        if [ "$SCOPE" = "Namespaced" ]; then
+          kubectl get "$CRD" --all-namespaces -o yaml 2>/dev/null > "$OUT/_crds/${CRD}.yaml" || true
+        else
+          kubectl get "$CRD" -o yaml 2>/dev/null > "$OUT/_crds/${CRD}.yaml" || true
+        fi
+        # remove if empty list
+        if grep -q "^items: \[\]$" "$OUT/_crds/${CRD}.yaml" 2>/dev/null; then
+          rm -f "$OUT/_crds/${CRD}.yaml"
+        fi
+      done
+
+      # Strip volatile fields to reduce diff noise
+      find "$OUT" -type f -name '*.yaml' -print0 | xargs -0 -r sed -i \
+kind: List
+metadata:

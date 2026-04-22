@@ -1,0 +1,70 @@
+apiVersion: v1
+items:
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"batch/v1","kind":"CronJob","metadata":{"annotations":{},"name":"fleet-cleanup-gitrepo-jobs","namespace":"cattle-fleet-system"},"spec":{"concurrencyPolicy":"Forbid","failedJobsHistoryLimit":1,"jobTemplate":{"spec":{"backoffLimit":1,"template":{"metadata":{"labels":{"app":"fleet-job"}},"spec":{"containers":[{"args":["cleanup","gitjob"],"command":["fleet"],"image":"rancher/fleet:v0.14.3","imagePullPolicy":null,"name":"cleanup","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":false}}],"nodeSelector":{"kubernetes.io/os":"linux"},"restartPolicy":"Never","securityContext":{"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000},"serviceAccountName":"gitjob","tolerations":[{"effect":"NoSchedule","key":"cattle.io/os","operator":"Equal","value":"linux"}]}}}},"schedule":"@daily","successfulJobsHistoryLimit":0}}
+      meta.helm.sh/release-name: fleet
+      meta.helm.sh/release-namespace: cattle-fleet-system
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: fleet-cleanup-gitrepo-jobs
+    namespace: cattle-fleet-system
+  spec:
+    concurrencyPolicy: Forbid
+    failedJobsHistoryLimit: 1
+    jobTemplate:
+      metadata:
+      spec:
+        backoffLimit: 1
+        template:
+          metadata:
+            labels:
+              app: fleet-job
+          spec:
+            containers:
+            - args:
+              - cleanup
+              - gitjob
+              command:
+              - fleet
+              image: rancher/fleet:v0.14.3
+              imagePullPolicy: IfNotPresent
+              name: cleanup
+              resources: {}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                  - ALL
+                privileged: false
+                readOnlyRootFilesystem: false
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+            dnsPolicy: ClusterFirst
+            nodeSelector:
+              kubernetes.io/os: linux
+            restartPolicy: Never
+            schedulerName: default-scheduler
+            securityContext:
+              runAsGroup: 1000
+              runAsNonRoot: true
+              runAsUser: 1000
+            serviceAccount: gitjob
+            serviceAccountName: gitjob
+            terminationGracePeriodSeconds: 30
+            tolerations:
+            - effect: NoSchedule
+              key: cattle.io/os
+              operator: Equal
+              value: linux
+    schedule: '@daily'
+    successfulJobsHistoryLimit: 0
+    suspend: false
+  status:
+    lastScheduleTime: "2026-04-22T00:00:00Z"
+    lastSuccessfulTime: "2026-04-22T00:00:08Z"
+kind: List
+metadata:

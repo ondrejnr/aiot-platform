@@ -1,0 +1,77 @@
+apiVersion: v1
+items:
+- apiVersion: networking.internal.knative.dev/v1alpha1
+  kind: Ingress
+  metadata:
+    annotations:
+      networking.internal.knative.dev/rollout: '{"configurations":[{"configurationName":"maintenance-predictor-predictor","percent":100,"revisions":[{"revisionName":"maintenance-predictor-predictor-00004","percent":100}],"stepParams":{}}]}'
+      networking.knative.dev/ingress.class: istio.ingress.networking.knative.dev
+      serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+      serving.knative.dev/lastModifier: system:serviceaccount:kubeflow:kserve-controller-manager
+    finalizers:
+    - ingresses.networking.internal.knative.dev
+    labels:
+      component: predictor
+      serving.knative.dev/route: maintenance-predictor-predictor
+      serving.knative.dev/routeNamespace: kubeflow-user-example-com
+      serving.knative.dev/service: maintenance-predictor-predictor
+      serving.kserve.io/inferenceservice: maintenance-predictor
+    name: maintenance-predictor-predictor
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: serving.knative.dev/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Route
+      name: maintenance-predictor-predictor
+  spec:
+    httpOption: Enabled
+    rules:
+    - hosts:
+      - maintenance-predictor-predictor.kubeflow-user-example-com
+      - maintenance-predictor-predictor.kubeflow-user-example-com.svc
+      - maintenance-predictor-predictor.kubeflow-user-example-com.svc.cluster.local
+      http:
+        paths:
+        - splits:
+          - appendHeaders:
+              Knative-Serving-Namespace: kubeflow-user-example-com
+              Knative-Serving-Revision: maintenance-predictor-predictor-00004
+            percent: 100
+            serviceName: maintenance-predictor-predictor-00004
+            serviceNamespace: kubeflow-user-example-com
+            servicePort: 80
+      visibility: ClusterLocal
+    - hosts:
+      - maintenance-predictor-predictor.kubeflow-user-example-com.35.241.255.137.nip.io
+      http:
+        paths:
+        - splits:
+          - appendHeaders:
+              Knative-Serving-Namespace: kubeflow-user-example-com
+              Knative-Serving-Revision: maintenance-predictor-predictor-00004
+            percent: 100
+            serviceName: maintenance-predictor-predictor-00004
+            serviceNamespace: kubeflow-user-example-com
+            servicePort: 80
+      visibility: ExternalIP
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-20T05:30:28Z"
+      status: "True"
+      type: LoadBalancerReady
+    - lastTransitionTime: "2026-04-16T11:04:16Z"
+      status: "True"
+      type: NetworkConfigured
+    - lastTransitionTime: "2026-04-20T05:30:28Z"
+      status: "True"
+      type: Ready
+    observedGeneration: 4
+    privateLoadBalancer:
+      ingress:
+      - domainInternal: knative-local-gateway.istio-system.svc.cluster.local
+    publicLoadBalancer:
+      ingress:
+      - domainInternal: istio-ingressgateway.istio-system.svc.cluster.local
+kind: List
+metadata:

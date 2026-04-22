@@ -1,0 +1,20 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  kind: FleetWorkspace
+  metadata:
+    name: fleet-default
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: FleetWorkspace
+  metadata:
+    annotations:
+      provisioning.cattle.io/managed: "false"
+    name: fleet-local
+    ownerReferences:
+    - apiVersion: v1
+      kind: Namespace
+      name: fleet-local
+  status: {}
+kind: List
+metadata:

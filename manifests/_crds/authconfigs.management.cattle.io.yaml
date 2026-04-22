@@ -1,0 +1,216 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: false
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+      migration-ad-guid-migration-status: Finished
+      migration-statusLastUpdated: "2026-04-19T20:47:36Z"
+    labels:
+      cattle.io/creator: norman
+    name: activedirectory
+  status:
+    conditions: null
+  type: activeDirectoryConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: true
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: adfs
+  status:
+    conditions: null
+  type: adfsConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: false
+  metadata:
+    annotations:
+      auth.cattle.io/azuread-endpoint-migrated: "true"
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: azuread
+  status:
+    conditions: null
+  type: azureADConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: true
+  metadata:
+    annotations:
+      auth.cattle.io/unused-secrets-cleaned: "true"
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: cognito
+  status:
+    conditions: null
+  type: cognitoConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: false
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: freeipa
+  status:
+    conditions: null
+  type: freeIpaConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: true
+  metadata:
+    annotations:
+      auth.cattle.io/unused-secrets-cleaned: "true"
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: genericoidc
+  status:
+    conditions: null
+  type: genericOIDCConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: false
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: github
+  status:
+    conditions: null
+  type: githubConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: false
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: githubapp
+  status:
+    conditions: null
+  type: githubAppConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: false
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: googleoauth
+  status:
+    conditions: null
+  type: googleOauthConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: true
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: keycloak
+  status:
+    conditions: null
+  type: keyCloakConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: true
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: keycloakoidc
+  status:
+    conditions: null
+  type: keyCloakOIDCConfig
+- apiVersion: management.cattle.io/v3
+  enabled: true
+  kind: AuthConfig
+  logoutAllSupported: false
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: unlocked
+    labels:
+      cattle.io/creator: norman
+    name: local
+  status:
+    conditions:
+    - status: "True"
+      type: SecretsMigrated
+  type: localConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: true
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: oidc
+  status:
+    conditions: null
+  type: oidcConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: true
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: okta
+  status:
+    conditions: null
+  type: oktaConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: false
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: openldap
+  status:
+    conditions: null
+  type: openLdapConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: true
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: ping
+  status:
+    conditions: null
+  type: pingConfig
+- apiVersion: management.cattle.io/v3
+  kind: AuthConfig
+  logoutAllSupported: true
+  metadata:
+    annotations:
+      management.cattle.io/auth-provider-cleanup: rancher-locked
+    labels:
+      cattle.io/creator: norman
+    name: shibboleth
+  status:
+    conditions: null
+  type: shibbolethConfig
+kind: List
+metadata:

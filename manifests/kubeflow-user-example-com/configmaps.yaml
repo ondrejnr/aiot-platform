@@ -1,0 +1,455 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    train.py: |
+      #!/usr/bin/env python3
+      """
+      Cluster Metrics Anomaly Detection & Capacity Forecasting
+      - Trains IsolationForest for anomaly detection
+      - Trains XGBoost for CPU/RAM capacity forecasting (next 1h)
+      - Logs both models + metrics to MLflow
+      """
+      import os, sys, json, warnings
+      warnings.filterwarnings("ignore")
+
+      import pandas as pd
+      import numpy as np
+      import psycopg2
+      from datetime import datetime, timedelta
+
+      from sklearn.ensemble import IsolationForest
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.model_selection import train_test_split
+      from sklearn.metrics import mean_absolute_error, mean_squared_error
+      import xgboost as xgb
+      import mlflow
+      import mlflow.sklearn
+      import mlflow.xgboost
+      import joblib
+
+      # Config
+      PG_DSN = "host=postgres.aiot.svc dbname=aiot user=aiot password=aiot123"
+      MLFLOW_URI = "http://mlflow-server.mlflow.svc:5000"
+      EXPERIMENT = "cluster-capacity-model"
+      MIN_ROWS = 50  # minimum rows needed to train
+
+      def load_data():
+          conn = psycopg2.connect(PG_DSN)
+          df = pd.read_sql("""
+              SELECT ts, node_name, cpu_usage_percent, memory_usage_percent,
+                     memory_available_bytes, disk_usage_percent,
+                     disk_io_read_bytes_rate, disk_io_write_bytes_rate,
+                     network_rx_bytes_rate, network_tx_bytes_rate,
+                     load_avg_1m, load_avg_5m, load_avg_15m,
+                     pods_running
+              FROM cluster_metrics
+              WHERE cpu_usage_percent IS NOT NULL
+                AND ts > NOW() - INTERVAL '14 days'
+              ORDER BY ts
+          """, conn)
+          conn.close()
+          df["ts"] = pd.to_datetime(df["ts"])
+          return df
+
+      def add_features(df):
+          """Add time-based and rolling features per node"""
+          df = df.sort_values(["node_name", "ts"])
+          df["hour"] = df["ts"].dt.hour
+          df["day_of_week"] = df["ts"].dt.dayofweek
+          df["minute_of_day"] = df["ts"].dt.hour * 60 + df["ts"].dt.minute
+
+          for col in ["cpu_usage_percent", "memory_usage_percent", "load_avg_1m"]:
+              if col in df.columns:
+                  df[f"{col}_rolling_mean_12"] = df.groupby("node_name")[col].transform(
+                      lambda x: x.rolling(12, min_periods=1).mean()
+                  )
+                  df[f"{col}_rolling_std_12"] = df.groupby("node_name")[col].transform(
+                      lambda x: x.rolling(12, min_periods=1).std().fillna(0)
+                  )
+                  df[f"{col}_diff"] = df.groupby("node_name")[col].diff().fillna(0)
+
+          # Target: next value (1 step = 5 min ahead)
+          for target_col in ["cpu_usage_percent", "memory_usage_percent"]:
+              df[f"{target_col}_next"] = df.groupby("node_name")[target_col].shift(-12)  # 1 hour ahead
+
+          return df
+
+      def train_anomaly_model(df, mlflow_run):
+          """Train IsolationForest on all node metrics"""
+          feature_cols = ["cpu_usage_percent", "memory_usage_percent", "load_avg_1m",
+                          "load_avg_5m", "load_avg_15m", "disk_io_read_bytes_rate",
+                          "disk_io_write_bytes_rate", "network_rx_bytes_rate",
+                          "network_tx_bytes_rate", "pods_running"]
+          feature_cols = [c for c in feature_cols if c in df.columns]
+          X = df[feature_cols].dropna()
+
+          if len(X) < MIN_ROWS:
+              print(f"  Anomaly: only {len(X)} rows, need {MIN_ROWS}. Skipping.")
+              return
+
+          scaler = StandardScaler()
+          X_scaled = scaler.fit_transform(X)
+
+          model = IsolationForest(contamination=0.05, random_state=42, n_estimators=100)
+          model.fit(X_scaled)
+
+          scores = model.decision_function(X_scaled)
+          anomalies = (model.predict(X_scaled) == -1).sum()
+
+          mlflow.log_param("anomaly_features", len(feature_cols))
+          mlflow.log_param("anomaly_samples", len(X))
+          mlflow.log_metric("anomaly_count", int(anomalies))
+          mlflow.log_metric("anomaly_pct", round(anomalies / len(X) * 100, 2))
+          mlflow.log_metric("anomaly_score_mean", round(float(scores.mean()), 4))
+
+          mlflow.sklearn.log_model(model, "anomaly_model")
+          joblib.dump(scaler, "/tmp/anomaly_scaler.pkl")
+          mlflow.log_artifact("/tmp/anomaly_scaler.pkl")
+
+          print(f"  Anomaly model: {len(X)} samples, {anomalies} anomalies ({anomalies/len(X)*100:.1f}%)")
+
+      def train_forecast_model(df, target_col, mlflow_run):
+          """Train XGBoost to predict target_col 1 hour ahead"""
+          target = f"{target_col}_next"
+          feature_cols = ["cpu_usage_percent", "memory_usage_percent", "load_avg_1m",
+                          "load_avg_5m", "load_avg_15m", "disk_usage_percent",
+                          "pods_running", "hour", "day_of_week", "minute_of_day",
+                          f"cpu_usage_percent_rolling_mean_12", f"cpu_usage_percent_rolling_std_12",
+                          f"cpu_usage_percent_diff",
+                          f"memory_usage_percent_rolling_mean_12", f"memory_usage_percent_rolling_std_12",
+                          f"memory_usage_percent_diff"]
+          feature_cols = [c for c in feature_cols if c in df.columns]
+
+          data = df[feature_cols + [target]].dropna()
+          if len(data) < MIN_ROWS:
+              print(f"  Forecast {target_col}: only {len(data)} rows, need {MIN_ROWS}. Skipping.")
+              return
+
+          X = data[feature_cols]
+          y = data[target]
+          X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+
+          model = xgb.XGBRegressor(
+              n_estimators=100, max_depth=6, learning_rate=0.1,
+              random_state=42, objective="reg:squarederror"
+          )
+          model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
+
+          preds = model.predict(X_test)
+          mae = mean_absolute_error(y_test, preds)
+          rmse = np.sqrt(mean_squared_error(y_test, preds))
+
+          short = target_col.replace("_usage_percent", "")
+          mlflow.log_metric(f"{short}_forecast_mae", round(mae, 4))
+          mlflow.log_metric(f"{short}_forecast_rmse", round(rmse, 4))
+          mlflow.log_param(f"{short}_forecast_samples", len(data))
+          mlflow.xgboost.log_model(model, f"{short}_forecast_model")
+
+          print(f"  Forecast {short}: MAE={mae:.2f}%, RMSE={rmse:.2f}% ({len(data)} samples)")
+
+      def main():
+          print("=" * 50)
+          print("Cluster ML Training Pipeline")
+          print("=" * 50)
+
+          mlflow.set_tracking_uri(MLFLOW_URI)
+          mlflow.set_experiment(EXPERIMENT)
+          try:
+              mlflow.enable_system_metrics_logging()
+              print("   System metrics logging enabled (cpu/mem/disk/net sampled each run)")
+          except Exception as e:
+              print(f"   WARN: system metrics not enabled: {e}")
+
+          print("\n1. Loading data from PostgreSQL...")
+          df = load_data()
+          print(f"   Loaded {len(df)} rows, {df['node_name'].nunique()} nodes")
+          print(f"   Date range: {df['ts'].min()} to {df['ts'].max()}")
+
+          if len(df) < MIN_ROWS:
+              print(f"\nNot enough data yet ({len(df)} < {MIN_ROWS}). Collect more metrics first.")
+              print("CronJob runs every 5min × 6 nodes = 72 rows/hour. Need ~1 hour of data.")
+              sys.exit(0)
+
+          print("\n2. Feature engineering...")
+          df = add_features(df)
+
+          print("\n3. Training models...")
+          with mlflow.start_run(run_name=f"cluster-train-{datetime.now().strftime('%Y%m%d-%H%M')}") as run:
+              mlflow.log_param("total_rows", len(df))
+              mlflow.log_param("nodes", df["node_name"].nunique())
+              mlflow.log_param("date_range_start", str(df["ts"].min()))
+              mlflow.log_param("date_range_end", str(df["ts"].max()))
+
+              train_anomaly_model(df, run)
+              train_forecast_model(df, "cpu_usage_percent", run)
+              train_forecast_model(df, "memory_usage_percent", run)
+
+              summary = {"rows": len(df), "nodes": int(df["node_name"].nunique()), "ts_min": str(df["ts"].min()), "ts_max": str(df["ts"].max()), "run_id": run.info.run_id}
+              with open("/tmp/summary.json", "w") as f:
+                  json.dump(summary, f, indent=2)
+              mlflow.log_artifact("/tmp/summary.json")
+
+              print(f"\n   MLflow run: {run.info.run_id}")
+
+          print("\n4. Done!")
+          print(f"   View results: mlflow.35.241.255.137.nip.io/#/experiments")
+
+      if __name__ == "__main__":
+          main()
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"train.py":"#!/usr/bin/env python3\n\"\"\"\nCluster Metrics Anomaly Detection \u0026 Capacity Forecasting\n- Trains IsolationForest for anomaly detection\n- Trains XGBoost for CPU/RAM capacity forecasting (next 1h)\n- Logs both models + metrics to MLflow\n\"\"\"\nimport os, sys, json, warnings\nwarnings.filterwarnings(\"ignore\")\n\nimport pandas as pd\nimport numpy as np\nimport psycopg2\nfrom datetime import datetime, timedelta\n\nfrom sklearn.ensemble import IsolationForest\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import mean_absolute_error, mean_squared_error\nimport xgboost as xgb\nimport mlflow\nimport mlflow.sklearn\nimport mlflow.xgboost\nimport joblib\n\n# Config\nPG_DSN = \"host=postgres.aiot.svc dbname=aiot user=aiot password=aiot123\"\nMLFLOW_URI = \"http://mlflow-server.mlflow.svc:5000\"\nEXPERIMENT = \"cluster-capacity-model\"\nMIN_ROWS = 50  # minimum rows needed to train\n\ndef load_data():\n    conn = psycopg2.connect(PG_DSN)\n    df = pd.read_sql(\"\"\"\n        SELECT ts, node_name, cpu_usage_percent, memory_usage_percent,\n               memory_available_bytes, disk_usage_percent,\n               disk_io_read_bytes_rate, disk_io_write_bytes_rate,\n               network_rx_bytes_rate, network_tx_bytes_rate,\n               load_avg_1m, load_avg_5m, load_avg_15m,\n               pods_running\n        FROM cluster_metrics\n        WHERE cpu_usage_percent IS NOT NULL\n          AND ts \u003e NOW() - INTERVAL '14 days'\n        ORDER BY ts\n    \"\"\", conn)\n    conn.close()\n    df[\"ts\"] = pd.to_datetime(df[\"ts\"])\n    return df\n\ndef add_features(df):\n    \"\"\"Add time-based and rolling features per node\"\"\"\n    df = df.sort_values([\"node_name\", \"ts\"])\n    df[\"hour\"] = df[\"ts\"].dt.hour\n    df[\"day_of_week\"] = df[\"ts\"].dt.dayofweek\n    df[\"minute_of_day\"] = df[\"ts\"].dt.hour * 60 + df[\"ts\"].dt.minute\n\n    for col in [\"cpu_usage_percent\", \"memory_usage_percent\", \"load_avg_1m\"]:\n        if col in df.columns:\n            df[f\"{col}_rolling_mean_12\"] = df.groupby(\"node_name\")[col].transform(\n                lambda x: x.rolling(12, min_periods=1).mean()\n            )\n            df[f\"{col}_rolling_std_12\"] = df.groupby(\"node_name\")[col].transform(\n                lambda x: x.rolling(12, min_periods=1).std().fillna(0)\n            )\n            df[f\"{col}_diff\"] = df.groupby(\"node_name\")[col].diff().fillna(0)\n\n    # Target: next value (1 step = 5 min ahead)\n    for target_col in [\"cpu_usage_percent\", \"memory_usage_percent\"]:\n        df[f\"{target_col}_next\"] = df.groupby(\"node_name\")[target_col].shift(-12)  # 1 hour ahead\n\n    return df\n\ndef train_anomaly_model(df, mlflow_run):\n    \"\"\"Train IsolationForest on all node metrics\"\"\"\n    feature_cols = [\"cpu_usage_percent\", \"memory_usage_percent\", \"load_avg_1m\",\n                    \"load_avg_5m\", \"load_avg_15m\", \"disk_io_read_bytes_rate\",\n                    \"disk_io_write_bytes_rate\", \"network_rx_bytes_rate\",\n                    \"network_tx_bytes_rate\", \"pods_running\"]\n    feature_cols = [c for c in feature_cols if c in df.columns]\n    X = df[feature_cols].dropna()\n\n    if len(X) \u003c MIN_ROWS:\n        print(f\"  Anomaly: only {len(X)} rows, need {MIN_ROWS}. Skipping.\")\n        return\n\n    scaler = StandardScaler()\n    X_scaled = scaler.fit_transform(X)\n\n    model = IsolationForest(contamination=0.05, random_state=42, n_estimators=100)\n    model.fit(X_scaled)\n\n    scores = model.decision_function(X_scaled)\n    anomalies = (model.predict(X_scaled) == -1).sum()\n\n    mlflow.log_param(\"anomaly_features\", len(feature_cols))\n    mlflow.log_param(\"anomaly_samples\", len(X))\n    mlflow.log_metric(\"anomaly_count\", int(anomalies))\n    mlflow.log_metric(\"anomaly_pct\", round(anomalies / len(X) * 100, 2))\n    mlflow.log_metric(\"anomaly_score_mean\", round(float(scores.mean()), 4))\n\n    mlflow.sklearn.log_model(model, \"anomaly_model\")\n    joblib.dump(scaler, \"/tmp/anomaly_scaler.pkl\")\n    mlflow.log_artifact(\"/tmp/anomaly_scaler.pkl\")\n\n    print(f\"  Anomaly model: {len(X)} samples, {anomalies} anomalies ({anomalies/len(X)*100:.1f}%)\")\n\ndef train_forecast_model(df, target_col, mlflow_run):\n    \"\"\"Train XGBoost to predict target_col 1 hour ahead\"\"\"\n    target = f\"{target_col}_next\"\n    feature_cols = [\"cpu_usage_percent\", \"memory_usage_percent\", \"load_avg_1m\",\n                    \"load_avg_5m\", \"load_avg_15m\", \"disk_usage_percent\",\n                    \"pods_running\", \"hour\", \"day_of_week\", \"minute_of_day\",\n                    f\"cpu_usage_percent_rolling_mean_12\", f\"cpu_usage_percent_rolling_std_12\",\n                    f\"cpu_usage_percent_diff\",\n                    f\"memory_usage_percent_rolling_mean_12\", f\"memory_usage_percent_rolling_std_12\",\n                    f\"memory_usage_percent_diff\"]\n    feature_cols = [c for c in feature_cols if c in df.columns]\n\n    data = df[feature_cols + [target]].dropna()\n    if len(data) \u003c MIN_ROWS:\n        print(f\"  Forecast {target_col}: only {len(data)} rows, need {MIN_ROWS}. Skipping.\")\n        return\n\n    X = data[feature_cols]\n    y = data[target]\n    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)\n\n    model = xgb.XGBRegressor(\n        n_estimators=100, max_depth=6, learning_rate=0.1,\n        random_state=42, objective=\"reg:squarederror\"\n    )\n    model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)\n\n    preds = model.predict(X_test)\n    mae = mean_absolute_error(y_test, preds)\n    rmse = np.sqrt(mean_squared_error(y_test, preds))\n\n    short = target_col.replace(\"_usage_percent\", \"\")\n    mlflow.log_metric(f\"{short}_forecast_mae\", round(mae, 4))\n    mlflow.log_metric(f\"{short}_forecast_rmse\", round(rmse, 4))\n    mlflow.log_param(f\"{short}_forecast_samples\", len(data))\n    mlflow.xgboost.log_model(model, f\"{short}_forecast_model\")\n\n    print(f\"  Forecast {short}: MAE={mae:.2f}%, RMSE={rmse:.2f}% ({len(data)} samples)\")\n\ndef main():\n    print(\"=\" * 50)\n    print(\"Cluster ML Training Pipeline\")\n    print(\"=\" * 50)\n\n    mlflow.set_tracking_uri(MLFLOW_URI)\n    mlflow.set_experiment(EXPERIMENT)\n    try:\n        mlflow.enable_system_metrics_logging()\n        print(\"   System metrics logging enabled (cpu/mem/disk/net sampled each run)\")\n    except Exception as e:\n        print(f\"   WARN: system metrics not enabled: {e}\")\n\n    print(\"\\n1. Loading data from PostgreSQL...\")\n    df = load_data()\n    print(f\"   Loaded {len(df)} rows, {df['node_name'].nunique()} nodes\")\n    print(f\"   Date range: {df['ts'].min()} to {df['ts'].max()}\")\n\n    if len(df) \u003c MIN_ROWS:\n        print(f\"\\nNot enough data yet ({len(df)} \u003c {MIN_ROWS}). Collect more metrics first.\")\n        print(\"CronJob runs every 5min × 6 nodes = 72 rows/hour. Need ~1 hour of data.\")\n        sys.exit(0)\n\n    print(\"\\n2. Feature engineering...\")\n    df = add_features(df)\n\n    print(\"\\n3. Training models...\")\n    with mlflow.start_run(run_name=f\"cluster-train-{datetime.now().strftime('%Y%m%d-%H%M')}\") as run:\n        mlflow.log_param(\"total_rows\", len(df))\n        mlflow.log_param(\"nodes\", df[\"node_name\"].nunique())\n        mlflow.log_param(\"date_range_start\", str(df[\"ts\"].min()))\n        mlflow.log_param(\"date_range_end\", str(df[\"ts\"].max()))\n\n        train_anomaly_model(df, run)\n        train_forecast_model(df, \"cpu_usage_percent\", run)\n        train_forecast_model(df, \"memory_usage_percent\", run)\n\n        summary = {\"rows\": len(df), \"nodes\": int(df[\"node_name\"].nunique()), \"ts_min\": str(df[\"ts\"].min()), \"ts_max\": str(df[\"ts\"].max()), \"run_id\": run.info.run_id}\n        with open(\"/tmp/summary.json\", \"w\") as f:\n            json.dump(summary, f, indent=2)\n        mlflow.log_artifact(\"/tmp/summary.json\")\n\n        print(f\"\\n   MLflow run: {run.info.run_id}\")\n\n    print(\"\\n4. Done!\")\n    print(f\"   View results: mlflow.35.241.255.137.nip.io/#/experiments\")\n\nif __name__ == \"__main__\":\n    main()\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"cluster-ml-train-script","namespace":"kubeflow-user-example-com"}}
+    name: cluster-ml-train-script
+    namespace: kubeflow-user-example-com
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: kubeflow-user-example-com
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: kubeflow-user-example-com
+- apiVersion: v1
+  data:
+    train.py: |
+      import os, json, time, urllib.request
+      import numpy as np, pandas as pd, psycopg2
+      from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+      from sklearn.model_selection import train_test_split
+      from sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score
+      import mlflow, mlflow.sklearn
+
+      ML=os.environ["MLFLOW_TRACKING_URI"]
+      mlflow.set_tracking_uri(ML)
+      EXP=os.environ.get("MLFLOW_EXPERIMENT","maintenance-predictor-fixed")
+      MODEL_NAME=os.environ.get("MODEL_NAME","maintenance-predictor")
+      mlflow.set_experiment(EXP)
+      try:
+          mlflow.enable_system_metrics_logging()
+          print("System metrics logging enabled")
+      except Exception as e:
+          print(f"WARN system metrics: {e}")
+
+      print("1. Loading data from Postgres...")
+      conn=psycopg2.connect(host=os.environ["DB_HOST"], dbname=os.environ["DB_NAME"],
+          user=os.environ["DB_USER"], password=os.environ["DB_PASSWORD"])
+      df=pd.read_sql("""
+        SELECT temperature, vibration, pressure, rpm, humidity, anomaly_score, status
+        FROM sensor_data
+        WHERE ts > now() - make_interval(days => 7)
+          AND temperature IS NOT NULL AND vibration IS NOT NULL
+          AND pressure IS NOT NULL AND rpm IS NOT NULL
+          AND humidity IS NOT NULL AND anomaly_score IS NOT NULL
+          AND status IS NOT NULL
+      """, conn)
+      conn.close()
+      print(f"   {len(df)} rows, status dist: {df.status.value_counts().to_dict()}")
+      if len(df) < 1000:
+          raise SystemExit("Not enough data to train")
+
+      FEAT=["temperature","vibration","pressure","rpm","humidity","anomaly_score"]
+      X=df[FEAT].values
+      y=df["status"].map({"OK":0,"WARNING":1,"CRITICAL":2}).values
+      Xtr,Xte,ytr,yte=train_test_split(X,y,test_size=0.2,random_state=42,stratify=y)
+
+      best=None
+      for algo,ctor in [("rf", lambda: RandomForestClassifier(n_estimators=200,max_depth=12,n_jobs=-1,random_state=42)),
+                         ("gb", lambda: GradientBoostingClassifier(n_estimators=150,max_depth=5,random_state=42))]:
+          print(f"2. Training {algo}...")
+          ts=time.strftime("%Y%m%d-%H%M%S")
+          with mlflow.start_run(run_name=f"{algo}-weekly-{ts}") as run:
+              m=ctor(); m.fit(Xtr,ytr)
+              pred=m.predict(Xte)
+              f1=f1_score(yte,pred,average="weighted")
+              acc=accuracy_score(yte,pred)
+              prec=precision_score(yte,pred,average="weighted",zero_division=0)
+              rec=recall_score(yte,pred,average="weighted")
+              mlflow.log_params({"algo":algo,"features":",".join(FEAT),"n_train":len(Xtr),"n_test":len(Xte)})
+              mlflow.log_metrics({"f1":f1,"accuracy":acc,"precision":prec,"recall":rec})
+              mlflow.sklearn.log_model(m, artifact_path="model",
+                  registered_model_name=MODEL_NAME)
+              _summary={"algo":algo,"f1":f1,"accuracy":acc,"precision":prec,"recall":rec,"n_train":len(Xtr),"n_test":len(Xte),"features":FEAT,"run_id":run.info.run_id}
+              open("/tmp/summary.json","w").write(json.dumps(_summary, indent=2))
+              mlflow.log_artifact("/tmp/summary.json")
+              print(f"   {algo}: f1={f1:.4f} acc={acc:.4f} run={run.info.run_id[:8]}")
+              if best is None or f1 > best[0]:
+                  best=(f1, algo, run.info.run_id)
+      print(f"3. Best: {best[1]} f1={best[0]:.4f} run={best[2][:8]}")
+      # Update description on latest version
+      import urllib.request
+      qs=urllib.request.urlopen(ML+f"/api/2.0/mlflow/model-versions/search?filter=name%3D%27{MODEL_NAME}%27&max_results=5&order_by=version_number+DESC", timeout=30).read()
+      vers=json.loads(qs).get("model_versions",[])
+      for v in vers[:2]:
+          req=urllib.request.Request(ML+"/api/2.0/mlflow/model-versions/update",
+              data=json.dumps({"name":MODEL_NAME,"version":v["version"],
+                  "description":f"Weekly retrain, algo=likely {best[1] if v['run_id']==best[2] else ('rf' if best[1]=='gb' else 'gb')}, f1={best[0]:.4f}"}).encode(),
+              method="PATCH", headers={"Content-Type":"application/json"})
+          try: urllib.request.urlopen(req, timeout=15)
+          except Exception as e: print(f"   warn: desc update v{v['version']}: {e}")
+      print("4. Done.")
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"train.py":"import os, json, time, urllib.request\nimport numpy as np, pandas as pd, psycopg2\nfrom sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import f1_score, accuracy_score, precision_score, recall_score\nimport mlflow, mlflow.sklearn\n\nML=os.environ[\"MLFLOW_TRACKING_URI\"]\nmlflow.set_tracking_uri(ML)\nEXP=os.environ.get(\"MLFLOW_EXPERIMENT\",\"maintenance-predictor-fixed\")\nMODEL_NAME=os.environ.get(\"MODEL_NAME\",\"maintenance-predictor\")\nmlflow.set_experiment(EXP)\ntry:\n    mlflow.enable_system_metrics_logging()\n    print(\"System metrics logging enabled\")\nexcept Exception as e:\n    print(f\"WARN system metrics: {e}\")\n\nprint(\"1. Loading data from Postgres...\")\nconn=psycopg2.connect(host=os.environ[\"DB_HOST\"], dbname=os.environ[\"DB_NAME\"],\n    user=os.environ[\"DB_USER\"], password=os.environ[\"DB_PASSWORD\"])\ndf=pd.read_sql(\"\"\"\n  SELECT temperature, vibration, pressure, rpm, humidity, anomaly_score, status\n  FROM sensor_data\n  WHERE ts \u003e now() - make_interval(days =\u003e 7)\n    AND temperature IS NOT NULL AND vibration IS NOT NULL\n    AND pressure IS NOT NULL AND rpm IS NOT NULL\n    AND humidity IS NOT NULL AND anomaly_score IS NOT NULL\n    AND status IS NOT NULL\n\"\"\", conn)\nconn.close()\nprint(f\"   {len(df)} rows, status dist: {df.status.value_counts().to_dict()}\")\nif len(df) \u003c 1000:\n    raise SystemExit(\"Not enough data to train\")\n\nFEAT=[\"temperature\",\"vibration\",\"pressure\",\"rpm\",\"humidity\",\"anomaly_score\"]\nX=df[FEAT].values\ny=df[\"status\"].map({\"OK\":0,\"WARNING\":1,\"CRITICAL\":2}).values\nXtr,Xte,ytr,yte=train_test_split(X,y,test_size=0.2,random_state=42,stratify=y)\n\nbest=None\nfor algo,ctor in [(\"rf\", lambda: RandomForestClassifier(n_estimators=200,max_depth=12,n_jobs=-1,random_state=42)),\n                   (\"gb\", lambda: GradientBoostingClassifier(n_estimators=150,max_depth=5,random_state=42))]:\n    print(f\"2. Training {algo}...\")\n    ts=time.strftime(\"%Y%m%d-%H%M%S\")\n    with mlflow.start_run(run_name=f\"{algo}-weekly-{ts}\") as run:\n        m=ctor(); m.fit(Xtr,ytr)\n        pred=m.predict(Xte)\n        f1=f1_score(yte,pred,average=\"weighted\")\n        acc=accuracy_score(yte,pred)\n        prec=precision_score(yte,pred,average=\"weighted\",zero_division=0)\n        rec=recall_score(yte,pred,average=\"weighted\")\n        mlflow.log_params({\"algo\":algo,\"features\":\",\".join(FEAT),\"n_train\":len(Xtr),\"n_test\":len(Xte)})\n        mlflow.log_metrics({\"f1\":f1,\"accuracy\":acc,\"precision\":prec,\"recall\":rec})\n        mlflow.sklearn.log_model(m, artifact_path=\"model\",\n            registered_model_name=MODEL_NAME)\n        _summary={\"algo\":algo,\"f1\":f1,\"accuracy\":acc,\"precision\":prec,\"recall\":rec,\"n_train\":len(Xtr),\"n_test\":len(Xte),\"features\":FEAT,\"run_id\":run.info.run_id}\n        open(\"/tmp/summary.json\",\"w\").write(json.dumps(_summary, indent=2))\n        mlflow.log_artifact(\"/tmp/summary.json\")\n        print(f\"   {algo}: f1={f1:.4f} acc={acc:.4f} run={run.info.run_id[:8]}\")\n        if best is None or f1 \u003e best[0]:\n            best=(f1, algo, run.info.run_id)\nprint(f\"3. Best: {best[1]} f1={best[0]:.4f} run={best[2][:8]}\")\n# Update description on latest version\nimport urllib.request\nqs=urllib.request.urlopen(ML+f\"/api/2.0/mlflow/model-versions/search?filter=name%3D%27{MODEL_NAME}%27\u0026max_results=5\u0026order_by=version_number+DESC\", timeout=30).read()\nvers=json.loads(qs).get(\"model_versions\",[])\nfor v in vers[:2]:\n    req=urllib.request.Request(ML+\"/api/2.0/mlflow/model-versions/update\",\n        data=json.dumps({\"name\":MODEL_NAME,\"version\":v[\"version\"],\n            \"description\":f\"Weekly retrain, algo=likely {best[1] if v['run_id']==best[2] else ('rf' if best[1]=='gb' else 'gb')}, f1={best[0]:.4f}\"}).encode(),\n        method=\"PATCH\", headers={\"Content-Type\":\"application/json\"})\n    try: urllib.request.urlopen(req, timeout=15)\n    except Exception as e: print(f\"   warn: desc update v{v['version']}: {e}\")\nprint(\"4. Done.\")\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"maintenance-retrain-script","namespace":"kubeflow-user-example-com"}}
+    name: maintenance-retrain-script
+    namespace: kubeflow-user-example-com
+- apiVersion: v1
+  data:
+    METADATA_GRPC_SERVICE_HOST: metadata-grpc-service.kubeflow
+    METADATA_GRPC_SERVICE_PORT: "8080"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      metacontroller.k8s.io/last-applied-configuration: '{"apiVersion":"v1","data":{"METADATA_GRPC_SERVICE_HOST":"metadata-grpc-service.kubeflow","METADATA_GRPC_SERVICE_PORT":"8080"},"kind":"ConfigMap","metadata":{"labels":{"controller-uid":"741b1f16-a29c-453d-9b51-db56a7ee96ad"},"name":"metadata-grpc-configmap","namespace":"kubeflow-user-example-com"}}'
+    labels:
+    name: metadata-grpc-configmap
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Namespace
+      name: kubeflow-user-example-com
+- apiVersion: v1
+  data:
+    serve.py: "#!/usr/bin/env python3\r\n\"\"\"Predictive Maintenance Inference Server.\"\"\"\r\nimport
+      os, logging, tempfile\r\nimport mlflow, mlflow.pyfunc\r\nimport mlflow.artifacts\r\nimport
+      numpy as np\r\nimport pandas as pd\r\nimport psycopg2\r\nfrom fastapi import
+      FastAPI, HTTPException\r\nfrom pydantic import BaseModel\r\nfrom typing import
+      List, Optional\r\n\r\nlogging.basicConfig(level=logging.INFO)\r\nlog = logging.getLogger(\"inference\")\r\n\r\napp
+      = FastAPI(title=\"Maintenance Predictor\")\r\n\r\nMODEL = None\r\nFEATURES =
+      [\"temperature\",\"vibration\",\"pressure\",\"rpm\",\"humidity\",\r\n            \"anomaly_score\",\"machine_type_enc\",\"machine_id_enc\"]\r\nMACHINE_TYPE_MAP
+      = {}\r\nMACHINE_ID_MAP = {}\r\n\r\ndef load_model():\r\n    global MODEL\r\n
+      \   uri = os.environ.get(\"MLFLOW_TRACKING_URI\",\"http://mlflow-server.mlflow.svc.cluster.local:5000\")\r\n
+      \   mlflow.set_tracking_uri(uri)\r\n    model_name = os.environ.get(\"MODEL_NAME\",\"maintenance-predictor\")\r\n
+      \   stage = os.environ.get(\"MODEL_STAGE\",\"Production\")\r\n    log.info(f\"Loading
+      model {model_name}/{stage} from {uri}\")\r\n    try:\r\n        client = mlflow.tracking.MlflowClient()\r\n
+      \       versions = client.get_latest_versions(model_name, stages=[stage])\r\n
+      \       if not versions:\r\n            log.error(f\"No model versions found
+      for stage {stage}\")\r\n            return\r\n        mv = versions[0]\r\n        log.info(f\"Found
+      model v{mv.version} run_id={mv.run_id} source={mv.source}\")\r\n        # Download
+      model via MLflow artifact proxy REST API\r\n        import tempfile, urllib.request,
+      json\r\n        source = mv.source  # e.g. /mlflow/artifacts/3/{run_id}/artifacts/model\r\n
+      \       prefix = \"/mlflow/artifacts/\"\r\n        relative = source[len(prefix):]
+      if source.startswith(prefix) else source\r\n        base_url = f\"{uri}/api/2.0/mlflow-artifacts/artifacts\"\r\n
+      \       # List files in model directory\r\n        list_url = f\"{base_url}?path={relative}\"\r\n
+      \       log.info(f\"Listing artifacts at {list_url}\")\r\n        req = urllib.request.Request(list_url)\r\n
+      \       resp = urllib.request.urlopen(req, timeout=30)\r\n        data = json.loads(resp.read())\r\n
+      \       files = [f[\"path\"] for f in data.get(\"files\", [])]\r\n        log.info(f\"Found
+      {len(files)} artifact files: {files}\")\r\n        # Download each file\r\n
+      \       dst = tempfile.mkdtemp()\r\n        model_dir = os.path.join(dst, \"model\")\r\n
+      \       os.makedirs(model_dir, exist_ok=True)\r\n        for f in files:\r\n
+      \           fname = os.path.basename(f)\r\n            file_url = f\"{base_url}/{relative}/{fname}\"\r\n
+      \           log.info(f\"Downloading {fname}\")\r\n            urllib.request.urlretrieve(file_url,
+      os.path.join(model_dir, fname))\r\n        log.info(f\"Downloaded {len(files)}
+      files to {model_dir}\")\r\n        MODEL = mlflow.pyfunc.load_model(model_dir)\r\n
+      \       log.info(\"Model loaded successfully\")\r\n    except Exception as e:\r\n
+      \       log.error(f\"Failed to load model: {e}\", exc_info=True)\r\n\r\ndef
+      init_encoders():\r\n    global MACHINE_TYPE_MAP, MACHINE_ID_MAP\r\n    try:\r\n
+      \       conn = psycopg2.connect(\r\n            host=os.environ.get(\"DB_HOST\",\"postgres.aiot.svc.cluster.local\"),\r\n
+      \           dbname=os.environ.get(\"DB_NAME\",\"aiot\"),\r\n            user=os.environ.get(\"DB_USER\",\"aiot\"),\r\n
+      \           password=os.environ.get(\"DB_PASSWORD\",\"aiot123\"))\r\n        cur
+      = conn.cursor()\r\n        cur.execute(\"SELECT DISTINCT machine_type FROM sensor_data
+      ORDER BY machine_type\")\r\n        for i,row in enumerate(cur.fetchall()):\r\n
+      \           MACHINE_TYPE_MAP[row[0]] = i\r\n        cur.execute(\"SELECT DISTINCT
+      machine_id FROM sensor_data ORDER BY machine_id\")\r\n        for i,row in enumerate(cur.fetchall()):\r\n
+      \           MACHINE_ID_MAP[row[0]] = i\r\n        conn.close()\r\n        log.info(f\"Encoders:
+      {len(MACHINE_TYPE_MAP)} types, {len(MACHINE_ID_MAP)} machines\")\r\n    except
+      Exception as e:\r\n        log.warning(f\"Could not init encoders: {e}\")\r\n\r\nclass
+      PredictRequest(BaseModel):\r\n    instances: Optional[List[dict]] = None\r\n
+      \   machine_id: Optional[str] = None\r\n    machine_type: Optional[str] = None\r\n
+      \   temperature: Optional[float] = None\r\n    vibration: Optional[float] =
+      None\r\n    pressure: Optional[float] = None\r\n    rpm: Optional[float] = None\r\n
+      \   humidity: Optional[float] = None\r\n    anomaly_score: Optional[float] =
+      0.0\r\n\r\nclass PredictResponse(BaseModel):\r\n    predictions: list\r\n\r\n@app.on_event(\"startup\")\r\ndef
+      startup():\r\n    load_model()\r\n    init_encoders()\r\n\r\n@app.get(\"/health\")\r\n@app.get(\"/v1/models/maintenance-predictor\")\r\ndef
+      health():\r\n    return {\"status\":\"ready\",\"model_loaded\": MODEL is not
+      None}\r\n\r\n@app.post(\"/v1/models/maintenance-predictor:predict\")\r\n@app.post(\"/predict\")\r\ndef
+      predict(req: PredictRequest):\r\n    if MODEL is None:\r\n        raise HTTPException(503,
+      \"Model not loaded\")\r\n    if req.instances:\r\n        rows = []\r\n        for
+      inst in req.instances:\r\n            rows.append(_encode(inst))\r\n        df
+      = pd.DataFrame(rows, columns=FEATURES)\r\n    else:\r\n        row = _encode(req.dict())\r\n
+      \       df = pd.DataFrame([row], columns=FEATURES)\r\n    preds = MODEL.predict(df)\r\n
+      \   return PredictResponse(predictions=preds.tolist())\r\n\r\n@app.get(\"/predict/latest\")\r\ndef
+      predict_latest():\r\n    if MODEL is None:\r\n        raise HTTPException(503,
+      \"Model not loaded\")\r\n    try:\r\n        conn = psycopg2.connect(\r\n            host=os.environ.get(\"DB_HOST\",\"postgres.aiot.svc.cluster.local\"),\r\n
+      \           dbname=os.environ.get(\"DB_NAME\",\"aiot\"),\r\n            user=os.environ.get(\"DB_USER\",\"aiot\"),\r\n
+      \           password=os.environ.get(\"DB_PASSWORD\",\"aiot123\"))\r\n        df
+      = pd.read_sql(\"SELECT machine_id, machine_type, temperature, vibration, pressure,
+      rpm, humidity, anomaly_score FROM sensor_data WHERE temperature IS NOT NULL
+      ORDER BY ts DESC LIMIT 10\", conn)\r\n        conn.close()\r\n    except Exception
+      as e:\r\n        raise HTTPException(500, str(e))\r\n    for c in [\"machine_type\",\"machine_id\"]:\r\n
+      \       enc = MACHINE_TYPE_MAP if c==\"machine_type\" else MACHINE_ID_MAP\r\n
+      \       df[c+\"_enc\"] = df[c].map(enc).fillna(0).astype(int)\r\n    X = df[FEATURES].fillna(0)\r\n
+      \   preds = MODEL.predict(X)\r\n    results = []\r\n    for i, row in df.iterrows():\r\n
+      \       results.append({\"machine_id\":row[\"machine_id\"],\"prediction\":int(preds[i]),\"label\":\"MAINTENANCE\"
+      if preds[i]==1 else \"OK\"})\r\n    return {\"predictions\":results}\r\n\r\ndef
+      _encode(d):\r\n    mt = d.get(\"machine_type\",\"\")\r\n    mi = d.get(\"machine_id\",\"\")\r\n
+      \   return [d.get(\"temperature\",0), d.get(\"vibration\",0), d.get(\"pressure\",0),\r\n
+      \           d.get(\"rpm\",0), d.get(\"humidity\",0), d.get(\"anomaly_score\",0),\r\n
+      \           MACHINE_TYPE_MAP.get(mt,0), MACHINE_ID_MAP.get(mi,0)]\r\n\r\nif
+      __name__ == \"__main__\":\r\n    import uvicorn\r\n    uvicorn.run(app, host=\"0.0.0.0\",
+      port=int(os.environ.get(\"PORT\",\"8000\")))\r\n"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"serve.py":"#!/usr/bin/env python3\r\n\"\"\"Predictive Maintenance Inference Server.\"\"\"\r\nimport os, logging, tempfile\r\nimport mlflow, mlflow.pyfunc\r\nimport mlflow.artifacts\r\nimport numpy as np\r\nimport pandas as pd\r\nimport psycopg2\r\nfrom fastapi import FastAPI, HTTPException\r\nfrom pydantic import BaseModel\r\nfrom typing import List, Optional\r\n\r\nlogging.basicConfig(level=logging.INFO)\r\nlog = logging.getLogger(\"inference\")\r\n\r\napp = FastAPI(title=\"Maintenance Predictor\")\r\n\r\nMODEL = None\r\nFEATURES = [\"temperature\",\"vibration\",\"pressure\",\"rpm\",\"humidity\",\r\n            \"anomaly_score\",\"machine_type_enc\",\"machine_id_enc\"]\r\nMACHINE_TYPE_MAP = {}\r\nMACHINE_ID_MAP = {}\r\n\r\ndef load_model():\r\n    global MODEL\r\n    uri = os.environ.get(\"MLFLOW_TRACKING_URI\",\"http://mlflow-server.mlflow.svc.cluster.local:5000\")\r\n    mlflow.set_tracking_uri(uri)\r\n    model_name = os.environ.get(\"MODEL_NAME\",\"maintenance-predictor\")\r\n    stage = os.environ.get(\"MODEL_STAGE\",\"Production\")\r\n    log.info(f\"Loading model {model_name}/{stage} from {uri}\")\r\n    try:\r\n        client = mlflow.tracking.MlflowClient()\r\n        versions = client.get_latest_versions(model_name, stages=[stage])\r\n        if not versions:\r\n            log.error(f\"No model versions found for stage {stage}\")\r\n            return\r\n        mv = versions[0]\r\n        log.info(f\"Found model v{mv.version} run_id={mv.run_id} source={mv.source}\")\r\n        # Download model via MLflow artifact proxy REST API\r\n        import tempfile, urllib.request, json\r\n        source = mv.source  # e.g. /mlflow/artifacts/3/{run_id}/artifacts/model\r\n        prefix = \"/mlflow/artifacts/\"\r\n        relative = source[len(prefix):] if source.startswith(prefix) else source\r\n        base_url = f\"{uri}/api/2.0/mlflow-artifacts/artifacts\"\r\n        # List files in model directory\r\n        list_url = f\"{base_url}?path={relative}\"\r\n        log.info(f\"Listing artifacts at {list_url}\")\r\n        req = urllib.request.Request(list_url)\r\n        resp = urllib.request.urlopen(req, timeout=30)\r\n        data = json.loads(resp.read())\r\n        files = [f[\"path\"] for f in data.get(\"files\", [])]\r\n        log.info(f\"Found {len(files)} artifact files: {files}\")\r\n        # Download each file\r\n        dst = tempfile.mkdtemp()\r\n        model_dir = os.path.join(dst, \"model\")\r\n        os.makedirs(model_dir, exist_ok=True)\r\n        for f in files:\r\n            fname = os.path.basename(f)\r\n            file_url = f\"{base_url}/{relative}/{fname}\"\r\n            log.info(f\"Downloading {fname}\")\r\n            urllib.request.urlretrieve(file_url, os.path.join(model_dir, fname))\r\n        log.info(f\"Downloaded {len(files)} files to {model_dir}\")\r\n        MODEL = mlflow.pyfunc.load_model(model_dir)\r\n        log.info(\"Model loaded successfully\")\r\n    except Exception as e:\r\n        log.error(f\"Failed to load model: {e}\", exc_info=True)\r\n\r\ndef init_encoders():\r\n    global MACHINE_TYPE_MAP, MACHINE_ID_MAP\r\n    try:\r\n        conn = psycopg2.connect(\r\n            host=os.environ.get(\"DB_HOST\",\"postgres.aiot.svc.cluster.local\"),\r\n            dbname=os.environ.get(\"DB_NAME\",\"aiot\"),\r\n            user=os.environ.get(\"DB_USER\",\"aiot\"),\r\n            password=os.environ.get(\"DB_PASSWORD\",\"aiot123\"))\r\n        cur = conn.cursor()\r\n        cur.execute(\"SELECT DISTINCT machine_type FROM sensor_data ORDER BY machine_type\")\r\n        for i,row in enumerate(cur.fetchall()):\r\n            MACHINE_TYPE_MAP[row[0]] = i\r\n        cur.execute(\"SELECT DISTINCT machine_id FROM sensor_data ORDER BY machine_id\")\r\n        for i,row in enumerate(cur.fetchall()):\r\n            MACHINE_ID_MAP[row[0]] = i\r\n        conn.close()\r\n        log.info(f\"Encoders: {len(MACHINE_TYPE_MAP)} types, {len(MACHINE_ID_MAP)} machines\")\r\n    except Exception as e:\r\n        log.warning(f\"Could not init encoders: {e}\")\r\n\r\nclass PredictRequest(BaseModel):\r\n    instances: Optional[List[dict]] = None\r\n    machine_id: Optional[str] = None\r\n    machine_type: Optional[str] = None\r\n    temperature: Optional[float] = None\r\n    vibration: Optional[float] = None\r\n    pressure: Optional[float] = None\r\n    rpm: Optional[float] = None\r\n    humidity: Optional[float] = None\r\n    anomaly_score: Optional[float] = 0.0\r\n\r\nclass PredictResponse(BaseModel):\r\n    predictions: list\r\n\r\n@app.on_event(\"startup\")\r\ndef startup():\r\n    load_model()\r\n    init_encoders()\r\n\r\n@app.get(\"/health\")\r\n@app.get(\"/v1/models/maintenance-predictor\")\r\ndef health():\r\n    return {\"status\":\"ready\",\"model_loaded\": MODEL is not None}\r\n\r\n@app.post(\"/v1/models/maintenance-predictor:predict\")\r\n@app.post(\"/predict\")\r\ndef predict(req: PredictRequest):\r\n    if MODEL is None:\r\n        raise HTTPException(503, \"Model not loaded\")\r\n    if req.instances:\r\n        rows = []\r\n        for inst in req.instances:\r\n            rows.append(_encode(inst))\r\n        df = pd.DataFrame(rows, columns=FEATURES)\r\n    else:\r\n        row = _encode(req.dict())\r\n        df = pd.DataFrame([row], columns=FEATURES)\r\n    preds = MODEL.predict(df)\r\n    return PredictResponse(predictions=preds.tolist())\r\n\r\n@app.get(\"/predict/latest\")\r\ndef predict_latest():\r\n    if MODEL is None:\r\n        raise HTTPException(503, \"Model not loaded\")\r\n    try:\r\n        conn = psycopg2.connect(\r\n            host=os.environ.get(\"DB_HOST\",\"postgres.aiot.svc.cluster.local\"),\r\n            dbname=os.environ.get(\"DB_NAME\",\"aiot\"),\r\n            user=os.environ.get(\"DB_USER\",\"aiot\"),\r\n            password=os.environ.get(\"DB_PASSWORD\",\"aiot123\"))\r\n        df = pd.read_sql(\"SELECT machine_id, machine_type, temperature, vibration, pressure, rpm, humidity, anomaly_score FROM sensor_data WHERE temperature IS NOT NULL ORDER BY ts DESC LIMIT 10\", conn)\r\n        conn.close()\r\n    except Exception as e:\r\n        raise HTTPException(500, str(e))\r\n    for c in [\"machine_type\",\"machine_id\"]:\r\n        enc = MACHINE_TYPE_MAP if c==\"machine_type\" else MACHINE_ID_MAP\r\n        df[c+\"_enc\"] = df[c].map(enc).fillna(0).astype(int)\r\n    X = df[FEATURES].fillna(0)\r\n    preds = MODEL.predict(X)\r\n    results = []\r\n    for i, row in df.iterrows():\r\n        results.append({\"machine_id\":row[\"machine_id\"],\"prediction\":int(preds[i]),\"label\":\"MAINTENANCE\" if preds[i]==1 else \"OK\"})\r\n    return {\"predictions\":results}\r\n\r\ndef _encode(d):\r\n    mt = d.get(\"machine_type\",\"\")\r\n    mi = d.get(\"machine_id\",\"\")\r\n    return [d.get(\"temperature\",0), d.get(\"vibration\",0), d.get(\"pressure\",0),\r\n            d.get(\"rpm\",0), d.get(\"humidity\",0), d.get(\"anomaly_score\",0),\r\n            MACHINE_TYPE_MAP.get(mt,0), MACHINE_ID_MAP.get(mi,0)]\r\n\r\nif __name__ == \"__main__\":\r\n    import uvicorn\r\n    uvicorn.run(app, host=\"0.0.0.0\", port=int(os.environ.get(\"PORT\",\"8000\")))\r\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"serve-py","namespace":"kubeflow-user-example-com"}}
+    name: serve-py
+    namespace: kubeflow-user-example-com
+kind: List
+metadata:

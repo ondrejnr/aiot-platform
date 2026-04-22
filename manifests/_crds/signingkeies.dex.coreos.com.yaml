@@ -1,0 +1,63 @@
+apiVersion: v1
+items:
+- apiVersion: dex.coreos.com/v1
+  kind: SigningKey
+  metadata:
+    name: openid-connect-keys
+    namespace: auth
+  nextRotation: "2026-04-22T08:33:56.205889673Z"
+  signingKey:
+    alg: RS256
+    d: bkUBIYw1Eo1KBz9ubcdXY8tZX5oHEXEP_epPoKx2FsTROoaH8nsND0ZJAa-nmaGBeEGDTn_YiimSlSam55LWSfdPjOqsrrm0jWatlmP56qYRMK07U0cH7rtXhv3azwyctKVnoq87hG-Hgi80gKpGsov8wXmrJXqySs9uUemPo1cZ99iFjo8NwhiM9uErrQOBdhL5OBv4nI6nmQJsqCvgrIxiQyC1i-Ace1eP-MFjaiSFyVFx4aQrPXW3_xxEpnmzTJW1DZ8cJaZa3_jLMkaKZnZ6AyIrMX2X0PZK9qrHV0js68-lYsxOjw_R3rt6cwEYDocBN8Q7auwquN1KdnL44Q
+    dp: gW36P2QwN_8fOO68TB_Q8GlMXUPHjAQFRaRgAU-v6uHOsZJ6uDjwTXL-tOTnTsipLk2pMNZCcck40KxyN4gKp9wErIXlvriW6VB0bMmXuVT6e-XOw3shZuiS7mS1sKT3y6BQyu2JeBTbLKq-Il3-qiVS3dJkKcWAV-3ALoyrjJk
+    dq: dJxg6yZk0rucn99VKvDBwce6z_PrUvu3gGkTSnEHBHmdsvxY1ZemvpyPXTi-wnHVj61hzkWbrsc-afkhbnC_El8razuDffPs3QQUhzrqOXpW699UYSE6K6JMFZPji7CbAPryIe1Bude26WGXFsBcLYCmslgNbLH0xXvQjiqbX7U
+    e: AQAB
+    kid: 5b7c73f58a70e3ba11e00bb62ce361e47230a733
+    kty: RSA
+    "n": v0jhHk_JIexoU_qeG4XZUPqkKd8_vuV5gGibHGfo0hPy4IfBSZvD5gCnBDSlLqdqxpYSz3pCzG9Shh7RZUzvQUcotlGKYHr3nmRqHtrzVT4tF9Bgtigi10jRQstZO8LS7yDaMKvv-qdsPTFZF0Y5D2LmGSRgz4zOI2jtqNTxGUlb3uRrYxgg64qYuAWx4pyZgFe5azQzPRcEbqqhoT_7vDI28aC0YVy6-qSUtBxfL2kjGXVMPsjIAnGagPpj6EJ9I-Z0R8dz4-p7fx3pyK12SFnH9-7ZDLIMpVVUVCsNn6o4YG4gtOEHKx54GZ7527704b_AKmZjVKPPI4BlGmwCGw
+    p: -ISxWOG51CIirogQhaf0XHr7Cf3Q5YklH7k9VcVjDZp84-XPqItE9eoR__eSOS6XcCpq-RDLlpp3LcqPQWO11hvBTTZZYM0hWHf82_QnQ3KpwNHZIM40ZbgCz_cmeL6heIP6cbEhQOFF8bQtlIG7mS-W5kS3ssoaj8-y7eK8Do8
+    q: xQsXohwvFQaCrE_mMaKbkFsd-IG1QxMPDnqK7-dMIiRUiwUTGEXw5lo94n8csz8vwFaAquwjiiJzAHPSS53LcOqKWVLwn7pexqrzHi4sZcHCkGTbbgH9HVr_xKXxmE6rUdAPtwVdKPPM-OUDgdJHJwH88aYc7aPTxeSl2AI6WbU
+    qi: mQtxrY1NILEGdqp2iRjHaD3C38Vztrh6T-ecc9UO_VVm4QU1iXcOEr60GPyCFAYQ2ZPqd8TV5fy_5Y1GEde9Y7sb58dhi_oTZcq3IRklcbSQGpO2HYJU2jJkNqliuruYglkRM5KS5gnIXZxH7PUfVPHac2tN_CkVdiDcHaCDraM
+    use: sig
+  signingKeyPub:
+    alg: RS256
+    e: AQAB
+    kid: 5b7c73f58a70e3ba11e00bb62ce361e47230a733
+    kty: RSA
+    "n": v0jhHk_JIexoU_qeG4XZUPqkKd8_vuV5gGibHGfo0hPy4IfBSZvD5gCnBDSlLqdqxpYSz3pCzG9Shh7RZUzvQUcotlGKYHr3nmRqHtrzVT4tF9Bgtigi10jRQstZO8LS7yDaMKvv-qdsPTFZF0Y5D2LmGSRgz4zOI2jtqNTxGUlb3uRrYxgg64qYuAWx4pyZgFe5azQzPRcEbqqhoT_7vDI28aC0YVy6-qSUtBxfL2kjGXVMPsjIAnGagPpj6EJ9I-Z0R8dz4-p7fx3pyK12SFnH9-7ZDLIMpVVUVCsNn6o4YG4gtOEHKx54GZ7527704b_AKmZjVKPPI4BlGmwCGw
+    use: sig
+  verificationKeys:
+  - expiry: "2026-04-22T08:33:51.130164716Z"
+    publicKey:
+      alg: RS256
+      e: AQAB
+      kid: 38e103d8f7b6d858f42fafca47cdf56423a4d367
+      kty: RSA
+      "n": 683XiCFBZVI5SD9ksUW8iNedU2CoSPsgMbRYKaTzUjm6016nMAyBGlPGGB3vDopz4Dy4UokVxqcls7z8YH4TBeZyk6iZ2zlfsx5kx9z-HO7hFEUH6fgz6Z1NBysTBAlXZ9wMPcATlUpwmDCsigFOoy_aTKh2xojW5uWGRVhd56pKxoXrKGDZbjz6P9lcz2tad9beu-11CwfNg9e4M1-U-5zzKEh7jBcAEID5CTK2_DxujGaWHoGYlzQ6klJni6Pk9-qWMIdRcBEgqTmta2BflmvA5HfjHreP2sDM5BYYWAjOrk40zaCO3dpsUkTChBKHmfBlf7OfBSRxKopwptkCDw
+      use: sig
+  - expiry: "2026-04-22T14:33:53.436142451Z"
+    publicKey:
+      alg: RS256
+      e: AQAB
+      kid: 2daf9e9f8f6c5ca54c39dfa708b05cfa2c82c590
+      kty: RSA
+      "n": wUyzyuMIvtt_SdTEPFxvLYL75MbL1u3QkS_J0yThV0IrrwgUuoqmRMrCEj8Hbn485mA_WDY9UV3kZbAwfDwbG4920QmnymsWF1uvXzj2wJy9OjA5CLeHwk363Nv8J2JRfcS6kEMJwMxgC2_U4eaUNMioJCWVxbNohBkSWFakPbQ3Zi9B55DcKl7xbechX1wrUkakGlKM_T8uPRlF9cbjyBW2_EftcvpA_NM-qV1jrJ8mrFac3-iVIk2Ak3gaVlvjm1fEVg3RQ65njoYd6HJLfOIS46ODTDMGXTsJInuL6kbH8oc-KdXaxyJwleYyxNlgp90q22Resn5CBmU6PkpBzw
+      use: sig
+  - expiry: "2026-04-22T20:33:55.641873055Z"
+    publicKey:
+      alg: RS256
+      e: AQAB
+      kid: 8846ee1a696063c208bddb570aaf5c3aed010a10
+      kty: RSA
+      "n": qz_woWQax5YS9GQQvSX_GcaU2XmLdDqQrhMwHAleJYrrrhmIe9Fib3XPLaFAbeJxS-dlQVS-lkURisYSMTD18Mu17eqIinpkVgEB6rALa4OazrzSg_F-zwMCIHiYYk90zXLzwbawLN_IlW98vKqMqzVIoAkm5ddE2qKlQjPcPT8qYscokmo7TrmIROFtpgV-BBfC31x8h_uOs3PuJJ-UIFtzwOT6Crr8KNFY8fkeLRSdlMGuaOkw4QLCGlZfEWniN3Wa4zYsZkLjqca1XIn-ztP4esp89Xyi5N2wYLCV12DmZYYxHpqPLVyTLqpBr0TMejRhPpXHVAdfHW0Dm7adDQ
+      use: sig
+  - expiry: "2026-04-23T02:33:56.203319721Z"
+    publicKey:
+      alg: RS256
+      e: AQAB
+      kid: e0ec805243b2a2e8e483ef77c1743cac7803cc91
+      kty: RSA
+      "n": tea2ogpKQ1QxhoogBsoZYVZJ8efHHMAHcAh2ohnMl5DZmCGZl2eqolHBOnPDlC8ibo59Bri1TCXu0E1V90aHQ0RA7txBj0mMxh3jOqyfdkA8tV31xdmpOYobV9LjaeXDUYlB_x1mEaDPtNz66NReW77gLoPF6oHKc5bRqc3wO1D5Q98qBFtdjPm1aY6I4VTlt9R_tTGqFwYBZ_UxwqDPVPd6Zba06kc41FW-oGFl0h9Jz-A6Vimabklf2h5v0ZvI1C4EqBzsAWF2Z6UZqELF6zlEM4qmGgcBppygrVpzzqEqiAxGa97x966DI9Oh8CLeMTwaaC-IndkRsI_8kQd1IQ
+      use: sig
+kind: List
+metadata:

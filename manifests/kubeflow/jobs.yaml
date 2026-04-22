@@ -1,0 +1,267 @@
+apiVersion: v1
+items:
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    labels:
+      k8up.io/owned-by: backup_adhoc-kf-pvc-only
+      k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+      k8up.io/type: backup
+      k8upjob: "true"
+    name: backup-adhoc-kf-pvc-only-0
+    namespace: kubeflow
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Backup
+      name: adhoc-kf-pvc-only
+  spec:
+    backoffLimit: 6
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: backup-adhoc-kf-pvc-only-0
+          job-name: backup-adhoc-kf-pvc-only-0
+          k8upjob: "true"
+      spec:
+        containers:
+        - args:
+          - -varDir
+          - /k8up
+          command:
+          - /usr/local/bin/k8up
+          - restic
+          env:
+          - name: FILEEXTENSION_ANNOTATION
+            value: k8up.io/file-extension
+          - name: HOSTNAME
+            value: kubeflow
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                key: access_key
+                name: r2-creds
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                key: secret_key
+                name: r2-creds
+          - name: CLUSTER_NAME
+            value: default
+          - name: RESTIC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: k8up-repo
+          - name: STATS_URL
+          - name: PROM_URL
+            value: http://127.0.0.1/
+          - name: BACKUPCOMMAND_ANNOTATION
+            value: k8up.io/backupcommand
+          - name: RESTIC_REPOSITORY
+            value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+          - name: TARGET_PODS
+            value: minio-7547d879b7-bq57b,mysql-f496799f-9rrpj
+          - name: SKIP_PREBACKUP
+            value: "true"
+          image: ghcr.io/k8up-io/k8up:v2.15.0
+          imagePullPolicy: IfNotPresent
+          name: backup
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/minio-pvc
+            name: minio-pvc
+            readOnly: true
+          - mountPath: /data/mysql-pv-claim
+            name: mysql-pv-claim
+            readOnly: true
+          - mountPath: /k8up
+            name: k8up-dir
+          - mountPath: /tmp
+            name: restic-tmp-dir
+          - mountPath: /.cache
+            name: restic-cache-dir
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/hostname: aiot-worker-02
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: pod-executor
+        serviceAccountName: pod-executor
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoExecute
+          key: node.kubernetes.io/not-ready
+          operator: Exists
+          tolerationSeconds: 300
+        - effect: NoExecute
+          key: node.kubernetes.io/unreachable
+          operator: Exists
+          tolerationSeconds: 300
+        volumes:
+        - name: minio-pvc
+          persistentVolumeClaim:
+            claimName: minio-pvc
+        - name: mysql-pv-claim
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
+        - emptyDir: {}
+          name: k8up-dir
+        - emptyDir: {}
+          name: restic-tmp-dir
+        - emptyDir: {}
+          name: restic-cache-dir
+  status:
+    completionTime: "2026-04-22T07:51:03Z"
+    conditions:
+    - lastProbeTime: "2026-04-22T07:51:03Z"
+      lastTransitionTime: "2026-04-22T07:51:03Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-22T07:51:03Z"
+      lastTransitionTime: "2026-04-22T07:51:03Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-22T07:48:03Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    labels:
+      k8up.io/owned-by: backup_adhoc-kf-pvc-only
+      k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+      k8up.io/type: backup
+      k8upjob: "true"
+    name: backup-adhoc-kf-pvc-only-prebackup
+    namespace: kubeflow
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Backup
+      name: adhoc-kf-pvc-only
+  spec:
+    backoffLimit: 6
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: backup-adhoc-kf-pvc-only-prebackup
+          job-name: backup-adhoc-kf-pvc-only-prebackup
+          k8upjob: "true"
+      spec:
+        containers:
+        - args:
+          - -varDir
+          - /k8up
+          command:
+          - /usr/local/bin/k8up
+          - restic
+          env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                key: access_key
+                name: r2-creds
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                key: secret_key
+                name: r2-creds
+          - name: PROM_URL
+            value: http://127.0.0.1/
+          - name: BACKUPCOMMAND_ANNOTATION
+            value: k8up.io/backupcommand
+          - name: FILEEXTENSION_ANNOTATION
+            value: k8up.io/file-extension
+          - name: HOSTNAME
+            value: kubeflow
+          - name: RESTIC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: k8up-repo
+          - name: STATS_URL
+          - name: CLUSTER_NAME
+            value: default
+          - name: RESTIC_REPOSITORY
+            value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+          - name: TARGET_PODS
+            value: mysql-dump-797b4db6d8-crnwh
+          - name: SLEEP_DURATION
+            value: 10s
+          image: ghcr.io/k8up-io/k8up:v2.15.0
+          imagePullPolicy: IfNotPresent
+          name: backup
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /k8up
+            name: k8up-dir
+          - mountPath: /tmp
+            name: restic-tmp-dir
+          - mountPath: /.cache
+            name: restic-cache-dir
+        dnsPolicy: ClusterFirst
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: pod-executor
+        serviceAccountName: pod-executor
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: k8up-dir
+        - emptyDir: {}
+          name: restic-tmp-dir
+        - emptyDir: {}
+          name: restic-cache-dir
+  status:
+    completionTime: "2026-04-22T07:51:05Z"
+    conditions:
+    - lastProbeTime: "2026-04-22T07:51:05Z"
+      lastTransitionTime: "2026-04-22T07:51:05Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-22T07:51:05Z"
+      lastTransitionTime: "2026-04-22T07:51:05Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-22T07:48:03Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+kind: List
+metadata:

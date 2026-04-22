@@ -1,0 +1,714 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: Admin
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: admin
+  rules:
+  - apiGroups:
+    - '*'
+    resources:
+    - '*'
+    verbs:
+    - '*'
+  - nonResourceURLs:
+    - '*'
+    verbs:
+    - '*'
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-admin created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.882399436 +0000 UTC m=+144027.886929306
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: Manage Authentication
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: authn-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - authconfigs
+    verbs:
+    - get
+    - list
+    - watch
+    - update
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-authn-manage created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.789106266 +0000 UTC m=+144027.793636136
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: Create Clusters
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: clusters-create
+  namespacedRules:
+    cattle-global-data:
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - create
+    fleet-default:
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - create
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusters
+    verbs:
+    - create
+  - apiGroups:
+    - provisioning.cattle.io
+    resources:
+    - clusters
+    verbs:
+    - create
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - templates
+    - templateversions
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - nodedrivers
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - kontainerdrivers
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - podsecurityadmissionconfigurationtemplates
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - rke-machine-config.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - create
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - clusterrepos
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - rke.cattle.io
+    resources:
+    - etcdsnapshots
+    verbs:
+    - get
+    - list
+    - watch
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-clusters-create created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: clusters-create-cattle-global-data created
+      reason: NamespacedRuleRoleExists
+      status: "True"
+      type: NamespacedRuleRoleExists
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: clusters-create-fleet-default created
+      reason: NamespacedRuleRoleExists
+      status: "True"
+      type: NamespacedRuleRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.601724962 +0000 UTC m=+144027.606254831
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: Manage Features
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: features-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - features
+    verbs:
+    - get
+    - list
+    - watch
+    - update
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-features-manage created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.733914997 +0000 UTC m=+144027.738444870
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: Manage Cluster Drivers
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: kontainerdrivers-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - kontainerdrivers
+    verbs:
+    - '*'
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-kontainerdrivers-manage created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.835509767 +0000 UTC m=+144027.840039636
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: Manage Node Drivers
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: nodedrivers-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - nodedrivers
+    verbs:
+    - '*'
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-nodedrivers-manage created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.78964262 +0000 UTC m=+144027.794172490
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: Manage Roles
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: roles-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - roletemplates
+    verbs:
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - create
+    - update
+    - watch
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-roles-manage created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.788262983 +0000 UTC m=+144027.792792851
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: Manage Settings
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: settings-manage
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - settings
+    verbs:
+    - '*'
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-settings-manage created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.7844907 +0000 UTC m=+144027.789020570
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: User
+  kind: GlobalRole
+  metadata:
+    annotations:
+      authz.management.cattle.io/bootstrapped-role: "true"
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: user
+  namespacedRules:
+    cattle-global-data:
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - create
+    fleet-default:
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - create
+  newUserDefault: true
+  rules:
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - kubeconfigs
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - deletecollection
+    - update
+    - patch
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - useractivities
+    verbs:
+    - get
+    - update
+    - patch
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - tokens
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - update
+    - patch
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - selfusers
+    verbs:
+    - create
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - passwordchangerequests
+    verbs:
+    - create
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - principals
+    - roletemplates
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - preferences
+    verbs:
+    - '*'
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - settings
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - features
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - clusters
+    verbs:
+    - create
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - nodedrivers
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - kontainerdrivers
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - fleetworkspaces
+    verbs:
+    - create
+  - apiGroups:
+    - provisioning.cattle.io
+    resources:
+    - clusters
+    verbs:
+    - create
+  - apiGroups:
+    - rke-machine-config.cattle.io
+    resources:
+    - '*'
+    verbs:
+    - create
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - rancherusernotifications
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - catalog.cattle.io
+    resources:
+    - clusterrepos
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - podsecurityadmissionconfigurationtemplates
+    verbs:
+    - get
+    - list
+    - watch
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-user created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: user-cattle-global-data created
+      reason: NamespacedRuleRoleExists
+      status: "True"
+      type: NamespacedRuleRoleExists
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: user-fleet-default created
+      reason: NamespacedRuleRoleExists
+      status: "True"
+      type: NamespacedRuleRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.7904834 +0000 UTC m=+144027.795013269
+    observedGeneration: 2
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: User Base
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: user-base
+  rules:
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - useractivities
+    verbs:
+    - get
+    - update
+    - patch
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - selfusers
+    verbs:
+    - create
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - passwordchangerequests
+    verbs:
+    - create
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - kubeconfigs
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - deletecollection
+    - update
+    - patch
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - tokens
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - delete
+    - update
+    - patch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - preferences
+    verbs:
+    - '*'
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - settings
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - features
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - rancherusernotifications
+    verbs:
+    - get
+    - list
+    - watch
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-user-base created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.783288505 +0000 UTC m=+144027.787818376
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: Manage Users
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: users-manage
+  namespacedRules:
+    cattle-local-user-passwords:
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - create
+      - update
+  rules:
+  - apiGroups:
+    - ext.cattle.io
+    resources:
+    - groupmembershiprefreshrequests
+    verbs:
+    - create
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - users
+    - globalrolebindings
+    verbs:
+    - '*'
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - globalroles
+    verbs:
+    - get
+    - list
+    - watch
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-users-manage created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: users-manage-cattle-local-user-passwords created
+      reason: NamespacedRuleRoleExists
+      status: "True"
+      type: NamespacedRuleRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.815778597 +0000 UTC m=+144027.820308467
+    observedGeneration: 1
+    summary: Completed
+- apiVersion: management.cattle.io/v3
+  builtin: true
+  displayName: View Rancher Metrics
+  kind: GlobalRole
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-gr-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-gr-controller
+    labels:
+      authz.management.cattle.io/bootstrapping: default-globalrole
+    name: view-rancher-metrics
+  rules:
+  - apiGroups:
+    - management.cattle.io
+    resources:
+    - ranchermetrics
+    verbs:
+    - get
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T04:30:36Z"
+      message: cattle-globalrole-view-rancher-metrics created
+      reason: ClusterRoleExists
+      status: "True"
+      type: ClusterRoleExists
+    lastUpdateTime: 2026-04-22 04:30:36.783995549 +0000 UTC m=+144027.788525424
+    observedGeneration: 1
+    summary: Completed
+kind: List
+metadata:

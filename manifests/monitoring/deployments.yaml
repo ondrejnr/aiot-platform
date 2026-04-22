@@ -1,0 +1,543 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"monitoring:prometheus-grafana","ingressName":"monitoring:prometheus-grafana","hostname":"grafana.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"grafana","app.kubernetes.io/version":"12.4.2","helm.sh/chart":"grafana-11.6.0"},"name":"prometheus-grafana","namespace":"monitoring"},"spec":{"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"grafana"}},"strategy":{"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"checksum/config":"2ae3be40dc872c79e3848f2a49fd38f0ac8077c62a1ad3f94f44c7d86e70c301","checksum/sc-dashboard-provider-config":"e70bf6a851099d385178a76de9757bb0bef8299da6d8443602590e44f05fdf24","checksum/secret":"255dcce8b67f5c37243e6ea276cff641014c46a38d3b0f5e8dfcd0452562869e","kubectl.kubernetes.io/default-container":"grafana"},"labels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"grafana","app.kubernetes.io/version":"12.4.2","helm.sh/chart":"grafana-11.6.0"}},"spec":{"automountServiceAccountToken":true,"containers":[{"env":[{"name":"METHOD","value":"WATCH"},{"name":"LABEL","value":"grafana_dashboard"},{"name":"LABEL_VALUE","value":"1"},{"name":"FOLDER","value":"/tmp/dashboards"},{"name":"RESOURCE","value":"both"},{"name":"NAMESPACE","value":"ALL"},{"name":"REQ_USERNAME","valueFrom":{"secretKeyRef":{"key":"admin-user","name":"prometheus-grafana"}}},{"name":"REQ_PASSWORD","valueFrom":{"secretKeyRef":{"key":"admin-password","name":"prometheus-grafana"}}},{"name":"REQ_URL","value":"http://localhost:3000/api/admin/provisioning/dashboards/reload"},{"name":"REQ_METHOD","value":"POST"}],"image":"quay.io/kiwigrid/k8s-sidecar:2.6.0","imagePullPolicy":"IfNotPresent","name":"grafana-sc-dashboard","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"seccompProfile":{"type":"RuntimeDefault"}},"volumeMounts":[{"mountPath":"/tmp/dashboards","name":"sc-dashboard-volume"}]},{"env":[{"name":"METHOD","value":"WATCH"},{"name":"LABEL","value":"grafana_datasource"},{"name":"LABEL_VALUE","value":"1"},{"name":"FOLDER","value":"/etc/grafana/provisioning/datasources"},{"name":"RESOURCE","value":"both"},{"name":"REQ_USERNAME","valueFrom":{"secretKeyRef":{"key":"admin-user","name":"prometheus-grafana"}}},{"name":"REQ_PASSWORD","valueFrom":{"secretKeyRef":{"key":"admin-password","name":"prometheus-grafana"}}},{"name":"REQ_URL","value":"http://localhost:3000/api/admin/provisioning/datasources/reload"},{"name":"REQ_METHOD","value":"POST"}],"image":"quay.io/kiwigrid/k8s-sidecar:2.6.0","imagePullPolicy":"IfNotPresent","name":"grafana-sc-datasources","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"seccompProfile":{"type":"RuntimeDefault"}},"volumeMounts":[{"mountPath":"/etc/grafana/provisioning/datasources","name":"sc-datasources-volume"}]},{"env":[{"name":"POD_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"GF_SECURITY_ADMIN_USER","valueFrom":{"secretKeyRef":{"key":"admin-user","name":"prometheus-grafana"}}},{"name":"GF_SECURITY_ADMIN_PASSWORD","valueFrom":{"secretKeyRef":{"key":"admin-password","name":"prometheus-grafana"}}},{"name":"GF_PATHS_DATA","value":"/var/lib/grafana/"},{"name":"GF_PATHS_LOGS","value":"/var/log/grafana"},{"name":"GF_PATHS_PLUGINS","value":"/var/lib/grafana/plugins"},{"name":"GF_PATHS_PROVISIONING","value":"/etc/grafana/provisioning"},{"name":"GF_UNIFIED_STORAGE_INDEX_PATH","value":"/var/lib/grafana-search/bleve"}],"image":"docker.io/grafana/grafana:12.4.2","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":10,"httpGet":{"path":"/api/health","port":"grafana"},"initialDelaySeconds":60,"timeoutSeconds":30},"name":"grafana","ports":[{"containerPort":3000,"name":"grafana","protocol":"TCP"},{"containerPort":9094,"name":"gossip-tcp","protocol":"TCP"},{"containerPort":9094,"name":"gossip-udp","protocol":"UDP"},{"containerPort":6060,"name":"profiling","protocol":"TCP"}],"readinessProbe":{"httpGet":{"path":"/api/health","port":"grafana"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"seccompProfile":{"type":"RuntimeDefault"}},"volumeMounts":[{"mountPath":"/etc/grafana/grafana.ini","name":"config","subPath":"grafana.ini"},{"mountPath":"/var/lib/grafana","name":"storage"},{"mountPath":"/var/lib/grafana-search","name":"search"},{"mountPath":"/tmp/dashboards","name":"sc-dashboard-volume"},{"mountPath":"/etc/grafana/provisioning/dashboards/sc-dashboardproviders.yaml","name":"sc-dashboard-provider","subPath":"provider.yaml"},{"mountPath":"/etc/grafana/provisioning/datasources","name":"sc-datasources-volume"}]}],"enableServiceLinks":true,"nodeSelector":{"node-role.kubernetes.io/worker":""},"securityContext":{"fsGroup":472,"runAsGroup":472,"runAsNonRoot":true,"runAsUser":472},"serviceAccountName":"prometheus-grafana","shareProcessNamespace":false,"volumes":[{"configMap":{"name":"prometheus-grafana"},"name":"config"},{"emptyDir":{},"name":"storage"},{"emptyDir":{},"name":"search"},{"emptyDir":{},"name":"sc-dashboard-volume"},{"configMap":{"name":"prometheus-grafana-config-dashboards"},"name":"sc-dashboard-provider"},{"emptyDir":{},"name":"sc-datasources-volume"}]}}}}
+      meta.helm.sh/release-name: prometheus
+      meta.helm.sh/release-namespace: monitoring
+    labels:
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/version: 12.4.2
+      helm.sh/chart: grafana-11.6.0
+    name: prometheus-grafana
+    namespace: monitoring
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/name: grafana
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          checksum/config: 0b84bf4770b7b543aea4ea143d9bfd513322e9d14159b1ff3862b70b052c0eb7
+          checksum/sc-dashboard-provider-config: e70bf6a851099d385178a76de9757bb0bef8299da6d8443602590e44f05fdf24
+          checksum/secret: 255dcce8b67f5c37243e6ea276cff641014c46a38d3b0f5e8dfcd0452562869e
+          kubectl.kubernetes.io/default-container: grafana
+        labels:
+          app.kubernetes.io/instance: prometheus
+          app.kubernetes.io/name: grafana
+          app.kubernetes.io/version: 12.4.2
+          helm.sh/chart: grafana-11.6.0
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - env:
+          - name: METHOD
+            value: WATCH
+          - name: LABEL
+            value: grafana_dashboard
+          - name: LABEL_VALUE
+            value: "1"
+          - name: FOLDER
+            value: /tmp/dashboards
+          - name: RESOURCE
+            value: both
+          - name: NAMESPACE
+            value: ALL
+          - name: REQ_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: admin-user
+                name: prometheus-grafana
+          - name: REQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: admin-password
+                name: prometheus-grafana
+          - name: REQ_URL
+            value: http://localhost:3000/api/admin/provisioning/dashboards/reload
+          - name: REQ_METHOD
+            value: POST
+          image: quay.io/kiwigrid/k8s-sidecar:2.6.0
+          imagePullPolicy: IfNotPresent
+          name: grafana-sc-dashboard
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp/dashboards
+            name: sc-dashboard-volume
+        - env:
+          - name: METHOD
+            value: WATCH
+          - name: LABEL
+            value: grafana_datasource
+          - name: LABEL_VALUE
+            value: "1"
+          - name: FOLDER
+            value: /etc/grafana/provisioning/datasources
+          - name: RESOURCE
+            value: both
+          - name: REQ_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: admin-user
+                name: prometheus-grafana
+          - name: REQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: admin-password
+                name: prometheus-grafana
+          - name: REQ_URL
+            value: http://localhost:3000/api/admin/provisioning/datasources/reload
+          - name: REQ_METHOD
+            value: POST
+          image: quay.io/kiwigrid/k8s-sidecar:2.6.0
+          imagePullPolicy: IfNotPresent
+          name: grafana-sc-datasources
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/grafana/provisioning/datasources
+            name: sc-datasources-volume
+        - env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: GF_SECURITY_ADMIN_USER
+            valueFrom:
+              secretKeyRef:
+                key: admin-user
+                name: prometheus-grafana
+          - name: GF_SECURITY_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: admin-password
+                name: prometheus-grafana
+          - name: GF_PATHS_DATA
+            value: /var/lib/grafana/
+          - name: GF_PATHS_LOGS
+            value: /var/log/grafana
+          - name: GF_PATHS_PLUGINS
+            value: /var/lib/grafana/plugins
+          - name: GF_PATHS_PROVISIONING
+            value: /etc/grafana/provisioning
+          - name: GF_UNIFIED_STORAGE_INDEX_PATH
+            value: /var/lib/grafana-search/bleve
+          image: docker.io/grafana/grafana:12.4.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /api/health
+              port: grafana
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 30
+          name: grafana
+          ports:
+          - containerPort: 3000
+            name: grafana
+            protocol: TCP
+          - containerPort: 9094
+            name: gossip-tcp
+            protocol: TCP
+          - containerPort: 9094
+            name: gossip-udp
+            protocol: UDP
+          - containerPort: 6060
+            name: profiling
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/health
+              port: grafana
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/grafana/grafana.ini
+            name: config
+            subPath: grafana.ini
+          - mountPath: /var/lib/grafana
+            name: storage
+          - mountPath: /var/lib/grafana-search
+            name: search
+          - mountPath: /tmp/dashboards
+            name: sc-dashboard-volume
+          - mountPath: /etc/grafana/provisioning/dashboards/sc-dashboardproviders.yaml
+            name: sc-dashboard-provider
+            subPath: provider.yaml
+          - mountPath: /etc/grafana/provisioning/datasources
+            name: sc-datasources-volume
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: true
+        nodeSelector:
+          node-role.kubernetes.io/worker: ""
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 472
+          runAsGroup: 472
+          runAsNonRoot: true
+          runAsUser: 472
+        serviceAccount: prometheus-grafana
+        serviceAccountName: prometheus-grafana
+        shareProcessNamespace: false
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: prometheus-grafana
+          name: config
+        - emptyDir: {}
+          name: storage
+        - emptyDir: {}
+          name: search
+        - emptyDir: {}
+          name: sc-dashboard-volume
+        - configMap:
+            defaultMode: 420
+            name: prometheus-grafana-config-dashboards
+          name: sc-dashboard-provider
+        - emptyDir: {}
+          name: sc-datasources-volume
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:43:19Z"
+      lastUpdateTime: "2026-04-19T22:02:08Z"
+      message: ReplicaSet "prometheus-grafana-769867554f" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-20T16:21:42Z"
+      lastUpdateTime: "2026-04-20T16:21:42Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 3
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"kube-prometheus-stack-operator","app.kubernetes.io/component":"prometheus-operator","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"kube-prometheus-stack-prometheus-operator","app.kubernetes.io/part-of":"kube-prometheus-stack","app.kubernetes.io/version":"83.4.1","chart":"kube-prometheus-stack-83.4.1","heritage":"Helm","release":"prometheus"},"name":"prometheus-kube-prometheus-operator","namespace":"monitoring"},"spec":{"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"kube-prometheus-stack-operator","release":"prometheus"}},"template":{"metadata":{"labels":{"app":"kube-prometheus-stack-operator","app.kubernetes.io/component":"prometheus-operator","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"kube-prometheus-stack-prometheus-operator","app.kubernetes.io/part-of":"kube-prometheus-stack","app.kubernetes.io/version":"83.4.1","chart":"kube-prometheus-stack-83.4.1","heritage":"Helm","release":"prometheus"}},"spec":{"automountServiceAccountToken":true,"containers":[{"args":["--kubelet-service=kube-system/prometheus-kube-prometheus-kubelet","--kubelet-endpoints=true","--kubelet-endpointslice=false","--localhost=127.0.0.1","--prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.90.1","--config-reloader-cpu-request=0","--config-reloader-cpu-limit=0","--config-reloader-memory-request=0","--config-reloader-memory-limit=0","--thanos-default-base-image=quay.io/thanos/thanos:v0.41.0","--secret-field-selector=type!=kubernetes.io/dockercfg,type!=kubernetes.io/service-account-token,type!=helm.sh/release.v1","--web.enable-tls=true","--web.cert-file=/cert/cert","--web.key-file=/cert/key","--web.listen-address=:10250","--web.tls-min-version=VersionTLS13"],"env":[{"name":"GOGC","value":"30"}],"image":"quay.io/prometheus-operator/prometheus-operator:v0.90.1","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/healthz","port":"https","scheme":"HTTPS"},"initialDelaySeconds":0,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"name":"kube-prometheus-stack","ports":[{"containerPort":10250,"name":"https"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/healthz","port":"https","scheme":"HTTPS"},"initialDelaySeconds":0,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"resources":{},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/cert","name":"tls-secret","readOnly":true}]}],"nodeSelector":{"node-role.kubernetes.io/worker":""},"securityContext":{"fsGroup":65534,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534,"seccompProfile":{"type":"RuntimeDefault"}},"serviceAccountName":"prometheus-kube-prometheus-operator","terminationGracePeriodSeconds":30,"volumes":[{"name":"tls-secret","secret":{"defaultMode":420,"secretName":"prometheus-kube-prometheus-admission"}}]}}}}
+      meta.helm.sh/release-name: prometheus
+      meta.helm.sh/release-namespace: monitoring
+    labels:
+      app: kube-prometheus-stack-operator
+      app.kubernetes.io/component: prometheus-operator
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
+      app.kubernetes.io/part-of: kube-prometheus-stack
+      app.kubernetes.io/version: 83.4.1
+      chart: kube-prometheus-stack-83.4.1
+      heritage: Helm
+      release: prometheus
+    name: prometheus-kube-prometheus-operator
+    namespace: monitoring
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: kube-prometheus-stack-operator
+        release: prometheus
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: kube-prometheus-stack-operator
+          app.kubernetes.io/component: prometheus-operator
+          app.kubernetes.io/instance: prometheus
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
+          app.kubernetes.io/part-of: kube-prometheus-stack
+          app.kubernetes.io/version: 83.4.1
+          chart: kube-prometheus-stack-83.4.1
+          heritage: Helm
+          release: prometheus
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - args:
+          - --kubelet-service=kube-system/prometheus-kube-prometheus-kubelet
+          - --kubelet-endpoints=true
+          - --kubelet-endpointslice=false
+          - --localhost=127.0.0.1
+          - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.90.1
+          - --config-reloader-cpu-request=0
+          - --config-reloader-cpu-limit=0
+          - --config-reloader-memory-request=0
+          - --config-reloader-memory-limit=0
+          - --thanos-default-base-image=quay.io/thanos/thanos:v0.41.0
+          - --secret-field-selector=type!=kubernetes.io/dockercfg,type!=kubernetes.io/service-account-token,type!=helm.sh/release.v1
+          - --web.enable-tls=true
+          - --web.cert-file=/cert/cert
+          - --web.key-file=/cert/key
+          - --web.listen-address=:10250
+          - --web.tls-min-version=VersionTLS13
+          env:
+          - name: GOGC
+            value: "30"
+          image: quay.io/prometheus-operator/prometheus-operator:v0.90.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: https
+              scheme: HTTPS
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: kube-prometheus-stack
+          ports:
+          - containerPort: 10250
+            name: https
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: https
+              scheme: HTTPS
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /cert
+            name: tls-secret
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          node-role.kubernetes.io/worker: ""
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 65534
+          runAsGroup: 65534
+          runAsNonRoot: true
+          runAsUser: 65534
+          seccompProfile:
+            type: RuntimeDefault
+        serviceAccount: prometheus-kube-prometheus-operator
+        serviceAccountName: prometheus-kube-prometheus-operator
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: tls-secret
+          secret:
+            defaultMode: 420
+            secretName: prometheus-kube-prometheus-admission
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:43:19Z"
+      lastUpdateTime: "2026-04-19T21:43:24Z"
+      message: ReplicaSet "prometheus-kube-prometheus-operator-85fcdcd4ff" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-20T16:20:32Z"
+      lastUpdateTime: "2026-04-20T16:20:32Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"metrics","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"kube-state-metrics","app.kubernetes.io/part-of":"kube-state-metrics","app.kubernetes.io/version":"2.18.0","helm.sh/chart":"kube-state-metrics-7.2.2","release":"prometheus"},"name":"prometheus-kube-state-metrics","namespace":"monitoring"},"spec":{"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"kube-state-metrics"}},"strategy":{"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app.kubernetes.io/component":"metrics","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"kube-state-metrics","app.kubernetes.io/part-of":"kube-state-metrics","app.kubernetes.io/version":"2.18.0","helm.sh/chart":"kube-state-metrics-7.2.2","release":"prometheus"}},"spec":{"automountServiceAccountToken":true,"containers":[{"args":["--port=8080","--resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpointslices,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments"],"image":"registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.18.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"httpHeaders":null,"path":"/livez","port":"http","scheme":"HTTP"},"initialDelaySeconds":5,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"name":"kube-state-metrics","ports":[{"containerPort":8080,"name":"http"},{"containerPort":8081,"name":"metrics"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"httpHeaders":null,"path":"/readyz","port":"metrics","scheme":"HTTP"},"initialDelaySeconds":5,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}}],"dnsPolicy":"ClusterFirst","hostNetwork":false,"securityContext":{"fsGroup":65534,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534,"seccompProfile":{"type":"RuntimeDefault"}},"serviceAccountName":"prometheus-kube-state-metrics"}}}}
+      meta.helm.sh/release-name: prometheus
+      meta.helm.sh/release-namespace: monitoring
+    labels:
+      app.kubernetes.io/component: metrics
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: kube-state-metrics
+      app.kubernetes.io/part-of: kube-state-metrics
+      app.kubernetes.io/version: 2.18.0
+      helm.sh/chart: kube-state-metrics-7.2.2
+      release: prometheus
+    name: prometheus-kube-state-metrics
+    namespace: monitoring
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/name: kube-state-metrics
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/component: metrics
+          app.kubernetes.io/instance: prometheus
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: kube-state-metrics
+          app.kubernetes.io/part-of: kube-state-metrics
+          app.kubernetes.io/version: 2.18.0
+          helm.sh/chart: kube-state-metrics-7.2.2
+          release: prometheus
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - args:
+          - --port=8080
+          - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpointslices,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
+          image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.18.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /livez
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: kube-state-metrics
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          - containerPort: 8081
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: metrics
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 65534
+          runAsGroup: 65534
+          runAsNonRoot: true
+          runAsUser: 65534
+          seccompProfile:
+            type: RuntimeDefault
+        serviceAccount: prometheus-kube-state-metrics
+        serviceAccountName: prometheus-kube-state-metrics
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:43:19Z"
+      lastUpdateTime: "2026-04-19T21:43:41Z"
+      message: ReplicaSet "prometheus-kube-state-metrics-7c568c7984" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-20T16:20:46Z"
+      lastUpdateTime: "2026-04-20T16:20:46Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:

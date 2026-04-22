@@ -1,0 +1,2578 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: alibabacredentialconfig
+  spec:
+    resourceFields:
+      accessKeyId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        type: string
+        update: true
+      accessKeySecret:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        type: password
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+      io.cattle.node_driver.name: amazonec2
+    name: amazonec2config
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: amazonec2
+  spec:
+    resourceFields:
+      accessKey:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS Access Key
+        type: string
+        update: true
+      ami:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS machine image
+        type: string
+        update: true
+      blockDurationMinutes:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "0"
+        description: AWS spot instance duration in minutes (60, 120, 180, 240, 300,
+          or 360)
+        type: string
+        update: true
+      deviceName:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS root device name
+        type: string
+        update: true
+      enablePrimaryIpv6:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Indicates whether the first IPv6 address assigned to the instance
+          should be marked as the primary IPv6 address. Enable this option if the
+          instance requires a stable, non-changing IPv6 address. This option does
+          not affect whether IPv6 addresses are assigned to the instance.
+        type: boolean
+        update: true
+      encryptEbsVolume:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Encrypt the EBS volume using the AWS Managed CMK
+        type: boolean
+        update: true
+      endpoint:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Optional endpoint URL (hostname only or fully qualified URI)
+        type: string
+        update: true
+      httpEndpoint:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Enables or disables the HTTP metadata endpoint on your instances
+        type: string
+        update: true
+      httpProtocolIpv6:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: disabled
+        description: 'Enables or disables the IPv6 endpoint for the instance metadata
+          service. Options: enabled, disabled (default).'
+        type: string
+        update: true
+      httpTokens:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: The state of token usage for your instance metadata requests.
+        type: string
+        update: true
+      iamInstanceProfile:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS IAM Instance Profile
+        type: string
+        update: true
+      insecureTransport:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Disable SSL when sending requests
+        type: boolean
+        update: true
+      instanceType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: t2.micro
+        description: AWS instance type
+        type: string
+        update: true
+      ipv6AddressCount:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "0"
+        description: 'The number of IPv6 addresses to assign to the network interface
+          (default: 0). Must be greater than zero when amazonec2-ipv6-address-only
+          is true.'
+        type: string
+        update: true
+      ipv6AddressOnly:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Indicates whether the instance has only IPv6 address. Useful
+          when the VPC or subnet is configured as IPv6-only. When set to true, the
+          instance will have IPv6 as its sole address. When set to true, amazonec2-ipv6-address-count
+          must be greater than zero.
+        type: boolean
+        update: true
+      keypairName:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS keypair to use; requires --amazonec2-ssh-keypath
+        type: string
+        update: true
+      kmsKey:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Custom KMS key using the AWS Managed CMK
+        type: string
+        update: true
+      monitoring:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Set this flag to enable CloudWatch monitoring
+        type: boolean
+        update: true
+      openPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Make the specified port number accessible from the Internet
+        nullable: true
+        type: array[string]
+        update: true
+      privateAddressOnly:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Only use a private IP address
+        type: boolean
+        update: true
+      region:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: us-east-1
+        description: AWS region
+        type: string
+        update: true
+      requestSpotInstance:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Set this flag to request spot instance
+        type: boolean
+        update: true
+      retries:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "5"
+        description: Set retry count for recoverable failures (use -1 to disable)
+        type: string
+        update: true
+      rootSize:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "16"
+        description: AWS root disk size (in GB)
+        type: string
+        update: true
+      secretKey:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS Secret Key
+        type: password
+        update: true
+      securityGroup:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue:
+          - rancher-nodes
+          stringValue: ""
+        description: AWS VPC security group
+        nullable: true
+        type: array[string]
+        update: true
+      securityGroupReadonly:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Skip adding default rules to security groups
+        type: boolean
+        update: true
+      sessionToken:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS Session Token
+        type: string
+        update: true
+      spotPrice:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "0.50"
+        description: AWS spot instance bid price (in dollar)
+        type: string
+        update: true
+      sshKeyContents:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: File contents for sshKeyContents
+        type: password
+        update: true
+      sshUser:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ubuntu
+        description: Set the name of the ssh user
+        type: string
+        update: true
+      subnetId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS VPC subnet id
+        type: string
+        update: true
+      tags:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS Tags (e.g. key1,value1,key2,value2)
+        type: string
+        update: true
+      useEbsOptimizedInstance:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Create an EBS optimized instance
+        type: boolean
+        update: true
+      usePrivateAddress:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Force the usage of private IP address
+        type: boolean
+        update: true
+      userdata:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: File contents for userdata
+        type: string
+        update: true
+      volumeType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: gp2
+        description: Amazon EBS volume type
+        type: string
+        update: true
+      vpcId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS VPC id
+        type: string
+        update: true
+      zone:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: a
+        description: AWS zone for instance (i.e. a,b,c,d,e)
+        type: string
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: amazonec2credentialconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: amazonec2
+  spec:
+    resourceFields:
+      accessKey:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS Access Key
+        required: true
+        type: string
+        update: true
+      defaultRegion:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS Default Region
+        dynamicField: true
+        type: string
+        update: true
+      secretKey:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: AWS Secret Key
+        required: true
+        type: password
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+      io.cattle.node_driver.name: azure
+    name: azureconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: azure
+  spec:
+    resourceFields:
+      acceleratedNetworking:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Specify if an Accelerated Networking NIC should be created for
+          your VM
+        type: boolean
+        update: true
+      availabilitySet:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: docker-machine
+        description: Azure Availability Set to place the virtual machine into
+        type: string
+        update: true
+      availabilityZone:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Specify the Availability Zones the Azure resources should be
+          created in
+        type: string
+        update: true
+      clientId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Azure Service Principal Account ID (optional, browser auth is
+          used if not specified)
+        type: string
+        update: true
+      clientSecret:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Azure Service Principal Account password (optional, browser auth
+          is used if not specified)
+        type: password
+        update: true
+      customData:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: File contents for customData
+        type: string
+        update: true
+      diskSize:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "30"
+        description: Disk size if using managed disk
+        type: string
+        update: true
+      dns:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: A unique DNS label for the public IP adddress
+        type: string
+        update: true
+      dockerPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "2376"
+        description: Port number for Docker engine
+        type: string
+        update: true
+      enablePublicIpStandardSku:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Specify if a Standard SKU should be used for the Public IP of
+          the Azure VM
+        type: boolean
+        update: true
+      environment:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: AzurePublicCloud
+        description: Azure environment (e.g. AzurePublicCloud, AzureChinaCloud)
+        type: string
+        update: true
+      faultDomainCount:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "3"
+        description: Fault domain count to use for availability set
+        type: string
+        update: true
+      image:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: canonical:ubuntu-24_04-lts:server-gen1:latest
+        description: Azure virtual machine OS image
+        type: string
+        update: true
+      location:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: westus
+        description: Azure region to create the virtual machine
+        type: string
+        update: true
+      managedDisks:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Configures VM and availability set for managed disks
+        type: boolean
+        update: true
+      noPublicIp:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Do not create a public IP address for the machine
+        type: boolean
+        update: true
+      nsg:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Azure Network Security Group to assign this node to (accepts
+          either a name or resource ID, default is to create a new NSG for each machine)
+        type: string
+        update: true
+      openPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Make the specified port number accessible from the Internet
+        nullable: true
+        type: array[string]
+        update: true
+      plan:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Purchase plan for Azure Virtual Machine (in <publisher>:<product>:<plan>
+          format)
+        type: string
+        update: true
+      privateIpAddress:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Specify a static private IP address for the machine
+        type: string
+        update: true
+      resourceGroup:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: docker-machine
+        description: Azure Resource Group name (will be created if missing)
+        type: string
+        update: true
+      size:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: Standard_D2_v2
+        description: Size for Azure Virtual Machine
+        type: string
+        update: true
+      sshUser:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: docker-user
+        description: Username for SSH login
+        type: string
+        update: true
+      staticPublicIp:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Assign a static public IP address to the machine
+        type: boolean
+        update: true
+      storageType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: Standard_LRS
+        description: Type of Storage Account to host the OS Disk for the machine
+        type: string
+        update: true
+      subnet:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: docker-machine
+        description: Azure Subnet Name to be used within the Virtual Network
+        type: string
+        update: true
+      subnetPrefix:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: 192.168.0.0/16
+        description: Private CIDR block to be used for the new subnet, should comply
+          RFC 1918
+        type: string
+        update: true
+      subscriptionId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Azure Subscription ID
+        type: string
+        update: true
+      tags:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Tags to be applied to the Azure VM instance
+        type: string
+        update: true
+      tenantId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Azure Tenant ID
+        type: string
+        update: true
+      updateDomainCount:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "5"
+        description: Update domain count to use for availability set
+        type: string
+        update: true
+      usePrivateIp:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Use private IP address of the machine to connect
+        type: boolean
+        update: true
+      vnet:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: docker-machine-vnet
+        description: Azure Virtual Network name to connect the virtual machine (in
+          [resourcegroup:]name format)
+        type: string
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: azurecredentialconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: azure
+  spec:
+    resourceFields:
+      clientId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Azure Service Principal Account ID (optional, browser auth is
+          used if not specified)
+        required: true
+        type: string
+        update: true
+      clientSecret:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Azure Service Principal Account password (optional, browser auth
+          is used if not specified)
+        required: true
+        type: password
+        update: true
+      environment:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: AzurePublicCloud
+        description: Azure environment (e.g. AzurePublicCloud, AzureChinaCloud)
+        required: true
+        type: string
+        update: true
+      subscriptionId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Azure Subscription ID
+        required: true
+        type: string
+        update: true
+      tenantId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Azure Tenant ID
+        type: string
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: credentialconfig
+  spec:
+    embed: true
+    embedType: cloudCredential
+    resourceFields:
+      alibabacredentialConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: alibabacredentialconfig
+        update: true
+      amazonec2credentialConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: amazonec2credentialconfig
+        update: true
+      azurecredentialConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: azurecredentialconfig
+        update: true
+      digitaloceancredentialConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: digitaloceancredentialconfig
+        update: true
+      googlecredentialConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: googlecredentialconfig
+        update: true
+      harvestercredentialConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: harvestercredentialconfig
+        update: true
+      linodecredentialConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: linodecredentialconfig
+        update: true
+      vmwarevspherecredentialConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: vmwarevspherecredentialconfig
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+      io.cattle.node_driver.name: digitalocean
+    name: digitaloceanconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: digitalocean
+  spec:
+    resourceFields:
+      accessToken:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Digital Ocean access token
+        type: password
+        update: true
+      backups:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: enable backups for droplet
+        type: boolean
+        update: true
+      image:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ubuntu-20-04-x64
+        description: Digital Ocean Image
+        type: string
+        update: true
+      ipv6:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: enable ipv6 for droplet
+        type: boolean
+        update: true
+      monitoring:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: enable monitoring for droplet
+        type: boolean
+        update: true
+      privateNetworking:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: enable private networking for droplet
+        type: boolean
+        update: true
+      region:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: nyc3
+        description: Digital Ocean region
+        type: string
+        update: true
+      size:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: s-1vcpu-1gb
+        description: Digital Ocean size
+        type: string
+        update: true
+      sshKeyContents:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: File contents for sshKeyContents
+        type: password
+        update: true
+      sshKeyFingerprint:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: SSH key fingerprint
+        type: string
+        update: true
+      sshPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "22"
+        description: SSH port
+        type: string
+        update: true
+      sshUser:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: root
+        description: SSH username
+        type: string
+        update: true
+      tags:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: comma-separated list of tags to apply to the Droplet
+        type: string
+        update: true
+      userdata:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: File contents for userdata
+        type: string
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: digitaloceancredentialconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: digitalocean
+  spec:
+    resourceFields:
+      accessToken:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Digital Ocean access token
+        required: true
+        type: password
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+      io.cattle.node_driver.name: google
+    name: googleconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: google
+  spec:
+    resourceFields:
+      address:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: GCE Instance External IP
+        type: string
+        update: true
+      authEncodedJson:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: File contents for authEncodedJson
+        type: password
+        update: true
+      diskSize:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "10"
+        description: GCE Instance Disk Size (in GB)
+        type: string
+        update: true
+      diskType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: pd-standard
+        description: GCE Instance Disk type
+        type: string
+        update: true
+      externalFirewallRulePrefix:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: A prefix to be added to the fire wall rule created when opening
+          ports publicly to ensure uniqueness
+        type: string
+        update: true
+      internalFirewallRulePrefix:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: A prefix to be added to the firewall rule created when exposing
+          ports internally to ensure uniqueness
+        type: string
+        update: true
+      machineImage:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ubuntu-os-cloud/global/images/ubuntu-2204-jammy-v20220420
+        description: GCE Machine Image Absolute URL
+        type: string
+        update: true
+      machineType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: n1-standard-1
+        description: GCE Machine Type
+        type: string
+        update: true
+      network:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: default
+        description: Specify network in which to provision vm
+        type: string
+        update: true
+      openPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Make the specified port number accessible from the Internet,
+          e.g, 8080/tcp
+        nullable: true
+        type: array[string]
+        update: true
+      preemptible:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: GCE Instance Preemptibility
+        type: boolean
+        update: true
+      project:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: GCE Project
+        type: string
+        update: true
+      scopes:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write
+        description: GCE Scopes (comma-separated if multiple scopes)
+        type: string
+        update: true
+      subnetwork:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Specify subnetwork in which to provision vm
+        type: string
+        update: true
+      tags:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: GCE Instance Tags (comma-separated)
+        type: string
+        update: true
+      useExisting:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Don't create a new VM, use an existing one
+        type: boolean
+        update: true
+      useInternalIp:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Use internal GCE Instance IP rather than public one
+        type: boolean
+        update: true
+      useInternalIpOnly:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Configure GCE instance to not have an external IP address
+        type: boolean
+        update: true
+      userdata:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: File contents for userdata
+        type: string
+        update: true
+      username:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: docker-user
+        description: GCE User Name
+        type: string
+        update: true
+      vmLabels:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: labels to add onto the created virtual machine
+        type: string
+        update: true
+      zone:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: us-central1-a
+        description: GCE Zone
+        type: string
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: googlecredentialconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: google
+  spec:
+    resourceFields:
+      authEncodedJson:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: File contents for authEncodedJson
+        required: true
+        type: password
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+      io.cattle.node_driver.name: harvester
+    name: harvesterconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: harvester
+  spec:
+    resourceFields:
+      cloudConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: just keep it empty, this value will be filled by rancher-machine
+        type: string
+        update: true
+      clusterId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester cluster id
+        type: string
+        update: true
+      clusterName:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester cluster name
+        type: string
+        update: true
+      clusterType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester cluster type
+        type: string
+        update: true
+      cpuCount:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "2"
+        description: number of CPUs for machine
+        type: string
+        update: true
+      cpuPinning:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: enable vm cpu pinning, please ensure the harvester cluster has
+          cpu manager enabled in at least one node
+        type: boolean
+        update: true
+      diskBus:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: bus of disk for machine
+        type: string
+        update: true
+      diskInfo:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester disk info
+        type: string
+        update: true
+      diskSize:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "0"
+        description: size of disk for machine (in GiB)
+        type: string
+        update: true
+      enableEfi:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: enable vm efi
+        type: boolean
+        update: true
+      enableSecureBoot:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: enable vm secure boot, only works when enable efi
+        type: boolean
+        update: true
+      enableTpm:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: enable vm TPM
+        type: boolean
+        update: true
+      imageName:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester image name
+        type: string
+        update: true
+      isolateEmulatorThread:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: enable vm isolatated emulator thread
+        type: boolean
+        update: true
+      keyPairName:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester key pair name
+        type: string
+        update: true
+      kubeconfigContent:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: contents of kubeconfig file for harvester cluster, base64 is
+          supported
+        type: password
+        update: true
+      memorySize:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "4"
+        description: size of memory for machine (in GiB)
+        type: string
+        update: true
+      networkData:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: networkData content of cloud-init for machine, base64 is supported
+        type: string
+        update: true
+      networkInfo:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester network info
+        type: string
+        update: true
+      networkModel:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester network model
+        type: string
+        update: true
+      networkName:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester network name
+        type: string
+        update: true
+      networkType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester network type
+        type: string
+        update: true
+      reservedMemorySize:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "-1"
+        description: size of reserved memory for machine (in MiB, integer value)
+        type: string
+        update: true
+      sshPassword:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: SSH password
+        type: string
+        update: true
+      sshPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "22"
+        description: SSH port
+        type: string
+        update: true
+      sshPrivateKeyPath:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: 'SSH private key path '
+        type: string
+        update: true
+      sshUser:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: root
+        description: SSH username
+        type: string
+        update: true
+      userData:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: userData content of cloud-init for machine, base64 is supported
+        type: string
+        update: true
+      vgpuInfo:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester-vgpu-info
+        type: string
+        update: true
+      vmAffinity:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester vm affinity, base64 is supported
+        type: string
+        update: true
+      vmNamespace:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: default
+        description: harvester vm namespace
+        type: string
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: harvestercredentialconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: harvester
+  spec:
+    resourceFields:
+      clusterId:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: harvester cluster id
+        type: string
+        update: true
+      clusterType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: imported
+        description: harvester cluster type
+        required: true
+        type: string
+        update: true
+      kubeconfigContent:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: contents of kubeconfig file for harvester cluster, base64 is
+          supported
+        required: true
+        type: password
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+      io.cattle.node_driver.name: linode
+    name: linodeconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: linode
+  spec:
+    resourceFields:
+      authorizedUsers:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Linode user accounts (separated by commas) whose Linode SSH keys
+          will be permitted root access to the created node
+        type: string
+        update: true
+      createPrivateIp:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Create private IP for the instance
+        type: boolean
+        update: true
+      dockerPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "2376"
+        description: Docker Port
+        type: string
+        update: true
+      image:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: linode/ubuntu18.04
+        description: Specifies the Linode Instance image which determines the OS distribution
+          and base files
+        type: string
+        update: true
+      instanceType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: g6-standard-4
+        description: Specifies the Linode Instance type which determines CPU, memory,
+          disk size, etc.
+        type: string
+        update: true
+      label:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Linode Instance Label
+        type: string
+        update: true
+      region:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: us-east
+        description: Specifies the region (location) of the Linode instance
+        type: string
+        update: true
+      rootPass:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Root Password
+        type: password
+        update: true
+      sshPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "22"
+        description: Linode Instance SSH Port
+        type: string
+        update: true
+      sshUser:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Specifies the user as which docker-machine should log in to the
+          Linode instance to install Docker.
+        type: string
+        update: true
+      stackscript:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Specifies the Linode StackScript to use to create the instance
+        type: string
+        update: true
+      stackscriptData:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: A JSON string specifying data for the selected StackScript
+        type: string
+        update: true
+      swapSize:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "512"
+        description: Linode Instance Swap Size (MB)
+        type: string
+        update: true
+      tags:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: A comma separated list of tags to apply to the Linode resource
+        type: string
+        update: true
+      token:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Linode API Token
+        type: password
+        update: true
+      uaPrefix:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Prefix the User-Agent in Linode API calls with some 'product/version'
+        type: string
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: linodecredentialconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: linode
+  spec:
+    resourceFields:
+      token:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Linode API Token
+        required: true
+        type: password
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: nodeconfig
+  spec:
+    embed: true
+    embedType: node
+    resourceFields:
+      amazonec2Config:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: amazonec2config
+      azureConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: azureconfig
+      digitaloceanConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: digitaloceanconfig
+      harvesterConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: harvesterconfig
+      linodeConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: linodeconfig
+      vmwarevsphereConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: vmwarevsphereconfig
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: nodetemplateconfig
+  spec:
+    embed: true
+    embedType: nodeTemplate
+    resourceFields:
+      amazonec2Config:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: amazonec2config
+        update: true
+      azureConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: azureconfig
+        update: true
+      digitaloceanConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: digitaloceanconfig
+        update: true
+      harvesterConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: harvesterconfig
+        update: true
+      linodeConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: linodeconfig
+        update: true
+      vmwarevsphereConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        nullable: true
+        type: vmwarevsphereconfig
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+      io.cattle.node_driver.name: vmwarevsphere
+    name: vmwarevsphereconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: vmwarevsphere
+  spec:
+    resourceFields:
+      boot2dockerUrl:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere URL for boot2docker image
+        type: string
+        update: true
+      cfgparam:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere vm configuration parameters (used for guestinfo)
+        nullable: true
+        type: array[string]
+        update: true
+      cloneFrom:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: If you choose creation type clone a name of what you want to
+          clone is required
+        type: string
+        update: true
+      cloudConfig:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: Filepath to a cloud-config yaml file to put into the ISO user-data
+        type: string
+        update: true
+      cloudinit:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere cloud-init filepath or url to add to guestinfo, filepath
+          will be read and base64 encoded before adding
+        type: string
+        update: true
+      contentLibrary:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: If you choose to clone from a content library template specify
+          the name of the library
+        type: string
+        update: true
+      cpuCount:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "2"
+        description: vSphere CPU number for docker VM
+        type: string
+        update: true
+      creationType:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: legacy
+        description: 'Creation type when creating a new virtual machine. Supported
+          values: vm, template, library, legacy'
+        type: string
+        update: true
+      customAttribute:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere custom attribute, format key/value e.g. '200=my custom
+          value'
+        nullable: true
+        type: array[string]
+        update: true
+      datacenter:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere datacenter for virtual machine
+        type: string
+        update: true
+      datastore:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere datastore for virtual machine
+        type: string
+        update: true
+      datastoreCluster:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere datastore cluster for virtual machine
+        type: string
+        update: true
+      diskSize:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "20480"
+        description: vSphere size of disk for docker VM (in MB)
+        type: string
+        update: true
+      folder:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere folder for the docker VM. This folder must already exist
+          in the datacenter
+        type: string
+        update: true
+      gracefulShutdownTimeout:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "0"
+        description: How many seconds to wait before timing out when attempting a
+          graceful shutdown for a vSphere virtual machine. A force destroy will perform
+          when the value is zero.
+        type: string
+        update: true
+      hostsystem:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere compute resource where the docker VM will be instantiated.
+          This can be omitted if using a cluster with DRS
+        type: string
+        update: true
+      memorySize:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "2048"
+        description: vSphere size of memory for docker VM (in MB)
+        type: string
+        update: true
+      network:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere network where the virtual machine will be attached
+        nullable: true
+        type: array[string]
+        update: true
+      os:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: linux
+        description: If using a non-B2D image you can specify the desired machine
+          OS
+        type: string
+        update: true
+      password:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere password
+        type: password
+        update: true
+      pool:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere resource pool for docker VM
+        type: string
+        update: true
+      sshPassword:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: tcuser
+        description: If using a non-B2D image you can specify the ssh password
+        type: string
+        update: true
+      sshPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "22"
+        description: If using a non-B2D image you can specify the ssh port
+        type: string
+        update: true
+      sshUser:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: docker
+        description: If using a non-B2D image you can specify the ssh user
+        type: string
+        update: true
+      sshUserGroup:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: staff
+        description: If using a non-B2D image the uploaded keys will need chown'ed,
+          defaults to staff e.g. docker:staff
+        type: string
+        update: true
+      tag:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere tag id e.g. urn:xxx
+        nullable: true
+        type: array[string]
+        update: true
+      username:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere username
+        type: string
+        update: true
+      vappIpallocationpolicy:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: 'vSphere vApp IP allocation policy. Supported values are: dhcp,
+          fixed, transient and fixedAllocated'
+        type: string
+        update: true
+      vappIpprotocol:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: 'vSphere vApp IP protocol for this deployment. Supported values
+          are: IPv4 and IPv6'
+        type: string
+        update: true
+      vappProperty:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere vApp properties
+        nullable: true
+        type: array[string]
+        update: true
+      vappTransport:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: 'vSphere OVF environment transports to use for properties. Supported
+          values are: iso and com.vmware.guestInfo'
+        type: string
+        update: true
+      vcenter:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere IP/hostname for vCenter
+        type: string
+        update: true
+      vcenterPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "443"
+        description: vSphere Port for vCenter
+        type: string
+        update: true
+  status: {}
+- apiVersion: management.cattle.io/v3
+  kind: DynamicSchema
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: vmwarevspherecredentialconfig
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: NodeDriver
+      name: vmwarevsphere
+  spec:
+    resourceFields:
+      password:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere password
+        required: true
+        type: password
+        update: true
+      username:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere username
+        required: true
+        type: string
+        update: true
+      vcenter:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: ""
+        description: vSphere IP/hostname for vCenter
+        required: true
+        type: string
+        update: true
+      vcenterPort:
+        create: true
+        default:
+          boolValue: false
+          intValue: 0
+          stringSliceValue: null
+          stringValue: "443"
+        description: vSphere Port for vCenter
+        required: true
+        type: string
+        update: true
+  status: {}
+kind: List
+metadata:

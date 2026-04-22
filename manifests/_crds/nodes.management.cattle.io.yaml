@@ -1,0 +1,702 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  kind: Node
+  metadata:
+    annotations:
+      cleanup.cattle.io/user-node-remove: "true"
+      management.cattle.io/nodesyncer: "true"
+    generateName: machine-
+    labels:
+      cattle.io/creator: norman
+      management.cattle.io/nodename: aiot-master
+    name: machine-5kjs5
+    namespace: local
+  spec:
+    controlPlane: true
+    customConfig: null
+    desiredNodeTaints: null
+    displayName: ""
+    etcd: false
+    imported: false
+    internalNodeSpec:
+      podCIDR: 10.244.0.0/24
+      podCIDRs:
+      - 10.244.0.0/24
+      taints:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+    metadataUpdate:
+      annotations: {}
+      labels: {}
+    nodePoolName: ""
+    requestedHostname: aiot-master
+    worker: false
+  status:
+    conditions:
+    - lastTransitionTime: 2026-04-14 01:18:12 +0000 UTC
+      lastUpdateTime: 2026-04-22 08:25:46 +0000 UTC
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:51:53Z"
+      message: registered with kubernetes
+      status: "True"
+      type: Registered
+    internalNodeStatus:
+      addresses:
+      - address: 10.132.0.2
+        type: InternalIP
+      - address: aiot-master
+        type: Hostname
+      allocatable:
+        cpu: "4"
+        ephemeral-storage: "96385779143"
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 16005000Ki
+        pods: "110"
+      capacity:
+        cpu: "4"
+        ephemeral-storage: 104585264Ki
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 16107400Ki
+        pods: "110"
+      conditions:
+      - lastHeartbeatTime: "2026-04-22T08:25:46Z"
+        lastTransitionTime: "2026-04-14T01:18:12Z"
+        message: kubelet is posting ready status
+        reason: KubeletReady
+        status: "True"
+        type: Ready
+      daemonEndpoints:
+        kubeletEndpoint:
+          Port: 10250
+      nodeInfo:
+        architecture: amd64
+        bootID: 0459e522-15a5-412b-bf78-045e057f9253
+        containerRuntimeVersion: containerd://2.2.3
+        kernelVersion: 5.14.0-691.el9.x86_64
+        kubeProxyVersion: v1.32.13
+        kubeletVersion: v1.32.13
+        machineID: 048311148df146e994ed26a093959ea8
+        operatingSystem: linux
+        osImage: CentOS Stream 9
+        systemUUID: 32b1e44f-62d4-4298-eac5-c2b8db897f41
+      runtimeHandlers:
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: ""
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: runc
+    limits:
+      cpu: 11100m
+      memory: 13002Mi
+    nodeAnnotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"2a:4a:65:62:7e:2d"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 10.132.0.2
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    nodeLabels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: aiot-master
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/control-plane: ""
+      node.kubernetes.io/exclude-from-external-load-balancers: ""
+    nodeName: aiot-master
+    requested:
+      cpu: 2045m
+      memory: 3782Mi
+      pods: "21"
+- apiVersion: management.cattle.io/v3
+  kind: Node
+  metadata:
+    annotations:
+      cleanup.cattle.io/user-node-remove: "true"
+      management.cattle.io/nodesyncer: "true"
+    generateName: machine-
+    labels:
+      cattle.io/creator: norman
+      management.cattle.io/nodename: oci-e5-node2
+    name: machine-96d47
+    namespace: local
+  spec:
+    controlPlane: false
+    customConfig: null
+    desiredNodeTaints: null
+    displayName: ""
+    etcd: false
+    imported: false
+    internalNodeSpec:
+      podCIDR: 10.244.4.0/24
+      podCIDRs:
+      - 10.244.4.0/24
+    metadataUpdate:
+      annotations: {}
+      labels: {}
+    nodePoolName: ""
+    requestedHostname: oci-e5-node2
+    worker: true
+  status:
+    conditions:
+    - lastTransitionTime: 2026-04-18 04:56:21 +0000 UTC
+      lastUpdateTime: 2026-04-22 08:27:41 +0000 UTC
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:51:53Z"
+      message: registered with kubernetes
+      status: "True"
+      type: Registered
+    internalNodeStatus:
+      addresses:
+      - address: 172.16.200.11
+        type: InternalIP
+      - address: oci-e5-node2
+        type: Hostname
+      allocatable:
+        cpu: 7600m
+        ephemeral-storage: "75755002134"
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 10233116Ki
+        pods: "110"
+      capacity:
+        cpu: "8"
+        ephemeral-storage: 84824Mi
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 11769116Ki
+        pods: "110"
+      conditions:
+      - lastHeartbeatTime: "2026-04-22T08:27:41Z"
+        lastTransitionTime: "2026-04-18T04:56:21Z"
+        message: kubelet is posting ready status
+        reason: KubeletReady
+        status: "True"
+        type: Ready
+      daemonEndpoints:
+        kubeletEndpoint:
+          Port: 10250
+      nodeInfo:
+        architecture: amd64
+        bootID: ac2220ff-7864-4002-ba35-179c34a1cf26
+        containerRuntimeVersion: containerd://2.2.3
+        kernelVersion: 6.12.0-201.74.2.1.el9uek.x86_64
+        kubeProxyVersion: v1.32.13
+        kubeletVersion: v1.32.13
+        machineID: 18e71302b64b4451b5e153beadcc1b77
+        operatingSystem: linux
+        osImage: Oracle Linux Server 9.7
+        systemUUID: 18e71302-b64b-4451-b5e1-53beadcc1b77
+      runtimeHandlers:
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: ""
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: runc
+    limits:
+      cpu: 27300m
+      memory: 20896Mi
+    nodeAnnotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"16:54:0e:22:4b:41"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 172.16.200.11
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    nodeLabels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      cloud: oci
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: oci-e5-node2
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+      topology.kubernetes.io/zone: oci-frankfurt
+    nodeName: oci-e5-node2
+    requested:
+      cpu: 3420m
+      memory: 5462Mi
+      pods: "41"
+- apiVersion: management.cattle.io/v3
+  kind: Node
+  metadata:
+    annotations:
+      cleanup.cattle.io/user-node-remove: "true"
+      management.cattle.io/nodesyncer: "true"
+    generateName: machine-
+    labels:
+      cattle.io/creator: norman
+      management.cattle.io/nodename: aiot-worker-02
+    name: machine-hbk8l
+    namespace: local
+  spec:
+    controlPlane: false
+    customConfig: null
+    desiredNodeTaints: null
+    displayName: ""
+    etcd: false
+    imported: false
+    internalNodeSpec:
+      podCIDR: 10.244.2.0/24
+      podCIDRs:
+      - 10.244.2.0/24
+    metadataUpdate:
+      annotations: {}
+      labels: {}
+    nodePoolName: ""
+    requestedHostname: aiot-worker-02
+    worker: true
+  status:
+    conditions:
+    - lastTransitionTime: 2026-04-20 12:16:51 +0000 UTC
+      lastUpdateTime: 2026-04-22 08:23:29 +0000 UTC
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:51:53Z"
+      message: registered with kubernetes
+      status: "True"
+      type: Registered
+    internalNodeStatus:
+      addresses:
+      - address: 10.132.0.4
+        type: InternalIP
+      - address: aiot-worker-02
+        type: Hostname
+      allocatable:
+        cpu: "4"
+        ephemeral-storage: "144704161143"
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 16005000Ki
+        pods: "110"
+      capacity:
+        cpu: "4"
+        ephemeral-storage: 157014064Ki
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 16107400Ki
+        pods: "110"
+      conditions:
+      - lastHeartbeatTime: "2026-04-22T08:23:29Z"
+        lastTransitionTime: "2026-04-20T12:16:51Z"
+        message: kubelet is posting ready status
+        reason: KubeletReady
+        status: "True"
+        type: Ready
+      daemonEndpoints:
+        kubeletEndpoint:
+          Port: 10250
+      nodeInfo:
+        architecture: amd64
+        bootID: c7b915e6-9eae-4b71-b3f6-37397f040da2
+        containerRuntimeVersion: containerd://2.2.3
+        kernelVersion: 5.14.0-691.el9.x86_64
+        kubeProxyVersion: v1.32.13
+        kubeletVersion: v1.32.13
+        machineID: 048311148df146e994ed26a093959ea8
+        operatingSystem: linux
+        osImage: CentOS Stream 9
+        systemUUID: 3ab7e681-5399-bc88-e01c-b0f40fd7a93d
+      runtimeHandlers:
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: ""
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: runc
+    limits:
+      cpu: 23200m
+      memory: 18218Mi
+    nodeAnnotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"86:3b:9d:76:60:f8"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 10.132.0.4
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    nodeLabels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: aiot-worker-02
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+    nodeName: aiot-worker-02
+    requested:
+      cpu: 3520m
+      memory: 7534Mi
+      pods: "50"
+- apiVersion: management.cattle.io/v3
+  kind: Node
+  metadata:
+    annotations:
+      cleanup.cattle.io/user-node-remove: "true"
+      management.cattle.io/nodesyncer: "true"
+    generateName: machine-
+    labels:
+      cattle.io/creator: norman
+      management.cattle.io/nodename: oci-test-node1
+    name: machine-jlxxv
+    namespace: local
+  spec:
+    controlPlane: false
+    customConfig: null
+    desiredNodeTaints: null
+    displayName: ""
+    etcd: false
+    imported: false
+    internalNodeSpec:
+      podCIDR: 10.244.5.0/24
+      podCIDRs:
+      - 10.244.5.0/24
+      taints:
+      - effect: NoSchedule
+        key: dedicated
+        value: ml-training
+    metadataUpdate:
+      annotations: {}
+      labels: {}
+    nodePoolName: ""
+    requestedHostname: oci-test-node1
+    worker: true
+  status:
+    conditions:
+    - lastTransitionTime: 2026-04-18 04:50:21 +0000 UTC
+      lastUpdateTime: 2026-04-22 08:27:08 +0000 UTC
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:51:53Z"
+      message: registered with kubernetes
+      status: "True"
+      type: Registered
+    internalNodeStatus:
+      addresses:
+      - address: 172.16.200.12
+        type: InternalIP
+      - address: oci-test-node1
+        type: Hostname
+      allocatable:
+        cpu: 1600m
+        ephemeral-storage: "24152480107"
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 10236204Ki
+        pods: "110"
+      capacity:
+        cpu: "2"
+        ephemeral-storage: 30144Mi
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 11772204Ki
+        pods: "110"
+      conditions:
+      - lastHeartbeatTime: "2026-04-22T08:27:08Z"
+        lastTransitionTime: "2026-04-18T04:50:21Z"
+        message: kubelet is posting ready status
+        reason: KubeletReady
+        status: "True"
+        type: Ready
+      daemonEndpoints:
+        kubeletEndpoint:
+          Port: 10250
+      nodeInfo:
+        architecture: amd64
+        bootID: e044a65f-c6fa-4d1f-b411-de53ebfdd9a2
+        containerRuntimeVersion: containerd://2.2.3
+        kernelVersion: 6.12.0-201.74.2.1.el9uek.x86_64
+        kubeProxyVersion: v1.32.13
+        kubeletVersion: v1.32.13
+        machineID: c17c930dee42429ba93b9c73dcec39f7
+        operatingSystem: linux
+        osImage: Oracle Linux Server 9.7
+        systemUUID: c17c930d-ee42-429b-a93b-9c73dcec39f7
+      runtimeHandlers:
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: ""
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: runc
+    limits:
+      cpu: "3"
+      memory: 2176Mi
+    nodeAnnotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"7e:58:56:97:4a:96"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 172.16.200.12
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    nodeLabels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      cloud: oci
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: oci-test-node1
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/ml-training: ""
+      topology.kubernetes.io/zone: oci-frankfurt
+    nodeName: oci-test-node1
+    requested:
+      cpu: 730m
+      memory: 1334Mi
+      pods: "8"
+- apiVersion: management.cattle.io/v3
+  kind: Node
+  metadata:
+    annotations:
+      cleanup.cattle.io/user-node-remove: "true"
+      management.cattle.io/nodesyncer: "true"
+    generateName: machine-
+    labels:
+      cattle.io/creator: norman
+      management.cattle.io/nodename: oci-e5-node1
+    name: machine-mr29s
+    namespace: local
+  spec:
+    controlPlane: false
+    customConfig: null
+    desiredNodeTaints: null
+    displayName: ""
+    etcd: false
+    imported: false
+    internalNodeSpec:
+      podCIDR: 10.244.3.0/24
+      podCIDRs:
+      - 10.244.3.0/24
+    metadataUpdate:
+      annotations: {}
+      labels: {}
+    nodePoolName: ""
+    requestedHostname: oci-e5-node1
+    worker: true
+  status:
+    conditions:
+    - lastTransitionTime: 2026-04-20 12:00:18 +0000 UTC
+      lastUpdateTime: 2026-04-22 08:27:57 +0000 UTC
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:51:53Z"
+      message: registered with kubernetes
+      status: "True"
+      type: Registered
+    internalNodeStatus:
+      addresses:
+      - address: 172.16.200.10
+        type: InternalIP
+      - address: oci-e5-node1
+        type: Hostname
+      allocatable:
+        cpu: 7600m
+        ephemeral-storage: "75755002134"
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 10233108Ki
+        pods: "110"
+      capacity:
+        cpu: "8"
+        ephemeral-storage: 84824Mi
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 11769108Ki
+        pods: "110"
+      conditions:
+      - lastHeartbeatTime: "2026-04-22T08:27:57Z"
+        lastTransitionTime: "2026-04-20T12:00:18Z"
+        message: kubelet is posting ready status
+        reason: KubeletReady
+        status: "True"
+        type: Ready
+      daemonEndpoints:
+        kubeletEndpoint:
+          Port: 10250
+      nodeInfo:
+        architecture: amd64
+        bootID: 77a5d50b-a555-4d09-98a6-220eb5a9dcf4
+        containerRuntimeVersion: containerd://2.2.3
+        kernelVersion: 6.12.0-201.74.2.1.el9uek.x86_64
+        kubeProxyVersion: v1.32.13
+        kubeletVersion: v1.32.13
+        machineID: f6e50a67da6e4469bfc08c323eb4d064
+        operatingSystem: linux
+        osImage: Oracle Linux Server 9.7
+        systemUUID: f6e50a67-da6e-4469-bfc0-8c323eb4d064
+      runtimeHandlers:
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: ""
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: runc
+    limits:
+      cpu: 17500m
+      memory: 13440Mi
+    nodeAnnotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"42:d6:1c:3f:58:78"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 172.16.200.10
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    nodeLabels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      cloud: oci
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: oci-e5-node1
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+      topology.kubernetes.io/zone: oci-frankfurt
+    nodeName: oci-e5-node1
+    requested:
+      cpu: 1685m
+      memory: 3630Mi
+      pods: "19"
+- apiVersion: management.cattle.io/v3
+  kind: Node
+  metadata:
+    annotations:
+      cleanup.cattle.io/user-node-remove: "true"
+      management.cattle.io/nodesyncer: "true"
+    generateName: machine-
+    labels:
+      cattle.io/creator: norman
+      management.cattle.io/nodename: aiot-worker-01
+    name: machine-vw9wr
+    namespace: local
+  spec:
+    controlPlane: false
+    customConfig: null
+    desiredNodeTaints: null
+    displayName: ""
+    etcd: false
+    imported: false
+    internalNodeSpec:
+      podCIDR: 10.244.1.0/24
+      podCIDRs:
+      - 10.244.1.0/24
+    metadataUpdate:
+      annotations: {}
+      labels: {}
+    nodePoolName: ""
+    requestedHostname: aiot-worker-01
+    worker: true
+  status:
+    conditions:
+    - lastTransitionTime: 2026-04-20 16:33:27 +0000 UTC
+      lastUpdateTime: 2026-04-22 08:25:56 +0000 UTC
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:51:53Z"
+      message: registered with kubernetes
+      status: "True"
+      type: Registered
+    internalNodeStatus:
+      addresses:
+      - address: 10.132.0.3
+        type: InternalIP
+      - address: aiot-worker-01
+        type: Hostname
+      allocatable:
+        cpu: "4"
+        ephemeral-storage: "144704161143"
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 16005000Ki
+        pods: "110"
+      capacity:
+        cpu: "4"
+        ephemeral-storage: 157014064Ki
+        hugepages-1Gi: "0"
+        hugepages-2Mi: "0"
+        memory: 16107400Ki
+        pods: "110"
+      conditions:
+      - lastHeartbeatTime: "2026-04-22T08:25:56Z"
+        lastTransitionTime: "2026-04-20T16:33:27Z"
+        message: kubelet is posting ready status
+        reason: KubeletReady
+        status: "True"
+        type: Ready
+      daemonEndpoints:
+        kubeletEndpoint:
+          Port: 10250
+      nodeInfo:
+        architecture: amd64
+        bootID: f0b7144a-1229-4c7f-8f37-bb5b400543f8
+        containerRuntimeVersion: containerd://2.2.3
+        kernelVersion: 5.14.0-691.el9.x86_64
+        kubeProxyVersion: v1.32.13
+        kubeletVersion: v1.32.13
+        machineID: 048311148df146e994ed26a093959ea8
+        operatingSystem: linux
+        osImage: CentOS Stream 9
+        systemUUID: 31ac02f6-908d-2e11-4319-bbbc15cdb3b8
+      runtimeHandlers:
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: ""
+      - features:
+          recursiveReadOnlyMounts: true
+          userNamespaces: true
+        name: runc
+    limits:
+      cpu: "5"
+      memory: 6528Mi
+    nodeAnnotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"c2:d5:10:6d:8d:c7"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 10.132.0.3
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    nodeLabels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: aiot-worker-01
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+    nodeName: aiot-worker-01
+    requested:
+      cpu: 1175m
+      memory: 2466Mi
+      pods: "18"
+kind: List
+metadata:

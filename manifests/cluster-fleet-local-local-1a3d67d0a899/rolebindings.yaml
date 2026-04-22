@@ -1,0 +1,26 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/5yRza4TIRTHX8WcdRnp0JnLTOLCuHDh7ro0Lg5w2mIpjHCoH819dzOtYxpjjd4NCSH/rx9nOBKjQ0YYz4AxJkb2KZb5mswnslyIm+xTY5E5UOPTS+9gBBtqYcoi084XzhcVrO5q0pdIWexOBxhhG4j45u20xjDtcb168c5H9+rN1fnxf4wjHglGyPS5UmFx6tr26z+JyoSWlk4iJIsBnlYQ0FC4QPi97BEj7mgmwLnSXzL2WPYwAvZbJ5Uks5ZkjDUklWs77AfdKaed7pW23caqOfXOitueC/abvj/PNSrXPziJehhms5wCPdL28q+Tf5tTnWZvg7bByvuU/fcL2+agS+MTrODg47xr4Z8Cwa9O1zxTowskHE0hfTtS5Dmo1CsBGD+cF4/3lE/e0mtrU40Mf54mdKcILXXiQbYkNk5uBG6tEb1T7TA4qZTVz9z/8elHAAAA//+0lkP32wIAAA
+      objectset.rio.cattle.io/id: cluster-registration
+      objectset.rio.cattle.io/owner-gvk: fleet.cattle.io/v1alpha1, Kind=ClusterRegistration
+      objectset.rio.cattle.io/owner-name: request-v522x
+      objectset.rio.cattle.io/owner-namespace: fleet-local
+    labels:
+      fleet.cattle.io/managed: "true"
+      objectset.rio.cattle.io/hash: a6fd030eb10ebbcbe03d25a69853d8d8638c54c3
+    name: request-v522x
+    namespace: cluster-fleet-local-local-1a3d67d0a899
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: fleet-bundle-deployment
+  subjects:
+  - kind: ServiceAccount
+    name: request-v522x-853eace5-702e-4d04-afcb-6d3299d033c8
+    namespace: cluster-fleet-local-local-1a3d67d0a899
+kind: List
+metadata:

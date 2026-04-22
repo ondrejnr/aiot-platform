@@ -1,0 +1,65 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"jenkins-controller","app.kubernetes.io/instance":"jenkins","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"jenkins","helm.sh/chart":"jenkins-5.9.14"},"name":"jenkins-schedule-agents","namespace":"jenkins"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"jenkins-schedule-agents"},"subjects":[{"kind":"ServiceAccount","name":"jenkins","namespace":"jenkins"}]}
+      meta.helm.sh/release-name: jenkins
+      meta.helm.sh/release-namespace: jenkins
+    labels:
+      app.kubernetes.io/component: jenkins-controller
+      app.kubernetes.io/instance: jenkins
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: jenkins
+      helm.sh/chart: jenkins-5.9.18
+    name: jenkins-schedule-agents
+    namespace: jenkins
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: jenkins-schedule-agents
+  subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: jenkins
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"jenkins-controller","app.kubernetes.io/instance":"jenkins","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"jenkins","helm.sh/chart":"jenkins-5.9.14"},"name":"jenkins-watch-configmaps","namespace":"jenkins"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"jenkins-casc-reload"},"subjects":[{"kind":"ServiceAccount","name":"jenkins","namespace":"jenkins"}]}
+      meta.helm.sh/release-name: jenkins
+      meta.helm.sh/release-namespace: jenkins
+    labels:
+      app.kubernetes.io/component: jenkins-controller
+      app.kubernetes.io/instance: jenkins
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: jenkins
+      helm.sh/chart: jenkins-5.9.18
+    name: jenkins-watch-configmaps
+    namespace: jenkins
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: jenkins-casc-reload
+  subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: jenkins
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    name: pod-executor-namespaced
+    namespace: jenkins
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: k8up-executor
+  subjects:
+  - kind: ServiceAccount
+    name: pod-executor
+    namespace: jenkins
+kind: List
+metadata:

@@ -1,0 +1,82 @@
+apiVersion: v1
+items:
+- apiVersion: provisioning.cattle.io/v1
+  kind: Cluster
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4yR226zMAzHX+WTr6FfW0qBSLuYpmkXewqTeJAtOCgxTBPi3Se6qqOTdrhM9PP/YE/QkaBBQVATILMXFOs5Lk9fP5OWSLIJ1m80ijjaWP/fGlDQBz/aaD1bblLthigUUh0IhSD5dtS/MoW0GV9AQYeMDXXEsgLGLPn3aNnc3H1I/qrF2BEocF6j+xMce9TLBCRXHVbsZ7BLMWNj7/Dt2m1OwGFN7sdltRhbUJBvj0WeZRVVGg+l2dXFvsr2VG+z0hS5qczeHA7HXbmIfqm0Dv3kiCS92Mee9GJ++jhv7HaQ9p5N7y0LqGleMEEZzikjhZHMAzGF06VBbef5PQAA//9ZhJipBwIAAA
+      objectset.rio.cattle.io/id: provisioning-cluster-create
+      objectset.rio.cattle.io/owner-gvk: management.cattle.io/v3, Kind=Cluster
+      objectset.rio.cattle.io/owner-name: local
+      objectset.rio.cattle.io/owner-namespace: ""
+      provisioning.cattle.io/management-cluster-display-name: local
+    finalizers:
+    - wrangler.cattle.io/provisioning-cluster-remove
+    - wrangler.cattle.io/rke-cluster-remove
+    - wrangler.cattle.io/cloud-config-secret-remover
+    labels:
+      objectset.rio.cattle.io/hash: 50675339e9ca48d1b72932eb038d75d9d2d44618
+    name: local
+    namespace: fleet-local
+  spec:
+    localClusterAuthEndpoint: {}
+  status:
+    clientSecretName: local-kubeconfig
+    clusterName: local
+    conditions:
+    - status: "True"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:51:08Z"
+      status: "False"
+      type: Reconciling
+    - lastUpdateTime: "2026-04-19T20:51:08Z"
+      status: "False"
+      type: Stalled
+    - lastUpdateTime: "2026-04-19T20:51:55Z"
+      status: "True"
+      type: Created
+    - lastUpdateTime: "2026-04-19T20:51:08Z"
+      status: "True"
+      type: RKECluster
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: BackingNamespaceCreated
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: DefaultProjectCreated
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: SystemProjectCreated
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: CreatorMadeOwner
+    - lastUpdateTime: "2026-04-19T20:51:12Z"
+      status: "True"
+      type: Pending
+    - lastUpdateTime: "2026-04-19T20:51:27Z"
+      status: "True"
+      type: Waiting
+    - status: Unknown
+      type: PreBootstrapped
+    - lastUpdateTime: "2026-04-19T20:51:12Z"
+      status: "True"
+      type: NoDiskPressure
+    - lastUpdateTime: "2026-04-19T20:51:12Z"
+      status: "True"
+      type: NoMemoryPressure
+    - lastUpdateTime: "2026-04-19T20:51:12Z"
+      status: "True"
+      type: ServiceAccountSecretsMigrated
+    - lastUpdateTime: "2026-04-19T20:51:14Z"
+      status: "True"
+      type: GlobalAdminsSynced
+    - lastUpdateTime: "2026-04-19T20:51:21Z"
+      status: "True"
+      type: Connected
+    - lastUpdateTime: "2026-04-19T20:51:54Z"
+      status: "True"
+      type: SystemAccountCreated
+    observedGeneration: 1
+    ready: true
+kind: List
+metadata:

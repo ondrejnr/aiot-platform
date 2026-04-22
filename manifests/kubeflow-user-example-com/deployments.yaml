@@ -1,0 +1,1155 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+      autoscaling.knative.dev/min-scale: "1"
+      deployment.kubernetes.io/revision: "1"
+      reconcile-trigger: "1776337432"
+      serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+      sidecar.istio.io/inject: "false"
+    labels:
+      app: maintenance-predictor-predictor-00002
+      component: predictor
+      service.istio.io/canonical-name: maintenance-predictor-predictor
+      service.istio.io/canonical-revision: maintenance-predictor-predictor-00002
+      serving.knative.dev/configuration: maintenance-predictor-predictor
+      serving.knative.dev/configurationGeneration: "2"
+      serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+      serving.knative.dev/revision: maintenance-predictor-predictor-00002
+      serving.knative.dev/revisionUID: 162d10a6-4f60-46da-b595-b74cd956ea23
+      serving.knative.dev/service: maintenance-predictor-predictor
+      serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+      serving.kserve.io/inferenceservice: maintenance-predictor
+    name: maintenance-predictor-predictor-00002-deployment
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: serving.knative.dev/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Revision
+      name: maintenance-predictor-predictor-00002
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        serving.knative.dev/revisionUID: 162d10a6-4f60-46da-b595-b74cd956ea23
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+          autoscaling.knative.dev/min-scale: "1"
+          reconcile-trigger: "1776337432"
+          serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+          sidecar.istio.io/inject: "false"
+        labels:
+          app: maintenance-predictor-predictor-00002
+          component: predictor
+          service.istio.io/canonical-name: maintenance-predictor-predictor
+          service.istio.io/canonical-revision: maintenance-predictor-predictor-00002
+          serving.knative.dev/configuration: maintenance-predictor-predictor
+          serving.knative.dev/configurationGeneration: "2"
+          serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+          serving.knative.dev/revision: maintenance-predictor-predictor-00002
+          serving.knative.dev/revisionUID: 162d10a6-4f60-46da-b595-b74cd956ea23
+          serving.knative.dev/service: maintenance-predictor-predictor
+          serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+          serving.kserve.io/inferenceservice: maintenance-predictor
+      spec:
+        containers:
+        - env:
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow-server.mlflow.svc.cluster.local:5000
+          - name: MODEL_NAME
+            value: maintenance-predictor
+          - name: MODEL_STAGE
+            value: Production
+          - name: DB_HOST
+            value: postgres.aiot.svc.cluster.local
+          - name: DB_NAME
+            value: aiot
+          - name: DB_USER
+            value: aiot
+          - name: DB_PASSWORD
+            value: aiot123
+          - name: PORT
+            value: "8000"
+          - name: K_REVISION
+            value: maintenance-predictor-predictor-00002
+          - name: K_CONFIGURATION
+            value: maintenance-predictor-predictor
+          - name: K_SERVICE
+            value: maintenance-predictor-predictor
+          image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+          imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              httpGet:
+                path: /wait-for-drain
+                port: 8022
+                scheme: HTTP
+          name: kserve-container
+          ports:
+          - containerPort: 8000
+            name: user-port
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+          - mountPath: /app/serve.py
+            name: serve-py
+            readOnly: true
+            subPath: serve.py
+          - mountPath: /mlflow
+            name: mlflow-data
+            readOnly: true
+        - env:
+          - name: SERVING_NAMESPACE
+            value: kubeflow-user-example-com
+          - name: SERVING_SERVICE
+            value: maintenance-predictor-predictor
+          - name: SERVING_CONFIGURATION
+            value: maintenance-predictor-predictor
+          - name: SERVING_REVISION
+            value: maintenance-predictor-predictor-00002
+          - name: QUEUE_SERVING_PORT
+            value: "8012"
+          - name: QUEUE_SERVING_TLS_PORT
+            value: "8112"
+          - name: CONTAINER_CONCURRENCY
+            value: "0"
+          - name: REVISION_TIMEOUT_SECONDS
+            value: "300"
+          - name: REVISION_RESPONSE_START_TIMEOUT_SECONDS
+            value: "0"
+          - name: REVISION_IDLE_TIMEOUT_SECONDS
+            value: "0"
+          - name: SERVING_POD
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: SERVING_POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: SERVING_LOGGING_CONFIG
+          - name: SERVING_LOGGING_LEVEL
+          - name: SERVING_REQUEST_LOG_TEMPLATE
+            value: '{"httpRequest": {"requestMethod": "{{.Request.Method}}", "requestUrl":
+              "{{js .Request.RequestURI}}", "requestSize": "{{.Request.ContentLength}}",
+              "status": {{.Response.Code}}, "responseSize": "{{.Response.Size}}",
+              "userAgent": "{{js .Request.UserAgent}}", "remoteIp": "{{js .Request.RemoteAddr}}",
+              "serverIp": "{{.Revision.PodIP}}", "referer": "{{js .Request.Referer}}",
+              "latency": "{{.Response.Latency}}s", "protocol": "{{.Request.Proto}}"},
+              "traceId": "{{index .Request.Header "X-B3-Traceid"}}"}'
+          - name: SERVING_ENABLE_REQUEST_LOG
+            value: "false"
+          - name: SERVING_REQUEST_METRICS_BACKEND
+            value: prometheus
+          - name: SERVING_REQUEST_METRICS_REPORTING_PERIOD_SECONDS
+            value: "5"
+          - name: TRACING_CONFIG_BACKEND
+            value: none
+          - name: TRACING_CONFIG_ZIPKIN_ENDPOINT
+          - name: TRACING_CONFIG_DEBUG
+            value: "false"
+          - name: TRACING_CONFIG_SAMPLE_RATE
+            value: "0.1"
+          - name: USER_PORT
+            value: "8000"
+          - name: SYSTEM_NAMESPACE
+            value: knative-serving
+          - name: METRICS_DOMAIN
+            value: knative.dev/internal/serving
+          - name: SERVING_READINESS_PROBE
+            value: '{"tcpSocket":{"port":8000,"host":"127.0.0.1"},"successThreshold":1}'
+          - name: ENABLE_PROFILING
+            value: "false"
+          - name: SERVING_ENABLE_PROBE_REQUEST_LOG
+            value: "false"
+          - name: METRICS_COLLECTOR_ADDRESS
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+          - name: ENABLE_HTTP2_AUTO_DETECTION
+            value: "false"
+          - name: ROOT_CA
+          image: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:89e6f90141f1b63405883fbb4de0d3b6d80f8b77e530904c4d29bdcd1dc5a167
+          imagePullPolicy: IfNotPresent
+          name: queue-proxy
+          ports:
+          - containerPort: 8022
+            name: http-queueadm
+            protocol: TCP
+          - containerPort: 9090
+            name: http-autometric
+            protocol: TCP
+          - containerPort: 9091
+            name: http-usermetric
+            protocol: TCP
+          - containerPort: 8012
+            name: queue-port
+            protocol: TCP
+          - containerPort: 8112
+            name: https-port
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              httpHeaders:
+              - name: K-Network-Probe
+                value: queue
+              path: /
+              port: 8012
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 25m
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsConfig:
+          nameservers:
+          - 10.96.0.10
+          options:
+          - name: ndots
+            value: "5"
+          searches:
+          - kubeflow-user-example-com.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        dnsPolicy: None
+        enableServiceLinks: false
+        nodeSelector:
+          kubernetes.io/hostname: oci-test-node1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 300
+        tolerations:
+        - effect: NoSchedule
+          key: dedicated
+          operator: Equal
+          value: ml-training
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: serve-py
+          name: serve-py
+        - name: mlflow-data
+          persistentVolumeClaim:
+            claimName: mlflow-artifacts-lp
+  status:
+    collisionCount: 1
+    conditions:
+    - lastTransitionTime: "2026-04-20T04:50:46Z"
+      lastUpdateTime: "2026-04-20T04:50:46Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:47:30Z"
+      lastUpdateTime: "2026-04-20T17:48:36Z"
+      message: ReplicaSet "maintenance-predictor-predictor-00002-deployment-744d85779b"
+        has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      aiot.ml/prod-run: 646584dbc4b14ef38fed3a0fd09c73d0
+      aiot.ml/prod-version: "55"
+      autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+      autoscaling.knative.dev/min-scale: "1"
+      deployment.kubernetes.io/revision: "1"
+      reconcile-trigger: "1776660630"
+      serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+      sidecar.istio.io/inject: "false"
+    labels:
+      app: maintenance-predictor-predictor-00003
+      component: predictor
+      service.istio.io/canonical-name: maintenance-predictor-predictor
+      service.istio.io/canonical-revision: maintenance-predictor-predictor-00003
+      serving.knative.dev/configuration: maintenance-predictor-predictor
+      serving.knative.dev/configurationGeneration: "3"
+      serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+      serving.knative.dev/revision: maintenance-predictor-predictor-00003
+      serving.knative.dev/revisionUID: a3f034b2-4612-4514-a36e-9ab8294e2477
+      serving.knative.dev/service: maintenance-predictor-predictor
+      serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+      serving.kserve.io/inferenceservice: maintenance-predictor
+    name: maintenance-predictor-predictor-00003-deployment
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: serving.knative.dev/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Revision
+      name: maintenance-predictor-predictor-00003
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 0
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        serving.knative.dev/revisionUID: a3f034b2-4612-4514-a36e-9ab8294e2477
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          aiot.ml/prod-run: 646584dbc4b14ef38fed3a0fd09c73d0
+          aiot.ml/prod-version: "55"
+          autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+          autoscaling.knative.dev/min-scale: "1"
+          reconcile-trigger: "1776660630"
+          serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+          sidecar.istio.io/inject: "false"
+        labels:
+          app: maintenance-predictor-predictor-00003
+          component: predictor
+          service.istio.io/canonical-name: maintenance-predictor-predictor
+          service.istio.io/canonical-revision: maintenance-predictor-predictor-00003
+          serving.knative.dev/configuration: maintenance-predictor-predictor
+          serving.knative.dev/configurationGeneration: "3"
+          serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+          serving.knative.dev/revision: maintenance-predictor-predictor-00003
+          serving.knative.dev/revisionUID: a3f034b2-4612-4514-a36e-9ab8294e2477
+          serving.knative.dev/service: maintenance-predictor-predictor
+          serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+          serving.kserve.io/inferenceservice: maintenance-predictor
+      spec:
+        containers:
+        - env:
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow-server.mlflow.svc.cluster.local:5000
+          - name: MODEL_NAME
+            value: maintenance-predictor
+          - name: MODEL_STAGE
+            value: Production
+          - name: DB_HOST
+            value: postgres.aiot.svc.cluster.local
+          - name: DB_NAME
+            value: aiot
+          - name: DB_USER
+            value: aiot
+          - name: DB_PASSWORD
+            value: aiot123
+          - name: PORT
+            value: "8000"
+          - name: K_REVISION
+            value: maintenance-predictor-predictor-00003
+          - name: K_CONFIGURATION
+            value: maintenance-predictor-predictor
+          - name: K_SERVICE
+            value: maintenance-predictor-predictor
+          image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+          imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              httpGet:
+                path: /wait-for-drain
+                port: 8022
+                scheme: HTTP
+          name: kserve-container
+          ports:
+          - containerPort: 8000
+            name: user-port
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+          - mountPath: /app/serve.py
+            name: serve-py
+            readOnly: true
+            subPath: serve.py
+          - mountPath: /mlflow
+            name: mlflow-data
+            readOnly: true
+        - env:
+          - name: SERVING_NAMESPACE
+            value: kubeflow-user-example-com
+          - name: SERVING_SERVICE
+            value: maintenance-predictor-predictor
+          - name: SERVING_CONFIGURATION
+            value: maintenance-predictor-predictor
+          - name: SERVING_REVISION
+            value: maintenance-predictor-predictor-00003
+          - name: QUEUE_SERVING_PORT
+            value: "8012"
+          - name: QUEUE_SERVING_TLS_PORT
+            value: "8112"
+          - name: CONTAINER_CONCURRENCY
+            value: "0"
+          - name: REVISION_TIMEOUT_SECONDS
+            value: "300"
+          - name: REVISION_RESPONSE_START_TIMEOUT_SECONDS
+            value: "0"
+          - name: REVISION_IDLE_TIMEOUT_SECONDS
+            value: "0"
+          - name: SERVING_POD
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: SERVING_POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: SERVING_LOGGING_CONFIG
+          - name: SERVING_LOGGING_LEVEL
+          - name: SERVING_REQUEST_LOG_TEMPLATE
+            value: '{"httpRequest": {"requestMethod": "{{.Request.Method}}", "requestUrl":
+              "{{js .Request.RequestURI}}", "requestSize": "{{.Request.ContentLength}}",
+              "status": {{.Response.Code}}, "responseSize": "{{.Response.Size}}",
+              "userAgent": "{{js .Request.UserAgent}}", "remoteIp": "{{js .Request.RemoteAddr}}",
+              "serverIp": "{{.Revision.PodIP}}", "referer": "{{js .Request.Referer}}",
+              "latency": "{{.Response.Latency}}s", "protocol": "{{.Request.Proto}}"},
+              "traceId": "{{index .Request.Header "X-B3-Traceid"}}"}'
+          - name: SERVING_ENABLE_REQUEST_LOG
+            value: "false"
+          - name: SERVING_REQUEST_METRICS_BACKEND
+            value: prometheus
+          - name: SERVING_REQUEST_METRICS_REPORTING_PERIOD_SECONDS
+            value: "5"
+          - name: TRACING_CONFIG_BACKEND
+            value: none
+          - name: TRACING_CONFIG_ZIPKIN_ENDPOINT
+          - name: TRACING_CONFIG_DEBUG
+            value: "false"
+          - name: TRACING_CONFIG_SAMPLE_RATE
+            value: "0.1"
+          - name: USER_PORT
+            value: "8000"
+          - name: SYSTEM_NAMESPACE
+            value: knative-serving
+          - name: METRICS_DOMAIN
+            value: knative.dev/internal/serving
+          - name: SERVING_READINESS_PROBE
+            value: '{"tcpSocket":{"port":8000,"host":"127.0.0.1"},"successThreshold":1}'
+          - name: ENABLE_PROFILING
+            value: "false"
+          - name: SERVING_ENABLE_PROBE_REQUEST_LOG
+            value: "false"
+          - name: METRICS_COLLECTOR_ADDRESS
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+          - name: ENABLE_HTTP2_AUTO_DETECTION
+            value: "false"
+          - name: ROOT_CA
+          image: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:89e6f90141f1b63405883fbb4de0d3b6d80f8b77e530904c4d29bdcd1dc5a167
+          imagePullPolicy: IfNotPresent
+          name: queue-proxy
+          ports:
+          - containerPort: 8022
+            name: http-queueadm
+            protocol: TCP
+          - containerPort: 9090
+            name: http-autometric
+            protocol: TCP
+          - containerPort: 9091
+            name: http-usermetric
+            protocol: TCP
+          - containerPort: 8012
+            name: queue-port
+            protocol: TCP
+          - containerPort: 8112
+            name: https-port
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              httpHeaders:
+              - name: K-Network-Probe
+                value: queue
+              path: /
+              port: 8012
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 25m
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsConfig:
+          nameservers:
+          - 10.96.0.10
+          options:
+          - name: ndots
+            value: "5"
+          searches:
+          - kubeflow-user-example-com.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        dnsPolicy: None
+        enableServiceLinks: false
+        nodeSelector:
+          kubernetes.io/hostname: oci-test-node1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 300
+        tolerations:
+        - effect: NoSchedule
+          key: dedicated
+          operator: Equal
+          value: ml-training
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: serve-py
+          name: serve-py
+        - name: mlflow-data
+          persistentVolumeClaim:
+            claimName: mlflow-artifacts-lp
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-20T05:30:28Z"
+      lastUpdateTime: "2026-04-20T05:30:28Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-20T04:50:31Z"
+      lastUpdateTime: "2026-04-20T17:48:36Z"
+      message: ReplicaSet "maintenance-predictor-predictor-00003-deployment-66dfdf9dfb"
+        has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      aiot.ml/prod-run: c1af02c4b4e1405a8bbb9b2cddd0d16e
+      aiot.ml/prod-version: "58"
+      autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+      autoscaling.knative.dev/min-scale: "1"
+      deployment.kubernetes.io/revision: "1"
+      reconcile-trigger: "1776663014"
+      serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+      sidecar.istio.io/inject: "false"
+    labels:
+      app: maintenance-predictor-predictor-00004
+      component: predictor
+      service.istio.io/canonical-name: maintenance-predictor-predictor
+      service.istio.io/canonical-revision: maintenance-predictor-predictor-00004
+      serving.knative.dev/configuration: maintenance-predictor-predictor
+      serving.knative.dev/configurationGeneration: "4"
+      serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+      serving.knative.dev/revision: maintenance-predictor-predictor-00004
+      serving.knative.dev/revisionUID: f9af6bd2-4db4-426b-abb5-a060424b9f1e
+      serving.knative.dev/service: maintenance-predictor-predictor
+      serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+      serving.kserve.io/inferenceservice: maintenance-predictor
+    name: maintenance-predictor-predictor-00004-deployment
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: serving.knative.dev/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Revision
+      name: maintenance-predictor-predictor-00004
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        serving.knative.dev/revisionUID: f9af6bd2-4db4-426b-abb5-a060424b9f1e
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          aiot.ml/prod-run: c1af02c4b4e1405a8bbb9b2cddd0d16e
+          aiot.ml/prod-version: "58"
+          autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+          autoscaling.knative.dev/min-scale: "1"
+          reconcile-trigger: "1776663014"
+          serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+          sidecar.istio.io/inject: "false"
+        labels:
+          app: maintenance-predictor-predictor-00004
+          component: predictor
+          service.istio.io/canonical-name: maintenance-predictor-predictor
+          service.istio.io/canonical-revision: maintenance-predictor-predictor-00004
+          serving.knative.dev/configuration: maintenance-predictor-predictor
+          serving.knative.dev/configurationGeneration: "4"
+          serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+          serving.knative.dev/revision: maintenance-predictor-predictor-00004
+          serving.knative.dev/revisionUID: f9af6bd2-4db4-426b-abb5-a060424b9f1e
+          serving.knative.dev/service: maintenance-predictor-predictor
+          serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+          serving.kserve.io/inferenceservice: maintenance-predictor
+      spec:
+        containers:
+        - env:
+          - name: MLFLOW_TRACKING_URI
+            value: http://mlflow-server.mlflow.svc.cluster.local:5000
+          - name: MODEL_NAME
+            value: maintenance-predictor
+          - name: MODEL_STAGE
+            value: Production
+          - name: DB_HOST
+            value: postgres.aiot.svc.cluster.local
+          - name: DB_NAME
+            value: aiot
+          - name: DB_USER
+            value: aiot
+          - name: DB_PASSWORD
+            value: aiot123
+          - name: PORT
+            value: "8000"
+          - name: K_REVISION
+            value: maintenance-predictor-predictor-00004
+          - name: K_CONFIGURATION
+            value: maintenance-predictor-predictor
+          - name: K_SERVICE
+            value: maintenance-predictor-predictor
+          image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+          imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              httpGet:
+                path: /wait-for-drain
+                port: 8022
+                scheme: HTTP
+          name: kserve-container
+          ports:
+          - containerPort: 8000
+            name: user-port
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+          - mountPath: /app/serve.py
+            name: serve-py
+            readOnly: true
+            subPath: serve.py
+          - mountPath: /mlflow
+            name: mlflow-data
+            readOnly: true
+        - env:
+          - name: SERVING_NAMESPACE
+            value: kubeflow-user-example-com
+          - name: SERVING_SERVICE
+            value: maintenance-predictor-predictor
+          - name: SERVING_CONFIGURATION
+            value: maintenance-predictor-predictor
+          - name: SERVING_REVISION
+            value: maintenance-predictor-predictor-00004
+          - name: QUEUE_SERVING_PORT
+            value: "8012"
+          - name: QUEUE_SERVING_TLS_PORT
+            value: "8112"
+          - name: CONTAINER_CONCURRENCY
+            value: "0"
+          - name: REVISION_TIMEOUT_SECONDS
+            value: "300"
+          - name: REVISION_RESPONSE_START_TIMEOUT_SECONDS
+            value: "0"
+          - name: REVISION_IDLE_TIMEOUT_SECONDS
+            value: "0"
+          - name: SERVING_POD
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: SERVING_POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: SERVING_LOGGING_CONFIG
+          - name: SERVING_LOGGING_LEVEL
+          - name: SERVING_REQUEST_LOG_TEMPLATE
+            value: '{"httpRequest": {"requestMethod": "{{.Request.Method}}", "requestUrl":
+              "{{js .Request.RequestURI}}", "requestSize": "{{.Request.ContentLength}}",
+              "status": {{.Response.Code}}, "responseSize": "{{.Response.Size}}",
+              "userAgent": "{{js .Request.UserAgent}}", "remoteIp": "{{js .Request.RemoteAddr}}",
+              "serverIp": "{{.Revision.PodIP}}", "referer": "{{js .Request.Referer}}",
+              "latency": "{{.Response.Latency}}s", "protocol": "{{.Request.Proto}}"},
+              "traceId": "{{index .Request.Header "X-B3-Traceid"}}"}'
+          - name: SERVING_ENABLE_REQUEST_LOG
+            value: "false"
+          - name: SERVING_REQUEST_METRICS_BACKEND
+            value: prometheus
+          - name: SERVING_REQUEST_METRICS_REPORTING_PERIOD_SECONDS
+            value: "5"
+          - name: TRACING_CONFIG_BACKEND
+            value: none
+          - name: TRACING_CONFIG_ZIPKIN_ENDPOINT
+          - name: TRACING_CONFIG_DEBUG
+            value: "false"
+          - name: TRACING_CONFIG_SAMPLE_RATE
+            value: "0.1"
+          - name: USER_PORT
+            value: "8000"
+          - name: SYSTEM_NAMESPACE
+            value: knative-serving
+          - name: METRICS_DOMAIN
+            value: knative.dev/internal/serving
+          - name: SERVING_READINESS_PROBE
+            value: '{"tcpSocket":{"port":8000,"host":"127.0.0.1"},"successThreshold":1}'
+          - name: ENABLE_PROFILING
+            value: "false"
+          - name: SERVING_ENABLE_PROBE_REQUEST_LOG
+            value: "false"
+          - name: METRICS_COLLECTOR_ADDRESS
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+          - name: ENABLE_HTTP2_AUTO_DETECTION
+            value: "false"
+          - name: ROOT_CA
+          image: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:89e6f90141f1b63405883fbb4de0d3b6d80f8b77e530904c4d29bdcd1dc5a167
+          imagePullPolicy: IfNotPresent
+          name: queue-proxy
+          ports:
+          - containerPort: 8022
+            name: http-queueadm
+            protocol: TCP
+          - containerPort: 9090
+            name: http-autometric
+            protocol: TCP
+          - containerPort: 9091
+            name: http-usermetric
+            protocol: TCP
+          - containerPort: 8012
+            name: queue-port
+            protocol: TCP
+          - containerPort: 8112
+            name: https-port
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              httpHeaders:
+              - name: K-Network-Probe
+                value: queue
+              path: /
+              port: 8012
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 25m
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsConfig:
+          nameservers:
+          - 10.96.0.10
+          options:
+          - name: ndots
+            value: "5"
+          searches:
+          - kubeflow-user-example-com.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        dnsPolicy: None
+        enableServiceLinks: false
+        nodeSelector:
+          kubernetes.io/hostname: oci-test-node1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 300
+        tolerations:
+        - effect: NoSchedule
+          key: dedicated
+          operator: Equal
+          value: ml-training
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: serve-py
+          name: serve-py
+        - name: mlflow-data
+          persistentVolumeClaim:
+            claimName: mlflow-artifacts-lp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-20T05:30:14Z"
+      lastUpdateTime: "2026-04-20T05:30:28Z"
+      message: ReplicaSet "maintenance-predictor-predictor-00004-deployment-54468d5c7c"
+        has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-20T12:14:35Z"
+      lastUpdateTime: "2026-04-20T12:14:35Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+    name: maintenance-tb
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: tensorboard.kubeflow.org/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Tensorboard
+      name: maintenance-tb
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: maintenance-tb
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: maintenance-tb
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                  - oci-test-node1
+              weight: 100
+        containers:
+        - args:
+          - --logdir=/tensorboard_logs/
+          - --bind_all
+          command:
+          - /usr/local/bin/tensorboard
+          image: tensorflow/tensorflow:2.5.1
+          imagePullPolicy: IfNotPresent
+          name: tensorboard
+          ports:
+          - containerPort: 6006
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tensorboard_logs/
+            name: tbpd
+            readOnly: true
+            subPath: tensorboard/
+          workingDir: /
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/hostname: oci-test-node1
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: dedicated
+          operator: Equal
+          value: ml-training
+        volumes:
+        - name: tbpd
+          persistentVolumeClaim:
+            claimName: mlflow-artifacts-lp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-20T04:30:13Z"
+      lastUpdateTime: "2026-04-20T04:30:23Z"
+      message: ReplicaSet "maintenance-tb-6d848d75fd" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-20T12:14:40Z"
+      lastUpdateTime: "2026-04-20T12:14:40Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "8"
+      metacontroller.k8s.io/last-applied-configuration: '{"apiVersion":"apps/v1","kind":"Deployment","metadata":{"labels":{"app":"ml-pipeline-ui-artifact","controller-uid":"741b1f16-a29c-453d-9b51-db56a7ee96ad"},"name":"ml-pipeline-ui-artifact","namespace":"kubeflow-user-example-com"},"spec":{"selector":{"matchLabels":{"app":"ml-pipeline-ui-artifact"}},"template":{"metadata":{"annotations":{},"labels":{"app":"ml-pipeline-ui-artifact"}},"spec":{"containers":[{"env":[{"name":"MINIO_ACCESS_KEY","valueFrom":{"secretKeyRef":{"key":"accesskey","name":"mlpipeline-minio-artifact"}}},{"name":"MINIO_SECRET_KEY","valueFrom":{"secretKeyRef":{"key":"secretkey","name":"mlpipeline-minio-artifact"}}}],"image":"10.132.0.2:30500/ml-pipeline/frontend:2.3.0","imagePullPolicy":"IfNotPresent","name":"ml-pipeline-ui-artifact","ports":[{"containerPort":3000}],"resources":{"limits":{"cpu":"100m","memory":"500Mi"},"requests":{"cpu":"10m","memory":"70Mi"}}}],"serviceAccountName":"default-editor"}}}}'
+    labels:
+      app: ml-pipeline-ui-artifact
+    name: ml-pipeline-ui-artifact
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Namespace
+      name: kubeflow-user-example-com
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: ml-pipeline-ui-artifact
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-20T16:40:32Z"
+        labels:
+          app: ml-pipeline-ui-artifact
+      spec:
+        containers:
+        - env:
+          - name: MINIO_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                key: accesskey
+                name: mlpipeline-minio-artifact
+          - name: MINIO_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: secretkey
+                name: mlpipeline-minio-artifact
+          image: 10.132.0.2:30500/ml-pipeline/frontend:2.3.0
+          imagePullPolicy: IfNotPresent
+          name: ml-pipeline-ui-artifact
+          ports:
+          - containerPort: 3000
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 500Mi
+            requests:
+              cpu: 10m
+              memory: 70Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/hostname: aiot-master
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: default-editor
+        serviceAccountName: default-editor
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+  status:
+    availableReplicas: 1
+    collisionCount: 1
+    conditions:
+    - lastTransitionTime: "2026-04-20T16:40:41Z"
+      lastUpdateTime: "2026-04-20T16:40:41Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-20T16:40:33Z"
+      lastUpdateTime: "2026-04-20T20:28:30Z"
+      message: ReplicaSet "ml-pipeline-ui-artifact-597d749854" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 8
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "4"
+      metacontroller.k8s.io/last-applied-configuration: '{"apiVersion":"apps/v1","kind":"Deployment","metadata":{"labels":{"app":"ml-pipeline-visualizationserver","controller-uid":"741b1f16-a29c-453d-9b51-db56a7ee96ad"},"name":"ml-pipeline-visualizationserver","namespace":"kubeflow-user-example-com"},"spec":{"selector":{"matchLabels":{"app":"ml-pipeline-visualizationserver"}},"template":{"metadata":{"annotations":{},"labels":{"app":"ml-pipeline-visualizationserver"}},"spec":{"containers":[{"image":"gcr.io/ml-pipeline/visualization-server:2.3.0","imagePullPolicy":"IfNotPresent","name":"ml-pipeline-visualizationserver","ports":[{"containerPort":8888}],"resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"50m","memory":"200Mi"}}}],"serviceAccountName":"default-editor"}}}}'
+    labels:
+      app: ml-pipeline-visualizationserver
+    name: ml-pipeline-visualizationserver
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Namespace
+      name: kubeflow-user-example-com
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: ml-pipeline-visualizationserver
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-20T16:40:32Z"
+        labels:
+          app: ml-pipeline-visualizationserver
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                  - oci-e5-node1
+              weight: 100
+        containers:
+        - image: gcr.io/ml-pipeline/visualization-server:2.3.0
+          imagePullPolicy: IfNotPresent
+          name: ml-pipeline-visualizationserver
+          ports:
+          - containerPort: 8888
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 50m
+              memory: 200Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: default-editor
+        serviceAccountName: default-editor
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    collisionCount: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:51:14Z"
+      lastUpdateTime: "2026-04-19T21:51:14Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:47:30Z"
+      lastUpdateTime: "2026-04-20T16:40:44Z"
+      message: ReplicaSet "ml-pipeline-visualizationserver-7d7bcb4b4c" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 4
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:

@@ -1,0 +1,124 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"StatefulSet","metadata":{"annotations":{},"name":"hab-sup","namespace":"habitat-demo"},"spec":{"replicas":3,"selector":{"matchLabels":{"app":"hab-sup"}},"serviceName":"hab-sup","template":{"metadata":{"labels":{"app":"hab-sup"}},"spec":{"containers":[{"command":["/bin/bash","-c","set -e\necho \"=== deps ===\"\napt-get update -qq\napt-get install -y -qq curl ca-certificates procps xz-utils libxml2 \u003e/dev/null\necho \"=== hab 1.6.1245 CLI ===\"\ncurl -sSf https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | bash -s -- -v 1.6.1245\nexport HAB_LICENSE=accept-no-persist\ngroupadd -r hab 2\u003e/dev/null || true\nuseradd -r -g hab -d /hab -s /bin/false hab 2\u003e/dev/null || true\necho \"=== install supervisor ===\"\nhab pkg install core/hab-sup/1.6.1245\nhab pkg install core/hab-launcher\nMYNAME=$(hostname)\nPEER_ARG=\"\"\nif [ \"$MYNAME\" != \"hab-sup-0\" ]; then\n  PEER_ARG=\"--peer hab-sup-0.hab-sup.habitat-demo.svc.cluster.local\"\nfi\necho \"=== starting supervisor ($MYNAME) $PEER_ARG ===\"\nexec hab sup run \\\n  --event-stream-application=aiot-playground \\\n  --event-stream-environment=production \\\n  --event-stream-site=aiot-cluster \\\n  --event-stream-url=$AUTOMATE_HOST:$AUTOMATE_NATS_PORT \\\n  --event-stream-token=$AUTOMATE_TOKEN \\\n  --event-stream-server-certificate=/cert/ca.crt \\\n  --listen-ctl=0.0.0.0:9632 \\\n  --listen-gossip=0.0.0.0:9638 \\\n  --listen-http=0.0.0.0:9631 \\\n  $PEER_ARG\n"],"env":[{"name":"HAB_LICENSE","value":"accept-no-persist"},{"name":"AUTOMATE_HOST","value":"aiot-worker-01.europe-west1-b.c.upbeat-sunup-493110-n3.internal"},{"name":"AUTOMATE_NATS_PORT","value":"4222"},{"name":"AUTOMATE_TOKEN","valueFrom":{"secretKeyRef":{"key":"token","name":"automate-event-stream"}}}],"image":"ubuntu:22.04","imagePullPolicy":"IfNotPresent","name":"hab-sup","ports":[{"containerPort":9631,"name":"http"},{"containerPort":9638,"name":"gossip"}],"volumeMounts":[{"mountPath":"/cert","name":"cert","readOnly":true},{"mountPath":"/hab","name":"hab"}]}],"nodeSelector":{"kubernetes.io/hostname":"aiot-worker-02"},"volumes":[{"name":"cert","secret":{"items":[{"key":"ca.crt","path":"ca.crt"}],"secretName":"automate-event-stream"}},{"emptyDir":{},"name":"hab"}]}}}}
+    name: hab-sup
+    namespace: habitat-demo
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 3
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: hab-sup
+    serviceName: hab-sup
+    template:
+      metadata:
+        labels:
+          app: hab-sup
+      spec:
+        containers:
+        - command:
+          - /bin/bash
+          - -c
+          - |
+            set -e
+            echo "=== deps ==="
+            apt-get update -qq
+            apt-get install -y -qq curl ca-certificates procps xz-utils libxml2 >/dev/null
+            echo "=== hab 1.6.1245 CLI ==="
+            curl -sSf https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | bash -s -- -v 1.6.1245
+            export HAB_LICENSE=accept-no-persist
+            groupadd -r hab 2>/dev/null || true
+            useradd -r -g hab -d /hab -s /bin/false hab 2>/dev/null || true
+            echo "=== install supervisor ==="
+            hab pkg install core/hab-sup/1.6.1245
+            hab pkg install core/hab-launcher
+            MYNAME=$(hostname)
+            PEER_ARG=""
+            if [ "$MYNAME" != "hab-sup-0" ]; then
+              PEER_ARG="--peer hab-sup-0.hab-sup.habitat-demo.svc.cluster.local"
+            fi
+            echo "=== starting supervisor ($MYNAME) $PEER_ARG ==="
+            exec hab sup run \
+              --event-stream-application=aiot-playground \
+              --event-stream-environment=production \
+              --event-stream-site=aiot-cluster \
+              --event-stream-url=$AUTOMATE_HOST:$AUTOMATE_NATS_PORT \
+              --event-stream-token=$AUTOMATE_TOKEN \
+              --event-stream-server-certificate=/cert/ca.crt \
+              --listen-ctl=0.0.0.0:9632 \
+              --listen-gossip=0.0.0.0:9638 \
+              --listen-http=0.0.0.0:9631 \
+              $PEER_ARG
+          env:
+          - name: HAB_LICENSE
+            value: accept-no-persist
+          - name: AUTOMATE_HOST
+            value: aiot-worker-01.europe-west1-b.c.upbeat-sunup-493110-n3.internal
+          - name: AUTOMATE_NATS_PORT
+            value: "4222"
+          - name: AUTOMATE_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: token
+                name: automate-event-stream
+          image: ubuntu:22.04
+          imagePullPolicy: IfNotPresent
+          name: hab-sup
+          ports:
+          - containerPort: 9631
+            name: http
+            protocol: TCP
+          - containerPort: 9638
+            name: gossip
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /cert
+            name: cert
+            readOnly: true
+          - mountPath: /hab
+            name: hab
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/hostname: aiot-worker-02
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            items:
+            - key: ca.crt
+              path: ca.crt
+            secretName: automate-event-stream
+        - emptyDir: {}
+          name: hab
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+  status:
+    availableReplicas: 3
+    collisionCount: 0
+    currentReplicas: 3
+    currentRevision: hab-sup-775d66799b
+    observedGeneration: 7
+    readyReplicas: 3
+    replicas: 3
+    updateRevision: hab-sup-775d66799b
+    updatedReplicas: 3
+kind: List
+metadata:

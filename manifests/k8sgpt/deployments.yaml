@@ -1,0 +1,637 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "3"
+    labels:
+      app: k8sgpt
+    name: k8sgpt
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: core.k8sgpt.ai/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: K8sGPT
+      name: k8sgpt
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: k8sgpt
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: k8sgpt
+      spec:
+        containers:
+        - args:
+          - serve
+          env:
+          - name: K8SGPT_MODEL
+            value: llama-3.3-70b-versatile
+          - name: K8SGPT_BACKEND
+            value: openai
+          - name: K8SGPT_MAX_TOKENS
+            value: "2048"
+          - name: K8SGPT_TOP_K
+            value: "10"
+          - name: XDG_CONFIG_HOME
+            value: /k8sgpt-data/.config
+          - name: XDG_CACHE_HOME
+            value: /k8sgpt-data/.cache
+          - name: K8SGPT_TOP_P
+            value: "0"
+          - name: K8SGPT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: openai-api-key
+                name: k8sgpt-openai
+          - name: K8SGPT_BASEURL
+            value: http://k8sgpt-llm-proxy.k8sgpt.svc.cluster.local:8080/v1
+          image: ghcr.io/k8sgpt-ai/k8sgpt:v0.4.3
+          imagePullPolicy: IfNotPresent
+          name: k8sgpt
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /k8sgpt-data
+            name: k8sgpt-vol
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: k8sgpt-k8sgpt
+        serviceAccountName: k8sgpt-k8sgpt
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: k8sgpt-vol
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:43:09Z"
+      lastUpdateTime: "2026-04-19T21:43:09Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:42:58Z"
+      lastUpdateTime: "2026-04-19T23:46:47Z"
+      message: ReplicaSet "k8sgpt-68967c757c" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 3
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"k8sgpt-anomaly-detector"},"name":"k8sgpt-anomaly-detector","namespace":"k8sgpt"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"k8sgpt-anomaly-detector"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-16T17:02:00Z"},"labels":{"app":"k8sgpt-anomaly-detector"}},"spec":{"containers":[{"command":["sh","-c","pip install --no-cache-dir --quiet requests \u0026\u0026 python3 /code/detector.py"],"env":[{"name":"PROMETHEUS_URL","value":"http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090"},{"name":"LLM_PROXY_URL","value":"http://k8sgpt-llm-proxy.k8sgpt.svc.cluster.local:8080"},{"name":"MM_WEBHOOK_URL","value":"https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr"},{"name":"CHECK_INTERVAL","value":"1800"},{"name":"Z_THRESHOLD","value":"5.0"},{"name":"ANOMALY_COOLDOWN","value":"7200"}],"image":"python:3.11-slim","imagePullPolicy":"IfNotPresent","name":"detector","resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"25m","memory":"64Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/code","name":"code"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"name":"k8sgpt-anomaly-detector-code"},"name":"code"}]}}}}
+    labels:
+      app: k8sgpt-anomaly-detector
+    name: k8sgpt-anomaly-detector
+    namespace: k8sgpt
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: k8sgpt-anomaly-detector
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-19T22:50:08Z"
+        labels:
+          app: k8sgpt-anomaly-detector
+      spec:
+        containers:
+        - command:
+          - sh
+          - -c
+          - pip install --no-cache-dir --quiet requests && python3 /code/detector.py
+          env:
+          - name: PROMETHEUS_URL
+            value: http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090
+          - name: LLM_PROXY_URL
+            value: http://k8sgpt-llm-proxy.k8sgpt.svc.cluster.local:8080
+          - name: MM_WEBHOOK_URL
+            value: https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr
+          - name: CHECK_INTERVAL
+            value: "1800"
+          - name: Z_THRESHOLD
+            value: "5.0"
+          - name: ANOMALY_COOLDOWN
+            value: "7200"
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          name: detector
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 25m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /code
+            name: code
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: k8sgpt-anomaly-detector-code
+          name: code
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:41:10Z"
+      lastUpdateTime: "2026-04-19T21:41:10Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:41:07Z"
+      lastUpdateTime: "2026-04-19T22:50:10Z"
+      message: ReplicaSet "k8sgpt-anomaly-detector-8698569b4c" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"k8sgpt-llm-proxy","namespace":"k8sgpt"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"k8sgpt-llm-proxy"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-18T07:22:27Z"},"labels":{"app":"k8sgpt-llm-proxy"}},"spec":{"affinity":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"preference":{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"In","values":["aiot-worker-02"]}]},"weight":100}]}},"containers":[{"args":["pip install fastapi uvicorn httpx --quiet \u0026\u0026\ncp /code/proxy.py /tmp/proxy.py \u0026\u0026\nuvicorn proxy:app --host 0.0.0.0 --port 8080 --app-dir /tmp\n"],"command":["/bin/sh","-c"],"env":[{"name":"GROQ_API_KEY","valueFrom":{"secretKeyRef":{"key":"GROQ_API_KEY","name":"groq-api-key"}}},{"name":"CEREBRAS_API_KEY","valueFrom":{"secretKeyRef":{"key":"CEREBRAS_API_KEY","name":"cerebras-api-key"}}},{"name":"SAMBANOVA_API_KEY","valueFrom":{"secretKeyRef":{"key":"SAMBANOVA_API_KEY","name":"sambanova-api-key"}}},{"name":"GOOGLE_AI_KEY","valueFrom":{"secretKeyRef":{"key":"GOOGLE_AI_KEY","name":"google-ai-key"}}},{"name":"OPENROUTER_API_KEY","valueFrom":{"secretKeyRef":{"key":"OPENROUTER_API_KEY","name":"openrouter-api-key"}}}],"image":"python:3.11-slim","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/health","port":8080,"scheme":"HTTP"},"periodSeconds":30,"successThreshold":1,"timeoutSeconds":10},"name":"proxy","ports":[{"containerPort":8080,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/health","port":8080,"scheme":"HTTP"},"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"50m","memory":"128Mi"}},"startupProbe":{"failureThreshold":18,"httpGet":{"path":"/health","port":8080,"scheme":"HTTP"},"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/code","name":"code"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"name":"k8sgpt-llm-proxy-code"},"name":"code"}]}}}}
+    name: k8sgpt-llm-proxy
+    namespace: k8sgpt
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: k8sgpt-llm-proxy
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-18T07:22:27Z"
+        labels:
+          app: k8sgpt-llm-proxy
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                  - aiot-worker-02
+              weight: 100
+        containers:
+        - args:
+          - |
+            pip install fastapi uvicorn httpx --quiet &&
+            cp /code/proxy.py /tmp/proxy.py &&
+            uvicorn proxy:app --host 0.0.0.0 --port 8080 --app-dir /tmp
+          command:
+          - /bin/sh
+          - -c
+          env:
+          - name: GROQ_API_KEY
+            valueFrom:
+              secretKeyRef:
+                key: GROQ_API_KEY
+                name: groq-api-key
+          - name: CEREBRAS_API_KEY
+            valueFrom:
+              secretKeyRef:
+                key: CEREBRAS_API_KEY
+                name: cerebras-api-key
+          - name: SAMBANOVA_API_KEY
+            valueFrom:
+              secretKeyRef:
+                key: SAMBANOVA_API_KEY
+                name: sambanova-api-key
+          - name: GOOGLE_AI_KEY
+            valueFrom:
+              secretKeyRef:
+                key: GOOGLE_AI_KEY
+                name: google-ai-key
+          - name: OPENROUTER_API_KEY
+            valueFrom:
+              secretKeyRef:
+                key: OPENROUTER_API_KEY
+                name: openrouter-api-key
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: proxy
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          startupProbe:
+            failureThreshold: 18
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /code
+            name: code
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: k8sgpt-llm-proxy-code
+          name: code
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:42:27Z"
+      lastUpdateTime: "2026-04-19T21:42:27Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:41:07Z"
+      lastUpdateTime: "2026-04-19T21:42:27Z"
+      message: ReplicaSet "k8sgpt-llm-proxy-86f7c4749" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"manager","app.kubernetes.io/created-by":"k8sgpt-operator","app.kubernetes.io/instance":"k8sgpt-operator","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"k8sgpt-operator","app.kubernetes.io/part-of":"k8sgpt-operator","app.kubernetes.io/version":"0.2.25","control-plane":"controller-manager","helm.sh/chart":"k8sgpt-operator-0.2.27"},"name":"k8sgpt-operator-controller-manager","namespace":"k8sgpt"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/instance":"k8sgpt-operator","app.kubernetes.io/name":"k8sgpt-operator","control-plane":"controller-manager"}},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/default-container":"manager"},"labels":{"app.kubernetes.io/instance":"k8sgpt-operator","app.kubernetes.io/name":"k8sgpt-operator","control-plane":"controller-manager"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/arch","operator":"In","values":["amd64","arm64","ppc64le","s390x"]},{"key":"kubernetes.io/os","operator":"In","values":["linux"]}]}]}}},"containers":[{"args":["--secure-listen-address=0.0.0.0:8443","--upstream=http://127.0.0.1:8080/","--logtostderr=true","--v=0"],"env":[{"name":"KUBERNETES_CLUSTER_DOMAIN","value":"cluster.local"}],"image":"quay.io/brancz/kube-rbac-proxy:v0.19.1","name":"kube-rbac-proxy","ports":[{"containerPort":8443,"name":"https","protocol":"TCP"}],"resources":{"limits":{"cpu":"500m","memory":"128Mi"},"requests":{"cpu":"5m","memory":"64Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}},{"args":["--health-probe-bind-address=:8081","--metrics-bind-address=127.0.0.1:8080","--leader-elect"],"command":["/manager"],"env":[{"name":"KUBERNETES_CLUSTER_DOMAIN","value":"cluster.local"},{"name":"OPERATOR_SINK_WEBHOOK_TIMEOUT_SECONDS","value":"30s"},{"name":"K8SGPT_ENABLE_DYNAMIC_RBAC","value":"true"}],"image":"ghcr.io/k8sgpt-ai/k8sgpt-operator:v0.2.27","livenessProbe":{"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":15,"periodSeconds":20},"name":"manager","readinessProbe":{"httpGet":{"path":"/readyz","port":8081},"initialDelaySeconds":5,"periodSeconds":10},"resources":{"limits":{"cpu":"500m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"64Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}}],"securityContext":{"runAsNonRoot":true},"serviceAccountName":"k8sgpt-operator-controller-manager","terminationGracePeriodSeconds":10}}}}
+    labels:
+      app.kubernetes.io/component: manager
+      app.kubernetes.io/created-by: k8sgpt-operator
+      app.kubernetes.io/instance: k8sgpt-operator
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: k8sgpt-operator
+      app.kubernetes.io/part-of: k8sgpt-operator
+      app.kubernetes.io/version: 0.2.25
+      control-plane: controller-manager
+      helm.sh/chart: k8sgpt-operator-0.2.27
+    name: k8sgpt-operator-controller-manager
+    namespace: k8sgpt
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: k8sgpt-operator
+        app.kubernetes.io/name: k8sgpt-operator
+        control-plane: controller-manager
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/default-container: manager
+        labels:
+          app.kubernetes.io/instance: k8sgpt-operator
+          app.kubernetes.io/name: k8sgpt-operator
+          control-plane: controller-manager
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                  - amd64
+                  - arm64
+                  - ppc64le
+                  - s390x
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                  - linux
+        containers:
+        - args:
+          - --secure-listen-address=0.0.0.0:8443
+          - --upstream=http://127.0.0.1:8080/
+          - --logtostderr=true
+          - --v=0
+          env:
+          - name: KUBERNETES_CLUSTER_DOMAIN
+            value: cluster.local
+          image: quay.io/brancz/kube-rbac-proxy:v0.19.1
+          imagePullPolicy: IfNotPresent
+          name: kube-rbac-proxy
+          ports:
+          - containerPort: 8443
+            name: https
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 5m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - args:
+          - --health-probe-bind-address=:8081
+          - --metrics-bind-address=127.0.0.1:8080
+          - --leader-elect
+          command:
+          - /manager
+          env:
+          - name: KUBERNETES_CLUSTER_DOMAIN
+            value: cluster.local
+          - name: OPERATOR_SINK_WEBHOOK_TIMEOUT_SECONDS
+            value: 30s
+          - name: K8SGPT_ENABLE_DYNAMIC_RBAC
+            value: "true"
+          image: ghcr.io/k8sgpt-ai/k8sgpt-operator:v0.2.27
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: manager
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsNonRoot: true
+        serviceAccount: k8sgpt-operator-controller-manager
+        serviceAccountName: k8sgpt-operator-controller-manager
+        terminationGracePeriodSeconds: 10
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:41:07Z"
+      lastUpdateTime: "2026-04-19T21:44:20Z"
+      message: ReplicaSet "k8sgpt-operator-controller-manager-5d8f9fd8c5" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-20T16:20:07Z"
+      lastUpdateTime: "2026-04-20T16:20:07Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"k8sgpt-robusta-bridge","namespace":"k8sgpt"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"k8sgpt-robusta-bridge"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-16T16:55:47Z"},"labels":{"app":"k8sgpt-robusta-bridge"}},"spec":{"containers":[{"args":["pip install fastapi uvicorn requests --quiet \u0026\u0026\ncp /code/bridge.py /tmp/bridge.py \u0026\u0026\nuvicorn bridge:app --host 0.0.0.0 --port 8090 --app-dir /tmp\n"],"command":["/bin/sh","-c"],"env":[{"name":"SLACK_WEBHOOK","value":"https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr"},{"name":"SLACK_API_TOKEN"},{"name":"SLACK_CHANNEL"}],"image":"python:3.11-slim","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/health","port":8090,"scheme":"HTTP"},"periodSeconds":30,"successThreshold":1,"timeoutSeconds":10},"name":"bridge","ports":[{"containerPort":8090,"name":"http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"path":"/health","port":8090,"scheme":"HTTP"},"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"25m","memory":"64Mi"}},"startupProbe":{"failureThreshold":12,"httpGet":{"path":"/health","port":8090,"scheme":"HTTP"},"initialDelaySeconds":20,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/code","name":"code"},{"mountPath":"/data","name":"cache"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"name":"k8sgpt-robusta-bridge-code"},"name":"code"},{"emptyDir":{},"name":"cache"}]}}}}
+    name: k8sgpt-robusta-bridge
+    namespace: k8sgpt
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: k8sgpt-robusta-bridge
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-16T16:55:47Z"
+        labels:
+          app: k8sgpt-robusta-bridge
+      spec:
+        containers:
+        - args:
+          - |
+            pip install fastapi uvicorn requests --quiet &&
+            cp /code/bridge.py /tmp/bridge.py &&
+            uvicorn bridge:app --host 0.0.0.0 --port 8090 --app-dir /tmp
+          command:
+          - /bin/sh
+          - -c
+          env:
+          - name: SLACK_WEBHOOK
+            value: https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr
+          - name: SLACK_API_TOKEN
+          - name: SLACK_CHANNEL
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8090
+              scheme: HTTP
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: bridge
+          ports:
+          - containerPort: 8090
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8090
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 25m
+              memory: 64Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /health
+              port: 8090
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /code
+            name: code
+          - mountPath: /data
+            name: cache
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: k8sgpt-robusta-bridge-code
+          name: code
+        - emptyDir: {}
+          name: cache
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:42:28Z"
+      lastUpdateTime: "2026-04-19T21:42:28Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:41:07Z"
+      lastUpdateTime: "2026-04-19T21:42:28Z"
+      message: ReplicaSet "k8sgpt-robusta-bridge-685db97fcc" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:

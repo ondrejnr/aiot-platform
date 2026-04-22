@@ -1,0 +1,204 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"mlflow:mlflow-server","ingressName":"mlflow:mlflow","hostname":"mlflow.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"field.cattle.io/publicEndpoints":"[{\"addresses\":[\"35.241.255.137\"],\"port\":443,\"protocol\":\"HTTPS\",\"serviceName\":\"mlflow:mlflow-server\",\"ingressName\":\"mlflow:mlflow\",\"hostname\":\"mlflow.35.241.255.137.nip.io\",\"path\":\"/\",\"allNodes\":false}]"},"name":"mlflow-server","namespace":"mlflow"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"mlflow"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-17T04:47:46Z"},"labels":{"app":"mlflow"}},"spec":{"affinity":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"preference":{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"In","values":["aiot-worker-02"]}]},"weight":50}]}},"containers":[{"command":["sh","-c","pip install psycopg2-binary \u0026\u0026 mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql://aiot:aiot123@postgres.aiot.svc:5432/mlflow --default-artifact-root /mlflow/artifacts --serve-artifacts"],"image":"ghcr.io/mlflow/mlflow:v2.19.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"exec":{"command":["stat","/mlflow"]},"failureThreshold":3,"initialDelaySeconds":30,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":5},"name":"mlflow","ports":[{"containerPort":5000,"protocol":"TCP"}],"resources":{"requests":{"cpu":"100m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/mlflow","name":"data"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"mlflow-data-lp"}}]}}}}
+    name: mlflow-server
+    namespace: mlflow
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: mlflow
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-17T04:47:46Z"
+        labels:
+          app: mlflow
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                  - aiot-worker-02
+              weight: 50
+        containers:
+        - command:
+          - sh
+          - -c
+          - pip install psycopg2-binary && mlflow server --host 0.0.0.0 --port 5000
+            --backend-store-uri postgresql://aiot:aiot123@postgres.aiot.svc:5432/mlflow
+            --default-artifact-root /mlflow/artifacts --serve-artifacts
+          image: ghcr.io/mlflow/mlflow:v2.19.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - stat
+              - /mlflow
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: mlflow
+          ports:
+          - containerPort: 5000
+            protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /mlflow
+            name: data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mlflow-data-lp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:41:12Z"
+      lastUpdateTime: "2026-04-19T21:41:12Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:41:08Z"
+      lastUpdateTime: "2026-04-19T21:41:12Z"
+      message: ReplicaSet "mlflow-server-6b6755484c" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 3
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"mlflow:tensorboard","ingressName":"mlflow:tensorboard","hostname":"tensorboard.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"field.cattle.io/publicEndpoints":"[{\"addresses\":[\"35.241.255.137\"],\"port\":443,\"protocol\":\"HTTPS\",\"serviceName\":\"mlflow:tensorboard\",\"ingressName\":\"mlflow:tensorboard\",\"hostname\":\"tensorboard.35.241.255.137.nip.io\",\"path\":\"/\",\"allNodes\":false}]"},"labels":{"app":"tensorboard"},"name":"tensorboard","namespace":"mlflow"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"tensorboard"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-17T04:47:46Z"},"labels":{"app":"tensorboard"}},"spec":{"affinity":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"preference":{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"In","values":["oci-e5-node1","oci-e5-node2"]}]},"weight":100}]}},"containers":[{"command":["sh","-c","pip install -q tensorboard \u0026\u0026 tensorboard --logdir /mlflow/tensorboard --host 0.0.0.0 --port 6006"],"image":"tensorflow/tensorflow:2.15.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"exec":{"command":["stat","/mlflow"]},"failureThreshold":3,"initialDelaySeconds":30,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":5},"name":"tensorboard","ports":[{"containerPort":6006,"protocol":"TCP"}],"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"50m","memory":"128Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/mlflow","name":"mlflow-data","readOnly":true}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"kubernetes.io/hostname":"aiot-worker-02"},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"name":"mlflow-data","persistentVolumeClaim":{"claimName":"mlflow-data-lp"}}]}}}}
+    labels:
+      app: tensorboard
+    name: tensorboard
+    namespace: mlflow
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: tensorboard
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-17T04:47:46Z"
+        labels:
+          app: tensorboard
+      spec:
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                  - oci-e5-node1
+                  - oci-e5-node2
+              weight: 100
+        containers:
+        - command:
+          - sh
+          - -c
+          - pip install -q tensorboard && tensorboard --logdir /mlflow/tensorboard
+            --host 0.0.0.0 --port 6006
+          image: tensorflow/tensorflow:2.15.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - stat
+              - /mlflow
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: tensorboard
+          ports:
+          - containerPort: 6006
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /mlflow
+            name: mlflow-data
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/hostname: aiot-worker-02
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: mlflow-data
+          persistentVolumeClaim:
+            claimName: mlflow-data-lp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:41:12Z"
+      lastUpdateTime: "2026-04-19T21:41:12Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:41:08Z"
+      lastUpdateTime: "2026-04-19T21:41:12Z"
+      message: ReplicaSet "tensorboard-84549dd69b" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 3
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:

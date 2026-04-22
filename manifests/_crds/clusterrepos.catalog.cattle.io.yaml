@@ -1,0 +1,70 @@
+apiVersion: v1
+items:
+- apiVersion: catalog.cattle.io/v1
+  kind: ClusterRepo
+  metadata:
+    name: rancher-charts
+  spec:
+    gitBranch: release-v2.13
+    gitRepo: https://git.rancher.io/charts
+  status:
+    branch: release-v2.13
+    commit: 9dc7f8073b89250a853788fbba7dae95e21224d8
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:47:29Z"
+      status: "True"
+      type: FollowerDownloaded
+    - lastUpdateTime: "2026-04-22T08:12:03Z"
+      status: "True"
+      type: Downloaded
+    downloadTime: "2026-04-22T08:12:03Z"
+    indexConfigMapName: rancher-charts-0-8e0d503d-0509-4231-80c4-2af75d332928
+    indexConfigMapNamespace: cattle-system
+    observedGeneration: 1
+    url: https://git.rancher.io/charts
+- apiVersion: catalog.cattle.io/v1
+  kind: ClusterRepo
+  metadata:
+    name: rancher-partner-charts
+  spec:
+    gitBranch: main
+    gitRepo: https://git.rancher.io/partner-charts
+  status:
+    branch: main
+    commit: bec594e2838bf942bde432959a55cec4de358936
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:47:29Z"
+      status: "True"
+      type: FollowerDownloaded
+    - lastUpdateTime: "2026-04-22T07:30:38Z"
+      status: "True"
+      type: Downloaded
+    downloadTime: "2026-04-22T07:30:38Z"
+    indexConfigMapName: rancher-partner-charts-0-88674ad1-9abf-416f-89b6-6c9ef892a95b
+    indexConfigMapNamespace: cattle-system
+    observedGeneration: 1
+    url: https://git.rancher.io/partner-charts
+- apiVersion: catalog.cattle.io/v1
+  kind: ClusterRepo
+  metadata:
+    name: rancher-rke2-charts
+  spec:
+    gitBranch: main
+    gitRepo: https://git.rancher.io/rke2-charts
+  status:
+    branch: main
+    commit: 0c6097cdeac53b7b3e9b1b507c28eb143f54b357
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:47:29Z"
+      status: "True"
+      type: FollowerDownloaded
+    - lastUpdateTime: "2026-04-22T07:30:40Z"
+      status: "True"
+      type: Downloaded
+    downloadTime: "2026-04-22T07:30:39Z"
+    indexConfigMapName: rancher-rke2-charts-0-5bbfe97e-a5e0-48c7-973c-b752505a19b1
+    indexConfigMapNamespace: cattle-system
+    observedGeneration: 1
+    url: https://git.rancher.io/rke2-charts
+kind: List
+metadata:

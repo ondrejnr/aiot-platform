@@ -1,0 +1,252 @@
+apiVersion: v1
+items:
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-21T02:30:00Z"
+    labels:
+      batch.kubernetes.io/job-name: etcd-snapshot-29612310
+      job-name: etcd-snapshot-29612310
+    name: etcd-snapshot-29612310
+    namespace: etcd-backup
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: etcd-snapshot
+  spec:
+    backoffLimit: 2
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: etcd-snapshot-29612310
+          job-name: etcd-snapshot-29612310
+      spec:
+        containers:
+        - args:
+          - |
+            set -e
+            TS=$(date +%Y%m%d-%H%M%S)
+            mc alias set r2 "$AWS_ENDPOINT" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
+            SIZE=$(stat -c %s /work/etcd-snapshot.db)
+            echo "Snapshot size: $SIZE bytes"
+            mc cp /work/etcd-snapshot.db "r2/$AWS_BUCKET/etcd-snapshots/etcd-${TS}.db"
+            echo "--- cleanup older than 7d ---"
+            mc find "r2/$AWS_BUCKET/etcd-snapshots/" --older-than 7d --exec "mc rm {}" || true
+            echo "--- current snapshots ---"
+            mc ls "r2/$AWS_BUCKET/etcd-snapshots/"
+          command:
+          - /bin/sh
+          - -c
+          envFrom:
+          - secretRef:
+              name: r2-credentials
+          image: minio/mc:latest
+          imagePullPolicy: Always
+          name: upload
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work
+            name: work
+        dnsPolicy: ClusterFirst
+        hostNetwork: true
+        initContainers:
+        - args:
+          - --endpoints=https://127.0.0.1:2379
+          - --cacert=/etc/etcd/ca.crt
+          - --cert=/etc/etcd/healthcheck-client.crt
+          - --key=/etc/etcd/healthcheck-client.key
+          - snapshot
+          - save
+          - /work/etcd-snapshot.db
+          command:
+          - /usr/local/bin/etcdctl
+          env:
+          - name: ETCDCTL_API
+            value: "3"
+          image: registry.k8s.io/etcd:3.5.16-0
+          imagePullPolicy: IfNotPresent
+          name: snapshot
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/etcd
+            name: etcd-certs
+            readOnly: true
+          - mountPath: /work
+            name: work
+        nodeSelector:
+          node-role.kubernetes.io/control-plane: ""
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+        volumes:
+        - hostPath:
+            path: /etc/kubernetes/pki/etcd
+            type: Directory
+          name: etcd-certs
+        - emptyDir: {}
+          name: work
+  status:
+    completionTime: "2026-04-21T02:30:16Z"
+    conditions:
+    - lastProbeTime: "2026-04-21T02:30:16Z"
+      lastTransitionTime: "2026-04-21T02:30:16Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-21T02:30:16Z"
+      lastTransitionTime: "2026-04-21T02:30:16Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-21T02:30:00Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T02:30:00Z"
+    labels:
+      batch.kubernetes.io/job-name: etcd-snapshot-29613750
+      job-name: etcd-snapshot-29613750
+    name: etcd-snapshot-29613750
+    namespace: etcd-backup
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: etcd-snapshot
+  spec:
+    backoffLimit: 2
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: etcd-snapshot-29613750
+          job-name: etcd-snapshot-29613750
+      spec:
+        containers:
+        - args:
+          - |
+            set -e
+            TS=$(date +%Y%m%d-%H%M%S)
+            mc alias set r2 "$AWS_ENDPOINT" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
+            SIZE=$(stat -c %s /work/etcd-snapshot.db)
+            echo "Snapshot size: $SIZE bytes"
+            mc cp /work/etcd-snapshot.db "r2/$AWS_BUCKET/etcd-snapshots/etcd-${TS}.db"
+            echo "--- cleanup older than 7d ---"
+            mc find "r2/$AWS_BUCKET/etcd-snapshots/" --older-than 7d --exec "mc rm {}" || true
+            echo "--- current snapshots ---"
+            mc ls "r2/$AWS_BUCKET/etcd-snapshots/"
+          command:
+          - /bin/sh
+          - -c
+          envFrom:
+          - secretRef:
+              name: r2-credentials
+          image: minio/mc:latest
+          imagePullPolicy: Always
+          name: upload
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /work
+            name: work
+        dnsPolicy: ClusterFirst
+        hostNetwork: true
+        initContainers:
+        - args:
+          - --endpoints=https://127.0.0.1:2379
+          - --cacert=/etc/etcd/ca.crt
+          - --cert=/etc/etcd/healthcheck-client.crt
+          - --key=/etc/etcd/healthcheck-client.key
+          - snapshot
+          - save
+          - /work/etcd-snapshot.db
+          command:
+          - /usr/local/bin/etcdctl
+          env:
+          - name: ETCDCTL_API
+            value: "3"
+          image: registry.k8s.io/etcd:3.5.16-0
+          imagePullPolicy: IfNotPresent
+          name: snapshot
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/etcd
+            name: etcd-certs
+            readOnly: true
+          - mountPath: /work
+            name: work
+        nodeSelector:
+          node-role.kubernetes.io/control-plane: ""
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+        volumes:
+        - hostPath:
+            path: /etc/kubernetes/pki/etcd
+            type: Directory
+          name: etcd-certs
+        - emptyDir: {}
+          name: work
+  status:
+    completionTime: "2026-04-22T02:30:27Z"
+    conditions:
+    - lastProbeTime: "2026-04-22T02:30:27Z"
+      lastTransitionTime: "2026-04-22T02:30:27Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-22T02:30:27Z"
+      lastTransitionTime: "2026-04-22T02:30:27Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-22T02:30:00Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+kind: List
+metadata:

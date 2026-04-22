@@ -1,0 +1,1582 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Node
+  metadata:
+    annotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"2a:4a:65:62:7e:2d"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 10.132.0.2
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      management.cattle.io/pod-limits: '{"cpu":"11100m","memory":"13002Mi"}'
+      management.cattle.io/pod-requests: '{"cpu":"2045m","memory":"3782Mi","pods":"21"}'
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: aiot-master
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/control-plane: ""
+      node.kubernetes.io/exclude-from-external-load-balancers: ""
+    name: aiot-master
+  spec:
+    podCIDR: 10.244.0.0/24
+    podCIDRs:
+    - 10.244.0.0/24
+    taints:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+  status:
+    addresses:
+    - address: 10.132.0.2
+      type: InternalIP
+    - address: aiot-master
+      type: Hostname
+    allocatable:
+      cpu: "4"
+      ephemeral-storage: "96385779143"
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 16005000Ki
+      pods: "110"
+    capacity:
+      cpu: "4"
+      ephemeral-storage: 104585264Ki
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 16107400Ki
+      pods: "110"
+    conditions:
+    - lastHeartbeatTime: "2026-04-18T05:08:37Z"
+      lastTransitionTime: "2026-04-18T05:08:37Z"
+      message: Flannel is running on this node
+      reason: FlannelIsUp
+      status: "False"
+      type: NetworkUnavailable
+    - lastHeartbeatTime: "2026-04-22T08:20:38Z"
+      lastTransitionTime: "2026-04-14T01:17:48Z"
+      message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - lastHeartbeatTime: "2026-04-22T08:20:38Z"
+      lastTransitionTime: "2026-04-14T01:17:48Z"
+      message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - lastHeartbeatTime: "2026-04-22T08:20:38Z"
+      lastTransitionTime: "2026-04-14T01:17:48Z"
+      message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - lastHeartbeatTime: "2026-04-22T08:20:38Z"
+      lastTransitionTime: "2026-04-14T01:18:12Z"
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+    images:
+    - names:
+      - 10.132.0.2:30500/aiot/aiot-python-runtime@sha256:bb1db3f5b0fc6723fdee3c191f6cfd3f56051557574546b309d1f9dc9903b34d
+      - 10.132.0.2:30500/aiot/aiot-python-runtime:v3
+      sizeBytes: 903539931
+    - names:
+      - docker.io/mattermost/mattermost-team-edition@sha256:88565cb169f3ca5e6303db3f99c98297763b3fc606fa464f9382393b328ecdb9
+      - docker.io/mattermost/mattermost-team-edition:latest
+      sizeBytes: 411309566
+    - names:
+      - 10.132.0.2:30500/ml-pipeline/frontend@sha256:80a7b092359ce1dae8c76853cc6920c4095b71c97a1b48b5c0e145a76d56a489
+      - 10.132.0.2:30500/ml-pipeline/frontend:2.3.0
+      sizeBytes: 164499229
+    - names:
+      - docker.io/library/postgres@sha256:65d6d1d12f304c426282337417e2770d3449e10557e74ac7c2f319124687411f
+      - docker.io/library/postgres:16
+      sizeBytes: 160157788
+    - names:
+      - docker.io/rancher/shell@sha256:c10d63f1b4158cf1a0fd64b166b9bf1ab166a64eec44f7fb097846cb04c323bd
+      - docker.io/rancher/shell:v0.6.2
+      sizeBytes: 113276169
+    - names:
+      - docker.io/istio/proxyv2@sha256:57621adeb78e67c52e34ec1676d1ae898b252134838d60298c7446d0964551cc
+      - docker.io/istio/proxyv2:1.22.1
+      sizeBytes: 100203938
+    - names:
+      - docker.io/otel/opentelemetry-collector-contrib@sha256:faf125d656fa47cea568b2f3b4494efd2525083bc75c1e96038bc23f05cd68fd
+      - docker.io/otel/opentelemetry-collector-contrib:0.139.0
+      sizeBytes: 92481504
+    - names:
+      - docker.io/zabbix/zabbix-server-pgsql@sha256:09673227a30995075f28b8f66ee3d8ecf1384ece479d9638b7ef26ce9eb28b32
+      - docker.io/zabbix/zabbix-server-pgsql:ubuntu-7.0.25
+      sizeBytes: 91447064
+    - names:
+      - docker.io/istio/pilot@sha256:0f616a2e1d184a70abef2801fe91bb1ad0455386a4fdf43947ede6426b25b09b
+      - docker.io/istio/pilot:1.22.1
+      sizeBytes: 79260863
+    - names:
+      - docker.io/velero/velero@sha256:c14904c6f93d129f5ba1fad1a0bbbb20a71f5a003a3cc615313097c7f49eb3e0
+      - docker.io/velero/velero:v1.14.1
+      sizeBytes: 64561226
+    - names:
+      - registry.k8s.io/etcd@sha256:c6a9d11cc5c04b114ccdef39a9265eeef818e3d02f5359be035ae784097fdec5
+      - registry.k8s.io/etcd:3.5.16-0
+      sizeBytes: 57680541
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:4a84f14b76fdc317dccfad1d92a8e09b650127adc79e3c7d40d4ca802dda3a1f
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.25
+      sizeBytes: 56714014
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:9c8f5a668b9f20c44693c3244bcfd7df650907cd91e7cec1ef0e2aa27b51c0fc
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.16
+      sizeBytes: 55715265
+    - names:
+      - docker.io/rancher/turtles@sha256:14e1c6c4cc6026e6cd99b4b6b711ded740b6883d53dd98cd55bf4424b4d1687b
+      - docker.io/rancher/turtles:v0.25.4
+      sizeBytes: 40311380
+    - names:
+      - docker.io/rancher/cluster-api-controller@sha256:313b29e3a0467734f7b9e6fca1aa7a44d6fef22b1b2c14b074ce18ee0c1a21b4
+      - docker.io/rancher/cluster-api-controller:v1.10.6
+      sizeBytes: 39203837
+    - names:
+      - ghcr.io/flannel-io/flannel@sha256:3726b7dd2f758f1cc8155edc442e7f3fbad68cf42530d6bcb3ddffdba40a1394
+      - ghcr.io/flannel-io/flannel:v0.28.2
+      sizeBytes: 34432254
+    - names:
+      - registry.k8s.io/kube-proxy@sha256:03e2b38f5bebd4eb70962d8834b4aa1625ee8566cdefddc2e979c94dcf1a2bbb
+      - registry.k8s.io/kube-proxy:v1.32.13
+      sizeBytes: 31053149
+    - names:
+      - docker.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
+      - docker.io/minio/mc:latest
+      sizeBytes: 29837309
+    - names:
+      - registry.k8s.io/kube-apiserver@sha256:5e9be27d5eff9604717cdb6021861490b060baa2097783fcf2e695e1035a141d
+      - registry.k8s.io/kube-apiserver:v1.32.13
+      sizeBytes: 29070506
+    - names:
+      - registry.k8s.io/kube-controller-manager@sha256:26bc6935bcd34136dbde00abee2bb99fef2309e20dba0203ca01add7c478501f
+      - registry.k8s.io/kube-controller-manager:v1.32.13
+      sizeBytes: 26656017
+    - names:
+      - registry.k8s.io/etcd@sha256:251e7e490f64859d329cd963bc879dc04acf3d7195bb52c4c50b4a07bedf37d6
+      - registry.k8s.io/etcd:3.5.24-0
+      sizeBytes: 23716032
+    - names:
+      - registry.k8s.io/kube-scheduler@sha256:f7e4075c8284a8214028de628e65209178c266dfa178fac6048884147309f6d6
+      - registry.k8s.io/kube-scheduler:v1.32.13
+      sizeBytes: 21069829
+    - names:
+      - registry.k8s.io/coredns/coredns@sha256:9caabbf6238b189a65d0d6e6ac138de60d6a1c419e5a341fbbb7c78382559c6e
+      - registry.k8s.io/coredns/coredns:v1.11.3
+      sizeBytes: 18562039
+    - names:
+      - quay.io/prometheus/node-exporter@sha256:0f422f62c15f154af8d8572b23d623aebfb10cec73a5c654d18f911f3f9df241
+      - quay.io/prometheus/node-exporter:v1.11.1
+      sizeBytes: 13308798
+    - names:
+      - ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python@sha256:7af626758480d97ae2bc0472fb8e08d936c372c8436c070732e4c5f5d41751af
+      - ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.60b1
+      sizeBytes: 10840504
+    - names:
+      - ghcr.io/flannel-io/flannel-cni-plugin@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa
+      - ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1
+      sizeBytes: 5142124
+    - names:
+      - registry.k8s.io/pause@sha256:278fb9dbcca9518083ad1e11276933a2e96f23de604a3a08cc3c80002767d24c
+      - registry.k8s.io/pause:3.10.1
+      sizeBytes: 320448
+    nodeInfo:
+      architecture: amd64
+      bootID: 0459e522-15a5-412b-bf78-045e057f9253
+      containerRuntimeVersion: containerd://2.2.3
+      kernelVersion: 5.14.0-691.el9.x86_64
+      kubeProxyVersion: v1.32.13
+      kubeletVersion: v1.32.13
+      machineID: 048311148df146e994ed26a093959ea8
+      operatingSystem: linux
+      osImage: CentOS Stream 9
+      systemUUID: 32b1e44f-62d4-4298-eac5-c2b8db897f41
+    runtimeHandlers:
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: ""
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: runc
+- apiVersion: v1
+  kind: Node
+  metadata:
+    annotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"c2:d5:10:6d:8d:c7"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 10.132.0.3
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      management.cattle.io/pod-limits: '{"cpu":"5","memory":"6528Mi"}'
+      management.cattle.io/pod-requests: '{"cpu":"1175m","memory":"2466Mi","pods":"17"}'
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: aiot-worker-01
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+    name: aiot-worker-01
+  spec:
+    podCIDR: 10.244.1.0/24
+    podCIDRs:
+    - 10.244.1.0/24
+  status:
+    addresses:
+    - address: 10.132.0.3
+      type: InternalIP
+    - address: aiot-worker-01
+      type: Hostname
+    allocatable:
+      cpu: "4"
+      ephemeral-storage: "144704161143"
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 16005000Ki
+      pods: "110"
+    capacity:
+      cpu: "4"
+      ephemeral-storage: 157014064Ki
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 16107400Ki
+      pods: "110"
+    conditions:
+    - lastHeartbeatTime: "2026-04-20T16:42:28Z"
+      lastTransitionTime: "2026-04-20T16:42:28Z"
+      message: Flannel is running on this node
+      reason: FlannelIsUp
+      status: "False"
+      type: NetworkUnavailable
+    - lastHeartbeatTime: "2026-04-22T08:20:51Z"
+      lastTransitionTime: "2026-04-20T16:33:23Z"
+      message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - lastHeartbeatTime: "2026-04-22T08:20:51Z"
+      lastTransitionTime: "2026-04-20T16:33:23Z"
+      message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - lastHeartbeatTime: "2026-04-22T08:20:51Z"
+      lastTransitionTime: "2026-04-20T16:33:23Z"
+      message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - lastHeartbeatTime: "2026-04-22T08:20:51Z"
+      lastTransitionTime: "2026-04-20T16:33:27Z"
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+    images:
+    - names:
+      - ghcr.io/open-webui/open-webui@sha256:b8095f79a6a8ffad8f830bdacc9b5b0aef805689b31bca0b065cc2424d3cfaeb
+      - ghcr.io/open-webui/open-webui:main
+      sizeBytes: 1702458879
+    - names:
+      - gcr.io/ml-pipeline/visualization-server@sha256:6b9ce7e205ee6f2438f96b7bcaa5b0737a66172585d33b92d867f8e79fbe3da5
+      - gcr.io/ml-pipeline/visualization-server:2.3.0
+      sizeBytes: 1558946485
+    - names:
+      - 10.132.0.2:30500/aiot/aiot-python-runtime@sha256:bb1db3f5b0fc6723fdee3c191f6cfd3f56051557574546b309d1f9dc9903b34d
+      - 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+      - 10.132.0.2:30500/aiot/aiot-python-runtime:v3
+      sizeBytes: 903539931
+    - names:
+      - 10.132.0.2:30500/aiot/aiot-python-runtime@sha256:875b282f33f8d8e448822fba9b172a2a92563159b5238be602bd5299b34a28d9
+      - 10.132.0.2:30500/aiot/aiot-python-runtime:v2
+      sizeBytes: 903334354
+    - names:
+      - 10.132.0.2:30500/aiot/aiot-python-runtime@sha256:916c134fb764993f07f06b5f35360b1e73e75c86b8f600d51ab70c327e314d79
+      sizeBytes: 901923744
+    - names:
+      - docker.io/rancher/rancher@sha256:4b1eea4c10ac2af1765a3036310fd77433a8fe42e25504843c8cfe2784c45a82
+      - docker.io/rancher/rancher:v2.13.3
+      sizeBytes: 819202844
+    - names:
+      - docker.io/rancher/rancher-agent@sha256:1898876ab36c047fdc4fe9d64dc3820be5e7c8ab301554e4f266b19e1870b4a3
+      - docker.io/rancher/rancher-agent:v2.13.3
+      sizeBytes: 525277518
+    - names:
+      - docker.io/mattermost/mattermost-team-edition@sha256:88565cb169f3ca5e6303db3f99c98297763b3fc606fa464f9382393b328ecdb9
+      - docker.io/mattermost/mattermost-team-edition:latest
+      sizeBytes: 411309566
+    - names:
+      - docker.io/alpine/k8s@sha256:eec3541331932d8613ce7b3283508063cba7f704302e9b4eda45e49b38a2a0f9
+      - docker.io/alpine/k8s:1.32.3
+      sizeBytes: 322775613
+    - names:
+      - docker.io/alpine/k8s@sha256:d489e3c7a6221af7394bc54a1498b641ada49ca51c344630966a62411b91a3df
+      - docker.io/alpine/k8s:1.31.2
+      sizeBytes: 312321011
+    - names:
+      - docker.io/alpine/k8s@sha256:129291af93e2b5df392f619cee8564cac4b377d66ff45f52f165af87688b68b9
+      - docker.io/alpine/k8s:1.30.4
+      sizeBytes: 303449140
+    - names:
+      - docker.io/zabbix/zabbix-web-service@sha256:8276e15547fd30f5f39ba38b4ec5cf78e91f4b14a69bf25e9f892d1f1d27275c
+      - docker.io/zabbix/zabbix-web-service:ubuntu-7.0.25
+      sizeBytes: 257895072
+    - names:
+      - docker.io/semaphoreui/semaphore@sha256:6816f4c37a904d73acf55fb0397098e1b6d3889ea8a75cec2325d95510168e16
+      - docker.io/semaphoreui/semaphore:v2.12.6
+      sizeBytes: 254934147
+    - names:
+      - docker.io/zabbix/zabbix-web-service@sha256:b3e3f215e640db636dae80d71e11efab1e868915f0679102d5efa38b129f3a0f
+      - docker.io/zabbix/zabbix-web-service:ubuntu-7.0.16
+      sizeBytes: 253639442
+    - names:
+      - docker.io/library/mysql@sha256:d0304ed9fdb64a3f6c7ad11a5fb4f13abfc10e6dfa3f288d652e7320c34df7f9
+      - docker.io/library/mysql:8.0
+      sizeBytes: 233592821
+    - names:
+      - docker.io/grafana/grafana@sha256:83749231c3835e390a3144e5e940203e42b9589761f20ef3169c716e734ad505
+      - docker.io/grafana/grafana:12.4.2
+      sizeBytes: 213873728
+    - names:
+      - docker.io/signoz/signoz-otel-collector@sha256:cc3e1559f0968f10a27977323c20323ca072ea3858af2233263e82532d551516
+      - docker.io/signoz/signoz-otel-collector:v0.144.2
+      sizeBytes: 200686388
+    - names:
+      - 10.132.0.2:30500/ml-pipeline/frontend@sha256:80a7b092359ce1dae8c76853cc6920c4095b71c97a1b48b5c0e145a76d56a489
+      - 10.132.0.2:30500/ml-pipeline/frontend:2.3.0
+      sizeBytes: 164499229
+    - names:
+      - docker.io/library/postgres@sha256:5a65324fe84dc41709ff914e90b07f3e2f577073ed27bf917d4873aca0c9ec51
+      - docker.io/library/postgres:16
+      sizeBytes: 160152079
+    - names:
+      - gcr.io/ml-pipeline/api-server@sha256:ffe711a7777ceafe509df4964f50bcd25e64fba440c71440a90280fee5f15e84
+      - gcr.io/ml-pipeline/api-server:2.2.0
+      sizeBytes: 157367074
+    - names:
+      - docker.io/dserio83/velero-api@sha256:6b3d9115fee2f391d86f340e7fb11b14836920e1479769703972b4af3385f1ce
+      - docker.io/dserio83/velero-api:0.3.1
+      sizeBytes: 155240579
+    - names:
+      - docker.io/jenkins/inbound-agent@sha256:808b6089af2afcc179922cb2072b532f63ce46e050b285c94655d9522045dbce
+      - docker.io/jenkins/inbound-agent:3355.v388858a_47b_33-3-jdk21
+      sizeBytes: 151085178
+    - names:
+      - docker.io/zabbix/zabbix-web-nginx-pgsql@sha256:7f09e08a65bebcc9078c4684968ebfdae8fde272de21be00b14f9a5c76162ad0
+      - docker.io/zabbix/zabbix-web-nginx-pgsql:ubuntu-7.0.16
+      sizeBytes: 150183789
+    - names:
+      - registry.cn-beijing.aliyuncs.com/kubesphereio/kubectl@sha256:93f55fcb7c50c57ab0296d2d61d151ac2e2e44dc2cdc20add9081c209e7f137e
+      - registry.cn-beijing.aliyuncs.com/kubesphereio/kubectl:v1.33.1
+      sizeBytes: 138782050
+    - names:
+      - docker.io/zabbix/zabbix-web-nginx-pgsql@sha256:fd10899aa6f30ed356a98a2a4cabfa1822a76287cdcb85913451d3b176c914b4
+      - docker.io/zabbix/zabbix-web-nginx-pgsql:ubuntu-7.0.25
+      sizeBytes: 137370311
+    - names:
+      - docker.io/amazon/aws-cli@sha256:5ea67dda865fcf2fde06692c9a8a44fb8af0edf4a102c8c2f54f4a5225063c1c
+      - docker.io/amazon/aws-cli:latest
+      sizeBytes: 136448836
+    - names:
+      - docker.io/library/mysql@sha256:152cf187a3efc56afb0b3877b4d21e231d1d6eb828ca9221056590b0ac834c75
+      - docker.io/library/mysql:8.0.29
+      sizeBytes: 131800488
+    - names:
+      - docker.io/rancher/shell@sha256:c10d63f1b4158cf1a0fd64b166b9bf1ab166a64eec44f7fb097846cb04c323bd
+      - docker.io/rancher/shell:v0.6.2
+      sizeBytes: 113276169
+    - names:
+      - docker.io/rancher/fleet@sha256:5f46325a7713a04bf350aa41005d7cbd497d47d7f8fc02e6a3d98f72e454acad
+      - docker.io/rancher/fleet:v0.14.3
+      sizeBytes: 111998288
+    - names:
+      - docker.io/library/postgres@sha256:5c4a21411ae06f964015aa9b5447b75f686dcded73d231289b75459d7c0b490a
+      - docker.io/library/postgres:16-alpine
+      sizeBytes: 109995527
+    - names:
+      - registry.k8s.io/ingress-nginx/controller@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
+      - registry.k8s.io/ingress-nginx/controller:v1.12.1
+      sizeBytes: 105504277
+    - names:
+      - docker.io/istio/proxyv2@sha256:57621adeb78e67c52e34ec1676d1ae898b252134838d60298c7446d0964551cc
+      - docker.io/istio/proxyv2:1.22.1
+      sizeBytes: 100203938
+    - names:
+      - docker.io/otel/opentelemetry-collector-contrib@sha256:faf125d656fa47cea568b2f3b4494efd2525083bc75c1e96038bc23f05cd68fd
+      - docker.io/otel/opentelemetry-collector-contrib:0.139.0
+      sizeBytes: 92481504
+    - names:
+      - docker.io/dserio83/velero-watchdog@sha256:d5deae5892290b187817f690ee24db4d6d64723f4c5f52b828f2ecffef403d94
+      - docker.io/dserio83/velero-watchdog:0.1.8
+      sizeBytes: 91957039
+    - names:
+      - docker.io/zabbix/zabbix-server-pgsql@sha256:09673227a30995075f28b8f66ee3d8ecf1384ece479d9638b7ef26ce9eb28b32
+      - docker.io/zabbix/zabbix-server-pgsql:ubuntu-7.0.25
+      sizeBytes: 91447064
+    - names:
+      - docker.io/zabbix/zabbix-server-pgsql@sha256:8427b6f70b85787a0f5efa8cbafc31707ae7b94d7404b2f7fc65d3963f81e622
+      - docker.io/zabbix/zabbix-server-pgsql:ubuntu-7.0.16
+      sizeBytes: 90751614
+    - names:
+      - docker.io/garethgeorge/backrest@sha256:1308397161321b3c5aeca8acc6bf26eccb990df385f2532d3ce0eaa8b483dedf
+      - docker.io/garethgeorge/backrest:v1.10.1
+      sizeBytes: 87479346
+    - names:
+      - ghcr.io/garethgeorge/backrest@sha256:f4d34bd6fa985d13bdb6c01c5d8727e07708899afa9567d800808357d77b9fb0
+      - ghcr.io/garethgeorge/backrest:latest
+      sizeBytes: 80621264
+    - names:
+      - docker.io/qdrant/qdrant@sha256:81bdf0a9deedbeec68eed207145ade0b9d5db15e2f84069180711aa9698445b1
+      - docker.io/qdrant/qdrant:v1.13.2
+      sizeBytes: 77178448
+    - names:
+      - docker.io/gitea/gitea@sha256:724d420b64da6582b9ac8298856e4791e8a46307f31265cb2630ed0b058073ab
+      - docker.io/gitea/gitea:1.24.0
+      sizeBytes: 75668387
+    - names:
+      - docker.io/dserio83/velero-ui@sha256:b4e1ec6664d349def6dd540e9b9421116f0e8fc5597b4d23fc50898dbd3c155b
+      - docker.io/dserio83/velero-ui:0.3.1
+      sizeBytes: 70044388
+    - names:
+      - docker.io/velero/velero@sha256:c14904c6f93d129f5ba1fad1a0bbbb20a71f5a003a3cc615313097c7f49eb3e0
+      - docker.io/velero/velero:v1.14.1
+      sizeBytes: 64561226
+    - names:
+      - ghcr.io/k8sgpt-ai/k8sgpt@sha256:18a726b5387acb114cd5bf71df92c22937874863c9763a1c905f813667af4f08
+      - ghcr.io/k8sgpt-ai/k8sgpt:v0.4.3
+      sizeBytes: 58810342
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:4a84f14b76fdc317dccfad1d92a8e09b650127adc79e3c7d40d4ca802dda3a1f
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.25
+      sizeBytes: 56714014
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:9c8f5a668b9f20c44693c3244bcfd7df650907cd91e7cec1ef0e2aa27b51c0fc
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.16
+      sizeBytes: 55715265
+    - names:
+      - ghcr.io/k8up-io/k8up@sha256:dac99f13d860d7beb077da31928ced08ccbbe769e8394371bae8fee3d53681fb
+      - ghcr.io/k8up-io/k8up:v2.15.0
+      sizeBytes: 55519032
+    - names:
+      - 10.132.0.2:30500/aiot-pipeline-demo@sha256:dbee8097154d98240b29dfa72b103a7d36e0ae6674bb89502f08a520034a3646
+      - 10.132.0.2:30500/aiot-pipeline-demo:23
+      sizeBytes: 54474053
+    - names:
+      - 10.132.0.2:30500/aiot-pipeline-demo@sha256:33364075b964bf86027ecf61bad4864a08afbc252c3639fbb068357d0baa3249
+      - 10.132.0.2:30500/aiot-pipeline-demo:24
+      sizeBytes: 54474029
+    - names:
+      - quay.io/argoproj/argoexec@sha256:80a82145d4abd2e467b1151d98f55252e6f8c6eeae0ca58ef398e1b0090080a3
+      - quay.io/argoproj/argoexec:v3.4.17
+      sizeBytes: 47910402
+    - names:
+      - docker.io/library/python@sha256:840e180ebcc6e5c8efab209c43f5e40fd2af98cb49db5c7103c90539c56bb30e
+      - docker.io/library/python:3.11.10-slim-bookworm
+      sizeBytes: 47768079
+    nodeInfo:
+      architecture: amd64
+      bootID: f0b7144a-1229-4c7f-8f37-bb5b400543f8
+      containerRuntimeVersion: containerd://2.2.3
+      kernelVersion: 5.14.0-691.el9.x86_64
+      kubeProxyVersion: v1.32.13
+      kubeletVersion: v1.32.13
+      machineID: 048311148df146e994ed26a093959ea8
+      operatingSystem: linux
+      osImage: CentOS Stream 9
+      systemUUID: 31ac02f6-908d-2e11-4319-bbbc15cdb3b8
+    runtimeHandlers:
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: ""
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: runc
+- apiVersion: v1
+  kind: Node
+  metadata:
+    annotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"86:3b:9d:76:60:f8"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 10.132.0.4
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      management.cattle.io/pod-limits: '{"cpu":"23200m","memory":"18218Mi"}'
+      management.cattle.io/pod-requests: '{"cpu":"3520m","memory":"7534Mi","pods":"50"}'
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: aiot-worker-02
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+    name: aiot-worker-02
+  spec:
+    podCIDR: 10.244.2.0/24
+    podCIDRs:
+    - 10.244.2.0/24
+  status:
+    addresses:
+    - address: 10.132.0.4
+      type: InternalIP
+    - address: aiot-worker-02
+      type: Hostname
+    allocatable:
+      cpu: "4"
+      ephemeral-storage: "144704161143"
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 16005000Ki
+      pods: "110"
+    capacity:
+      cpu: "4"
+      ephemeral-storage: 157014064Ki
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 16107400Ki
+      pods: "110"
+    conditions:
+    - lastHeartbeatTime: "2026-04-18T05:07:51Z"
+      lastTransitionTime: "2026-04-18T05:07:51Z"
+      message: Flannel is running on this node
+      reason: FlannelIsUp
+      status: "False"
+      type: NetworkUnavailable
+    - lastHeartbeatTime: "2026-04-22T08:23:29Z"
+      lastTransitionTime: "2026-04-18T05:05:12Z"
+      message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - lastHeartbeatTime: "2026-04-22T08:23:29Z"
+      lastTransitionTime: "2026-04-18T05:05:12Z"
+      message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - lastHeartbeatTime: "2026-04-22T08:23:29Z"
+      lastTransitionTime: "2026-04-18T05:05:12Z"
+      message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - lastHeartbeatTime: "2026-04-22T08:23:29Z"
+      lastTransitionTime: "2026-04-20T12:16:51Z"
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+    images:
+    - names:
+      - docker.io/kubeflownotebookswg/jupyter-scipy@sha256:b58efa2ea70d1c960e1056f3eed4ca908fa95cba010ffdbf515762d74f54134b
+      - docker.io/kubeflownotebookswg/jupyter-scipy:v1.9.2
+      sizeBytes: 1317803331
+    - names:
+      - 10.132.0.2:30500/aiot/aiot-python-runtime@sha256:bb1db3f5b0fc6723fdee3c191f6cfd3f56051557574546b309d1f9dc9903b34d
+      - 10.132.0.2:30500/aiot/aiot-python-runtime:v3
+      sizeBytes: 903539931
+    - names:
+      - 10.132.0.2:30500/aiot/aiot-python-runtime@sha256:916c134fb764993f07f06b5f35360b1e73e75c86b8f600d51ab70c327e314d79
+      - 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+      sizeBytes: 901923744
+    - names:
+      - docker.io/rancher/rancher@sha256:4b1eea4c10ac2af1765a3036310fd77433a8fe42e25504843c8cfe2784c45a82
+      - docker.io/rancher/rancher:v2.13.3
+      sizeBytes: 819202844
+    - names:
+      - docker.io/tensorflow/tensorflow@sha256:4689c724a7d65a7d289cc2ae536fa3cd6b636b2df3e23da3a44ffdd6ac3af46f
+      - docker.io/tensorflow/tensorflow:2.15.0
+      sizeBytes: 535524911
+    - names:
+      - docker.io/dbeaver/cloudbeaver@sha256:915821e3c3476dae83a413bf881471d20105b4e2a8e73540b20182505dc0dbe8
+      - docker.io/dbeaver/cloudbeaver:24.3.1
+      sizeBytes: 444465106
+    - names:
+      - docker.io/mattermost/mattermost-team-edition@sha256:88565cb169f3ca5e6303db3f99c98297763b3fc606fa464f9382393b328ecdb9
+      - docker.io/mattermost/mattermost-team-edition:latest
+      sizeBytes: 411309566
+    - names:
+      - docker.io/alpine/k8s@sha256:d489e3c7a6221af7394bc54a1498b641ada49ca51c344630966a62411b91a3df
+      - docker.io/alpine/k8s:1.31.2
+      sizeBytes: 312321011
+    - names:
+      - docker.io/jenkins/jenkins@sha256:7004d07dbcdc5439fdad8853acdb029c5e3ab7a3d8190184fbf89bec66786c02
+      - docker.io/jenkins/jenkins:2.555.1-jdk21
+      sizeBytes: 292175576
+    - names:
+      - ghcr.io/mlflow/mlflow@sha256:e68e3089108faf453681319dc7ae6e746b6f25c28243167dcead391c051871ae
+      - ghcr.io/mlflow/mlflow:v2.19.0
+      sizeBytes: 259108480
+    - names:
+      - docker.io/zabbix/zabbix-web-service@sha256:8276e15547fd30f5f39ba38b4ec5cf78e91f4b14a69bf25e9f892d1f1d27275c
+      - docker.io/zabbix/zabbix-web-service:ubuntu-7.0.25
+      sizeBytes: 257895072
+    - names:
+      - docker.io/zabbix/zabbix-web-service@sha256:b3e3f215e640db636dae80d71e11efab1e868915f0679102d5efa38b129f3a0f
+      - docker.io/zabbix/zabbix-web-service:ubuntu-7.0.16
+      sizeBytes: 253639442
+    - names:
+      - ghcr.io/cloudnative-pg/postgresql@sha256:2bc26604d2f0650f9b98668a51a95679c02024860d512ace92e7fcf69da7d611
+      - ghcr.io/cloudnative-pg/postgresql:16
+      sizeBytes: 252779733
+    - names:
+      - docker.io/grafana/grafana@sha256:83749231c3835e390a3144e5e940203e42b9589761f20ef3169c716e734ad505
+      - docker.io/grafana/grafana:12.4.2
+      sizeBytes: 213873728
+    - names:
+      - docker.io/signoz/signoz-otel-collector@sha256:cc3e1559f0968f10a27977323c20323ca072ea3858af2233263e82532d551516
+      - docker.io/signoz/signoz-otel-collector:v0.144.2
+      sizeBytes: 200686388
+    - names:
+      - 10.132.0.2:30500/aiot/aiot-python-runtime@sha256:2c68d657032bfbdfcf708ccba46ad0ca1f4f8da303c1ed2044947c6a375cda61
+      sizeBytes: 197891659
+    - names:
+      - docker.io/dpage/pgadmin4@sha256:ff557f69d9808085dc3554f56c1b06a36ac8cddabe4485212920b9604261abdb
+      - docker.io/dpage/pgadmin4:latest
+      sizeBytes: 174818631
+    - names:
+      - 10.132.0.2:30500/ml-pipeline/frontend:2.3.0
+      - gcr.io/ml-pipeline/frontend:2.3.0
+      sizeBytes: 164499229
+    - names:
+      - docker.io/library/postgres@sha256:5a65324fe84dc41709ff914e90b07f3e2f577073ed27bf917d4873aca0c9ec51
+      - docker.io/library/postgres:16
+      sizeBytes: 160152079
+    - names:
+      - docker.io/dserio83/velero-api@sha256:6b3d9115fee2f391d86f340e7fb11b14836920e1479769703972b4af3385f1ce
+      - docker.io/dserio83/velero-api:0.3.1
+      sizeBytes: 155240579
+    - names:
+      - gcr.io/ml-pipeline/mysql@sha256:882e55f40d61034a2bb8a1abab1353571ad2a33866f382350788eb34740528b5
+      - gcr.io/ml-pipeline/mysql:8.0.26
+      sizeBytes: 150597450
+    - names:
+      - docker.io/zabbix/zabbix-web-nginx-pgsql@sha256:fd10899aa6f30ed356a98a2a4cabfa1822a76287cdcb85913451d3b176c914b4
+      - docker.io/zabbix/zabbix-web-nginx-pgsql:ubuntu-7.0.25
+      sizeBytes: 137370311
+    - names:
+      - docker.io/rancher/fleet@sha256:5f46325a7713a04bf350aa41005d7cbd497d47d7f8fc02e6a3d98f72e454acad
+      - docker.io/rancher/fleet:v0.14.3
+      sizeBytes: 111998288
+    - names:
+      - registry.k8s.io/ingress-nginx/controller@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
+      - registry.k8s.io/ingress-nginx/controller:v1.12.1
+      sizeBytes: 105504277
+    - names:
+      - docker.io/emqx/emqx@sha256:a1e3d10fa1dcc8c94325b815a93b5b5974253a97cb36470b44e47d5d3ef9cd13
+      - docker.io/emqx/emqx:5.8
+      sizeBytes: 105487191
+    - names:
+      - docker.io/minio/minio@sha256:6fce70c2fd719603cb538e25ec3f58d77c12c1f5141e46240a850065c7ce4470
+      - docker.io/minio/minio:RELEASE.2023-09-04T19-57-37Z
+      sizeBytes: 105403458
+    - names:
+      - docker.io/istio/proxyv2@sha256:57621adeb78e67c52e34ec1676d1ae898b252134838d60298c7446d0964551cc
+      - docker.io/istio/proxyv2:1.22.1
+      sizeBytes: 100203938
+    - names:
+      - ghcr.io/headlamp-k8s/headlamp@sha256:89c6c65810bfde61796483c93c70d659104355593792bf55cab680d685da8eeb
+      - ghcr.io/headlamp-k8s/headlamp:latest
+      sizeBytes: 95113756
+    - names:
+      - docker.io/otel/opentelemetry-collector-contrib@sha256:faf125d656fa47cea568b2f3b4494efd2525083bc75c1e96038bc23f05cd68fd
+      - docker.io/otel/opentelemetry-collector-contrib:0.139.0
+      sizeBytes: 92481504
+    - names:
+      - docker.io/dserio83/velero-watchdog@sha256:d5deae5892290b187817f690ee24db4d6d64723f4c5f52b828f2ecffef403d94
+      - docker.io/dserio83/velero-watchdog:0.1.8
+      sizeBytes: 91957039
+    - names:
+      - docker.io/zabbix/zabbix-server-pgsql@sha256:09673227a30995075f28b8f66ee3d8ecf1384ece479d9638b7ef26ce9eb28b32
+      - docker.io/zabbix/zabbix-server-pgsql:ubuntu-7.0.25
+      sizeBytes: 91447064
+    - names:
+      - docker.io/dserio83/velero-ui@sha256:b4e1ec6664d349def6dd540e9b9421116f0e8fc5597b4d23fc50898dbd3c155b
+      - docker.io/dserio83/velero-ui:0.3.1
+      sizeBytes: 70044388
+    - names:
+      - docker.io/velero/velero@sha256:c14904c6f93d129f5ba1fad1a0bbbb20a71f5a003a3cc615313097c7f49eb3e0
+      - docker.io/velero/velero:v1.14.1
+      sizeBytes: 64561226
+    - names:
+      - ghcr.io/k8sgpt-ai/k8sgpt@sha256:18a726b5387acb114cd5bf71df92c22937874863c9763a1c905f813667af4f08
+      - ghcr.io/k8sgpt-ai/k8sgpt:v0.4.3
+      sizeBytes: 58810342
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:4a84f14b76fdc317dccfad1d92a8e09b650127adc79e3c7d40d4ca802dda3a1f
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.25
+      sizeBytes: 56714014
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:9c8f5a668b9f20c44693c3244bcfd7df650907cd91e7cec1ef0e2aa27b51c0fc
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.16
+      sizeBytes: 55715265
+    - names:
+      - ghcr.io/k8up-io/k8up@sha256:dac99f13d860d7beb077da31928ced08ccbbe769e8394371bae8fee3d53681fb
+      - ghcr.io/k8up-io/k8up:v2.15.0
+      sizeBytes: 55519032
+    - names:
+      - 10.132.0.2:30500/aiot-pipeline-demo@sha256:dbee8097154d98240b29dfa72b103a7d36e0ae6674bb89502f08a520034a3646
+      - 10.132.0.2:30500/aiot-pipeline-demo:23
+      sizeBytes: 54474053
+    - names:
+      - 10.132.0.2:30500/aiot-pipeline-demo@sha256:33364075b964bf86027ecf61bad4864a08afbc252c3639fbb068357d0baa3249
+      - 10.132.0.2:30500/aiot-pipeline-demo:24
+      sizeBytes: 54474029
+    - names:
+      - docker.io/library/python@sha256:233de06753d30d120b1a3ce359d8d3be8bda78524cd8f520c99883bfe33964cf
+      - docker.io/library/python:3.11-slim
+      sizeBytes: 45453380
+    - names:
+      - docker.io/library/python@sha256:804ddf3251a60bbf9c92e73b7566c40428d54d0e79d3428194edf40da6521286
+      - docker.io/library/python:3.12-slim
+      sizeBytes: 43199948
+    - names:
+      - gcr.io/ml-pipeline/workflow-controller@sha256:4c978c30d1779c0498bede029d8895fe47be888ca22f9072808af0e5e7dc6782
+      - gcr.io/ml-pipeline/workflow-controller:v3.4.17-license-compliance
+      sizeBytes: 36159592
+    - names:
+      - ghcr.io/cloudnative-pg/cloudnative-pg@sha256:b5210df46c05bed3c5dbb67d316dece0ed67f4d148acac169416079dc10e4a91
+      - ghcr.io/cloudnative-pg/cloudnative-pg:1.25.1
+      sizeBytes: 35807663
+    - names:
+      - ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator@sha256:590e50477b76702b6b630cf047e4f712cb5bf37f064ce6f8d08758d7437f56ab
+      - ghcr.io/open-telemetry/opentelemetry-operator/opentelemetry-operator:0.148.0
+      sizeBytes: 35658258
+    - names:
+      - gcr.io/ml-pipeline/cache-server@sha256:293941ee4f65ac9da756da3b828095d52fb14204ac5cd888afcba01e714d57c1
+      - gcr.io/ml-pipeline/cache-server:2.3.0
+      sizeBytes: 35593219
+    - names:
+      - gcr.io/ml-pipeline/persistenceagent@sha256:109ac1b38c413e70d0cb6d2a83215c6b1db7f5f3284019ccb4dbbfe121f64d84
+      - gcr.io/ml-pipeline/persistenceagent:2.3.0
+      sizeBytes: 34801074
+    - names:
+      - ghcr.io/flannel-io/flannel@sha256:3726b7dd2f758f1cc8155edc442e7f3fbad68cf42530d6bcb3ddffdba40a1394
+      - ghcr.io/flannel-io/flannel:v0.28.2
+      sizeBytes: 34432254
+    - names:
+      - quay.io/brancz/kube-rbac-proxy@sha256:147cb28fea35473b2cf8697892d375bbe0aec237c5740b0368719b4c0d71b290
+      - quay.io/brancz/kube-rbac-proxy:v0.20.0
+      sizeBytes: 33937278
+    - names:
+      - quay.io/brancz/kube-rbac-proxy@sha256:9f21034731c7c3228611b9d40807f3230ce8ed2b286b913bf2d1e760d8d866fc
+      - quay.io/brancz/kube-rbac-proxy:v0.19.1
+      sizeBytes: 33284637
+    - names:
+      - ghcr.io/k8sgpt-ai/k8sgpt-operator@sha256:d32bfb48e2f49f187c8715a826813377b3d2a57859532c4e42241c8d87762f69
+      - ghcr.io/k8sgpt-ai/k8sgpt-operator:v0.2.27
+      sizeBytes: 32934759
+    nodeInfo:
+      architecture: amd64
+      bootID: c7b915e6-9eae-4b71-b3f6-37397f040da2
+      containerRuntimeVersion: containerd://2.2.3
+      kernelVersion: 5.14.0-691.el9.x86_64
+      kubeProxyVersion: v1.32.13
+      kubeletVersion: v1.32.13
+      machineID: 048311148df146e994ed26a093959ea8
+      operatingSystem: linux
+      osImage: CentOS Stream 9
+      systemUUID: 3ab7e681-5399-bc88-e01c-b0f40fd7a93d
+    runtimeHandlers:
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: ""
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: runc
+- apiVersion: v1
+  kind: Node
+  metadata:
+    annotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"42:d6:1c:3f:58:78"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 172.16.200.10
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      management.cattle.io/pod-limits: '{"cpu":"17500m","memory":"13440Mi"}'
+      management.cattle.io/pod-requests: '{"cpu":"1685m","memory":"3630Mi","pods":"19"}'
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      cloud: oci
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: oci-e5-node1
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+      topology.kubernetes.io/zone: oci-frankfurt
+    name: oci-e5-node1
+  spec:
+    podCIDR: 10.244.3.0/24
+    podCIDRs:
+    - 10.244.3.0/24
+  status:
+    addresses:
+    - address: 172.16.200.10
+      type: InternalIP
+    - address: oci-e5-node1
+      type: Hostname
+    allocatable:
+      cpu: 7600m
+      ephemeral-storage: "75755002134"
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 10233108Ki
+      pods: "110"
+    capacity:
+      cpu: "8"
+      ephemeral-storage: 84824Mi
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 11769108Ki
+      pods: "110"
+    conditions:
+    - lastHeartbeatTime: "2026-04-20T12:00:24Z"
+      lastTransitionTime: "2026-04-20T12:00:24Z"
+      message: Flannel is running on this node
+      reason: FlannelIsUp
+      status: "False"
+      type: NetworkUnavailable
+    - lastHeartbeatTime: "2026-04-22T08:22:52Z"
+      lastTransitionTime: "2026-04-20T12:00:18Z"
+      message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - lastHeartbeatTime: "2026-04-22T08:22:52Z"
+      lastTransitionTime: "2026-04-20T12:00:18Z"
+      message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - lastHeartbeatTime: "2026-04-22T08:22:52Z"
+      lastTransitionTime: "2026-04-20T12:00:18Z"
+      message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - lastHeartbeatTime: "2026-04-22T08:22:52Z"
+      lastTransitionTime: "2026-04-20T12:00:18Z"
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+    images:
+    - names:
+      - gcr.io/ml-pipeline/visualization-server@sha256:6b9ce7e205ee6f2438f96b7bcaa5b0737a66172585d33b92d867f8e79fbe3da5
+      - gcr.io/ml-pipeline/visualization-server:2.3.0
+      sizeBytes: 1558946485
+    - names:
+      - docker.io/rancher/rancher@sha256:4b1eea4c10ac2af1765a3036310fd77433a8fe42e25504843c8cfe2784c45a82
+      - docker.io/rancher/rancher:v2.13.3
+      sizeBytes: 819202844
+    - names:
+      - gcr.io/ml-pipeline/metadata-writer@sha256:9bcfd2abc361bd98a40801d17cfbbfa123bec1082d3cecf5ccda817e2182c565
+      - gcr.io/ml-pipeline/metadata-writer:2.3.0
+      sizeBytes: 415224519
+    - names:
+      - docker.io/mattermost/mattermost-team-edition@sha256:88565cb169f3ca5e6303db3f99c98297763b3fc606fa464f9382393b328ecdb9
+      - docker.io/mattermost/mattermost-team-edition:latest
+      sizeBytes: 411309566
+    - names:
+      - docker.io/library/python@sha256:eedf63967cdb57d8214db38ce21f105003ed4e4d0358f02bedc057341bcf92a0
+      - docker.io/library/python:3.7
+      sizeBytes: 372694260
+    - names:
+      - docker.io/n8nio/n8n@sha256:ad20607cdd24bac004ec44804b6b8ded9a2fbf92ed46c4496bf007762c883af2
+      sizeBytes: 313962927
+    - names:
+      - docker.io/alpine/k8s@sha256:d489e3c7a6221af7394bc54a1498b641ada49ca51c344630966a62411b91a3df
+      - docker.io/alpine/k8s:1.31.2
+      sizeBytes: 312321011
+    - names:
+      - docker.io/n8nio/n8n@sha256:331ce55da625364978ef7ffcc12f1355c4bee6363ba955a7a45c7eb2121d35f7
+      - docker.io/n8nio/n8n:latest
+      sizeBytes: 304351285
+    - names:
+      - docker.io/jenkins/jenkins@sha256:7004d07dbcdc5439fdad8853acdb029c5e3ab7a3d8190184fbf89bec66786c02
+      - docker.io/jenkins/jenkins:2.555.1-jdk21
+      sizeBytes: 292175576
+    - names:
+      - docker.io/jenkins/jenkins@sha256:c4098086090ca98491d4bf66182f5e3b015a8232f2acf2df209a212a5801aa8e
+      - docker.io/jenkins/jenkins:2.541.3-jdk21
+      sizeBytes: 288472368
+    - names:
+      - docker.io/signoz/zookeeper@sha256:fcc4a3288154ccaa3bdb5ae6dc10180c084d29a8a6a26b62ac8e30a8940dc2e6
+      - docker.io/signoz/zookeeper:3.7.1
+      sizeBytes: 273559719
+    - names:
+      - docker.io/grafana/grafana@sha256:83749231c3835e390a3144e5e940203e42b9589761f20ef3169c716e734ad505
+      - docker.io/grafana/grafana:12.4.2
+      sizeBytes: 213873728
+    - names:
+      - docker.io/signoz/signoz-otel-collector@sha256:cc3e1559f0968f10a27977323c20323ca072ea3858af2233263e82532d551516
+      - docker.io/signoz/signoz-otel-collector:v0.144.2
+      sizeBytes: 200686388
+    - names:
+      - 10.132.0.2:30500/ml-pipeline/frontend@sha256:80a7b092359ce1dae8c76853cc6920c4095b71c97a1b48b5c0e145a76d56a489
+      - 10.132.0.2:30500/ml-pipeline/frontend:2.3.0
+      sizeBytes: 164499229
+    - names:
+      - docker.io/library/postgres@sha256:5a65324fe84dc41709ff914e90b07f3e2f577073ed27bf917d4873aca0c9ec51
+      - docker.io/library/postgres:16
+      sizeBytes: 160152079
+    - names:
+      - gcr.io/ml-pipeline/api-server@sha256:ffe711a7777ceafe509df4964f50bcd25e64fba440c71440a90280fee5f15e84
+      - gcr.io/ml-pipeline/api-server:2.2.0
+      sizeBytes: 157367074
+    - names:
+      - quay.io/prometheus/prometheus@sha256:cd37346c974517be59bd528c43cfff51727fb75393df0ad8d10ce10013a047b6
+      - quay.io/prometheus/prometheus:v3.11.2
+      sizeBytes: 152918965
+    - names:
+      - docker.io/jenkins/inbound-agent@sha256:808b6089af2afcc179922cb2072b532f63ce46e050b285c94655d9522045dbce
+      - docker.io/jenkins/inbound-agent:3355.v388858a_47b_33-3-jdk21
+      sizeBytes: 151085178
+    - names:
+      - docker.io/zabbix/zabbix-web-nginx-pgsql@sha256:7f09e08a65bebcc9078c4684968ebfdae8fde272de21be00b14f9a5c76162ad0
+      - docker.io/zabbix/zabbix-web-nginx-pgsql:ubuntu-7.0.16
+      sizeBytes: 150183789
+    - names:
+      - docker.io/zabbix/zabbix-web-nginx-pgsql@sha256:fd10899aa6f30ed356a98a2a4cabfa1822a76287cdcb85913451d3b176c914b4
+      - docker.io/zabbix/zabbix-web-nginx-pgsql:ubuntu-7.0.25
+      sizeBytes: 137370311
+    - names:
+      - docker.io/rancher/fleet@sha256:5f46325a7713a04bf350aa41005d7cbd497d47d7f8fc02e6a3d98f72e454acad
+      - docker.io/rancher/fleet:v0.14.3
+      sizeBytes: 111998288
+    - names:
+      - gcr.io/ml-pipeline/metadata-envoy@sha256:e8e263a919ffa0e46b633a124107b19fb3d398d7821f24e5d25584fd9a77bd5e
+      - gcr.io/ml-pipeline/metadata-envoy:2.3.0
+      sizeBytes: 111761696
+    - names:
+      - registry.k8s.io/ingress-nginx/controller@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
+      - registry.k8s.io/ingress-nginx/controller:v1.12.1
+      sizeBytes: 105504277
+    - names:
+      - docker.io/kserve/models-web-app@sha256:04829025b3ed4f2aad7029f6a596aa4cae5bf6dee2012af4e1eaf14696905647
+      - docker.io/kserve/models-web-app:v0.13.0-rc.0
+      sizeBytes: 102614155
+    - names:
+      - docker.io/kubeflownotebookswg/jupyter-web-app@sha256:afb52057c997593e1de5f721e361e11cfc1d864c43cdc56085775c54cf29a971
+      - docker.io/kubeflownotebookswg/jupyter-web-app:v1.9.2
+      sizeBytes: 101668244
+    - names:
+      - docker.io/kubeflownotebookswg/volumes-web-app@sha256:f63c3e550af3d62a80eacc9e54a5053920721f6b5a04b40c542909286222eae7
+      - docker.io/kubeflownotebookswg/volumes-web-app:v1.9.2
+      sizeBytes: 101596821
+    - names:
+      - docker.io/istio/proxyv2@sha256:57621adeb78e67c52e34ec1676d1ae898b252134838d60298c7446d0964551cc
+      - docker.io/istio/proxyv2:1.22.1
+      sizeBytes: 100203938
+    - names:
+      - ghcr.io/headlamp-k8s/headlamp@sha256:89c6c65810bfde61796483c93c70d659104355593792bf55cab680d685da8eeb
+      - ghcr.io/headlamp-k8s/headlamp:latest
+      sizeBytes: 95113756
+    - names:
+      - docker.io/otel/opentelemetry-collector-contrib@sha256:faf125d656fa47cea568b2f3b4494efd2525083bc75c1e96038bc23f05cd68fd
+      - docker.io/otel/opentelemetry-collector-contrib:0.139.0
+      sizeBytes: 92481504
+    - names:
+      - docker.io/zabbix/zabbix-server-pgsql@sha256:09673227a30995075f28b8f66ee3d8ecf1384ece479d9638b7ef26ce9eb28b32
+      - docker.io/zabbix/zabbix-server-pgsql:ubuntu-7.0.25
+      sizeBytes: 91447064
+    - names:
+      - docker.io/zabbix/zabbix-server-pgsql@sha256:8427b6f70b85787a0f5efa8cbafc31707ae7b94d7404b2f7fc65d3963f81e622
+      - docker.io/zabbix/zabbix-server-pgsql:ubuntu-7.0.16
+      sizeBytes: 90751614
+    - names:
+      - docker.io/kubeflownotebookswg/tensorboards-web-app@sha256:77f07f52a84a15d1587df903832e833c1549a1b44ceab04c4fe46dc936b27ca5
+      - docker.io/kubeflownotebookswg/tensorboards-web-app:v1.9.2
+      sizeBytes: 86705596
+    - names:
+      - docker.io/bitnami/kubectl@sha256:175d3e94e675f4d078c60fe097087a2d77dbc9f76d49d4185c83ca79489c2a46
+      - docker.io/bitnami/kubectl:latest
+      sizeBytes: 78135604
+    - names:
+      - docker.io/velero/velero@sha256:c14904c6f93d129f5ba1fad1a0bbbb20a71f5a003a3cc615313097c7f49eb3e0
+      - docker.io/velero/velero:v1.14.1
+      sizeBytes: 64561226
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:4a84f14b76fdc317dccfad1d92a8e09b650127adc79e3c7d40d4ca802dda3a1f
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.25
+      sizeBytes: 56714014
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:9c8f5a668b9f20c44693c3244bcfd7df650907cd91e7cec1ef0e2aa27b51c0fc
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.16
+      sizeBytes: 55715265
+    - names:
+      - ghcr.io/k8up-io/k8up@sha256:dac99f13d860d7beb077da31928ced08ccbbe769e8394371bae8fee3d53681fb
+      - ghcr.io/k8up-io/k8up:v2.15.0
+      sizeBytes: 55519032
+    - names:
+      - docker.io/kubeflowkatib/katib-ui@sha256:7a41c508deb1f9c41ee27723c2dcddaf8d4f0832acab0254dac3a2b16f7a924f
+      - docker.io/kubeflowkatib/katib-ui:v0.17.0
+      sizeBytes: 51076788
+    - names:
+      - gcr.io/ml-pipeline/viewer-crd-controller@sha256:8cf8213d69e40e0af1bb7258a095486f309a82d510ae0439992b0db8b357de7c
+      - gcr.io/ml-pipeline/viewer-crd-controller:2.3.0
+      sizeBytes: 47280422
+    - names:
+      - docker.io/library/python@sha256:233de06753d30d120b1a3ce359d8d3be8bda78524cd8f520c99883bfe33964cf
+      - docker.io/library/python:3.11-slim
+      sizeBytes: 45453380
+    - names:
+      - docker.io/library/python@sha256:804ddf3251a60bbf9c92e73b7566c40428d54d0e79d3428194edf40da6521286
+      - docker.io/library/python:3.12-slim
+      sizeBytes: 43199948
+    - names:
+      - gcr.io/ml-pipeline/scheduledworkflow@sha256:f7e67e0bc071de53bc14ff136ff4e78c3a20411852033b8d5ae8649d05516300
+      - gcr.io/ml-pipeline/scheduledworkflow:2.3.0
+      sizeBytes: 37433659
+    - names:
+      - quay.io/prometheus/alertmanager@sha256:58e117eabccebbff04e6643a3432d6315a2cc3a8c24ab5849bc628886bf08857
+      - quay.io/prometheus/alertmanager:v0.32.0
+      sizeBytes: 36168424
+    - names:
+      - gcr.io/ml-pipeline/workflow-controller@sha256:4c978c30d1779c0498bede029d8895fe47be888ca22f9072808af0e5e7dc6782
+      - gcr.io/ml-pipeline/workflow-controller:v3.4.17-license-compliance
+      sizeBytes: 36159592
+    - names:
+      - gcr.io/ml-pipeline/cache-server@sha256:293941ee4f65ac9da756da3b828095d52fb14204ac5cd888afcba01e714d57c1
+      - gcr.io/ml-pipeline/cache-server:2.3.0
+      sizeBytes: 35593219
+    - names:
+      - docker.io/velero/velero-plugin-for-aws@sha256:fdf710a65c6ead48b1018cda19360943abe17ca8c3e9ef5ab7be73a63b99a6d3
+      - docker.io/velero/velero-plugin-for-aws:v1.10.1
+      sizeBytes: 35062012
+    - names:
+      - gcr.io/ml-pipeline/persistenceagent@sha256:109ac1b38c413e70d0cb6d2a83215c6b1db7f5f3284019ccb4dbbfe121f64d84
+      - gcr.io/ml-pipeline/persistenceagent:2.3.0
+      sizeBytes: 34801074
+    - names:
+      - ghcr.io/flannel-io/flannel@sha256:3726b7dd2f758f1cc8155edc442e7f3fbad68cf42530d6bcb3ddffdba40a1394
+      - ghcr.io/flannel-io/flannel:v0.28.2
+      sizeBytes: 34432254
+    - names:
+      - docker.io/kubeflownotebookswg/profile-controller@sha256:f05a5538ae7ed2851cdfd86d8d7647691cb1b9568b5574c015908db1f4d83135
+      - docker.io/kubeflownotebookswg/profile-controller:v1.9.2
+      sizeBytes: 33898911
+    - names:
+      - ghcr.io/dexidp/dex@sha256:2c07866020c0058589456850a516785adba5992caf4efa02f96ec0a92593f940
+      - ghcr.io/dexidp/dex:v2.39.1
+      sizeBytes: 33627974
+    nodeInfo:
+      architecture: amd64
+      bootID: 77a5d50b-a555-4d09-98a6-220eb5a9dcf4
+      containerRuntimeVersion: containerd://2.2.3
+      kernelVersion: 6.12.0-201.74.2.1.el9uek.x86_64
+      kubeProxyVersion: v1.32.13
+      kubeletVersion: v1.32.13
+      machineID: f6e50a67da6e4469bfc08c323eb4d064
+      operatingSystem: linux
+      osImage: Oracle Linux Server 9.7
+      systemUUID: f6e50a67-da6e-4469-bfc0-8c323eb4d064
+    runtimeHandlers:
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: ""
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: runc
+- apiVersion: v1
+  kind: Node
+  metadata:
+    annotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"16:54:0e:22:4b:41"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 172.16.200.11
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      management.cattle.io/pod-limits: '{"cpu":"27300m","memory":"20896Mi"}'
+      management.cattle.io/pod-requests: '{"cpu":"3420m","memory":"5462Mi","pods":"41"}'
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      cloud: oci
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: oci-e5-node2
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+      topology.kubernetes.io/zone: oci-frankfurt
+    name: oci-e5-node2
+  spec:
+    podCIDR: 10.244.4.0/24
+    podCIDRs:
+    - 10.244.4.0/24
+  status:
+    addresses:
+    - address: 172.16.200.11
+      type: InternalIP
+    - address: oci-e5-node2
+      type: Hostname
+    allocatable:
+      cpu: 7600m
+      ephemeral-storage: "75755002134"
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 10233116Ki
+      pods: "110"
+    capacity:
+      cpu: "8"
+      ephemeral-storage: 84824Mi
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 11769116Ki
+      pods: "110"
+    conditions:
+    - lastHeartbeatTime: "2026-04-18T04:56:28Z"
+      lastTransitionTime: "2026-04-18T04:56:28Z"
+      message: Flannel is running on this node
+      reason: FlannelIsUp
+      status: "False"
+      type: NetworkUnavailable
+    - lastHeartbeatTime: "2026-04-22T08:22:36Z"
+      lastTransitionTime: "2026-04-18T04:56:21Z"
+      message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - lastHeartbeatTime: "2026-04-22T08:22:36Z"
+      lastTransitionTime: "2026-04-18T04:56:21Z"
+      message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - lastHeartbeatTime: "2026-04-22T08:22:36Z"
+      lastTransitionTime: "2026-04-18T04:56:21Z"
+      message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - lastHeartbeatTime: "2026-04-22T08:22:36Z"
+      lastTransitionTime: "2026-04-18T04:56:21Z"
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+    images:
+    - names:
+      - gcr.io/ml-pipeline/visualization-server@sha256:6b9ce7e205ee6f2438f96b7bcaa5b0737a66172585d33b92d867f8e79fbe3da5
+      - gcr.io/ml-pipeline/visualization-server:2.3.0
+      sizeBytes: 1558946485
+    - names:
+      - docker.io/kubeflownotebookswg/jupyter-scipy@sha256:b58efa2ea70d1c960e1056f3eed4ca908fa95cba010ffdbf515762d74f54134b
+      - docker.io/kubeflownotebookswg/jupyter-scipy:v1.9.2
+      sizeBytes: 1317803331
+    - names:
+      - 10.132.0.2:30500/aiot/aiot-python-runtime@sha256:916c134fb764993f07f06b5f35360b1e73e75c86b8f600d51ab70c327e314d79
+      - 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+      sizeBytes: 901923744
+    - names:
+      - docker.io/rancher/rancher-agent@sha256:1898876ab36c047fdc4fe9d64dc3820be5e7c8ab301554e4f266b19e1870b4a3
+      - docker.io/rancher/rancher-agent:v2.13.3
+      sizeBytes: 525277518
+    - names:
+      - gcr.io/ml-pipeline/metadata-writer@sha256:9bcfd2abc361bd98a40801d17cfbbfa123bec1082d3cecf5ccda817e2182c565
+      - gcr.io/ml-pipeline/metadata-writer:2.3.0
+      sizeBytes: 415224519
+    - names:
+      - docker.io/library/python@sha256:eedf63967cdb57d8214db38ce21f105003ed4e4d0358f02bedc057341bcf92a0
+      - docker.io/library/python:3.7
+      sizeBytes: 372694260
+    - names:
+      - docker.io/alpine/k8s@sha256:d489e3c7a6221af7394bc54a1498b641ada49ca51c344630966a62411b91a3df
+      - docker.io/alpine/k8s:1.31.2
+      sizeBytes: 312321011
+    - names:
+      - docker.io/zabbix/zabbix-web-service@sha256:8276e15547fd30f5f39ba38b4ec5cf78e91f4b14a69bf25e9f892d1f1d27275c
+      - docker.io/zabbix/zabbix-web-service:ubuntu-7.0.25
+      sizeBytes: 257895072
+    - names:
+      - docker.io/zabbix/zabbix-web-service@sha256:b3e3f215e640db636dae80d71e11efab1e868915f0679102d5efa38b129f3a0f
+      - docker.io/zabbix/zabbix-web-service:ubuntu-7.0.16
+      sizeBytes: 253639442
+    - names:
+      - ghcr.io/cloudnative-pg/postgresql@sha256:2bc26604d2f0650f9b98668a51a95679c02024860d512ace92e7fcf69da7d611
+      - ghcr.io/cloudnative-pg/postgresql:16
+      sizeBytes: 252779733
+    - names:
+      - docker.io/clickhouse/clickhouse-server@sha256:4536143e22dc9bddb217c7e610f6b7ed5e6efd8fefdbc61acdeadb5d8022213a
+      - docker.io/clickhouse/clickhouse-server:25.5.6
+      sizeBytes: 204958820
+    - names:
+      - docker.io/signoz/signoz-otel-collector@sha256:cc3e1559f0968f10a27977323c20323ca072ea3858af2233263e82532d551516
+      - docker.io/signoz/signoz-otel-collector:v0.144.2
+      sizeBytes: 200686388
+    - names:
+      - docker.io/chef/inspec@sha256:aab713a664a72860e11ee993adf0f43420ab37205448f7f269ab15620ccda0ed
+      - docker.io/chef/inspec:5.22.65
+      sizeBytes: 172451192
+    - names:
+      - docker.io/library/postgres@sha256:5a65324fe84dc41709ff914e90b07f3e2f577073ed27bf917d4873aca0c9ec51
+      - docker.io/library/postgres:16
+      sizeBytes: 160152079
+    - names:
+      - docker.io/jenkins/inbound-agent@sha256:808b6089af2afcc179922cb2072b532f63ce46e050b285c94655d9522045dbce
+      - docker.io/jenkins/inbound-agent:3355.v388858a_47b_33-3-jdk21
+      sizeBytes: 151085178
+    - names:
+      - docker.io/rancher/fleet@sha256:5f46325a7713a04bf350aa41005d7cbd497d47d7f8fc02e6a3d98f72e454acad
+      - docker.io/rancher/fleet:v0.14.3
+      sizeBytes: 111998288
+    - names:
+      - gcr.io/ml-pipeline/metadata-envoy@sha256:e8e263a919ffa0e46b633a124107b19fb3d398d7821f24e5d25584fd9a77bd5e
+      - gcr.io/ml-pipeline/metadata-envoy:2.3.0
+      sizeBytes: 111761696
+    - names:
+      - registry.k8s.io/ingress-nginx/controller@sha256:d2fbc4ec70d8aa2050dd91a91506e998765e86c96f32cffb56c503c9c34eed5b
+      - registry.k8s.io/ingress-nginx/controller:v1.12.1
+      sizeBytes: 105504277
+    - names:
+      - docker.io/kserve/models-web-app@sha256:04829025b3ed4f2aad7029f6a596aa4cae5bf6dee2012af4e1eaf14696905647
+      - docker.io/kserve/models-web-app:v0.13.0-rc.0
+      sizeBytes: 102614155
+    - names:
+      - docker.io/kubeflownotebookswg/jupyter-web-app@sha256:afb52057c997593e1de5f721e361e11cfc1d864c43cdc56085775c54cf29a971
+      - docker.io/kubeflownotebookswg/jupyter-web-app:v1.9.2
+      sizeBytes: 101668244
+    - names:
+      - docker.io/kubeflownotebookswg/volumes-web-app@sha256:f63c3e550af3d62a80eacc9e54a5053920721f6b5a04b40c542909286222eae7
+      - docker.io/kubeflownotebookswg/volumes-web-app:v1.9.2
+      sizeBytes: 101596821
+    - names:
+      - docker.io/istio/proxyv2@sha256:57621adeb78e67c52e34ec1676d1ae898b252134838d60298c7446d0964551cc
+      - docker.io/istio/proxyv2:1.22.1
+      sizeBytes: 100203938
+    - names:
+      - docker.io/otel/opentelemetry-collector-contrib@sha256:faf125d656fa47cea568b2f3b4494efd2525083bc75c1e96038bc23f05cd68fd
+      - docker.io/otel/opentelemetry-collector-contrib:0.139.0
+      sizeBytes: 92481504
+    - names:
+      - docker.io/dserio83/velero-watchdog@sha256:d5deae5892290b187817f690ee24db4d6d64723f4c5f52b828f2ecffef403d94
+      - docker.io/dserio83/velero-watchdog:0.1.8
+      sizeBytes: 91957039
+    - names:
+      - docker.io/zabbix/zabbix-server-pgsql@sha256:09673227a30995075f28b8f66ee3d8ecf1384ece479d9638b7ef26ce9eb28b32
+      - docker.io/zabbix/zabbix-server-pgsql:ubuntu-7.0.25
+      sizeBytes: 91447064
+    - names:
+      - docker.io/kubeflownotebookswg/tensorboards-web-app@sha256:77f07f52a84a15d1587df903832e833c1549a1b44ceab04c4fe46dc936b27ca5
+      - docker.io/kubeflownotebookswg/tensorboards-web-app:v1.9.2
+      sizeBytes: 86705596
+    - names:
+      - docker.io/bitnami/kubectl@sha256:8affbdae5326dc4d3dab460a0ae70ee6ee47110d8294c5c0d9cdabcf43ca4a8c
+      - docker.io/bitnami/kubectl:latest
+      sizeBytes: 77353940
+    - names:
+      - gcr.io/tfx-oss-public/ml_metadata_store_server@sha256:51404ef4419c1426da80f3e14a83dcb55f65bb5a971371d36d14cec1e50af830
+      - gcr.io/tfx-oss-public/ml_metadata_store_server:1.14.0
+      sizeBytes: 70679133
+    - names:
+      - docker.io/velero/velero@sha256:c14904c6f93d129f5ba1fad1a0bbbb20a71f5a003a3cc615313097c7f49eb3e0
+      - docker.io/velero/velero:v1.14.1
+      sizeBytes: 64561226
+    - names:
+      - docker.io/kubeflownotebookswg/centraldashboard@sha256:af55c22ef5de242f54442137f2b321e890b7cbf4030ab9486dc68f19fc47fdf0
+      - docker.io/kubeflownotebookswg/centraldashboard:v1.9.2
+      sizeBytes: 64149433
+    - names:
+      - docker.io/signoz/signoz@sha256:1e608f65588c1cebe84dd6cfbd0242ba14ebb54598d0edbdb9045112f561cc0f
+      - docker.io/signoz/signoz:v0.117.1
+      sizeBytes: 60914731
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:4a84f14b76fdc317dccfad1d92a8e09b650127adc79e3c7d40d4ca802dda3a1f
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.25
+      sizeBytes: 56714014
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:9c8f5a668b9f20c44693c3244bcfd7df650907cd91e7cec1ef0e2aa27b51c0fc
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.16
+      sizeBytes: 55715265
+    - names:
+      - docker.io/kubeflowkatib/katib-ui@sha256:7a41c508deb1f9c41ee27723c2dcddaf8d4f0832acab0254dac3a2b16f7a924f
+      - docker.io/kubeflowkatib/katib-ui:v0.17.0
+      sizeBytes: 51076788
+    - names:
+      - quay.io/argoproj/argoexec@sha256:80a82145d4abd2e467b1151d98f55252e6f8c6eeae0ca58ef398e1b0090080a3
+      - quay.io/argoproj/argoexec:v3.4.17
+      sizeBytes: 47910402
+    - names:
+      - gcr.io/ml-pipeline/viewer-crd-controller@sha256:8cf8213d69e40e0af1bb7258a095486f309a82d510ae0439992b0db8b357de7c
+      - gcr.io/ml-pipeline/viewer-crd-controller:2.3.0
+      sizeBytes: 47280422
+    - names:
+      - docker.io/library/python@sha256:233de06753d30d120b1a3ce359d8d3be8bda78524cd8f520c99883bfe33964cf
+      - docker.io/library/python:3.11-slim
+      sizeBytes: 45453380
+    - names:
+      - docker.io/library/python@sha256:804ddf3251a60bbf9c92e73b7566c40428d54d0e79d3428194edf40da6521286
+      - docker.io/library/python:3.12-slim
+      sizeBytes: 43199948
+    - names:
+      - docker.io/hashicorp/terraform@sha256:18f9986038bbaf02cf49db9c09261c778161c51dcc7fb7e355ae8938459428cd
+      - docker.io/hashicorp/terraform:1.9.8
+      sizeBytes: 40449658
+    - names:
+      - gcr.io/ml-pipeline/scheduledworkflow@sha256:f7e67e0bc071de53bc14ff136ff4e78c3a20411852033b8d5ae8649d05516300
+      - gcr.io/ml-pipeline/scheduledworkflow:2.3.0
+      sizeBytes: 37433659
+    - names:
+      - ghcr.io/cloudnative-pg/cloudnative-pg@sha256:b5210df46c05bed3c5dbb67d316dece0ed67f4d148acac169416079dc10e4a91
+      - ghcr.io/cloudnative-pg/cloudnative-pg:1.25.1
+      sizeBytes: 35807663
+    - names:
+      - ghcr.io/flannel-io/flannel@sha256:3726b7dd2f758f1cc8155edc442e7f3fbad68cf42530d6bcb3ddffdba40a1394
+      - ghcr.io/flannel-io/flannel:v0.28.2
+      sizeBytes: 34432254
+    - names:
+      - docker.io/kubeflownotebookswg/profile-controller@sha256:f05a5538ae7ed2851cdfd86d8d7647691cb1b9568b5574c015908db1f4d83135
+      - docker.io/kubeflownotebookswg/profile-controller:v1.9.2
+      sizeBytes: 33898911
+    - names:
+      - ghcr.io/dexidp/dex@sha256:2c07866020c0058589456850a516785adba5992caf4efa02f96ec0a92593f940
+      - ghcr.io/dexidp/dex:v2.39.1
+      sizeBytes: 33627974
+    - names:
+      - docker.io/kubeflowkatib/katib-controller@sha256:72f14e03b9e107fe5f5e326c702b69c2ed010fdfb3dae7ef37d0aea382874db1
+      - docker.io/kubeflowkatib/katib-controller:v0.17.0
+      sizeBytes: 33397120
+    - names:
+      - gcr.io/ml-pipeline/kfp-driver@sha256:3c0665cd36aa87e4359a4c8b6271dcba5bdd817815cd0496ed12eb5dde5fd2ec
+      sizeBytes: 33202664
+    - names:
+      - docker.io/kubeflownotebookswg/notebook-controller@sha256:0f14bd28fdd5a6a29c0b0db23c780d495777176d037d133c5fd7470b11320905
+      - docker.io/kubeflownotebookswg/notebook-controller:v1.9.2
+      sizeBytes: 31161254
+    - names:
+      - registry.k8s.io/kube-proxy@sha256:03e2b38f5bebd4eb70962d8834b4aa1625ee8566cdefddc2e979c94dcf1a2bbb
+      - registry.k8s.io/kube-proxy:v1.32.13
+      sizeBytes: 31053149
+    - names:
+      - docker.io/kserve/kserve-controller@sha256:8a1a71bb5ff11c4fba01541f2d8d869752cbbd5f50cd785adf07aa76c8c3351c
+      - docker.io/kserve/kserve-controller:v0.13.1
+      sizeBytes: 30617081
+    - names:
+      - docker.io/kubeflow/training-operator@sha256:dabb76dbda29ff822e5f08d7c130505b2ed17ee29c60af4185efc756a166c915
+      - docker.io/kubeflow/training-operator:v1-04f9f13
+      sizeBytes: 28737687
+    nodeInfo:
+      architecture: amd64
+      bootID: ac2220ff-7864-4002-ba35-179c34a1cf26
+      containerRuntimeVersion: containerd://2.2.3
+      kernelVersion: 6.12.0-201.74.2.1.el9uek.x86_64
+      kubeProxyVersion: v1.32.13
+      kubeletVersion: v1.32.13
+      machineID: 18e71302b64b4451b5e153beadcc1b77
+      operatingSystem: linux
+      osImage: Oracle Linux Server 9.7
+      systemUUID: 18e71302-b64b-4451-b5e1-53beadcc1b77
+    runtimeHandlers:
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: ""
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: runc
+- apiVersion: v1
+  kind: Node
+  metadata:
+    annotations:
+      flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"7e:58:56:97:4a:96"}'
+      flannel.alpha.coreos.com/backend-type: vxlan
+      flannel.alpha.coreos.com/kube-subnet-manager: "true"
+      flannel.alpha.coreos.com/public-ip: 172.16.200.12
+      kubeadm.alpha.kubernetes.io/cri-socket: unix:///var/run/containerd/containerd.sock
+      management.cattle.io/pod-limits: '{"cpu":"3","memory":"2176Mi"}'
+      management.cattle.io/pod-requests: '{"cpu":"730m","memory":"1334Mi","pods":"8"}'
+      node.alpha.kubernetes.io/ttl: "0"
+      volumes.kubernetes.io/controller-managed-attach-detach: "true"
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      cloud: oci
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: oci-test-node1
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/ml-training: ""
+      topology.kubernetes.io/zone: oci-frankfurt
+    name: oci-test-node1
+  spec:
+    podCIDR: 10.244.5.0/24
+    podCIDRs:
+    - 10.244.5.0/24
+    taints:
+    - effect: NoSchedule
+      key: dedicated
+      value: ml-training
+  status:
+    addresses:
+    - address: 172.16.200.12
+      type: InternalIP
+    - address: oci-test-node1
+      type: Hostname
+    allocatable:
+      cpu: 1600m
+      ephemeral-storage: "24152480107"
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 10236204Ki
+      pods: "110"
+    capacity:
+      cpu: "2"
+      ephemeral-storage: 30144Mi
+      hugepages-1Gi: "0"
+      hugepages-2Mi: "0"
+      memory: 11772204Ki
+      pods: "110"
+    conditions:
+    - lastHeartbeatTime: "2026-04-18T04:50:30Z"
+      lastTransitionTime: "2026-04-18T04:50:30Z"
+      message: Flannel is running on this node
+      reason: FlannelIsUp
+      status: "False"
+      type: NetworkUnavailable
+    - lastHeartbeatTime: "2026-04-22T08:22:02Z"
+      lastTransitionTime: "2026-04-18T04:50:21Z"
+      message: kubelet has sufficient memory available
+      reason: KubeletHasSufficientMemory
+      status: "False"
+      type: MemoryPressure
+    - lastHeartbeatTime: "2026-04-22T08:22:02Z"
+      lastTransitionTime: "2026-04-18T04:50:21Z"
+      message: kubelet has no disk pressure
+      reason: KubeletHasNoDiskPressure
+      status: "False"
+      type: DiskPressure
+    - lastHeartbeatTime: "2026-04-22T08:22:02Z"
+      lastTransitionTime: "2026-04-18T04:50:21Z"
+      message: kubelet has sufficient PID available
+      reason: KubeletHasSufficientPID
+      status: "False"
+      type: PIDPressure
+    - lastHeartbeatTime: "2026-04-22T08:22:02Z"
+      lastTransitionTime: "2026-04-18T04:50:21Z"
+      message: kubelet is posting ready status
+      reason: KubeletReady
+      status: "True"
+      type: Ready
+    daemonEndpoints:
+      kubeletEndpoint:
+        Port: 10250
+    images:
+    - names:
+      - 10.132.0.2:30500/aiot/aiot-python-runtime@sha256:916c134fb764993f07f06b5f35360b1e73e75c86b8f600d51ab70c327e314d79
+      - 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+      sizeBytes: 901923744
+    - names:
+      - docker.io/tensorflow/tensorflow@sha256:07d837eced57184599f50944a47e10a23584dae666dc93aa9a762b1111651fa7
+      - docker.io/tensorflow/tensorflow:2.5.1
+      sizeBytes: 434597092
+    - names:
+      - docker.io/istio/proxyv2@sha256:57621adeb78e67c52e34ec1676d1ae898b252134838d60298c7446d0964551cc
+      - docker.io/istio/proxyv2:1.22.1
+      sizeBytes: 100203938
+    - names:
+      - docker.io/otel/opentelemetry-collector-contrib@sha256:faf125d656fa47cea568b2f3b4494efd2525083bc75c1e96038bc23f05cd68fd
+      - docker.io/otel/opentelemetry-collector-contrib:0.139.0
+      sizeBytes: 92481504
+    - names:
+      - docker.io/velero/velero@sha256:c14904c6f93d129f5ba1fad1a0bbbb20a71f5a003a3cc615313097c7f49eb3e0
+      - docker.io/velero/velero:v1.14.1
+      sizeBytes: 64561226
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:4a84f14b76fdc317dccfad1d92a8e09b650127adc79e3c7d40d4ca802dda3a1f
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.25
+      sizeBytes: 56714014
+    - names:
+      - docker.io/zabbix/zabbix-agent2@sha256:9c8f5a668b9f20c44693c3244bcfd7df650907cd91e7cec1ef0e2aa27b51c0fc
+      - docker.io/zabbix/zabbix-agent2:ubuntu-7.0.16
+      sizeBytes: 55715265
+    - names:
+      - docker.io/library/python@sha256:233de06753d30d120b1a3ce359d8d3be8bda78524cd8f520c99883bfe33964cf
+      - docker.io/library/python:3.11-slim
+      sizeBytes: 45453380
+    - names:
+      - ghcr.io/flannel-io/flannel@sha256:3726b7dd2f758f1cc8155edc442e7f3fbad68cf42530d6bcb3ddffdba40a1394
+      - ghcr.io/flannel-io/flannel:v0.28.2
+      sizeBytes: 34432254
+    - names:
+      - registry.k8s.io/kube-proxy@sha256:03e2b38f5bebd4eb70962d8834b4aa1625ee8566cdefddc2e979c94dcf1a2bbb
+      - registry.k8s.io/kube-proxy:v1.32.13
+      sizeBytes: 31053149
+    - names:
+      - quay.io/prometheus/node-exporter@sha256:0f422f62c15f154af8d8572b23d623aebfb10cec73a5c654d18f911f3f9df241
+      - quay.io/prometheus/node-exporter:v1.11.1
+      sizeBytes: 13308798
+    - names:
+      - gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:89e6f90141f1b63405883fbb4de0d3b6d80f8b77e530904c4d29bdcd1dc5a167
+      sizeBytes: 10903423
+    - names:
+      - ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python@sha256:7af626758480d97ae2bc0472fb8e08d936c372c8436c070732e4c5f5d41751af
+      - ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.60b1
+      sizeBytes: 10840504
+    - names:
+      - ghcr.io/flannel-io/flannel-cni-plugin@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa
+      - ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1
+      sizeBytes: 5142124
+    - names:
+      - registry.k8s.io/pause@sha256:278fb9dbcca9518083ad1e11276933a2e96f23de604a3a08cc3c80002767d24c
+      - registry.k8s.io/pause:3.10.1
+      sizeBytes: 320448
+    nodeInfo:
+      architecture: amd64
+      bootID: e044a65f-c6fa-4d1f-b411-de53ebfdd9a2
+      containerRuntimeVersion: containerd://2.2.3
+      kernelVersion: 6.12.0-201.74.2.1.el9uek.x86_64
+      kubeProxyVersion: v1.32.13
+      kubeletVersion: v1.32.13
+      machineID: c17c930dee42429ba93b9c73dcec39f7
+      operatingSystem: linux
+      osImage: Oracle Linux Server 9.7
+      systemUUID: c17c930d-ee42-429b-a93b-9c73dcec39f7
+    runtimeHandlers:
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: ""
+    - features:
+        recursiveReadOnlyMounts: true
+        userNamespaces: true
+      name: runc
+kind: List
+metadata:

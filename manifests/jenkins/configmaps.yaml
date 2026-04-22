@@ -1,0 +1,266 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: jenkins
+- apiVersion: v1
+  data:
+    apply_config.sh: |-
+      set -e
+      echo "disable Setup Wizard"
+      # Prevent Setup Wizard when JCasC is enabled
+      echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.UpgradeWizard.state
+      echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.InstallUtil.lastExecVersion
+      echo "download plugins"
+      # Install missing plugins
+      cp /var/jenkins_config/plugins.txt /var/jenkins_home;
+      rm -rf /usr/share/jenkins/ref/plugins/*.lock
+      version () { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+      if [ -f "/usr/share/jenkins/jenkins.war" ] && [ -n "$(command -v jenkins-plugin-cli)" 2>/dev/null ] && [ $(version $(jenkins-plugin-cli --version)) -ge $(version "2.1.1") ]; then
+        jenkins-plugin-cli --verbose --war "/usr/share/jenkins/jenkins.war" --plugin-file "/var/jenkins_home/plugins.txt" --latest true;
+      else
+        /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`;
+      fi
+      echo "copy plugins to shared volume"
+      # Copy plugins to shared volume
+      yes n | cp -i /usr/share/jenkins/ref/plugins/* /var/jenkins_plugins/;
+      echo "finished initialization"
+    plugins.txt: |-
+      kubernetes
+      workflow-aggregator
+      git
+      configuration-as-code
+      dark-theme
+      gitea
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"apply_config.sh":"set -e\necho \"disable Setup Wizard\"\n# Prevent Setup Wizard when JCasC is enabled\necho $JENKINS_VERSION \u003e /var/jenkins_home/jenkins.install.UpgradeWizard.state\necho $JENKINS_VERSION \u003e /var/jenkins_home/jenkins.install.InstallUtil.lastExecVersion\necho \"download plugins\"\n# Install missing plugins\ncp /var/jenkins_config/plugins.txt /var/jenkins_home;\nrm -rf /usr/share/jenkins/ref/plugins/*.lock\nversion () { echo \"$@\" | awk -F. '{ printf(\"%d%03d%03d%03d\\n\", $1,$2,$3,$4); }'; }\nif [ -f \"/usr/share/jenkins/jenkins.war\" ] \u0026\u0026 [ -n \"$(command -v jenkins-plugin-cli)\" 2\u003e/dev/null ] \u0026\u0026 [ $(version $(jenkins-plugin-cli --version)) -ge $(version \"2.1.1\") ]; then\n  jenkins-plugin-cli --verbose --war \"/usr/share/jenkins/jenkins.war\" --plugin-file \"/var/jenkins_home/plugins.txt\" --latest true;\nelse\n  /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`;\nfi\necho \"copy plugins to shared volume\"\n# Copy plugins to shared volume\nyes n | cp -i /usr/share/jenkins/ref/plugins/* /var/jenkins_plugins/;\necho \"finished initialization\"","plugins.txt":"kubernetes\nworkflow-aggregator\ngit\nconfiguration-as-code\ndark-theme\ngitea"},"kind":"ConfigMap","metadata":{"annotations":{"meta.helm.sh/release-name":"jenkins","meta.helm.sh/release-namespace":"jenkins"},"creationTimestamp":"2026-04-14T01:29:22Z","labels":{"app.kubernetes.io/component":"jenkins-controller","app.kubernetes.io/instance":"jenkins","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"jenkins","helm.sh/chart":"jenkins-5.9.18"},"name":"jenkins","namespace":"jenkins","resourceVersion":"4758246","uid":"6a6d1fb4-af55-4005-b9df-a46b5b209444"}}
+      meta.helm.sh/release-name: jenkins
+      meta.helm.sh/release-namespace: jenkins
+    labels:
+      app.kubernetes.io/component: jenkins-controller
+      app.kubernetes.io/instance: jenkins
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: jenkins
+      helm.sh/chart: jenkins-5.9.18
+    name: jenkins
+    namespace: jenkins
+- apiVersion: v1
+  data:
+    jcasc-default-config.yaml: |-
+      jenkins:
+        authorizationStrategy:
+          loggedInUsersCanDoAnything:
+            allowAnonymousRead: false
+        securityRealm:
+          local:
+            allowsSignup: false
+            enableCaptcha: false
+            users:
+            - id: "${chart-admin-username}"
+              name: "Jenkins Admin"
+              password: "${chart-admin-password}"
+        disableRememberMe: false
+        mode: NORMAL
+        numExecutors: 0
+        labelString: ""
+        projectNamingStrategy: "standard"
+        markupFormatter:
+          plainText
+        clouds:
+        - kubernetes:
+            containerCapStr: "10"
+            defaultsProviderTemplate: ""
+            connectTimeout: "5"
+            readTimeout: "15"
+            jenkinsUrl: "http://jenkins.jenkins.svc.cluster.local:8080"
+            jenkinsTunnel: "jenkins-agent.jenkins.svc.cluster.local:50000"
+            skipTlsVerify: false
+            usageRestricted: false
+            maxRequestsPerHostStr: "32"
+            retentionTimeout: "5"
+            waitForPodSec: "600"
+            name: "kubernetes"
+            namespace: "jenkins"
+            restrictedPssSecurityContext: false
+            serverUrl: "https://kubernetes.default"
+            credentialsId: ""
+            podLabels:
+            - key: "jenkins/jenkins-jenkins-agent"
+              value: "true"
+            templates:
+              - name: "default"
+                namespace: "jenkins"
+                id: bad56ce76c3a0312a1969d7702f884e938a2ac146244a2fdb558e233960e33e2
+                containers:
+                - name: "jnlp"
+                  alwaysPullImage: false
+                  args: "^${computer.jnlpmac} ^${computer.name}"
+                  envVars:
+                    - envVar:
+                        key: "JENKINS_URL"
+                        value: "http://jenkins.jenkins.svc.cluster.local:8080/"
+                  image: "jenkins/inbound-agent:3355.v388858a_47b_33-19"
+                  privileged: "false"
+                  resourceLimitCpu: 512m
+                  resourceLimitMemory: 512Mi
+                  resourceRequestCpu: 512m
+                  resourceRequestMemory: 512Mi
+                  ttyEnabled: false
+                  workingDir: /home/jenkins/agent
+                idleMinutes: 0
+                instanceCap: 2147483647
+                label: "jenkins-jenkins-agent "
+                nodeUsageMode: "NORMAL"
+                podRetention: Never
+                showRawYaml: true
+                serviceAccount: "default"
+                slaveConnectTimeoutStr: "100"
+                yamlMergeStrategy: override
+                inheritYamlMergeStrategy: false
+        slaveAgentPort: 50000
+      security:
+        apiToken:
+          creationOfLegacyTokenEnabled: false
+          tokenGenerationOnCreationEnabled: false
+          usageStatisticsEnabled: true
+      unclassified:
+        location:
+          url: http://jenkins.35.241.255.137.nip.io
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"jcasc-default-config.yaml":"jenkins:\n  authorizationStrategy:\n    loggedInUsersCanDoAnything:\n      allowAnonymousRead: false\n  securityRealm:\n    local:\n      allowsSignup: false\n      enableCaptcha: false\n      users:\n      - id: \"${chart-admin-username}\"\n        name: \"Jenkins Admin\"\n        password: \"${chart-admin-password}\"\n  disableRememberMe: false\n  mode: NORMAL\n  numExecutors: 0\n  labelString: \"\"\n  projectNamingStrategy: \"standard\"\n  markupFormatter:\n    plainText\n  clouds:\n  - kubernetes:\n      containerCapStr: \"10\"\n      defaultsProviderTemplate: \"\"\n      connectTimeout: \"5\"\n      readTimeout: \"15\"\n      jenkinsUrl: \"http://jenkins.jenkins.svc.cluster.local:8080\"\n      jenkinsTunnel: \"jenkins-agent.jenkins.svc.cluster.local:50000\"\n      skipTlsVerify: false\n      usageRestricted: false\n      maxRequestsPerHostStr: \"32\"\n      retentionTimeout: \"5\"\n      waitForPodSec: \"600\"\n      name: \"kubernetes\"\n      namespace: \"jenkins\"\n      restrictedPssSecurityContext: false\n      serverUrl: \"https://kubernetes.default\"\n      credentialsId: \"\"\n      podLabels:\n      - key: \"jenkins/jenkins-jenkins-agent\"\n        value: \"true\"\n      templates:\n        - name: \"default\"\n          namespace: \"jenkins\"\n          id: 28db075af0957a256fc45064e6acab29eca522c5fc8ff0b34758e6a8e837f782\n          containers:\n          - name: \"jnlp\"\n            alwaysPullImage: false\n            args: \"^${computer.jnlpmac} ^${computer.name}\"\n            envVars:\n              - envVar:\n                  key: \"JENKINS_URL\"\n                  value: \"http://jenkins.jenkins.svc.cluster.local:8080/\"\n            image: \"jenkins/inbound-agent:3355.v388858a_47b_33-18\"\n            privileged: \"false\"\n            resourceLimitCpu: 512m\n            resourceLimitMemory: 512Mi\n            resourceRequestCpu: 512m\n            resourceRequestMemory: 512Mi\n            ttyEnabled: false\n            workingDir: /home/jenkins/agent\n          idleMinutes: 0\n          instanceCap: 2147483647\n          label: \"jenkins-jenkins-agent \"\n          nodeUsageMode: \"NORMAL\"\n          podRetention: Never\n          showRawYaml: true\n          serviceAccount: \"default\"\n          slaveConnectTimeoutStr: \"100\"\n          yamlMergeStrategy: override\n          inheritYamlMergeStrategy: false\n  slaveAgentPort: 50000\n  crumbIssuer:\n    standard:\n      excludeClientIPFromCrumb: true\nsecurity:\n  apiToken:\n    creationOfLegacyTokenEnabled: false\n    tokenGenerationOnCreationEnabled: false\n    usageStatisticsEnabled: true\nunclassified:\n  location:\n    url: http://jenkins.35.241.255.137.nip.io"},"kind":"ConfigMap","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"jenkins-controller","app.kubernetes.io/instance":"jenkins","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"jenkins","helm.sh/chart":"jenkins-5.9.14","jenkins-jenkins-config":"true"},"name":"jenkins-jenkins-jcasc-config","namespace":"jenkins"}}
+      meta.helm.sh/release-name: jenkins
+      meta.helm.sh/release-namespace: jenkins
+    labels:
+      app.kubernetes.io/component: jenkins-controller
+      app.kubernetes.io/instance: jenkins
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: jenkins
+      helm.sh/chart: jenkins-5.9.18
+      jenkins-jenkins-config: "true"
+    name: jenkins-jenkins-jcasc-config
+    namespace: jenkins
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: jenkins
+- apiVersion: v1
+  data:
+    Dockerfile.patch: |
+      FROM ghcr.io/pluralsh/console:0.12.13 AS upstream
+
+      FROM hexpm/elixir:1.18.4-erlang-27.2-alpine-3.21.7 AS builder
+      WORKDIR /work
+      COPY --from=upstream /opt/app /opt/app
+      COPY features.ex /work/features.ex
+      RUN PA="" && for d in $(find /opt/app/lib -maxdepth 2 -type d -name ebin); do PA="$PA -pa $d"; done && \
+          mkdir -p /out && \
+          elixirc $PA -o /out /work/features.ex && \
+          ls -la /out
+
+      FROM ghcr.io/pluralsh/console:0.12.13
+      USER root
+      COPY --from=builder /out/Elixir.Console.Features.beam /opt/app/lib/console-0.12.13+dirty/ebin/Elixir.Console.Features.beam
+      USER 65532
+    features.ex: |-
+      defmodule Console.Features do
+        use GenServer
+        require Logger
+        alias Console.Plural.{Account, Features}
+
+        def start_link(_opts \\ :ok),
+          do: GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+
+        def start(), do: GenServer.start_link(__MODULE__, :ok)
+
+        def init(_), do: {:ok, {Features.everything(), Account.enterprise()}}
+
+        def available?(_feature), do: true
+
+        def expiry(), do: nil
+
+        def cluster_max(), do: :infinity
+
+        def fetch(), do: Features.everything()
+
+        def account(), do: Account.enterprise()
+
+        def handle_call(:fetch, _, state),
+          do: {:reply, Features.everything(), state}
+
+        def handle_call(:account, _, state),
+          do: {:reply, Account.enterprise(), state}
+
+        def handle_info(:poll, state), do: {:noreply, state}
+        def handle_info(_msg, state), do: {:noreply, state}
+
+        def check_license(_license_key \\ nil) do
+          account = Account.enterprise()
+          {account.availableFeatures, account}
+        end
+      end
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"Dockerfile.patch":"FROM ghcr.io/pluralsh/console:0.12.13 AS upstream\n\nFROM hexpm/elixir:1.18.4-erlang-27.2-alpine-3.21.7 AS builder\nWORKDIR /work\nCOPY --from=upstream /opt/app /opt/app\nCOPY features.ex /work/features.ex\nRUN PA=\"\" \u0026\u0026 for d in $(find /opt/app/lib -maxdepth 2 -type d -name ebin); do PA=\"$PA -pa $d\"; done \u0026\u0026 \\\n    mkdir -p /out \u0026\u0026 \\\n    elixirc $PA -o /out /work/features.ex \u0026\u0026 \\\n    ls -la /out\n\nFROM ghcr.io/pluralsh/console:0.12.13\nUSER root\nCOPY --from=builder /out/Elixir.Console.Features.beam /opt/app/lib/console-0.12.13+dirty/ebin/Elixir.Console.Features.beam\nUSER 65532\n","features.ex":"defmodule Console.Features do\n  use GenServer\n  require Logger\n  alias Console.Plural.{Account, Features}\n\n  def start_link(_opts \\\\ :ok),\n    do: GenServer.start_link(__MODULE__, :ok, name: __MODULE__)\n\n  def start(), do: GenServer.start_link(__MODULE__, :ok)\n\n  def init(_), do: {:ok, {Features.everything(), Account.enterprise()}}\n\n  def available?(_feature), do: true\n\n  def expiry(), do: nil\n\n  def cluster_max(), do: :infinity\n\n  def fetch(), do: Features.everything()\n\n  def account(), do: Account.enterprise()\n\n  def handle_call(:fetch, _, state),\n    do: {:reply, Features.everything(), state}\n\n  def handle_call(:account, _, state),\n    do: {:reply, Account.enterprise(), state}\n\n  def handle_info(:poll, state), do: {:noreply, state}\n  def handle_info(_msg, state), do: {:noreply, state}\n\n  def check_license(_license_key \\\\ nil) do\n    account = Account.enterprise()\n    {account.availableFeatures, account}\n  end\nend"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"plural-patch","namespace":"jenkins"}}
+    name: plural-patch
+    namespace: jenkins
+kind: List
+metadata:

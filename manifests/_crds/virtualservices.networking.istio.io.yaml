@@ -1,0 +1,590 @@
+apiVersion: v1
+items:
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"name":"dex","namespace":"auth"},"spec":{"gateways":["kubeflow/kubeflow-gateway"],"hosts":["*"],"http":[{"match":[{"uri":{"prefix":"/dex/"}}],"route":[{"destination":{"host":"dex.auth.svc.cluster.local","port":{"number":5556}}}]}]}}
+    name: dex
+    namespace: auth
+  spec:
+    gateways:
+    - kubeflow/kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - match:
+      - uri:
+          prefix: /dex/
+      route:
+      - destination:
+          host: dex.auth.svc.cluster.local
+          port:
+            number: 5556
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      aiot.ml/prod-run: c1af02c4b4e1405a8bbb9b2cddd0d16e
+      aiot.ml/prod-version: "58"
+      reconcile-trigger: "1776663014"
+      sidecar.istio.io/inject: "false"
+    name: maintenance-predictor
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: serving.kserve.io/v1beta1
+      blockOwnerDeletion: true
+      controller: true
+      kind: InferenceService
+      name: maintenance-predictor
+  spec:
+    gateways:
+    - knative-serving/knative-local-gateway
+    - kubeflow/kubeflow-gateway
+    hosts:
+    - maintenance-predictor.kubeflow-user-example-com.svc.cluster.local
+    - maintenance-predictor.kubeflow-user-example-com.35.241.255.137.nip.io
+    http:
+    - headers:
+        request:
+          set:
+            Host: maintenance-predictor-predictor.kubeflow-user-example-com.svc.cluster.local
+      match:
+      - authority:
+          regex: ^maintenance-predictor\.kubeflow-user-example-com(\.svc(\.cluster\.local)?)?(?::\d{1,5})?$
+        gateways:
+        - knative-serving/knative-local-gateway
+      - authority:
+          regex: ^maintenance-predictor\.kubeflow-user-example-com\.35\.241\.255\.137\.nip\.io(?::\d{1,5})?$
+        gateways:
+        - kubeflow/kubeflow-gateway
+      route:
+      - destination:
+          host: knative-local-gateway.istio-system.svc.cluster.local
+          port:
+            number: 80
+        weight: 100
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      networking.internal.knative.dev/rollout: '{"configurations":[{"configurationName":"maintenance-predictor-predictor","percent":100,"revisions":[{"revisionName":"maintenance-predictor-predictor-00004","percent":100}],"stepParams":{}}]}'
+      networking.knative.dev/ingress.class: istio.ingress.networking.knative.dev
+      serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+      serving.knative.dev/lastModifier: system:serviceaccount:kubeflow:kserve-controller-manager
+    labels:
+      networking.internal.knative.dev/ingress: maintenance-predictor-predictor
+      serving.knative.dev/route: maintenance-predictor-predictor
+      serving.knative.dev/routeNamespace: kubeflow-user-example-com
+    name: maintenance-predictor-predictor-ingress
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: networking.internal.knative.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: maintenance-predictor-predictor
+  spec:
+    gateways:
+    - knative-serving/knative-ingress-gateway
+    - knative-serving/knative-local-gateway
+    hosts:
+    - maintenance-predictor-predictor.kubeflow-user-example-com
+    - maintenance-predictor-predictor.kubeflow-user-example-com.35.241.255.137.nip.io
+    - maintenance-predictor-predictor.kubeflow-user-example-com.svc
+    - maintenance-predictor-predictor.kubeflow-user-example-com.svc.cluster.local
+    http:
+    - headers:
+        request:
+          set:
+            K-Network-Hash: e6067fac5c88d717a4446d80c3fd89600e6903b26c5e02a8f7698ad9f068c874
+      match:
+      - authority:
+          prefix: maintenance-predictor-predictor.kubeflow-user-example-com
+        gateways:
+        - knative-serving/knative-local-gateway
+        headers:
+          K-Network-Hash:
+            exact: override
+      retries: {}
+      route:
+      - destination:
+          host: maintenance-predictor-predictor-00004.kubeflow-user-example-com.svc.cluster.local
+          port:
+            number: 80
+        headers:
+          request:
+            set:
+              Knative-Serving-Namespace: kubeflow-user-example-com
+              Knative-Serving-Revision: maintenance-predictor-predictor-00004
+        weight: 100
+    - match:
+      - authority:
+          prefix: maintenance-predictor-predictor.kubeflow-user-example-com
+        gateways:
+        - knative-serving/knative-local-gateway
+      retries: {}
+      route:
+      - destination:
+          host: maintenance-predictor-predictor-00004.kubeflow-user-example-com.svc.cluster.local
+          port:
+            number: 80
+        headers:
+          request:
+            set:
+              Knative-Serving-Namespace: kubeflow-user-example-com
+              Knative-Serving-Revision: maintenance-predictor-predictor-00004
+        weight: 100
+    - headers:
+        request:
+          set:
+            K-Network-Hash: e6067fac5c88d717a4446d80c3fd89600e6903b26c5e02a8f7698ad9f068c874
+      match:
+      - authority:
+          prefix: maintenance-predictor-predictor.kubeflow-user-example-com.35.241.255.137.nip.io
+        gateways:
+        - knative-serving/knative-ingress-gateway
+        headers:
+          K-Network-Hash:
+            exact: override
+      retries: {}
+      route:
+      - destination:
+          host: maintenance-predictor-predictor-00004.kubeflow-user-example-com.svc.cluster.local
+          port:
+            number: 80
+        headers:
+          request:
+            set:
+              Knative-Serving-Namespace: kubeflow-user-example-com
+              Knative-Serving-Revision: maintenance-predictor-predictor-00004
+        weight: 100
+    - match:
+      - authority:
+          prefix: maintenance-predictor-predictor.kubeflow-user-example-com.35.241.255.137.nip.io
+        gateways:
+        - knative-serving/knative-ingress-gateway
+      retries: {}
+      route:
+      - destination:
+          host: maintenance-predictor-predictor-00004.kubeflow-user-example-com.svc.cluster.local
+          port:
+            number: 80
+        headers:
+          request:
+            set:
+              Knative-Serving-Namespace: kubeflow-user-example-com
+              Knative-Serving-Revision: maintenance-predictor-predictor-00004
+        weight: 100
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      networking.internal.knative.dev/rollout: '{"configurations":[{"configurationName":"maintenance-predictor-predictor","percent":100,"revisions":[{"revisionName":"maintenance-predictor-predictor-00004","percent":100}],"stepParams":{}}]}'
+      networking.knative.dev/ingress.class: istio.ingress.networking.knative.dev
+      serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+      serving.knative.dev/lastModifier: system:serviceaccount:kubeflow:kserve-controller-manager
+    labels:
+      networking.internal.knative.dev/ingress: maintenance-predictor-predictor
+      serving.knative.dev/route: maintenance-predictor-predictor
+      serving.knative.dev/routeNamespace: kubeflow-user-example-com
+    name: maintenance-predictor-predictor-mesh
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: networking.internal.knative.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: maintenance-predictor-predictor
+  spec:
+    gateways:
+    - mesh
+    hosts:
+    - maintenance-predictor-predictor.kubeflow-user-example-com
+    - maintenance-predictor-predictor.kubeflow-user-example-com.svc
+    - maintenance-predictor-predictor.kubeflow-user-example-com.svc.cluster.local
+    http:
+    - headers:
+        request:
+          set:
+            K-Network-Hash: e6067fac5c88d717a4446d80c3fd89600e6903b26c5e02a8f7698ad9f068c874
+      match:
+      - authority:
+          prefix: maintenance-predictor-predictor.kubeflow-user-example-com
+        gateways:
+        - mesh
+        headers:
+          K-Network-Hash:
+            exact: override
+      retries: {}
+      route:
+      - destination:
+          host: maintenance-predictor-predictor-00004.kubeflow-user-example-com.svc.cluster.local
+          port:
+            number: 80
+        headers:
+          request:
+            set:
+              Knative-Serving-Namespace: kubeflow-user-example-com
+              Knative-Serving-Revision: maintenance-predictor-predictor-00004
+        weight: 100
+    - match:
+      - authority:
+          prefix: maintenance-predictor-predictor.kubeflow-user-example-com
+        gateways:
+        - mesh
+      retries: {}
+      route:
+      - destination:
+          host: maintenance-predictor-predictor-00004.kubeflow-user-example-com.svc.cluster.local
+          port:
+            number: 80
+        headers:
+          request:
+            set:
+              Knative-Serving-Namespace: kubeflow-user-example-com
+              Knative-Serving-Revision: maintenance-predictor-predictor-00004
+        weight: 100
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    name: maintenance-tb
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: tensorboard.kubeflow.org/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Tensorboard
+      name: maintenance-tb
+  spec:
+    gateways:
+    - kubeflow/kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - match:
+      - uri:
+          prefix: /tensorboard/kubeflow-user-example-com/maintenance-tb/
+      rewrite:
+        uri: /
+      route:
+      - destination:
+          host: maintenance-tb.kubeflow-user-example-com.svc.cluster.local
+          port:
+            number: 80
+      timeout: 300s
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    name: notebook-kubeflow-user-example-com-ml-workshop
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: kubeflow.org/v1beta1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Notebook
+      name: ml-workshop
+  spec:
+    gateways:
+    - kubeflow/kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - headers:
+        request:
+          set: {}
+      match:
+      - uri:
+          prefix: /notebook/kubeflow-user-example-com/ml-workshop/
+      rewrite:
+        uri: /notebook/kubeflow-user-example-com/ml-workshop/
+      route:
+      - destination:
+          host: ml-workshop.kubeflow-user-example-com.svc.cluster.local
+          port:
+            number: 80
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"labels":{"app":"centraldashboard","app.kubernetes.io/component":"centraldashboard","app.kubernetes.io/name":"centraldashboard","kustomize.component":"centraldashboard"},"name":"centraldashboard","namespace":"kubeflow"},"spec":{"gateways":["kubeflow-gateway"],"hosts":["*"],"http":[{"match":[{"uri":{"prefix":"/"}}],"rewrite":{"uri":"/"},"route":[{"destination":{"host":"centraldashboard.kubeflow.svc.cluster.local","port":{"number":80}}}]}]}}
+    labels:
+      app: centraldashboard
+      app.kubernetes.io/component: centraldashboard
+      app.kubernetes.io/name: centraldashboard
+      kustomize.component: centraldashboard
+    name: centraldashboard
+    namespace: kubeflow
+  spec:
+    gateways:
+    - kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - match:
+      - uri:
+          prefix: /
+      rewrite:
+        uri: /
+      route:
+      - destination:
+          host: centraldashboard.kubeflow.svc.cluster.local
+          port:
+            number: 80
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"labels":{"app":"jupyter-web-app","kustomize.component":"jupyter-web-app"},"name":"jupyter-web-app-jupyter-web-app","namespace":"kubeflow"},"spec":{"gateways":["kubeflow-gateway"],"hosts":["*"],"http":[{"headers":{"request":{"add":{"x-forwarded-prefix":"/jupyter"}}},"match":[{"uri":{"prefix":"/jupyter/"}}],"rewrite":{"uri":"/"},"route":[{"destination":{"host":"jupyter-web-app-service.kubeflow.svc.cluster.local","port":{"number":80}}}]}]}}
+    labels:
+      app: jupyter-web-app
+      kustomize.component: jupyter-web-app
+    name: jupyter-web-app-jupyter-web-app
+    namespace: kubeflow
+  spec:
+    gateways:
+    - kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - headers:
+        request:
+          add:
+            x-forwarded-prefix: /jupyter
+      match:
+      - uri:
+          prefix: /jupyter/
+      rewrite:
+        uri: /
+      route:
+      - destination:
+          host: jupyter-web-app-service.kubeflow.svc.cluster.local
+          port:
+            number: 80
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"name":"katib-ui","namespace":"kubeflow"},"spec":{"gateways":["kubeflow-gateway"],"hosts":["*"],"http":[{"match":[{"uri":{"prefix":"/katib/"}}],"rewrite":{"uri":"/katib/"},"route":[{"destination":{"host":"katib-ui.kubeflow.svc.cluster.local","port":{"number":80}}}]}]}}
+    name: katib-ui
+    namespace: kubeflow
+  spec:
+    gateways:
+    - kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - match:
+      - uri:
+          prefix: /katib/
+      rewrite:
+        uri: /katib/
+      route:
+      - destination:
+          host: katib-ui.kubeflow.svc.cluster.local
+          port:
+            number: 80
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1beta1","kind":"VirtualService","metadata":{"annotations":{},"labels":{"app":"kserve","app.kubernetes.io/component":"kserve-models-web-app","app.kubernetes.io/name":"kserve","kustomize.component":"kserve-models-web-app"},"name":"kserve-models-web-app","namespace":"kubeflow"},"spec":{"gateways":["kubeflow/kubeflow-gateway"],"hosts":["*"],"http":[{"match":[{"uri":{"prefix":"/kserve-endpoints/"}}],"rewrite":{"uri":"/"},"route":[{"destination":{"host":"kserve-models-web-app.kubeflow.svc.cluster.local","port":{"number":80}}}]}]}}
+    labels:
+      app: kserve
+      app.kubernetes.io/component: kserve-models-web-app
+      app.kubernetes.io/name: kserve
+      kustomize.component: kserve-models-web-app
+    name: kserve-models-web-app
+    namespace: kubeflow
+  spec:
+    gateways:
+    - kubeflow/kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - match:
+      - uri:
+          prefix: /kserve-endpoints/
+      rewrite:
+        uri: /
+      route:
+      - destination:
+          host: kserve-models-web-app.kubeflow.svc.cluster.local
+          port:
+            number: 80
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"labels":{"application-crd-id":"kubeflow-pipelines"},"name":"metadata-grpc","namespace":"kubeflow"},"spec":{"gateways":["kubeflow-gateway"],"hosts":["*"],"http":[{"match":[{"uri":{"prefix":"/ml_metadata"}}],"rewrite":{"uri":"/ml_metadata"},"route":[{"destination":{"host":"metadata-envoy-service.kubeflow.svc.cluster.local","port":{"number":9090}}}]}]}}
+    labels:
+      application-crd-id: kubeflow-pipelines
+    name: metadata-grpc
+    namespace: kubeflow
+  spec:
+    gateways:
+    - kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - match:
+      - uri:
+          prefix: /ml_metadata
+      rewrite:
+        uri: /ml_metadata
+      route:
+      - destination:
+          host: metadata-envoy-service.kubeflow.svc.cluster.local
+          port:
+            number: 9090
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"ml-pipeline","app.kubernetes.io/name":"kubeflow-pipelines","application-crd-id":"kubeflow-pipelines"},"name":"ml-pipeline-ui","namespace":"kubeflow"},"spec":{"gateways":["kubeflow-gateway"],"hosts":["*"],"http":[{"match":[{"uri":{"prefix":"/pipeline"}}],"rewrite":{"uri":"/pipeline"},"route":[{"destination":{"host":"ml-pipeline-ui.kubeflow.svc.cluster.local","port":{"number":80}}}],"timeout":"300s"}]}}
+    labels:
+      app.kubernetes.io/component: ml-pipeline
+      app.kubernetes.io/name: kubeflow-pipelines
+      application-crd-id: kubeflow-pipelines
+    name: ml-pipeline-ui
+    namespace: kubeflow
+  spec:
+    gateways:
+    - kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - match:
+      - uri:
+          prefix: /pipeline
+      rewrite:
+        uri: /pipeline
+      route:
+      - destination:
+          host: ml-pipeline-ui.kubeflow.svc.cluster.local
+          port:
+            number: 80
+      timeout: 300s
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"labels":{"kustomize.component":"profiles"},"name":"profiles-kfam","namespace":"kubeflow"},"spec":{"gateways":["kubeflow-gateway"],"hosts":["*"],"http":[{"headers":{"request":{"add":{"x-forwarded-prefix":"/kfam"}}},"match":[{"uri":{"prefix":"/kfam/"}}],"rewrite":{"uri":"/kfam/"},"route":[{"destination":{"host":"profiles-kfam.kubeflow.svc.cluster.local","port":{"number":8081}}}]}]}}
+    labels:
+      kustomize.component: profiles
+    name: profiles-kfam
+    namespace: kubeflow
+  spec:
+    gateways:
+    - kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - headers:
+        request:
+          add:
+            x-forwarded-prefix: /kfam
+      match:
+      - uri:
+          prefix: /kfam/
+      rewrite:
+        uri: /kfam/
+      route:
+      - destination:
+          host: profiles-kfam.kubeflow.svc.cluster.local
+          port:
+            number: 8081
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"labels":{"app":"tensorboards-web-app","kustomize.component":"tensorboards-web-app"},"name":"tensorboards-web-app-tensorboards-web-app","namespace":"kubeflow"},"spec":{"gateways":["kubeflow-gateway"],"hosts":["*"],"http":[{"headers":{"request":{"add":{"x-forwarded-prefix":"/tensorboards"}}},"match":[{"uri":{"prefix":"/tensorboards/"}}],"rewrite":{"uri":"/"},"route":[{"destination":{"host":"tensorboards-web-app-service.kubeflow.svc.cluster.local","port":{"number":80}}}]}]}}
+    labels:
+      app: tensorboards-web-app
+      kustomize.component: tensorboards-web-app
+    name: tensorboards-web-app-tensorboards-web-app
+    namespace: kubeflow
+  spec:
+    gateways:
+    - kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - headers:
+        request:
+          add:
+            x-forwarded-prefix: /tensorboards
+      match:
+      - uri:
+          prefix: /tensorboards/
+      rewrite:
+        uri: /
+      route:
+      - destination:
+          host: tensorboards-web-app-service.kubeflow.svc.cluster.local
+          port:
+            number: 80
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"labels":{"app":"volumes-web-app","kustomize.component":"volumes-web-app"},"name":"volumes-web-app-volumes-web-app","namespace":"kubeflow"},"spec":{"gateways":["kubeflow-gateway"],"hosts":["*"],"http":[{"headers":{"request":{"add":{"x-forwarded-prefix":"/volumes"}}},"match":[{"uri":{"prefix":"/volumes/"}}],"rewrite":{"uri":"/"},"route":[{"destination":{"host":"volumes-web-app-service.kubeflow.svc.cluster.local","port":{"number":80}}}]}]}}
+    labels:
+      app: volumes-web-app
+      kustomize.component: volumes-web-app
+    name: volumes-web-app-volumes-web-app
+    namespace: kubeflow
+  spec:
+    gateways:
+    - kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - headers:
+        request:
+          add:
+            x-forwarded-prefix: /volumes
+      match:
+      - uri:
+          prefix: /volumes/
+      rewrite:
+        uri: /
+      route:
+      - destination:
+          host: volumes-web-app-service.kubeflow.svc.cluster.local
+          port:
+            number: 80
+- apiVersion: networking.istio.io/v1
+  kind: VirtualService
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.istio.io/v1alpha3","kind":"VirtualService","metadata":{"annotations":{},"name":"oauth2-proxy","namespace":"oauth2-proxy"},"spec":{"gateways":["kubeflow/kubeflow-gateway"],"hosts":["*"],"http":[{"match":[{"uri":{"prefix":"/oauth2/"}}],"route":[{"destination":{"host":"oauth2-proxy.oauth2-proxy.svc.cluster.local","port":{"number":80}}}]}]}}
+    name: oauth2-proxy
+    namespace: oauth2-proxy
+  spec:
+    gateways:
+    - kubeflow/kubeflow-gateway
+    hosts:
+    - '*'
+    http:
+    - match:
+      - uri:
+          prefix: /oauth2/
+      route:
+      - destination:
+          host: oauth2-proxy.oauth2-proxy.svc.cluster.local
+          port:
+            number: 80
+kind: List
+metadata:

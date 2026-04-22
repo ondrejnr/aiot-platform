@@ -1,0 +1,154 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  kind: Cluster
+  metadata:
+    annotations:
+      authz.management.cattle.io/creator-role-bindings: '{"created":[],"required":["cluster-owner"]}'
+      authz.management.cattle.io/initial-sync: "true"
+      lifecycle.cattle.io/create.cluster-agent-controller-cleanup: "true"
+      lifecycle.cattle.io/create.cluster-provisioner-controller: "true"
+      lifecycle.cattle.io/create.cluster-scoped-gc: "true"
+      lifecycle.cattle.io/create.mgmt-cluster-rbac-remove: "true"
+      management.cattle.io/current-cluster-controllers-version: v1.32.13
+      provisioner.cattle.io/encrypt-migrated: "true"
+      provisioner.cattle.io/ke-driver-update: updated
+    finalizers:
+    - wrangler.cattle.io/mgmt-cluster-remove
+    - controller.cattle.io/cluster-agent-controller-cleanup
+    - controller.cattle.io/cluster-scoped-gc
+    - controller.cattle.io/cluster-provisioner-controller
+    - controller.cattle.io/mgmt-cluster-rbac-remove
+    name: local
+  spec:
+    agentImageOverride: ""
+    answers: {}
+    clusterSecrets: {}
+    description: ""
+    desiredAgentImage: ""
+    desiredAuthImage: ""
+    displayName: local
+    dockerRootDir: /var/lib/docker
+    enableNetworkPolicy: null
+    fleetWorkspaceName: fleet-local
+    internal: true
+    localClusterAuthEndpoint:
+      enabled: false
+    windowsPreferedCluster: false
+  status:
+    agentImage: ""
+    aksStatus:
+      privateRequiresTunnel: null
+      rbacEnabled: null
+      upstreamSpec: null
+    aliStatus:
+      privateRequiresTunnel: null
+      upstreamSpec: null
+    allocatable:
+      cpu: 24800m
+      memory: 62712428Ki
+      pods: "550"
+    appliedEnableNetworkPolicy: false
+    appliedSpec:
+      agentImageOverride: ""
+      answers: {}
+      clusterSecrets: {}
+      description: ""
+      desiredAgentImage: ""
+      desiredAuthImage: ""
+      displayName: ""
+      enableNetworkPolicy: null
+      internal: false
+      localClusterAuthEndpoint:
+        enabled: false
+      windowsPreferedCluster: false
+    authImage: ""
+    capabilities:
+      loadBalancerCapabilities: {}
+    capacity:
+      cpu: "26"
+      memory: 67525228Ki
+      pods: "550"
+    conditions:
+    - status: "True"
+      type: Ready
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: BackingNamespaceCreated
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: DefaultProjectCreated
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: SystemProjectCreated
+    - lastUpdateTime: "2026-04-19T20:51:11Z"
+      status: "True"
+      type: CreatorMadeOwner
+    - lastUpdateTime: "2026-04-19T20:51:12Z"
+      status: "True"
+      type: Pending
+    - lastUpdateTime: "2026-04-19T20:51:54Z"
+      status: "True"
+      type: Provisioned
+    - lastUpdateTime: "2026-04-19T20:51:27Z"
+      status: "True"
+      type: Waiting
+    - status: Unknown
+      type: PreBootstrapped
+    - lastUpdateTime: "2026-04-19T20:51:12Z"
+      status: "True"
+      type: NoDiskPressure
+    - lastUpdateTime: "2026-04-19T20:51:12Z"
+      status: "True"
+      type: NoMemoryPressure
+    - lastUpdateTime: "2026-04-19T20:51:12Z"
+      status: "True"
+      type: ServiceAccountSecretsMigrated
+    - lastUpdateTime: "2026-04-19T20:51:14Z"
+      status: "True"
+      type: GlobalAdminsSynced
+    - lastUpdateTime: "2026-04-19T20:51:21Z"
+      status: "True"
+      type: Connected
+    - lastUpdateTime: "2026-04-19T20:51:54Z"
+      status: "True"
+      type: SystemAccountCreated
+    - lastUpdateTime: "2026-04-19T20:51:55Z"
+      status: "True"
+      type: Updated
+    driver: imported
+    eksStatus:
+      generatedNodeRole: ""
+      managedLaunchTemplateID: ""
+      managedLaunchTemplateVersions: null
+      privateRequiresTunnel: null
+      securityGroups: null
+      subnets: null
+      upstreamSpec: null
+      virtualNetwork: ""
+    gkeStatus:
+      privateRequiresTunnel: null
+      upstreamSpec: null
+    limits:
+      cpu: "76"
+      memory: 61258Mi
+      pods: "0"
+    linuxWorkerCount: 5
+    nodeCount: 6
+    provider: ""
+    requested:
+      cpu: 10530m
+      memory: 20426Mi
+      pods: "136"
+    version:
+      buildDate: "2026-02-26T20:20:24Z"
+      compiler: gc
+      gitCommit: 6172d7357c6287643350a4fc7e048f24098f2a1b
+      gitTreeState: clean
+      gitVersion: v1.32.13
+      goVersion: go1.24.13
+      major: "1"
+      minor: "32"
+      platform: linux/amd64
+kind: List
+metadata:

@@ -1,0 +1,52 @@
+apiVersion: v1
+items:
+- apiVersion: security.istio.io/v1
+  kind: RequestAuthentication
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"security.istio.io/v1beta1","kind":"RequestAuthentication","metadata":{"annotations":{},"name":"dex-jwt","namespace":"istio-system"},"spec":{"jwtRules":[{"forwardOriginalToken":true,"fromHeaders":[{"name":"Authorization","prefix":"Bearer "}],"issuer":"https://kubeflow.35.241.255.137.nip.io/dex","jwksUri":"http://dex.auth.svc.cluster.local:5556/dex/keys","outputClaimToHeaders":[{"claim":"email","header":"kubeflow-userid"},{"claim":"groups","header":"kubeflow-groups"}]}],"selector":{"matchLabels":{"app":"istio-ingressgateway"}}}}
+    name: dex-jwt
+    namespace: istio-system
+  spec:
+    jwtRules:
+    - forwardOriginalToken: true
+      fromHeaders:
+      - name: Authorization
+        prefix: 'Bearer '
+      issuer: https://kubeflow.35.241.255.137.nip.io/dex
+      jwksUri: http://dex.auth.svc.cluster.local:5556/dex/keys
+      outputClaimToHeaders:
+      - claim: email
+        header: kubeflow-userid
+      - claim: groups
+        header: kubeflow-groups
+    selector:
+      matchLabels:
+        app: istio-ingressgateway
+- apiVersion: security.istio.io/v1
+  kind: RequestAuthentication
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"security.istio.io/v1beta1","kind":"RequestAuthentication","metadata":{"annotations":{},"name":"m2m-token-issuer","namespace":"istio-system"},"spec":{"jwtRules":[{"forwardOriginalToken":true,"fromHeaders":[{"name":"Authorization","prefix":"Bearer "}],"issuer":"https://kubernetes.default.svc.cluster.local","jwksUri":"http://cluster-jwks-proxy.istio-system.svc.cluster.local/openid/v1/jwks","outputClaimToHeaders":[{"claim":"sub","header":"kubeflow-userid"},{"claim":"groups","header":"kubeflow-groups"}]}],"selector":{"matchLabels":{"app":"istio-ingressgateway"}}}}
+    name: m2m-token-issuer
+    namespace: istio-system
+  spec:
+    jwtRules:
+    - forwardOriginalToken: true
+      fromHeaders:
+      - name: Authorization
+        prefix: 'Bearer '
+      issuer: https://kubernetes.default.svc.cluster.local
+      jwksUri: http://cluster-jwks-proxy.istio-system.svc.cluster.local/openid/v1/jwks
+      outputClaimToHeaders:
+      - claim: sub
+        header: kubeflow-userid
+      - claim: groups
+        header: kubeflow-groups
+    selector:
+      matchLabels:
+        app: istio-ingressgateway
+kind: List
+metadata:

@@ -1,0 +1,359 @@
+apiVersion: v1
+items:
+- apiVersion: serving.knative.dev/v1
+  kind: Revision
+  metadata:
+    annotations:
+      autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+      autoscaling.knative.dev/min-scale: "1"
+      reconcile-trigger: "1776337432"
+      serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+      serving.knative.dev/routingStateModified: "2026-04-20T04:50:46Z"
+      sidecar.istio.io/inject: "false"
+    labels:
+      component: predictor
+      serving.knative.dev/configuration: maintenance-predictor-predictor
+      serving.knative.dev/configurationGeneration: "2"
+      serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+      serving.knative.dev/routingState: reserve
+      serving.knative.dev/service: maintenance-predictor-predictor
+      serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+      serving.kserve.io/inferenceservice: maintenance-predictor
+    name: maintenance-predictor-predictor-00002
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: serving.knative.dev/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Configuration
+      name: maintenance-predictor-predictor
+  spec:
+    containerConcurrency: 0
+    containers:
+    - env:
+      - name: MLFLOW_TRACKING_URI
+        value: http://mlflow-server.mlflow.svc.cluster.local:5000
+      - name: MODEL_NAME
+        value: maintenance-predictor
+      - name: MODEL_STAGE
+        value: Production
+      - name: DB_HOST
+        value: postgres.aiot.svc.cluster.local
+      - name: DB_NAME
+        value: aiot
+      - name: DB_USER
+        value: aiot
+      - name: DB_PASSWORD
+        value: aiot123
+      image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+      name: kserve-container
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        successThreshold: 1
+        tcpSocket:
+          port: 0
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+        requests:
+          cpu: 200m
+          memory: 512Mi
+      volumeMounts:
+      - mountPath: /app/serve.py
+        name: serve-py
+        readOnly: true
+        subPath: serve.py
+      - mountPath: /mlflow
+        name: mlflow-data
+        readOnly: true
+    dnsConfig:
+      nameservers:
+      - 10.96.0.10
+      options:
+      - name: ndots
+        value: "5"
+      searches:
+      - kubeflow-user-example-com.svc.cluster.local
+      - svc.cluster.local
+      - cluster.local
+    dnsPolicy: None
+    enableServiceLinks: false
+    nodeSelector:
+      kubernetes.io/hostname: oci-test-node1
+    timeoutSeconds: 300
+    tolerations:
+    - effect: NoSchedule
+      key: dedicated
+      operator: Equal
+      value: ml-training
+    volumes:
+    - configMap:
+        name: serve-py
+      name: serve-py
+    - name: mlflow-data
+      persistentVolumeClaim:
+        claimName: mlflow-artifacts-lp
+  status:
+    actualReplicas: 0
+    conditions:
+    - lastTransitionTime: "2026-04-20T04:51:46Z"
+      message: The target is not receiving traffic.
+      reason: NoTraffic
+      severity: Info
+      status: "False"
+      type: Active
+    - lastTransitionTime: "2026-04-17T16:16:40Z"
+      status: "True"
+      type: ContainerHealthy
+    - lastTransitionTime: "2026-04-19T21:47:30Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-04-19T21:47:30Z"
+      status: "True"
+      type: ResourcesAvailable
+    containerStatuses:
+    - name: kserve-container
+    observedGeneration: 1
+- apiVersion: serving.knative.dev/v1
+  kind: Revision
+  metadata:
+    annotations:
+      aiot.ml/prod-run: 646584dbc4b14ef38fed3a0fd09c73d0
+      aiot.ml/prod-version: "55"
+      autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+      autoscaling.knative.dev/min-scale: "1"
+      reconcile-trigger: "1776660630"
+      serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+      serving.knative.dev/routingStateModified: "2026-04-20T05:30:28Z"
+      sidecar.istio.io/inject: "false"
+    labels:
+      component: predictor
+      serving.knative.dev/configuration: maintenance-predictor-predictor
+      serving.knative.dev/configurationGeneration: "3"
+      serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+      serving.knative.dev/routingState: reserve
+      serving.knative.dev/service: maintenance-predictor-predictor
+      serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+      serving.kserve.io/inferenceservice: maintenance-predictor
+    name: maintenance-predictor-predictor-00003
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: serving.knative.dev/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Configuration
+      name: maintenance-predictor-predictor
+  spec:
+    containerConcurrency: 0
+    containers:
+    - env:
+      - name: MLFLOW_TRACKING_URI
+        value: http://mlflow-server.mlflow.svc.cluster.local:5000
+      - name: MODEL_NAME
+        value: maintenance-predictor
+      - name: MODEL_STAGE
+        value: Production
+      - name: DB_HOST
+        value: postgres.aiot.svc.cluster.local
+      - name: DB_NAME
+        value: aiot
+      - name: DB_USER
+        value: aiot
+      - name: DB_PASSWORD
+        value: aiot123
+      image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+      name: kserve-container
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        successThreshold: 1
+        tcpSocket:
+          port: 0
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+        requests:
+          cpu: 200m
+          memory: 512Mi
+      volumeMounts:
+      - mountPath: /app/serve.py
+        name: serve-py
+        readOnly: true
+        subPath: serve.py
+      - mountPath: /mlflow
+        name: mlflow-data
+        readOnly: true
+    dnsConfig:
+      nameservers:
+      - 10.96.0.10
+      options:
+      - name: ndots
+        value: "5"
+      searches:
+      - kubeflow-user-example-com.svc.cluster.local
+      - svc.cluster.local
+      - cluster.local
+    dnsPolicy: None
+    enableServiceLinks: false
+    nodeSelector:
+      kubernetes.io/hostname: oci-test-node1
+    timeoutSeconds: 300
+    tolerations:
+    - effect: NoSchedule
+      key: dedicated
+      operator: Equal
+      value: ml-training
+    volumes:
+    - configMap:
+        name: serve-py
+      name: serve-py
+    - name: mlflow-data
+      persistentVolumeClaim:
+        claimName: mlflow-artifacts-lp
+  status:
+    actualReplicas: 0
+    conditions:
+    - lastTransitionTime: "2026-04-20T05:31:28Z"
+      message: The target is not receiving traffic.
+      reason: NoTraffic
+      severity: Info
+      status: "False"
+      type: Active
+    - lastTransitionTime: "2026-04-20T04:50:46Z"
+      status: "True"
+      type: ContainerHealthy
+    - lastTransitionTime: "2026-04-20T04:50:46Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-04-20T04:50:31Z"
+      status: "True"
+      type: ResourcesAvailable
+    containerStatuses:
+    - name: kserve-container
+    observedGeneration: 1
+- apiVersion: serving.knative.dev/v1
+  kind: Revision
+  metadata:
+    annotations:
+      aiot.ml/prod-run: c1af02c4b4e1405a8bbb9b2cddd0d16e
+      aiot.ml/prod-version: "58"
+      autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+      autoscaling.knative.dev/min-scale: "1"
+      reconcile-trigger: "1776663014"
+      serving.knative.dev/creator: system:serviceaccount:kubeflow:kserve-controller-manager
+      serving.knative.dev/routes: maintenance-predictor-predictor
+      serving.knative.dev/routingStateModified: "2026-04-20T05:30:14Z"
+      sidecar.istio.io/inject: "false"
+    labels:
+      component: predictor
+      serving.knative.dev/configuration: maintenance-predictor-predictor
+      serving.knative.dev/configurationGeneration: "4"
+      serving.knative.dev/configurationUID: cae7331d-1f54-488b-9544-790990c7be21
+      serving.knative.dev/routingState: active
+      serving.knative.dev/service: maintenance-predictor-predictor
+      serving.knative.dev/serviceUID: 57c2cf76-1706-4ecd-aa64-a8d38fe0f3f7
+      serving.kserve.io/inferenceservice: maintenance-predictor
+    name: maintenance-predictor-predictor-00004
+    namespace: kubeflow-user-example-com
+    ownerReferences:
+    - apiVersion: serving.knative.dev/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Configuration
+      name: maintenance-predictor-predictor
+  spec:
+    containerConcurrency: 0
+    containers:
+    - env:
+      - name: MLFLOW_TRACKING_URI
+        value: http://mlflow-server.mlflow.svc.cluster.local:5000
+      - name: MODEL_NAME
+        value: maintenance-predictor
+      - name: MODEL_STAGE
+        value: Production
+      - name: DB_HOST
+        value: postgres.aiot.svc.cluster.local
+      - name: DB_NAME
+        value: aiot
+      - name: DB_USER
+        value: aiot
+      - name: DB_PASSWORD
+        value: aiot123
+      image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+      name: kserve-container
+      ports:
+      - containerPort: 8000
+        protocol: TCP
+      readinessProbe:
+        successThreshold: 1
+        tcpSocket:
+          port: 0
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+        requests:
+          cpu: 200m
+          memory: 512Mi
+      volumeMounts:
+      - mountPath: /app/serve.py
+        name: serve-py
+        readOnly: true
+        subPath: serve.py
+      - mountPath: /mlflow
+        name: mlflow-data
+        readOnly: true
+    dnsConfig:
+      nameservers:
+      - 10.96.0.10
+      options:
+      - name: ndots
+        value: "5"
+      searches:
+      - kubeflow-user-example-com.svc.cluster.local
+      - svc.cluster.local
+      - cluster.local
+    dnsPolicy: None
+    enableServiceLinks: false
+    nodeSelector:
+      kubernetes.io/hostname: oci-test-node1
+    timeoutSeconds: 300
+    tolerations:
+    - effect: NoSchedule
+      key: dedicated
+      operator: Equal
+      value: ml-training
+    volumes:
+    - configMap:
+        name: serve-py
+      name: serve-py
+    - name: mlflow-data
+      persistentVolumeClaim:
+        claimName: mlflow-artifacts-lp
+  status:
+    actualReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-20T12:14:36Z"
+      severity: Info
+      status: "True"
+      type: Active
+    - lastTransitionTime: "2026-04-20T05:30:28Z"
+      status: "True"
+      type: ContainerHealthy
+    - lastTransitionTime: "2026-04-20T05:30:28Z"
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-04-20T05:30:15Z"
+      status: "True"
+      type: ResourcesAvailable
+    containerStatuses:
+    - name: kserve-container
+    desiredReplicas: 1
+    observedGeneration: 1
+kind: List
+metadata:

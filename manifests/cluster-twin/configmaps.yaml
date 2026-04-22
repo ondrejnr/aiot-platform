@@ -1,0 +1,751 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    reporter.py: |
+      #!/usr/bin/env python3
+      """Cluster Twin — reports via direct K8s API, no kubectl."""
+      import json
+      import os
+      import ssl
+      import sys
+      import urllib.request
+      import urllib.error
+      from datetime import datetime, timezone, timedelta
+
+      WEBHOOK = os.environ["MM_WEBHOOK"]
+      MODE = os.environ.get("MODE", "daily")
+      CLUSTER_NAME = os.environ.get("CLUSTER_NAME", "aiot2")
+
+      API = "https://kubernetes.default.svc"
+      with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as f:
+          TOKEN = f.read().strip()
+      CA = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+      CTX = ssl.create_default_context(cafile=CA)
+
+
+      def api(path):
+          req = urllib.request.Request(API + path, headers={"Authorization": f"Bearer {TOKEN}", "Accept": "application/json"})
+          try:
+              with urllib.request.urlopen(req, context=CTX, timeout=30) as r:
+                  return json.loads(r.read())
+          except urllib.error.HTTPError as e:
+              if e.code == 404:
+                  return None
+              print(f"API {path}: HTTP {e.code}", file=sys.stderr)
+              return None
+          except Exception as e:
+              print(f"API {path}: {e}", file=sys.stderr)
+              return None
+
+
+      def post_mm(text):
+          data = json.dumps({"text": text}).encode("utf-8")
+          req = urllib.request.Request(WEBHOOK, data=data, headers={"Content-Type": "application/json"})
+          try:
+              with urllib.request.urlopen(req, timeout=15) as r:
+                  return r.status
+          except urllib.error.URLError as e:
+              print(f"webhook error: {e}", file=sys.stderr)
+              return 0
+
+
+      def check_nodes():
+          d = api("/api/v1/nodes")
+          if not d:
+              return None, ["nodes: query failed"]
+          bad = []
+          ready = 0
+          for n in d.get("items", []):
+              name = n["metadata"]["name"]
+              conds = {c["type"]: c["status"] for c in n["status"].get("conditions", [])}
+              if conds.get("Ready") == "True":
+                  ready += 1
+              else:
+                  bad.append(f"{name} NotReady")
+              for p in ("MemoryPressure", "DiskPressure", "PIDPressure"):
+                  if conds.get(p) == "True":
+                      bad.append(f"{name} {p}")
+          return (ready, len(d["items"])), bad
+
+
+      def _owned_by_job(pod):
+          for o in pod["metadata"].get("ownerReferences", []) or []:
+              if o.get("kind") == "Job":
+                  return True
+          return False
+
+
+      def _recent_restart(pod, window_min=20):
+          """Return True only if any container was terminated within the last window_min minutes."""
+          cutoff = datetime.now(timezone.utc) - timedelta(minutes=window_min)
+          for c in pod["status"].get("containerStatuses", []) or []:
+              term = c.get("lastState", {}).get("terminated", {})
+              fin = term.get("finishedAt") if term else None
+              if fin:
+                  try:
+                      t = datetime.fromisoformat(fin.replace("Z", "+00:00"))
+                      if t > cutoff:
+                          return True
+                  except Exception:
+                      pass
+          return False
+
+
+      def check_pods():
+          d = api("/api/v1/pods")
+          if not d:
+              return None, ["pods: query failed"]
+          running = 0
+          failing = []
+          for p in d.get("items", []):
+              ns = p["metadata"]["namespace"]
+              name = p["metadata"]["name"]
+              phase = p["status"].get("phase", "")
+              if phase == "Running":
+                  all_ready = True
+                  restart_total = 0
+                  for c in p["status"].get("containerStatuses", []) or []:
+                      if not c.get("ready"):
+                          all_ready = False
+                      restart_total += c.get("restartCount", 0)
+                  if all_ready:
+                      running += 1
+                  else:
+                      reason = ""
+                      for c in p["status"].get("containerStatuses", []) or []:
+                          w = c.get("state", {}).get("waiting", {})
+                          if w:
+                              reason = w.get("reason", "")
+                              break
+                      failing.append(f"{ns}/{name} NotReady {reason}".strip())
+                  # Only alert on restarts that happened recently (avoid stale noise)
+                  if restart_total >= 5 and _recent_restart(p, window_min=20):
+                      failing.append(f"{ns}/{name} restarts={restart_total} (recent)")
+              elif phase == "Succeeded":
+                  running += 1
+              elif phase == "Pending":
+                  failing.append(f"{ns}/{name} Pending")
+              elif phase == "Failed" and _owned_by_job(p):
+                  # Skip: failed Job/CronJob pods are tracked by check_cronjobs()
+                  pass
+              else:
+                  reason = ""
+                  for c in p["status"].get("containerStatuses", []) or []:
+                      w = c.get("state", {}).get("waiting", {})
+                      if w:
+                          reason = w.get("reason", "")
+                          break
+                  failing.append(f"{ns}/{name} {phase} {reason}".strip())
+          return (running, len(d["items"])), failing
+
+
+      def check_pvcs():
+          d = api("/api/v1/persistentvolumeclaims")
+          if not d:
+              return []
+          return [f"{p['metadata']['namespace']}/{p['metadata']['name']} {p['status'].get('phase','?')}"
+                  for p in d.get("items", []) if p["status"].get("phase") != "Bound"]
+
+
+      def check_cronjobs():
+          d = api("/apis/batch/v1/cronjobs")
+          if not d:
+              return []
+          warn = []
+          for c in d.get("items", []):
+              if c["spec"].get("suspend"):
+                  continue
+              ns = c["metadata"]["namespace"]
+              name = c["metadata"]["name"]
+              last = c["status"].get("lastScheduleTime")
+              last_ok = c["status"].get("lastSuccessfulTime")
+              if last and last_ok and last != last_ok:
+                  try:
+                      t1 = datetime.fromisoformat(last.replace("Z", "+00:00"))
+                      t2 = datetime.fromisoformat(last_ok.replace("Z", "+00:00"))
+                      if (t1 - t2).total_seconds() > 3600:
+                          warn.append(f"{ns}/{name} last run not successful")
+                  except Exception:
+                      pass
+          return warn
+
+
+      def check_velero():
+          d = api("/apis/velero.io/v1/namespaces/velero/backups")
+          if not d:
+              return []
+          items = d.get("items", [])
+          if not items:
+              return ["velero: no backups"]
+          latest = max(items, key=lambda b: b["metadata"].get("creationTimestamp", ""))
+          phase = latest["status"].get("phase", "Unknown")
+          name = latest["metadata"]["name"]
+          created = latest["metadata"].get("creationTimestamp", "")
+          age_h = 0.0
+          try:
+              t = datetime.fromisoformat(created.replace("Z", "+00:00"))
+              age_h = (datetime.now(timezone.utc) - t).total_seconds() / 3600
+          except Exception:
+              pass
+          msgs = []
+          if phase != "Completed":
+              msgs.append(f"velero: last backup {name} phase={phase}")
+          if age_h > 30:
+              msgs.append(f"velero: last backup {age_h:.0f}h old")
+          return msgs
+
+
+      def check_certs():
+          d = api("/apis/cert-manager.io/v1/certificates")
+          if not d:
+              return []
+          bad = []
+          for c in d.get("items", []):
+              ready = "Unknown"
+              for cond in c.get("status", {}).get("conditions", []):
+                  if cond["type"] == "Ready":
+                      ready = cond["status"]
+              if ready != "True":
+                  bad.append(f"{c['metadata']['namespace']}/{c['metadata']['name']} NotReady")
+          return bad
+
+
+      def build_daily():
+          lines = [f"### :sunrise: Cluster Daily Digest — `{CLUSTER_NAME}`",
+                   f"_{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}_", ""]
+          nodes, nb = check_nodes()
+          if nodes:
+              r, t = nodes
+              icon = ":white_check_mark:" if not nb else ":warning:"
+              lines.append(f"{icon} **Nodes:** {r}/{t} Ready")
+          for b in nb:
+              lines.append(f"   - :x: {b}")
+
+          pods, pb = check_pods()
+          if pods:
+              r, t = pods
+              icon = ":white_check_mark:" if len(pb) == 0 else ":warning:"
+              lines.append(f"{icon} **Pods:** {r}/{t} OK  ({len(pb)} issues)")
+          for b in pb[:10]:
+              lines.append(f"   - :x: {b}")
+          if len(pb) > 10:
+              lines.append(f"   - _…and {len(pb)-10} more_")
+
+          pvc_bad = check_pvcs()
+          if pvc_bad:
+              lines.append(f":warning: **PVCs:** {len(pvc_bad)} not bound")
+              for b in pvc_bad[:5]:
+                  lines.append(f"   - {b}")
+          else:
+              lines.append(":white_check_mark: **PVCs:** all bound")
+
+          cj_bad = check_cronjobs()
+          if cj_bad:
+              lines.append(f":warning: **CronJobs:** {len(cj_bad)} issues")
+              for b in cj_bad[:5]:
+                  lines.append(f"   - {b}")
+          else:
+              lines.append(":white_check_mark: **CronJobs:** healthy")
+
+          vel = check_velero()
+          if vel:
+              for v in vel:
+                  lines.append(f":warning: {v}")
+          else:
+              lines.append(":white_check_mark: **Velero:** last backup OK")
+
+          cb = check_certs()
+          if cb:
+              lines.append(f":warning: **Certificates:** {len(cb)} not ready")
+              for b in cb[:5]:
+                  lines.append(f"   - {b}")
+          else:
+              lines.append(":white_check_mark: **Certificates:** all ready")
+
+          lines.append("")
+          lines.append("_rule-based, no LLM · cluster-twin v0.1_")
+          return "\n".join(lines)
+
+
+      def build_critical():
+          alerts = []
+          _, nb = check_nodes()
+          for b in nb:
+              alerts.append(f":rotating_light: NODE · {b}")
+
+          _, pb = check_pods()
+          for b in pb:
+              if any(k in b for k in ("CrashLoop", "Failed", "restarts=", "ImagePullBackOff", "ErrImagePull", "OOMKilled")):
+                  alerts.append(f":rotating_light: POD · {b}")
+
+          for v in check_velero():
+              alerts.append(f":rotating_light: BACKUP · {v}")
+
+          if not alerts:
+              return None
+          header = (f"### :rotating_light: Critical Alerts — `{CLUSTER_NAME}`\n"
+                    f"_{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}_\n")
+          return header + "\n".join(alerts[:20])
+
+
+      def main():
+          if MODE == "daily":
+              msg = build_daily()
+          elif MODE == "critical":
+              msg = build_critical()
+              if not msg:
+                  print("silent: no critical")
+                  return 0
+          elif MODE == "test":
+              msg = f":test_tube: cluster-twin test OK from `{CLUSTER_NAME}` at {datetime.now(timezone.utc).isoformat()}"
+          else:
+              print(f"unknown MODE {MODE}", file=sys.stderr)
+              return 1
+          st = post_mm(msg)
+          print(f"posted status={st}")
+          return 0 if st in (200, 204) else 2
+
+
+      if __name__ == "__main__":
+          sys.exit(main())
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"reporter.py":"#!/usr/bin/env python3\n\"\"\"Cluster Twin — reports via direct K8s API, no kubectl.\"\"\"\nimport json\nimport os\nimport ssl\nimport sys\nimport urllib.request\nimport urllib.error\nfrom datetime import datetime, timezone, timedelta\n\nWEBHOOK = os.environ[\"MM_WEBHOOK\"]\nMODE = os.environ.get(\"MODE\", \"daily\")\nCLUSTER_NAME = os.environ.get(\"CLUSTER_NAME\", \"aiot2\")\n\nAPI = \"https://kubernetes.default.svc\"\nwith open(\"/var/run/secrets/kubernetes.io/serviceaccount/token\") as f:\n    TOKEN = f.read().strip()\nCA = \"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt\"\nCTX = ssl.create_default_context(cafile=CA)\n\n\ndef api(path):\n    req = urllib.request.Request(API + path, headers={\"Authorization\": f\"Bearer {TOKEN}\", \"Accept\": \"application/json\"})\n    try:\n        with urllib.request.urlopen(req, context=CTX, timeout=30) as r:\n            return json.loads(r.read())\n    except urllib.error.HTTPError as e:\n        if e.code == 404:\n            return None\n        print(f\"API {path}: HTTP {e.code}\", file=sys.stderr)\n        return None\n    except Exception as e:\n        print(f\"API {path}: {e}\", file=sys.stderr)\n        return None\n\n\ndef post_mm(text):\n    data = json.dumps({\"text\": text}).encode(\"utf-8\")\n    req = urllib.request.Request(WEBHOOK, data=data, headers={\"Content-Type\": \"application/json\"})\n    try:\n        with urllib.request.urlopen(req, timeout=15) as r:\n            return r.status\n    except urllib.error.URLError as e:\n        print(f\"webhook error: {e}\", file=sys.stderr)\n        return 0\n\n\ndef check_nodes():\n    d = api(\"/api/v1/nodes\")\n    if not d:\n        return None, [\"nodes: query failed\"]\n    bad = []\n    ready = 0\n    for n in d.get(\"items\", []):\n        name = n[\"metadata\"][\"name\"]\n        conds = {c[\"type\"]: c[\"status\"] for c in n[\"status\"].get(\"conditions\", [])}\n        if conds.get(\"Ready\") == \"True\":\n            ready += 1\n        else:\n            bad.append(f\"{name} NotReady\")\n        for p in (\"MemoryPressure\", \"DiskPressure\", \"PIDPressure\"):\n            if conds.get(p) == \"True\":\n                bad.append(f\"{name} {p}\")\n    return (ready, len(d[\"items\"])), bad\n\n\ndef _owned_by_job(pod):\n    for o in pod[\"metadata\"].get(\"ownerReferences\", []) or []:\n        if o.get(\"kind\") == \"Job\":\n            return True\n    return False\n\n\ndef _recent_restart(pod, window_min=20):\n    \"\"\"Return True only if any container was terminated within the last window_min minutes.\"\"\"\n    cutoff = datetime.now(timezone.utc) - timedelta(minutes=window_min)\n    for c in pod[\"status\"].get(\"containerStatuses\", []) or []:\n        term = c.get(\"lastState\", {}).get(\"terminated\", {})\n        fin = term.get(\"finishedAt\") if term else None\n        if fin:\n            try:\n                t = datetime.fromisoformat(fin.replace(\"Z\", \"+00:00\"))\n                if t \u003e cutoff:\n                    return True\n            except Exception:\n                pass\n    return False\n\n\ndef check_pods():\n    d = api(\"/api/v1/pods\")\n    if not d:\n        return None, [\"pods: query failed\"]\n    running = 0\n    failing = []\n    for p in d.get(\"items\", []):\n        ns = p[\"metadata\"][\"namespace\"]\n        name = p[\"metadata\"][\"name\"]\n        phase = p[\"status\"].get(\"phase\", \"\")\n        if phase == \"Running\":\n            all_ready = True\n            restart_total = 0\n            for c in p[\"status\"].get(\"containerStatuses\", []) or []:\n                if not c.get(\"ready\"):\n                    all_ready = False\n                restart_total += c.get(\"restartCount\", 0)\n            if all_ready:\n                running += 1\n            else:\n                reason = \"\"\n                for c in p[\"status\"].get(\"containerStatuses\", []) or []:\n                    w = c.get(\"state\", {}).get(\"waiting\", {})\n                    if w:\n                        reason = w.get(\"reason\", \"\")\n                        break\n                failing.append(f\"{ns}/{name} NotReady {reason}\".strip())\n            # Only alert on restarts that happened recently (avoid stale noise)\n            if restart_total \u003e= 5 and _recent_restart(p, window_min=20):\n                failing.append(f\"{ns}/{name} restarts={restart_total} (recent)\")\n        elif phase == \"Succeeded\":\n            running += 1\n        elif phase == \"Pending\":\n            failing.append(f\"{ns}/{name} Pending\")\n        elif phase == \"Failed\" and _owned_by_job(p):\n            # Skip: failed Job/CronJob pods are tracked by check_cronjobs()\n            pass\n        else:\n            reason = \"\"\n            for c in p[\"status\"].get(\"containerStatuses\", []) or []:\n                w = c.get(\"state\", {}).get(\"waiting\", {})\n                if w:\n                    reason = w.get(\"reason\", \"\")\n                    break\n            failing.append(f\"{ns}/{name} {phase} {reason}\".strip())\n    return (running, len(d[\"items\"])), failing\n\n\ndef check_pvcs():\n    d = api(\"/api/v1/persistentvolumeclaims\")\n    if not d:\n        return []\n    return [f\"{p['metadata']['namespace']}/{p['metadata']['name']} {p['status'].get('phase','?')}\"\n            for p in d.get(\"items\", []) if p[\"status\"].get(\"phase\") != \"Bound\"]\n\n\ndef check_cronjobs():\n    d = api(\"/apis/batch/v1/cronjobs\")\n    if not d:\n        return []\n    warn = []\n    for c in d.get(\"items\", []):\n        if c[\"spec\"].get(\"suspend\"):\n            continue\n        ns = c[\"metadata\"][\"namespace\"]\n        name = c[\"metadata\"][\"name\"]\n        last = c[\"status\"].get(\"lastScheduleTime\")\n        last_ok = c[\"status\"].get(\"lastSuccessfulTime\")\n        if last and last_ok and last != last_ok:\n            try:\n                t1 = datetime.fromisoformat(last.replace(\"Z\", \"+00:00\"))\n                t2 = datetime.fromisoformat(last_ok.replace(\"Z\", \"+00:00\"))\n                if (t1 - t2).total_seconds() \u003e 3600:\n                    warn.append(f\"{ns}/{name} last run not successful\")\n            except Exception:\n                pass\n    return warn\n\n\ndef check_velero():\n    d = api(\"/apis/velero.io/v1/namespaces/velero/backups\")\n    if not d:\n        return []\n    items = d.get(\"items\", [])\n    if not items:\n        return [\"velero: no backups\"]\n    latest = max(items, key=lambda b: b[\"metadata\"].get(\"creationTimestamp\", \"\"))\n    phase = latest[\"status\"].get(\"phase\", \"Unknown\")\n    name = latest[\"metadata\"][\"name\"]\n    created = latest[\"metadata\"].get(\"creationTimestamp\", \"\")\n    age_h = 0.0\n    try:\n        t = datetime.fromisoformat(created.replace(\"Z\", \"+00:00\"))\n        age_h = (datetime.now(timezone.utc) - t).total_seconds() / 3600\n    except Exception:\n        pass\n    msgs = []\n    if phase != \"Completed\":\n        msgs.append(f\"velero: last backup {name} phase={phase}\")\n    if age_h \u003e 30:\n        msgs.append(f\"velero: last backup {age_h:.0f}h old\")\n    return msgs\n\n\ndef check_certs():\n    d = api(\"/apis/cert-manager.io/v1/certificates\")\n    if not d:\n        return []\n    bad = []\n    for c in d.get(\"items\", []):\n        ready = \"Unknown\"\n        for cond in c.get(\"status\", {}).get(\"conditions\", []):\n            if cond[\"type\"] == \"Ready\":\n                ready = cond[\"status\"]\n        if ready != \"True\":\n            bad.append(f\"{c['metadata']['namespace']}/{c['metadata']['name']} NotReady\")\n    return bad\n\n\ndef build_daily():\n    lines = [f\"### :sunrise: Cluster Daily Digest — `{CLUSTER_NAME}`\",\n             f\"_{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}_\", \"\"]\n    nodes, nb = check_nodes()\n    if nodes:\n        r, t = nodes\n        icon = \":white_check_mark:\" if not nb else \":warning:\"\n        lines.append(f\"{icon} **Nodes:** {r}/{t} Ready\")\n    for b in nb:\n        lines.append(f\"   - :x: {b}\")\n\n    pods, pb = check_pods()\n    if pods:\n        r, t = pods\n        icon = \":white_check_mark:\" if len(pb) == 0 else \":warning:\"\n        lines.append(f\"{icon} **Pods:** {r}/{t} OK  ({len(pb)} issues)\")\n    for b in pb[:10]:\n        lines.append(f\"   - :x: {b}\")\n    if len(pb) \u003e 10:\n        lines.append(f\"   - _…and {len(pb)-10} more_\")\n\n    pvc_bad = check_pvcs()\n    if pvc_bad:\n        lines.append(f\":warning: **PVCs:** {len(pvc_bad)} not bound\")\n        for b in pvc_bad[:5]:\n            lines.append(f\"   - {b}\")\n    else:\n        lines.append(\":white_check_mark: **PVCs:** all bound\")\n\n    cj_bad = check_cronjobs()\n    if cj_bad:\n        lines.append(f\":warning: **CronJobs:** {len(cj_bad)} issues\")\n        for b in cj_bad[:5]:\n            lines.append(f\"   - {b}\")\n    else:\n        lines.append(\":white_check_mark: **CronJobs:** healthy\")\n\n    vel = check_velero()\n    if vel:\n        for v in vel:\n            lines.append(f\":warning: {v}\")\n    else:\n        lines.append(\":white_check_mark: **Velero:** last backup OK\")\n\n    cb = check_certs()\n    if cb:\n        lines.append(f\":warning: **Certificates:** {len(cb)} not ready\")\n        for b in cb[:5]:\n            lines.append(f\"   - {b}\")\n    else:\n        lines.append(\":white_check_mark: **Certificates:** all ready\")\n\n    lines.append(\"\")\n    lines.append(\"_rule-based, no LLM · cluster-twin v0.1_\")\n    return \"\\n\".join(lines)\n\n\ndef build_critical():\n    alerts = []\n    _, nb = check_nodes()\n    for b in nb:\n        alerts.append(f\":rotating_light: NODE · {b}\")\n\n    _, pb = check_pods()\n    for b in pb:\n        if any(k in b for k in (\"CrashLoop\", \"Failed\", \"restarts=\", \"ImagePullBackOff\", \"ErrImagePull\", \"OOMKilled\")):\n            alerts.append(f\":rotating_light: POD · {b}\")\n\n    for v in check_velero():\n        alerts.append(f\":rotating_light: BACKUP · {v}\")\n\n    if not alerts:\n        return None\n    header = (f\"### :rotating_light: Critical Alerts — `{CLUSTER_NAME}`\\n\"\n              f\"_{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}_\\n\")\n    return header + \"\\n\".join(alerts[:20])\n\n\ndef main():\n    if MODE == \"daily\":\n        msg = build_daily()\n    elif MODE == \"critical\":\n        msg = build_critical()\n        if not msg:\n            print(\"silent: no critical\")\n            return 0\n    elif MODE == \"test\":\n        msg = f\":test_tube: cluster-twin test OK from `{CLUSTER_NAME}` at {datetime.now(timezone.utc).isoformat()}\"\n    else:\n        print(f\"unknown MODE {MODE}\", file=sys.stderr)\n        return 1\n    st = post_mm(msg)\n    print(f\"posted status={st}\")\n    return 0 if st in (200, 204) else 2\n\n\nif __name__ == \"__main__\":\n    sys.exit(main())\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"cluster-twin-script","namespace":"cluster-twin"}}
+    name: cluster-twin-script
+    namespace: cluster-twin
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: cluster-twin
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: cluster-twin
+- apiVersion: v1
+  data:
+    bot.py: |
+      #!/usr/bin/env python3
+      """Cluster Twin bot — listens on Mattermost WS, answers @twin mentions."""
+      import asyncio
+      import json
+      import os
+      import re
+      import ssl
+      import sys
+      import time
+      import urllib.request
+      from datetime import datetime, timezone
+
+      import websockets
+
+      # --- MM connection ---
+      MM_URL = os.environ["MM_URL"].rstrip("/")
+      MM_TOKEN = os.environ["MM_BOT_TOKEN"]
+      BOT_USER_ID = os.environ["MM_BOT_USER_ID"]
+      # --- LLM proxy (k8sgpt-llm-proxy handles multiple providers + keys) ---
+      LLM_URL = os.environ.get("LLM_PROXY_URL", "http://k8sgpt-llm-proxy.k8sgpt.svc:8080/v1/chat/completions")
+      LLM_MODEL_HINT = os.environ.get("LLM_MODEL_HINT", "auto")
+      # --- K8s ---
+      API = "https://kubernetes.default.svc"
+      with open("/var/run/secrets/kubernetes.io/serviceaccount/token") as f:
+          K8S_TOKEN = f.read().strip()
+      K8S_CA = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+      K8S_CTX = ssl.create_default_context(cafile=K8S_CA)
+
+      DAILY_TOKEN_BUDGET = int(os.environ.get("DAILY_TOKEN_BUDGET", "50000"))
+      token_counter = {"day": "", "used": 0}
+      cache = {}
+      CACHE_TTL = 3600
+
+
+      # ---------- MM HTTP ----------
+      def mm_api(path, method="GET", body=None):
+          url = MM_URL + "/api/v4" + path
+          data = json.dumps(body).encode() if body is not None else None
+          req = urllib.request.Request(
+              url, data=data, method=method,
+              headers={"Authorization": f"Bearer {MM_TOKEN}",
+                       "Content-Type": "application/json"})
+          ctx = None
+          if url.startswith("https://"):
+              ctx = ssl.create_default_context()
+              ctx.check_hostname = False
+              ctx.verify_mode = ssl.CERT_NONE
+          with urllib.request.urlopen(req, context=ctx, timeout=30) as r:
+              return json.loads(r.read())
+
+
+      def mm_post(channel_id, message, root_id=""):
+          return mm_api("/posts", "POST",
+                        {"channel_id": channel_id, "message": message, "root_id": root_id})
+
+
+      # ---------- K8s API ----------
+      def k8s(path):
+          req = urllib.request.Request(
+              API + path,
+              headers={"Authorization": f"Bearer {K8S_TOKEN}",
+                       "Accept": "application/json"})
+          try:
+              with urllib.request.urlopen(req, context=K8S_CTX, timeout=30) as r:
+                  return json.loads(r.read())
+          except Exception as e:
+              print(f"k8s err {path}: {e}", file=sys.stderr)
+              return None
+
+
+      # ---------- Context gatherers ----------
+      def gather_pod_context(pattern):
+          d = k8s("/api/v1/pods")
+          if not d:
+              return "No K8s access."
+          rx = re.compile(pattern, re.IGNORECASE)
+          matches = [p for p in d["items"]
+                     if rx.search(p["metadata"]["name"]) or rx.search(p["metadata"]["namespace"])]
+          if not matches:
+              return f"No pods match `{pattern}`."
+          lines = [f"Pods matching `{pattern}` ({len(matches)}):"]
+          for p in matches[:10]:
+              ns = p["metadata"]["namespace"]
+              name = p["metadata"]["name"]
+              phase = p["status"].get("phase", "?")
+              node = p["spec"].get("nodeName", "?")
+              cs = p["status"].get("containerStatuses", []) or []
+              restarts = sum(c.get("restartCount", 0) for c in cs)
+              reason = ""
+              last_term = ""
+              for c in cs:
+                  w = c.get("state", {}).get("waiting", {})
+                  if w:
+                      reason = f"{w.get('reason','')} {w.get('message','')[:100]}"
+                  lt = c.get("lastState", {}).get("terminated", {})
+                  if lt:
+                      last_term = f"prev: {lt.get('reason','')} exit={lt.get('exitCode','')}"
+              lines.append(f"- {ns}/{name} phase={phase} node={node} restarts={restarts} {reason} {last_term}".strip())
+          for p in matches[:3]:
+              ns = p["metadata"]["namespace"]
+              name = p["metadata"]["name"]
+              ev = k8s(f"/api/v1/namespaces/{ns}/events?fieldSelector=involvedObject.name={name}")
+              if ev:
+                  evs = sorted(ev["items"], key=lambda e: e.get("lastTimestamp") or "", reverse=True)[:5]
+                  if evs:
+                      lines.append(f"\nEvents for {ns}/{name}:")
+                      for e in evs:
+                          lines.append(f"  {e.get('type','')} {e.get('reason','')}: {e.get('message','')[:150]}")
+          return "\n".join(lines)
+
+
+      def gather_node_context():
+          d = k8s("/api/v1/nodes")
+          if not d:
+              return "No K8s access."
+          lines = [f"Nodes ({len(d['items'])}):"]
+          for n in d["items"]:
+              name = n["metadata"]["name"]
+              conds = {c["type"]: c["status"] for c in n["status"].get("conditions", [])}
+              ready = conds.get("Ready", "?")
+              press = [p for p in ("MemoryPressure", "DiskPressure", "PIDPressure") if conds.get(p) == "True"]
+              cap = n["status"].get("capacity", {})
+              alloc = n["status"].get("allocatable", {})
+              lines.append(f"- {name} Ready={ready} cpu={alloc.get('cpu')}/{cap.get('cpu')} mem={alloc.get('memory')}/{cap.get('memory')} pods={alloc.get('pods')} pressure={press or 'none'}")
+          return "\n".join(lines)
+
+
+
+      def gather_disk_context():
+          nd = k8s("/api/v1/nodes")
+          if not nd:
+              return "No K8s access."
+          lines = ["Node disk usage (kubelet stats/summary):"]
+          for n in nd["items"]:
+              name = n["metadata"]["name"]
+              try:
+                  s = k8s(f"/api/v1/nodes/{name}/proxy/stats/summary")
+              except Exception as e:
+                  lines.append(f"- {name}: error {e}")
+                  continue
+              if not s:
+                  lines.append(f"- {name}: unreachable")
+                  continue
+              fs = (s.get("node") or {}).get("fs", {}) or {}
+              img = (s.get("node") or {}).get("runtime", {}).get("imageFs", {}) or {}
+              def fmt(b):
+                  if b is None: return "?"
+                  for u in ("B","KiB","MiB","GiB","TiB"):
+                      if b < 1024: return f"{b:.1f}{u}"
+                      b /= 1024
+                  return f"{b:.1f}PiB"
+              cap = fs.get("capacityBytes") or 0
+              used = fs.get("usedBytes") or 0
+              avail = fs.get("availableBytes") or 0
+              pct = (used/cap*100) if cap else 0
+              icap = img.get("capacityBytes") or 0
+              iused = img.get("usedBytes") or 0
+              ipct = (iused/icap*100) if icap else 0
+              warn = " :warning:" if pct > 80 or ipct > 80 else ""
+              lines.append(f"- {name}: rootfs {fmt(used)}/{fmt(cap)} ({pct:.0f}%), imagefs {fmt(iused)}/{fmt(icap)} ({ipct:.0f}%), free {fmt(avail)}{warn}")
+          pvcs = k8s("/api/v1/persistentvolumeclaims")
+          if pvcs:
+              total = len(pvcs["items"])
+              bound = sum(1 for p_ in pvcs["items"] if p_["status"].get("phase") == "Bound")
+              lines.append(f"PVCs: {bound}/{total} Bound")
+          return "\n".join(lines)
+
+
+      def gather_cluster_overview():
+          parts = []
+          nd = k8s("/api/v1/nodes")
+          if nd:
+              ready = sum(1 for n in nd["items"] if any(c["type"] == "Ready" and c["status"] == "True" for c in n["status"].get("conditions", [])))
+              parts.append(f"Nodes: {ready}/{len(nd['items'])} Ready")
+          pd = k8s("/api/v1/pods")
+          if pd:
+              total = len(pd["items"])
+              bad = []
+              for p in pd["items"]:
+                  phase = p["status"].get("phase", "")
+                  if phase not in ("Running", "Succeeded"):
+                      bad.append(f"{p['metadata']['namespace']}/{p['metadata']['name']} {phase}")
+                  else:
+                      for c in p["status"].get("containerStatuses", []) or []:
+                          if not c.get("ready") and phase == "Running":
+                              bad.append(f"{p['metadata']['namespace']}/{p['metadata']['name']} NotReady")
+                              break
+                          if c.get("restartCount", 0) >= 5:
+                              bad.append(f"{p['metadata']['namespace']}/{p['metadata']['name']} restarts={c['restartCount']}")
+                              break
+              parts.append(f"Pods: {total - len(bad)}/{total} OK, {len(bad)} issues")
+              if bad:
+                  parts.append("Problem pods:\n" + "\n".join(f"  - {b}" for b in bad[:15]))
+          return "\n".join(parts)
+
+
+      # ---------- LLM ----------
+      def check_budget():
+          today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+          if token_counter["day"] != today:
+              token_counter["day"] = today
+              token_counter["used"] = 0
+          return token_counter["used"] < DAILY_TOKEN_BUDGET
+
+
+      def call_llm(question, context):
+          if not check_budget():
+              return f"_LLM budget exhausted ({DAILY_TOKEN_BUDGET} tokens/day). Resets tomorrow._"
+          key = hash(question + context[:500])
+          now = time.time()
+          if key in cache and now - cache[key][0] < CACHE_TTL:
+              return cache[key][1] + "\n_(cached)_"
+          system = ("You are Cluster Twin, an SRE assistant for a Kubernetes cluster `aiot2`. "
+                    "Answer in the language of the question (Slovak or English). Be concise, bullet-pointed, "
+                    "actionable. When you see error patterns (OOMKilled, CrashLoopBackOff, ImagePullBackOff), "
+                    "explain the likely root cause and suggest 1-3 concrete fixes (kubectl commands). "
+                    "If context is irrelevant, say so and suggest what command user should run.")
+          body = {
+              "model": LLM_MODEL_HINT,
+              "messages": [
+                  {"role": "system", "content": system},
+                  {"role": "user", "content": f"Question: {question}\n\nCluster context:\n{context}"},
+              ],
+              "temperature": 0.2, "max_tokens": 800,
+          }
+          req = urllib.request.Request(
+              LLM_URL,
+              data=json.dumps(body).encode(),
+              headers={"Content-Type": "application/json"})
+          try:
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  d = json.loads(r.read())
+              usage = d.get("usage", {})
+              token_counter["used"] += usage.get("total_tokens", 0)
+              msg = d["choices"][0]["message"]["content"]
+              proxy_info = d.get("_proxy", {})
+              backend = f"{proxy_info.get('backend','?')}/{proxy_info.get('model', d.get('model','?'))}"
+              footer = f"\n\n_via llm-proxy → {backend} · tokens: {usage.get('total_tokens','?')} · today: {token_counter['used']}/{DAILY_TOKEN_BUDGET}_"
+              result = msg + footer
+              cache[key] = (now, result)
+              return result
+          except Exception as e:
+              return f"_LLM error: {e}_"
+
+
+      # ---------- Commands ----------
+      HELP = """**Cluster Twin — commands**
+      - `@twin status` — full cluster overview
+      - `@twin nodes` — node status
+      - `@twin pods <pattern>` — pods matching regex (e.g. `rag-worker`, `aiot`, `kubeflow`)
+      - `@twin help` — this help
+
+      **Free-form questions** (LLM, Groq):
+      - `@twin preco rag-worker casto padal?`
+      - `@twin aky je stav velero zaloh?`
+      - `@twin co robi katib-mysql?`
+      """
+
+
+      def route(text):
+          text = re.sub(r"@twin\b", "", text, flags=re.IGNORECASE).strip()
+          if not text or text.lower() in ("help", "?"):
+              return HELP
+          low = text.lower()
+          if low == "status":
+              return "### Cluster status\n" + gather_cluster_overview()
+          if low == "nodes":
+              return "### Nodes\n" + gather_node_context()
+          if low in ("disk", "disks", "disky"):
+              return "### Disk usage\n" + gather_disk_context()
+          m = re.match(r"^pods?\s+(.+)$", low)
+          if m:
+              return "### Pods\n" + gather_pod_context(m.group(1))
+          if low == "pods":
+              return gather_cluster_overview()
+          if any(k in low for k in ("disk", "disky", "zaplnen", "miesto", "capacity", "df ")):
+              ctx = gather_disk_context() + "\n\n" + gather_cluster_overview()
+              return call_llm(text, ctx)
+          ctx = gather_cluster_overview()
+          for word in re.findall(r"[a-z][a-z0-9\-]{3,}", low):
+              if word in ("status", "pods", "nodes", "cluster", "klaster", "preco", "proc", "why",
+                          "posledne", "casto", "aky", "stav", "robi", "some", "what", "does", "last",
+                          "about", "show", "tell", "velero", "zaloh"):
+                  continue
+              extra = gather_pod_context(re.escape(word))
+              if "No pods match" not in extra:
+                  ctx += "\n\n" + extra
+                  break
+          return call_llm(text, ctx)
+
+
+      def handle_post(post, channel_id):
+          msg = post.get("message", "")
+          sender_id = post.get("user_id", "")
+          post_id = post.get("id", "")
+          root_id = post.get("root_id", "") or post_id
+          if sender_id == BOT_USER_ID:
+              return
+          is_mention = "@twin" in msg.lower() or f"@{BOT_USER_ID}" in msg
+          channel_type = post.get("channel_type", "")
+          is_dm = channel_type == "D"
+          if not (is_mention or is_dm):
+              return
+          try:
+              reply = route(msg)
+          except Exception as e:
+              reply = f":boom: Error: {e}"
+          try:
+              mm_post(channel_id, reply, root_id=root_id if is_mention else "")
+          except Exception as e:
+              print(f"post error: {e}", file=sys.stderr)
+
+
+      # ---------- WebSocket main loop ----------
+      async def ws_main():
+          scheme, rest = MM_URL.split("://", 1)
+          ws_scheme = "wss" if scheme == "https" else "ws"
+          ws_url = f"{ws_scheme}://{rest}/api/v4/websocket"
+          print(f"WS connecting: {ws_url}", flush=True)
+          ssl_ctx = None
+          if ws_scheme == "wss":
+              ssl_ctx = ssl.create_default_context()
+              ssl_ctx.check_hostname = False
+              ssl_ctx.verify_mode = ssl.CERT_NONE
+          async with websockets.connect(ws_url, ssl=ssl_ctx, ping_interval=30, max_size=2**20) as ws:
+              await ws.send(json.dumps({"seq": 1, "action": "authentication_challenge",
+                                        "data": {"token": MM_TOKEN}}))
+              print("WS connected + authenticated", flush=True)
+              msg_count = 0
+              async for raw in ws:
+                  if isinstance(raw, bytes):
+                      continue
+                  msg_count += 1
+                  if msg_count <= 3:
+                      print(f"WS msg #{msg_count}: {raw[:300]}", flush=True)
+                  try:
+                      evt = json.loads(raw)
+                  except Exception:
+                      continue
+                  if evt.get("event") == "posted":
+                      data = evt.get("data", {})
+                      try:
+                          post = json.loads(data.get("post", "{}"))
+                      except Exception:
+                          continue
+                      post["channel_type"] = data.get("channel_type", "")
+                      print(f"POSTED: sender={data.get('sender_name')} msg={post.get('message','')[:100]}", flush=True)
+                      await asyncio.get_event_loop().run_in_executor(
+                          None, handle_post, post, post.get("channel_id", ""))
+
+
+      def run():
+          print(f"Cluster Twin bot starting. BOT_USER_ID={BOT_USER_ID}", flush=True)
+          while True:
+              try:
+                  asyncio.run(ws_main())
+              except Exception as e:
+                  print(f"WS loop error: {e}; reconnecting in 5s", flush=True)
+                  time.sleep(5)
+
+
+      if __name__ == "__main__":
+          run()
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"bot.py":"#!/usr/bin/env python3\n\"\"\"Cluster Twin bot — listens on Mattermost WS, answers @twin mentions.\"\"\"\nimport asyncio\nimport json\nimport os\nimport re\nimport ssl\nimport sys\nimport time\nimport urllib.request\nfrom datetime import datetime, timezone\n\nimport websockets\n\n# --- MM connection ---\nMM_URL = os.environ[\"MM_URL\"].rstrip(\"/\")\nMM_TOKEN = os.environ[\"MM_BOT_TOKEN\"]\nBOT_USER_ID = os.environ[\"MM_BOT_USER_ID\"]\n# --- LLM proxy (k8sgpt-llm-proxy handles multiple providers + keys) ---\nLLM_URL = os.environ.get(\"LLM_PROXY_URL\", \"http://k8sgpt-llm-proxy.k8sgpt.svc:8080/v1/chat/completions\")\nLLM_MODEL_HINT = os.environ.get(\"LLM_MODEL_HINT\", \"auto\")\n# --- K8s ---\nAPI = \"https://kubernetes.default.svc\"\nwith open(\"/var/run/secrets/kubernetes.io/serviceaccount/token\") as f:\n    K8S_TOKEN = f.read().strip()\nK8S_CA = \"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt\"\nK8S_CTX = ssl.create_default_context(cafile=K8S_CA)\n\nDAILY_TOKEN_BUDGET = int(os.environ.get(\"DAILY_TOKEN_BUDGET\", \"50000\"))\ntoken_counter = {\"day\": \"\", \"used\": 0}\ncache = {}\nCACHE_TTL = 3600\n\n\n# ---------- MM HTTP ----------\ndef mm_api(path, method=\"GET\", body=None):\n    url = MM_URL + \"/api/v4\" + path\n    data = json.dumps(body).encode() if body is not None else None\n    req = urllib.request.Request(\n        url, data=data, method=method,\n        headers={\"Authorization\": f\"Bearer {MM_TOKEN}\",\n                 \"Content-Type\": \"application/json\"})\n    ctx = None\n    if url.startswith(\"https://\"):\n        ctx = ssl.create_default_context()\n        ctx.check_hostname = False\n        ctx.verify_mode = ssl.CERT_NONE\n    with urllib.request.urlopen(req, context=ctx, timeout=30) as r:\n        return json.loads(r.read())\n\n\ndef mm_post(channel_id, message, root_id=\"\"):\n    return mm_api(\"/posts\", \"POST\",\n                  {\"channel_id\": channel_id, \"message\": message, \"root_id\": root_id})\n\n\n# ---------- K8s API ----------\ndef k8s(path):\n    req = urllib.request.Request(\n        API + path,\n        headers={\"Authorization\": f\"Bearer {K8S_TOKEN}\",\n                 \"Accept\": \"application/json\"})\n    try:\n        with urllib.request.urlopen(req, context=K8S_CTX, timeout=30) as r:\n            return json.loads(r.read())\n    except Exception as e:\n        print(f\"k8s err {path}: {e}\", file=sys.stderr)\n        return None\n\n\n# ---------- Context gatherers ----------\ndef gather_pod_context(pattern):\n    d = k8s(\"/api/v1/pods\")\n    if not d:\n        return \"No K8s access.\"\n    rx = re.compile(pattern, re.IGNORECASE)\n    matches = [p for p in d[\"items\"]\n               if rx.search(p[\"metadata\"][\"name\"]) or rx.search(p[\"metadata\"][\"namespace\"])]\n    if not matches:\n        return f\"No pods match `{pattern}`.\"\n    lines = [f\"Pods matching `{pattern}` ({len(matches)}):\"]\n    for p in matches[:10]:\n        ns = p[\"metadata\"][\"namespace\"]\n        name = p[\"metadata\"][\"name\"]\n        phase = p[\"status\"].get(\"phase\", \"?\")\n        node = p[\"spec\"].get(\"nodeName\", \"?\")\n        cs = p[\"status\"].get(\"containerStatuses\", []) or []\n        restarts = sum(c.get(\"restartCount\", 0) for c in cs)\n        reason = \"\"\n        last_term = \"\"\n        for c in cs:\n            w = c.get(\"state\", {}).get(\"waiting\", {})\n            if w:\n                reason = f\"{w.get('reason','')} {w.get('message','')[:100]}\"\n            lt = c.get(\"lastState\", {}).get(\"terminated\", {})\n            if lt:\n                last_term = f\"prev: {lt.get('reason','')} exit={lt.get('exitCode','')}\"\n        lines.append(f\"- {ns}/{name} phase={phase} node={node} restarts={restarts} {reason} {last_term}\".strip())\n    for p in matches[:3]:\n        ns = p[\"metadata\"][\"namespace\"]\n        name = p[\"metadata\"][\"name\"]\n        ev = k8s(f\"/api/v1/namespaces/{ns}/events?fieldSelector=involvedObject.name={name}\")\n        if ev:\n            evs = sorted(ev[\"items\"], key=lambda e: e.get(\"lastTimestamp\") or \"\", reverse=True)[:5]\n            if evs:\n                lines.append(f\"\\nEvents for {ns}/{name}:\")\n                for e in evs:\n                    lines.append(f\"  {e.get('type','')} {e.get('reason','')}: {e.get('message','')[:150]}\")\n    return \"\\n\".join(lines)\n\n\ndef gather_node_context():\n    d = k8s(\"/api/v1/nodes\")\n    if not d:\n        return \"No K8s access.\"\n    lines = [f\"Nodes ({len(d['items'])}):\"]\n    for n in d[\"items\"]:\n        name = n[\"metadata\"][\"name\"]\n        conds = {c[\"type\"]: c[\"status\"] for c in n[\"status\"].get(\"conditions\", [])}\n        ready = conds.get(\"Ready\", \"?\")\n        press = [p for p in (\"MemoryPressure\", \"DiskPressure\", \"PIDPressure\") if conds.get(p) == \"True\"]\n        cap = n[\"status\"].get(\"capacity\", {})\n        alloc = n[\"status\"].get(\"allocatable\", {})\n        lines.append(f\"- {name} Ready={ready} cpu={alloc.get('cpu')}/{cap.get('cpu')} mem={alloc.get('memory')}/{cap.get('memory')} pods={alloc.get('pods')} pressure={press or 'none'}\")\n    return \"\\n\".join(lines)\n\n\n\ndef gather_disk_context():\n    nd = k8s(\"/api/v1/nodes\")\n    if not nd:\n        return \"No K8s access.\"\n    lines = [\"Node disk usage (kubelet stats/summary):\"]\n    for n in nd[\"items\"]:\n        name = n[\"metadata\"][\"name\"]\n        try:\n            s = k8s(f\"/api/v1/nodes/{name}/proxy/stats/summary\")\n        except Exception as e:\n            lines.append(f\"- {name}: error {e}\")\n            continue\n        if not s:\n            lines.append(f\"- {name}: unreachable\")\n            continue\n        fs = (s.get(\"node\") or {}).get(\"fs\", {}) or {}\n        img = (s.get(\"node\") or {}).get(\"runtime\", {}).get(\"imageFs\", {}) or {}\n        def fmt(b):\n            if b is None: return \"?\"\n            for u in (\"B\",\"KiB\",\"MiB\",\"GiB\",\"TiB\"):\n                if b \u003c 1024: return f\"{b:.1f}{u}\"\n                b /= 1024\n            return f\"{b:.1f}PiB\"\n        cap = fs.get(\"capacityBytes\") or 0\n        used = fs.get(\"usedBytes\") or 0\n        avail = fs.get(\"availableBytes\") or 0\n        pct = (used/cap*100) if cap else 0\n        icap = img.get(\"capacityBytes\") or 0\n        iused = img.get(\"usedBytes\") or 0\n        ipct = (iused/icap*100) if icap else 0\n        warn = \" :warning:\" if pct \u003e 80 or ipct \u003e 80 else \"\"\n        lines.append(f\"- {name}: rootfs {fmt(used)}/{fmt(cap)} ({pct:.0f}%), imagefs {fmt(iused)}/{fmt(icap)} ({ipct:.0f}%), free {fmt(avail)}{warn}\")\n    pvcs = k8s(\"/api/v1/persistentvolumeclaims\")\n    if pvcs:\n        total = len(pvcs[\"items\"])\n        bound = sum(1 for p_ in pvcs[\"items\"] if p_[\"status\"].get(\"phase\") == \"Bound\")\n        lines.append(f\"PVCs: {bound}/{total} Bound\")\n    return \"\\n\".join(lines)\n\n\ndef gather_cluster_overview():\n    parts = []\n    nd = k8s(\"/api/v1/nodes\")\n    if nd:\n        ready = sum(1 for n in nd[\"items\"] if any(c[\"type\"] == \"Ready\" and c[\"status\"] == \"True\" for c in n[\"status\"].get(\"conditions\", [])))\n        parts.append(f\"Nodes: {ready}/{len(nd['items'])} Ready\")\n    pd = k8s(\"/api/v1/pods\")\n    if pd:\n        total = len(pd[\"items\"])\n        bad = []\n        for p in pd[\"items\"]:\n            phase = p[\"status\"].get(\"phase\", \"\")\n            if phase not in (\"Running\", \"Succeeded\"):\n                bad.append(f\"{p['metadata']['namespace']}/{p['metadata']['name']} {phase}\")\n            else:\n                for c in p[\"status\"].get(\"containerStatuses\", []) or []:\n                    if not c.get(\"ready\") and phase == \"Running\":\n                        bad.append(f\"{p['metadata']['namespace']}/{p['metadata']['name']} NotReady\")\n                        break\n                    if c.get(\"restartCount\", 0) \u003e= 5:\n                        bad.append(f\"{p['metadata']['namespace']}/{p['metadata']['name']} restarts={c['restartCount']}\")\n                        break\n        parts.append(f\"Pods: {total - len(bad)}/{total} OK, {len(bad)} issues\")\n        if bad:\n            parts.append(\"Problem pods:\\n\" + \"\\n\".join(f\"  - {b}\" for b in bad[:15]))\n    return \"\\n\".join(parts)\n\n\n# ---------- LLM ----------\ndef check_budget():\n    today = datetime.now(timezone.utc).strftime(\"%Y-%m-%d\")\n    if token_counter[\"day\"] != today:\n        token_counter[\"day\"] = today\n        token_counter[\"used\"] = 0\n    return token_counter[\"used\"] \u003c DAILY_TOKEN_BUDGET\n\n\ndef call_llm(question, context):\n    if not check_budget():\n        return f\"_LLM budget exhausted ({DAILY_TOKEN_BUDGET} tokens/day). Resets tomorrow._\"\n    key = hash(question + context[:500])\n    now = time.time()\n    if key in cache and now - cache[key][0] \u003c CACHE_TTL:\n        return cache[key][1] + \"\\n_(cached)_\"\n    system = (\"You are Cluster Twin, an SRE assistant for a Kubernetes cluster `aiot2`. \"\n              \"Answer in the language of the question (Slovak or English). Be concise, bullet-pointed, \"\n              \"actionable. When you see error patterns (OOMKilled, CrashLoopBackOff, ImagePullBackOff), \"\n              \"explain the likely root cause and suggest 1-3 concrete fixes (kubectl commands). \"\n              \"If context is irrelevant, say so and suggest what command user should run.\")\n    body = {\n        \"model\": LLM_MODEL_HINT,\n        \"messages\": [\n            {\"role\": \"system\", \"content\": system},\n            {\"role\": \"user\", \"content\": f\"Question: {question}\\n\\nCluster context:\\n{context}\"},\n        ],\n        \"temperature\": 0.2, \"max_tokens\": 800,\n    }\n    req = urllib.request.Request(\n        LLM_URL,\n        data=json.dumps(body).encode(),\n        headers={\"Content-Type\": \"application/json\"})\n    try:\n        with urllib.request.urlopen(req, timeout=60) as r:\n            d = json.loads(r.read())\n        usage = d.get(\"usage\", {})\n        token_counter[\"used\"] += usage.get(\"total_tokens\", 0)\n        msg = d[\"choices\"][0][\"message\"][\"content\"]\n        proxy_info = d.get(\"_proxy\", {})\n        backend = f\"{proxy_info.get('backend','?')}/{proxy_info.get('model', d.get('model','?'))}\"\n        footer = f\"\\n\\n_via llm-proxy → {backend} · tokens: {usage.get('total_tokens','?')} · today: {token_counter['used']}/{DAILY_TOKEN_BUDGET}_\"\n        result = msg + footer\n        cache[key] = (now, result)\n        return result\n    except Exception as e:\n        return f\"_LLM error: {e}_\"\n\n\n# ---------- Commands ----------\nHELP = \"\"\"**Cluster Twin — commands**\n- `@twin status` — full cluster overview\n- `@twin nodes` — node status\n- `@twin pods \u003cpattern\u003e` — pods matching regex (e.g. `rag-worker`, `aiot`, `kubeflow`)\n- `@twin help` — this help\n\n**Free-form questions** (LLM, Groq):\n- `@twin preco rag-worker casto padal?`\n- `@twin aky je stav velero zaloh?`\n- `@twin co robi katib-mysql?`\n\"\"\"\n\n\ndef route(text):\n    text = re.sub(r\"@twin\\b\", \"\", text, flags=re.IGNORECASE).strip()\n    if not text or text.lower() in (\"help\", \"?\"):\n        return HELP\n    low = text.lower()\n    if low == \"status\":\n        return \"### Cluster status\\n\" + gather_cluster_overview()\n    if low == \"nodes\":\n        return \"### Nodes\\n\" + gather_node_context()\n    if low in (\"disk\", \"disks\", \"disky\"):\n        return \"### Disk usage\\n\" + gather_disk_context()\n    m = re.match(r\"^pods?\\s+(.+)$\", low)\n    if m:\n        return \"### Pods\\n\" + gather_pod_context(m.group(1))\n    if low == \"pods\":\n        return gather_cluster_overview()\n    if any(k in low for k in (\"disk\", \"disky\", \"zaplnen\", \"miesto\", \"capacity\", \"df \")):\n        ctx = gather_disk_context() + \"\\n\\n\" + gather_cluster_overview()\n        return call_llm(text, ctx)\n    ctx = gather_cluster_overview()\n    for word in re.findall(r\"[a-z][a-z0-9\\-]{3,}\", low):\n        if word in (\"status\", \"pods\", \"nodes\", \"cluster\", \"klaster\", \"preco\", \"proc\", \"why\",\n                    \"posledne\", \"casto\", \"aky\", \"stav\", \"robi\", \"some\", \"what\", \"does\", \"last\",\n                    \"about\", \"show\", \"tell\", \"velero\", \"zaloh\"):\n            continue\n        extra = gather_pod_context(re.escape(word))\n        if \"No pods match\" not in extra:\n            ctx += \"\\n\\n\" + extra\n            break\n    return call_llm(text, ctx)\n\n\ndef handle_post(post, channel_id):\n    msg = post.get(\"message\", \"\")\n    sender_id = post.get(\"user_id\", \"\")\n    post_id = post.get(\"id\", \"\")\n    root_id = post.get(\"root_id\", \"\") or post_id\n    if sender_id == BOT_USER_ID:\n        return\n    is_mention = \"@twin\" in msg.lower() or f\"@{BOT_USER_ID}\" in msg\n    channel_type = post.get(\"channel_type\", \"\")\n    is_dm = channel_type == \"D\"\n    if not (is_mention or is_dm):\n        return\n    try:\n        reply = route(msg)\n    except Exception as e:\n        reply = f\":boom: Error: {e}\"\n    try:\n        mm_post(channel_id, reply, root_id=root_id if is_mention else \"\")\n    except Exception as e:\n        print(f\"post error: {e}\", file=sys.stderr)\n\n\n# ---------- WebSocket main loop ----------\nasync def ws_main():\n    scheme, rest = MM_URL.split(\"://\", 1)\n    ws_scheme = \"wss\" if scheme == \"https\" else \"ws\"\n    ws_url = f\"{ws_scheme}://{rest}/api/v4/websocket\"\n    print(f\"WS connecting: {ws_url}\", flush=True)\n    ssl_ctx = None\n    if ws_scheme == \"wss\":\n        ssl_ctx = ssl.create_default_context()\n        ssl_ctx.check_hostname = False\n        ssl_ctx.verify_mode = ssl.CERT_NONE\n    async with websockets.connect(ws_url, ssl=ssl_ctx, ping_interval=30, max_size=2**20) as ws:\n        await ws.send(json.dumps({\"seq\": 1, \"action\": \"authentication_challenge\",\n                                  \"data\": {\"token\": MM_TOKEN}}))\n        print(\"WS connected + authenticated\", flush=True)\n        msg_count = 0\n        async for raw in ws:\n            if isinstance(raw, bytes):\n                continue\n            msg_count += 1\n            if msg_count \u003c= 3:\n                print(f\"WS msg #{msg_count}: {raw[:300]}\", flush=True)\n            try:\n                evt = json.loads(raw)\n            except Exception:\n                continue\n            if evt.get(\"event\") == \"posted\":\n                data = evt.get(\"data\", {})\n                try:\n                    post = json.loads(data.get(\"post\", \"{}\"))\n                except Exception:\n                    continue\n                post[\"channel_type\"] = data.get(\"channel_type\", \"\")\n                print(f\"POSTED: sender={data.get('sender_name')} msg={post.get('message','')[:100]}\", flush=True)\n                await asyncio.get_event_loop().run_in_executor(\n                    None, handle_post, post, post.get(\"channel_id\", \"\"))\n\n\ndef run():\n    print(f\"Cluster Twin bot starting. BOT_USER_ID={BOT_USER_ID}\", flush=True)\n    while True:\n        try:\n            asyncio.run(ws_main())\n        except Exception as e:\n            print(f\"WS loop error: {e}; reconnecting in 5s\", flush=True)\n            time.sleep(5)\n\n\nif __name__ == \"__main__\":\n    run()\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"twin-bot-script","namespace":"cluster-twin"}}
+    name: twin-bot-script
+    namespace: cluster-twin
+kind: List
+metadata:

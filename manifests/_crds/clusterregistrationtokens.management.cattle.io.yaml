@@ -1,0 +1,31 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  kind: ClusterRegistrationToken
+  metadata:
+    name: default-token
+    namespace: local
+  spec:
+    clusterName: local
+  status:
+    command: kubectl apply -f https://rancher.35.241.255.137.nip.io/v3/import/qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp_local.yaml
+    insecureCommand: curl --insecure -sfL https://rancher.35.241.255.137.nip.io/v3/import/qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp_local.yaml
+      | kubectl apply -f -
+    insecureNodeCommand: ' curl --insecure -fL https://rancher.35.241.255.137.nip.io/system-agent-install.sh
+      | sudo  sh -s - --server https://rancher.35.241.255.137.nip.io --label ''cattle.io/os=linux''
+      --token qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp'
+    insecureWindowsNodeCommand: ' curl.exe --insecure -fL https://rancher.35.241.255.137.nip.io/wins-agent-install.ps1
+      -o install.ps1; Set-ExecutionPolicy Bypass -Scope Process -Force; ./install.ps1
+      -Server https://rancher.35.241.255.137.nip.io -Label ''cattle.io/os=windows''
+      -Token qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp -Worker'
+    manifestUrl: https://rancher.35.241.255.137.nip.io/v3/import/qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp_local.yaml
+    nodeCommand: ' curl -fL https://rancher.35.241.255.137.nip.io/system-agent-install.sh
+      | sudo  sh -s - --server https://rancher.35.241.255.137.nip.io --label ''cattle.io/os=linux''
+      --token qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp'
+    token: qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp
+    windowsNodeCommand: ' curl.exe -fL https://rancher.35.241.255.137.nip.io/wins-agent-install.ps1
+      -o install.ps1; Set-ExecutionPolicy Bypass -Scope Process -Force; ./install.ps1
+      -Server https://rancher.35.241.255.137.nip.io -Label ''cattle.io/os=windows''
+      -Token qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp -Worker'
+kind: List
+metadata:

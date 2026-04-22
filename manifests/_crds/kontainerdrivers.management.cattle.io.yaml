@@ -1,0 +1,82 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  kind: KontainerDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-kontainer-driver-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-kontainer-driver-lifecycle
+    labels:
+      cattle.io/creator: norman
+    name: linodekubernetesengine
+  spec:
+    active: false
+    builtIn: false
+    checksum: b17337edeb3b3d4d4f007836e0f9dd946e51eb5cf0945f51f6d48e74123883b5
+    uiUrl: ""
+    url: https://github.com/linode/kontainer-engine-driver-lke/releases/download/v0.0.13/kontainer-engine-driver-lke-linux-amd64
+    whitelistDomains:
+    - api.linode.com
+  status:
+    actualUrl: ""
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:47:35Z"
+      status: "True"
+      type: Inactive
+    displayName: linodekubernetesengine
+    executablePath: ""
+- apiVersion: management.cattle.io/v3
+  kind: KontainerDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-kontainer-driver-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-kontainer-driver-lifecycle
+    labels:
+      cattle.io/creator: norman
+    name: opentelekomcloudcontainerengine
+  spec:
+    active: false
+    builtIn: false
+    checksum: 0998586e1949c826430b10d6b78ee74f2a97769bede0bdd1178c1865a2607065
+    uiUrl: https://otc-rancher.obs.eu-de.otc.t-systems.com/cluster/ui/v1.2.1/component.js
+    url: https://otc-rancher.obs.eu-de.otc.t-systems.com/cluster/driver/1.1.1/kontainer-engine-driver-otccce_linux_amd64.tar.gz
+    whitelistDomains:
+    - '*.otc.t-systems.com'
+  status:
+    actualUrl: ""
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:47:35Z"
+      status: "True"
+      type: Inactive
+    displayName: opentelekomcloudcontainerengine
+    executablePath: ""
+- apiVersion: management.cattle.io/v3
+  kind: KontainerDriver
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-kontainer-driver-lifecycle: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-kontainer-driver-lifecycle
+    labels:
+      cattle.io/creator: norman
+    name: oraclecontainerengine
+  spec:
+    active: false
+    builtIn: false
+    checksum: be98aae12bb4834867dc190aac7078a4caa8236b8ee54bb86215b4f890d83865
+    uiUrl: ""
+    url: https://github.com/rancher-plugins/kontainer-engine-driver-oke/releases/download/v1.8.8/kontainer-engine-driver-oke-linux
+    whitelistDomains:
+    - '*.oraclecloud.com'
+  status:
+    actualUrl: ""
+    conditions:
+    - lastUpdateTime: "2026-04-19T20:47:35Z"
+      status: "True"
+      type: Inactive
+    displayName: oraclecontainerengine
+    executablePath: ""
+kind: List
+metadata:

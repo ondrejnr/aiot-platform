@@ -1,0 +1,1473 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: rancher/rancher-agent:head
+  kind: Setting
+  metadata:
+    name: agent-image
+  source: env
+  value: rancher/rancher-agent:v2.13.3
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: 300s
+  kind: Setting
+  metadata:
+    name: agent-rollout-timeout
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: strict
+  kind: Setting
+  metadata:
+    name: agent-tls-mode
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: aks-operator-version
+  source: env
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "300"
+  kind: Setting
+  metadata:
+    name: aks-refresh
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ali-operator-version
+  source: env
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "300"
+  kind: Setting
+  metadata:
+    name: alibaba-refresh
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: api-host
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: 1.1.11
+  kind: Setting
+  metadata:
+    name: api-ui-version
+  source: env
+  value: 1.1.11
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: rancher/kube-api-auth:v0.2.5
+  kind: Setting
+  metadata:
+    name: auth-image
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: auth-password-requirements-description
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "129600"
+  kind: Setting
+  metadata:
+    name: auth-token-max-ttl-minutes
+  source: ""
+  value: "0"
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "3600"
+  kind: Setting
+  metadata:
+    name: auth-user-info-max-age-seconds
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: 0 0 * * *
+  kind: Setting
+  metadata:
+    name: auth-user-info-resync-cron
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "960"
+  kind: Setting
+  metadata:
+    name: auth-user-session-idle-ttl-minutes
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "960"
+  kind: Setting
+  metadata:
+    name: auth-user-session-ttl-minutes
+  source: ""
+  value: "0"
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "10"
+  kind: Setting
+  metadata:
+    name: authorization-cache-ttl-seconds
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "10"
+  kind: Setting
+  metadata:
+    name: authorization-deny-cache-ttl-seconds
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "10000"
+  kind: Setting
+  metadata:
+    name: azure-group-cache-size
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: cacerts
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: release-v2.13
+  kind: Setting
+  metadata:
+    name: chart-default-branch
+  source: env
+  value: release-v2.13
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://git.rancher.io/
+  kind: Setting
+  metadata:
+    name: chart-default-url
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://releases.rancher.com/cli/v1.0.0-alpha8/rancher-darwin-amd64-v1.0.0-alpha8.tar.gz
+  kind: Setting
+  metadata:
+    name: cli-url-darwin
+  source: env
+  value: https://releases.rancher.com/cli2/v2.13.3/rancher-darwin-amd64-v2.13.3.tar.gz
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://releases.rancher.com/cli/v1.0.0-alpha8/rancher-linux-amd64-v1.0.0-alpha8.tar.gz
+  kind: Setting
+  metadata:
+    name: cli-url-linux
+  source: env
+  value: https://releases.rancher.com/cli2/v2.13.3/rancher-linux-amd64-v2.13.3.tar.gz
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://releases.rancher.com/cli/v1.0.0-alpha8/rancher-windows-386-v1.0.0-alpha8.zip
+  kind: Setting
+  metadata:
+    name: cli-url-windows
+  source: env
+  value: https://releases.rancher.com/cli2/v2.13.3/rancher-windows-386-v2.13.3.zip
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: cli-version
+  source: env
+  value: v2.13.3
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: |-
+    {
+      "nodeAffinity": {
+        "requiredDuringSchedulingIgnoredDuringExecution": {
+          "nodeSelectorTerms": [
+            {
+              "matchExpressions": [
+                {
+                  "key": "kubernetes.io/os",
+                  "operator": "NotIn",
+                  "values": [
+                    "windows"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "preferredDuringSchedulingIgnoredDuringExecution": [
+          {
+            "weight": 100,
+            "preference": {
+              "matchExpressions": [
+                {
+                  "key": "node-role.kubernetes.io/controlplane",
+                  "operator": "In",
+                  "values": [
+                    "true"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "weight": 100,
+            "preference": {
+              "matchExpressions": [
+                {
+                  "key": "node-role.kubernetes.io/control-plane",
+                  "operator": "In",
+                  "values": [
+                    "true"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "weight": 1,
+            "preference": {
+              "matchExpressions": [
+                {
+                  "key": "cattle.io/cluster-agent",
+                  "operator": "In",
+                  "values": [
+                    "true"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "podAntiAffinity": {
+        "preferredDuringSchedulingIgnoredDuringExecution": [
+          {
+            "weight": 100,
+            "podAffinityTerm": {
+              "labelSelector": {
+                "matchExpressions": [
+                  {
+                    "key": "app",
+                    "operator": "In",
+                    "values": [
+                      "cattle-cluster-agent"
+                    ]
+                  }
+                ]
+              },
+              "topologyKey": "kubernetes.io/hostname"
+            }
+          }
+        ]
+      }
+    }
+  kind: Setting
+  metadata:
+    name: cluster-agent-default-affinity
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "{\n\t\"minAvailable\": \"1\",\n\t\"maxUnavailable\": \"0\"\n}"
+  kind: Setting
+  metadata:
+    name: cluster-agent-default-pod-disruption-budget
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: |-
+    {
+        "preemptionPolicy": "PreemptLowerPriority",
+        "value": 1000000000
+    }
+  kind: Setting
+  metadata:
+    name: cluster-agent-default-priority-class
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: cluster-autoscaler-chart-repository
+  source: env
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: cluster-autoscaler-image
+  source: env
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "50"
+  kind: Setting
+  metadata:
+    name: cluster-controller-start-count
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "false"
+  kind: Setting
+  metadata:
+    name: cluster-template-enforcement
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: rancher-config
+  kind: Setting
+  metadata:
+    name: config-map-name
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://acs-mirror.azureedge.net/csi-proxy/%[1]s/binaries/csi-proxy-%[1]s.tar.gz
+  kind: Setting
+  metadata:
+    name: csi-proxy-agent-url
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: csi-proxy-agent-version
+  source: env
+  value: v1.1.3
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: csp-adapter-min-version
+  source: env
+  value: 108.0.0+up8.0.0
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: delete-inactive-user-after
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: 0s
+  kind: Setting
+  metadata:
+    name: delete-machine-on-failure-after
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: disable-inactive-user-after
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: display-add-extension-repos-banner
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: eks-operator-version
+  source: env
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "300"
+  kind: Setting
+  metadata:
+    name: eks-refresh
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: '*/5 * * * *'
+  kind: Setting
+  metadata:
+    annotations:
+      settings.management.cattle.io/migrated: "true"
+    name: eks-refresh-cron
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://releases.rancher.com/install-docker/28.1.sh
+  kind: Setting
+  metadata:
+    name: engine-install-url
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://releases.rancher.com/os/latest/rancheros-vmware.iso
+  kind: Setting
+  metadata:
+    name: engine-iso-url
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: v17.12.0
+  kind: Setting
+  metadata:
+    name: engine-newest-version
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ~v1.11.2 || ~v1.12.0 || ~v1.13.0 || ~v17.03.0 || ~v17.06.0 || ~v17.09.0
+    || ~v18.06.0 || ~v18.09.0 || ~v19.03.0 || ~v20.10.0 || ~v23.0.0 || ~v24.0.0 ||
+    ~v25.0.0 || ~v26.0.0 || ~v26.1.0|| ~v27.0.0|| ~v27.1.0|| ~v27.2.0|| ~v27.3.0||
+    ~v27.4.0|| ~v27.5.0|| ~v28.0.0|| ~v28.1.0
+  kind: Setting
+  metadata:
+    name: engine-supported-range
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: eula-agreed
+  source: ""
+  value: "2026-04-19T20:54:25.763Z"
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "true"
+  kind: Setting
+  metadata:
+    name: first-login
+  source: ""
+  value: "false"
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: |-
+    {
+      "nodeAffinity": {
+        "preferredDuringSchedulingIgnoredDuringExecution": [
+          {
+            "weight": 1,
+            "preference": {
+              "matchExpressions": [
+                {
+                  "key": "fleet.cattle.io/agent",
+                  "operator": "In",
+                  "values": [
+                    "true"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  kind: Setting
+  metadata:
+    name: fleet-agent-default-affinity
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: fleet-default
+  kind: Setting
+  metadata:
+    name: fleet-default-workspace-name
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: fleet-min-version
+  source: env
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: fleet-version
+  source: env
+  value: 108.0.3+up0.14.3
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://api.github.com
+  kind: Setting
+  metadata:
+    name: github-proxy-api-url
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: gke-operator-version
+  source: env
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "300"
+  kind: Setting
+  metadata:
+    name: gke-refresh
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "false"
+  kind: Setting
+  metadata:
+    name: global-registry-enabled
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: has-support
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "10"
+  kind: Setting
+  metadata:
+    name: helm-max-history
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: dev
+  kind: Setting
+  metadata:
+    name: helm-version
+  source: env
+  value: v3.19.0-rancher1
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "false"
+  kind: Setting
+  metadata:
+    name: hide-local-cluster
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ignore-node-name
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "true"
+  kind: Setting
+  metadata:
+    name: imported-cluster-version-management
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: sslip.io
+  kind: Setting
+  metadata:
+    name: ingress-ip-domain
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: /var/lib/docker
+  kind: Setting
+  metadata:
+    name: initial-docker-root-dir
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: install-uuid
+  source: ""
+  value: 4ff22302-227c-4b8c-b82b-0e08feaddb00
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: internal-cacerts
+  source: ""
+  value: |
+    -----BEGIN CERTIFICATE-----
+    MIIBvjCCAWOgAwIBAgIBADAKBggqhkjOPQQDAjBGMRwwGgYDVQQKExNkeW5hbWlj
+    bGlzdGVuZXItb3JnMSYwJAYDVQQDDB1keW5hbWljbGlzdGVuZXItY2FAMTc3NjYz
+    MTY1MjAeFw0yNjA0MTkxOTQ3MzJaFw0zNjA0MTYxOTQ3MzJaMEYxHDAaBgNVBAoT
+    E2R5bmFtaWNsaXN0ZW5lci1vcmcxJjAkBgNVBAMMHWR5bmFtaWNsaXN0ZW5lci1j
+    YUAxNzc2NjMxNjUyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeUICrFnsuAcC
+    7vv8CvyQgvDcXesZ+MJ9Cfa6CArysN6JRKa+o/9b/SY6w5nSSBoMZXqC/KV+S2T1
+    FAmtuC+o6KNCMEAwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB/wQFMAMBAf8wHQYD
+    VR0OBBYEFPhRFHlO61M1llJhMOpaFRq4P1qHMAoGCCqGSM49BAMCA0kAMEYCIQD7
+    vkYer2UP+xzTTV26m9CdFXuCAoDV48wd0JCMaRh12AIhAJ9yXcNx3kXBNudb/2G9
+    Blbiipq0Sg6hvVINAvnlXaaW
+    -----END CERTIFICATE-----
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: internal-server-url
+  source: ""
+  value: https://10.108.226.249
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "60"
+  kind: Setting
+  metadata:
+    name: jailer-timeout
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "5"
+  kind: Setting
+  metadata:
+    name: k3s-based-upgrader-uninstall-concurrency
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: k3s-default-version
+  source: ""
+  value: 1.34.6+k3s1
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: k8s-version
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: k8s-version-to-images
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: k8s-version-to-service-options
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: k8s-versions-current
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: k8s-versions-deprecated
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: release-v2.13
+  kind: Setting
+  metadata:
+    name: kdm-branch
+  source: env
+  value: release-v2.13
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: '{}'
+  kind: Setting
+  metadata:
+    name: kev2-operators
+  source: ""
+  value: '[{"name":"aks","active":true},{"name":"alibaba","active":false},{"name":"eks","active":true},{"name":"gke","active":true}]'
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "43200"
+  kind: Setting
+  metadata:
+    name: kubeconfig-default-token-ttl-minutes
+  source: ""
+  value: "0"
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "true"
+  kind: Setting
+  metadata:
+    name: kubeconfig-generate-token
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: rancher/machine:v0.15.0-rancher137
+  kind: Setting
+  metadata:
+    name: machine-provision-image
+  source: env
+  value: rancher/machine:v0.15.0-rancher137
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: Always
+  kind: Setting
+  metadata:
+    name: machine-provision-image-pull-policy
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: dev
+  kind: Setting
+  metadata:
+    name: machine-version
+  source: env
+  value: v0.15.0-rancher137
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "31457280"
+  kind: Setting
+  metadata:
+    name: max-ui-plugin-file-byte-size
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: cattle-system
+  kind: Setting
+  metadata:
+    name: namespace
+  source: env
+  value: cattle-system
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: no-default-admin
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: main
+  kind: Setting
+  metadata:
+    name: partner-chart-default-branch
+  source: env
+  value: main
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://git.rancher.io/
+  kind: Setting
+  metadata:
+    name: partner-chart-default-url
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "12"
+  kind: Setting
+  metadata:
+    name: password-min-length
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: rancher
+  kind: Setting
+  metadata:
+    name: peer-service
+  source: env
+  value: rancher
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: 1Mi
+  kind: Setting
+  metadata:
+    name: public-api-body-limit
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: rancher-provisioning-capi-version
+  source: env
+  value: 108.0.0+up0.9.0
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: rancher-turtles-version
+  source: env
+  value: 108.0.4+up0.25.4
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: rancher-webhook-version
+  source: env
+  value: 108.0.3+up0.9.3
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: remotedialer-proxy-version
+  source: env
+  value: 106.0.2+up0.6.0
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: '{"refresh-interval-minutes":"1440","url":"https://releases.rancher.com/kontainer-driver-metadata/release-v2.13/data.json"}'
+  kind: Setting
+  metadata:
+    name: rke-metadata-config
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: main
+  kind: Setting
+  metadata:
+    name: rke2-chart-default-branch
+  source: env
+  value: main
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://git.rancher.io/
+  kind: Setting
+  metadata:
+    name: rke2-chart-default-url
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: rke2-default-version
+  source: ""
+  value: 1.34.6+rke2r3
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "7"
+  kind: Setting
+  metadata:
+    name: rotate-certs-if-expiring-in-days
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: 30s
+  kind: Setting
+  metadata:
+    name: s3-bucket-check-timeout
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: rancher/scc-operator:v0.3.1
+  kind: Setting
+  metadata:
+    name: scc-operator-image
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: rancher/rancher
+  kind: Setting
+  metadata:
+    name: server-image
+  source: env
+  value: rancher/rancher
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: server-url
+  source: ""
+  value: https://rancher.35.241.255.137.nip.io
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: dev
+  kind: Setting
+  metadata:
+    name: server-version
+  source: env
+  value: v2.13.3
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: dev
+  kind: Setting
+  metadata:
+    name: server-version-type
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: rancher/shell:v0.6.2
+  kind: Setting
+  metadata:
+    name: shell-image
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "true"
+  kind: Setting
+  metadata:
+    name: skip-helm-index-filtering
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: skip-hosted-cluster-chart-installation
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: 15m
+  kind: Setting
+  metadata:
+    name: sql-cache-gc-interval
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "1000"
+  kind: Setting
+  metadata:
+    name: sql-cache-gc-keep-count
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://github.com/rancher/system-agent/releases/download/v0.3.14/install.sh
+  kind: Setting
+  metadata:
+    name: system-agent-install-script
+  source: env
+  value: https://github.com/rancher/system-agent/releases/download/v0.3.14/install.sh
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: system-agent-installer-image
+  source: env
+  value: rancher/system-agent-installer-
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: system-agent-upgrade-image
+  source: env
+  value: rancher/system-agent:v0.3.14-suc
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "5"
+  kind: Setting
+  metadata:
+    name: system-agent-upgrader-install-concurrency
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: system-agent-version
+  source: env
+  value: v0.3.14
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: external
+  kind: Setting
+  metadata:
+    name: system-catalog
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: system-default-registry
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "21600"
+  kind: Setting
+  metadata:
+    name: system-feature-chart-refresh-seconds
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: 300s
+  kind: Setting
+  metadata:
+    name: system-managed-charts-operation-timeout
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: kube-system,kube-public,cattle-system,cattle-alerting,cattle-logging,cattle-prometheus,ingress-nginx,cattle-global-data,cattle-istio,kube-node-lease,cert-manager,cattle-global-nt,security-scan,cattle-fleet-system,cattle-fleet-local-system,calico-system,tigera-operator,cattle-impersonation-system,rancher-operator-system,cattle-csp-adapter-system,calico-apiserver,cattle-elemental-system,cattle-scc-system,cattle-telemetry-system,cattle-local-user-passwords,cattle-tokens
+  kind: Setting
+  metadata:
+    name: system-namespaces
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: system-upgrade-controller-chart-version
+  source: env
+  value: 108.0.0
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+  kind: Setting
+  metadata:
+    name: tls-ciphers
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "1.2"
+  kind: Setting
+  metadata:
+    name: tls-min-version
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-banner-dark
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-banner-footer
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-banner-header
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-banner-light
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-banner-login-consent
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: '{}'
+  kind: Setting
+  metadata:
+    name: ui-banners
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-brand
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "true"
+  kind: Setting
+  metadata:
+    name: ui-community-links
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "true"
+  kind: Setting
+  metadata:
+    name: ui-content-enabled
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-content-endpoint
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-custom-links
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://releases.rancher.com/harvester-ui/plugin/harvester-1.0.3-head/harvester-1.0.3-head.umd.min.js
+  kind: Setting
+  metadata:
+    name: ui-dashboard-harvester-legacy-plugin
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://releases.rancher.com/dashboard/release-2.13/index.html
+  kind: Setting
+  metadata:
+    name: ui-dashboard-index
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: /usr/share/rancher/ui-dashboard
+  kind: Setting
+  metadata:
+    name: ui-dashboard-path
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: vue
+  kind: Setting
+  metadata:
+    name: ui-default-landing
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-extensions
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-favicon
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-feedback-form
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://releases.rancher.com/ui/release-2.13/index.html
+  kind: Setting
+  metadata:
+    name: ui-index
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-issues
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: <=1.14.x
+  kind: Setting
+  metadata:
+    name: ui-k8s-default-version-range
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: '>= 1.11.0 <=1.14.x'
+  kind: Setting
+  metadata:
+    name: ui-k8s-supported-versions-range
+  source: ""
+  value: '>=v1.32.x <=v1.34.x'
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-link-color
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-login-background-dark
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-login-background-light
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-logo-dark
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-logo-light
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: dynamic
+  kind: Setting
+  metadata:
+    name: ui-offline-preferred
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: /usr/share/rancher/ui
+  kind: Setting
+  metadata:
+    name: ui-path
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-performance
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: rancher
+  kind: Setting
+  metadata:
+    name: ui-pl
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: vue
+  kind: Setting
+  metadata:
+    name: ui-preferred
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-primary-color
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: ui-theme
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "true"
+  kind: Setting
+  metadata:
+    name: unprivileged-jail-user
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: user-last-login-default
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: user-retention-cron
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: "false"
+  kind: Setting
+  metadata:
+    name: user-retention-dry-run
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: forums.rancher.com
+  kind: Setting
+  metadata:
+    name: whitelist-domain
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: HTTP_PROXY,HTTPS_PROXY,NO_PROXY
+  kind: Setting
+  metadata:
+    name: whitelist-envvars
+  source: ""
+  value: ""
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: https://raw.githubusercontent.com/rancher/wins/v0.5.3-r2/install.ps1
+  kind: Setting
+  metadata:
+    name: wins-agent-install-script
+  source: env
+  value: https://raw.githubusercontent.com/rancher/wins/v0.5.3-r2/install.ps1
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: wins-agent-upgrade-image
+  source: env
+  value: rancher/wins:v0.5.3-r2
+- apiVersion: management.cattle.io/v3
+  customized: false
+  default: ""
+  kind: Setting
+  metadata:
+    name: wins-agent-version
+  source: env
+  value: v0.5.3-r2
+kind: List
+metadata:

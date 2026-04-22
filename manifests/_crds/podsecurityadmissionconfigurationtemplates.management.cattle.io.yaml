@@ -1,0 +1,70 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  configuration:
+    defaults:
+      audit: privileged
+      audit-version: latest
+      enforce: privileged
+      enforce-version: latest
+      warn: privileged
+      warn-version: latest
+    exemptions:
+      namespaces: []
+      runtimeClasses: []
+      usernames: []
+  description: This is the built-in unrestricted Pod Security Admission Configuration
+    Template. It defines the most permissive PSS policy, allowing for known privilege
+    escalations. This policy contains no exemptions.
+  kind: PodSecurityAdmissionConfigurationTemplate
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: rancher-privileged
+- apiVersion: management.cattle.io/v3
+  configuration:
+    defaults:
+      audit: restricted
+      audit-version: latest
+      enforce: restricted
+      enforce-version: latest
+      warn: restricted
+      warn-version: latest
+    exemptions:
+      namespaces:
+      - cattle-csp-adapter-system
+      - cattle-epinio-system
+      - cattle-externalip-system
+      - cattle-fleet-local-system
+      - cattle-fleet-system
+      - cattle-gatekeeper-system
+      - cattle-istio-system
+      - cattle-logging-system
+      - cattle-monitoring-system
+      - cattle-neuvector-system
+      - cattle-provisioning-capi-system
+      - cattle-sriov-system
+      - cattle-system
+      - cattle-turtles-system
+      - cattle-ui-plugin-system
+      - cattle-windows-gmsa-system
+      - cis-operator-system
+      - compliance-operator-system
+      - ingress-nginx
+      - istio-system
+      - kube-system
+      - longhorn-system
+      - rancher-alerting-drivers
+      - tigera-operator
+      runtimeClasses: []
+      usernames: []
+  description: This is the built-in restricted Pod Security Admission Configuration
+    Template. It defines a heavily restricted policy, based on current Pod hardening
+    best practices. This policy contains namespace level exemptions for Rancher components.
+  kind: PodSecurityAdmissionConfigurationTemplate
+  metadata:
+    labels:
+      cattle.io/creator: norman
+    name: rancher-restricted
+kind: List
+metadata:

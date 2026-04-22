@@ -1,0 +1,125 @@
+apiVersion: v1
+items:
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: 0476540f
+    namespace: aiot
+  spec:
+    date: "2026-04-22T07:01:29Z"
+    id: 0476540f042e9f8b1621f2e770b7aa32bbaf274b094c89ced1db58f9be9b7a4e
+    paths:
+    - /data/qdrant-pvc
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: 17c42d47
+    namespace: aiot
+  spec:
+    date: "2026-04-22T07:01:26Z"
+    id: 17c42d479f92ee1c4ef86dc7f1969f86d739ba0b915c2c19ace0ddce0eb4f999
+    paths:
+    - /data/pgadmin-data
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: 5c072bff
+    namespace: aiot
+  spec:
+    date: "2026-04-22T07:01:39Z"
+    id: 5c072bff69723c1ecb795c0d5e9c1309393e22708e44a3169843e93765a281f5
+    paths:
+    - /aiot-pg-ha-dump.sql
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: f5426abb
+    namespace: aiot
+  spec:
+    date: "2026-04-22T07:01:19Z"
+    id: f5426abb1fbcac4c1e93388f4500637fbef68664fbd0af54eb9bcf1e70d532b0
+    paths:
+    - /data/cloudbeaver-data-lp
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: 440b29a9
+    namespace: jenkins
+  spec:
+    date: "2026-04-22T07:00:59Z"
+    id: 440b29a92cac442fad7d815b73962a0589ac316a9a2ad1c199a272aca8fb720a
+    paths:
+    - /data/jenkins-lp
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: "423999e0"
+    namespace: kubeflow
+  spec:
+    date: "2026-04-22T07:07:16Z"
+    id: 423999e0e9bb41afda2f166c0f14e7b3653a388c3d5bcc34f9a6e6a9aff39dc8
+    paths:
+    - /data/minio-pvc
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: 98d155b9
+    namespace: kubeflow
+  spec:
+    date: "2026-04-22T07:48:25Z"
+    id: 98d155b9be6ffa5df71c56203ffc1f155c299822103d9d19eb5765750c255ed0
+    paths:
+    - /data/minio-pvc
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: d81ed277
+    namespace: kubeflow
+  spec:
+    date: "2026-04-22T07:48:27Z"
+    id: d81ed2771c17f76154c1e7a014d8971c23dc7753eddf0210de8e5a86cf8fe415
+    paths:
+    - /data/mysql-pv-claim
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: a41f1f18
+    namespace: mlflow
+  spec:
+    date: "2026-04-22T07:00:51Z"
+    id: a41f1f1894a0061344a8dc24191116ecb2937cda751f2634d8456e5a42e7b8b5
+    paths:
+    - /data/mlflow-data-lp
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: 4e8cc5fd
+    namespace: semaphore
+  spec:
+    date: "2026-04-22T06:04:36Z"
+    id: 4e8cc5fd6398bbab631bed55cb6fe9e4a9c0afdcbc02e8eb872ecec3f3d2ab22
+    paths:
+    - /data/semaphore-data
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+- apiVersion: k8up.io/v1
+  kind: Snapshot
+  metadata:
+    name: d7478611
+    namespace: semaphore
+  spec:
+    date: "2026-04-22T07:00:50Z"
+    id: d74786111dfc85d8c8497b086df60985b14e3b946726bc5f71fe40cb51ff7f40
+    paths:
+    - /data/semaphore-data
+    repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+kind: List
+metadata:

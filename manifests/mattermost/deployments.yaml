@@ -1,0 +1,101 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "8"
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"mattermost:mattermost","ingressName":"mattermost:mattermost","hostname":"mm.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"field.cattle.io/publicEndpoints":"[{\"addresses\":[\"35.241.255.137\"],\"port\":443,\"protocol\":\"HTTPS\",\"serviceName\":\"mattermost:mattermost\",\"ingressName\":\"mattermost:mattermost\",\"hostname\":\"mm.35.241.255.137.nip.io\",\"path\":\"/\",\"allNodes\":false}]"},"name":"mattermost","namespace":"mattermost"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"mattermost"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-18T05:35:20Z"},"labels":{"app":"mattermost"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"In","values":["oci-e5-node1"]}]}]}}},"containers":[{"env":[{"name":"MM_SQLSETTINGS_DRIVERNAME","value":"postgres"},{"name":"MM_SQLSETTINGS_DATASOURCE","value":"postgres://aiot:aiot123@postgres.aiot.svc:5432/mattermost?sslmode=disable"},{"name":"MM_SERVICESETTINGS_SITEURL","value":"https://mm.35.241.255.137.nip.io"},{"name":"MM_SERVICESETTINGS_SESSIONLENGTHMOBILEINDAYS","value":"365"},{"name":"MM_SERVICESETTINGS_SESSIONLENGTHWEBINDAYS","value":"365"},{"name":"MM_SERVICESETTINGS_SESSIONLENGTHSSOINDDAYS","value":"365"},{"name":"MM_SERVICESETTINGS_SESSIONIDLETIMEOUTINMINUTES","value":"0"},{"name":"MM_SERVICESETTINGS_EXTENDSSESSIONLENGTHWITHACTIVITY","value":"true"},{"name":"MM_EMAILSETTINGS_ENABLESIGNUPWITHEMAIL","value":"true"},{"name":"MM_EMAILSETTINGS_REQUIREEMAILVERIFICATION","value":"false"},{"name":"MM_TEAMSETTINGS_ENABLEOPENSERVER","value":"true"},{"name":"MM_SERVICESETTINGS_ENABLEOPENSERVER","value":"true"}],"image":"mattermost/mattermost-team-edition:latest","imagePullPolicy":"Always","name":"mattermost","ports":[{"containerPort":8065,"protocol":"TCP"}],"resources":{"requests":{"cpu":"100m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File"}],"dnsPolicy":"ClusterFirst","nodeSelector":{"node-role.kubernetes.io/worker":""},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30}}}}
+    name: mattermost
+    namespace: mattermost
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: mattermost
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-22T06:51:38Z"
+        labels:
+          app: mattermost
+      spec:
+        containers:
+        - env:
+          - name: MM_SQLSETTINGS_DRIVERNAME
+            value: postgres
+          - name: MM_SQLSETTINGS_DATASOURCE
+            value: postgres://aiot:aiot123@postgres.aiot.svc:5432/mattermost?sslmode=disable
+          - name: MM_SERVICESETTINGS_SITEURL
+            value: https://mm.35.241.255.137.nip.io
+          - name: MM_SERVICESETTINGS_SESSIONLENGTHMOBILEINDAYS
+            value: "365"
+          - name: MM_SERVICESETTINGS_SESSIONLENGTHWEBINDAYS
+            value: "365"
+          - name: MM_SERVICESETTINGS_SESSIONLENGTHSSOINDDAYS
+            value: "365"
+          - name: MM_SERVICESETTINGS_SESSIONIDLETIMEOUTINMINUTES
+            value: "0"
+          - name: MM_SERVICESETTINGS_EXTENDSSESSIONLENGTHWITHACTIVITY
+            value: "true"
+          - name: MM_EMAILSETTINGS_ENABLESIGNUPWITHEMAIL
+            value: "true"
+          - name: MM_EMAILSETTINGS_REQUIREEMAILVERIFICATION
+            value: "false"
+          - name: MM_TEAMSETTINGS_ENABLEOPENSERVER
+            value: "true"
+          - name: MM_SERVICESETTINGS_ENABLEOPENSERVER
+            value: "true"
+          image: mattermost/mattermost-team-edition:latest
+          imagePullPolicy: Always
+          name: mattermost
+          ports:
+          - containerPort: 8065
+            protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/hostname: aiot-master
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-20T11:25:33Z"
+      lastUpdateTime: "2026-04-20T11:25:33Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:41:12Z"
+      lastUpdateTime: "2026-04-22T06:51:41Z"
+      message: ReplicaSet "mattermost-6bdd54885f" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 10
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:

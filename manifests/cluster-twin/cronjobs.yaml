@@ -1,0 +1,122 @@
+apiVersion: v1
+items:
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"batch/v1","kind":"CronJob","metadata":{"annotations":{},"name":"critical-checker","namespace":"cluster-twin"},"spec":{"concurrencyPolicy":"Forbid","failedJobsHistoryLimit":3,"jobTemplate":{"spec":{"backoffLimit":1,"template":{"spec":{"containers":[{"command":["python3","/scripts/reporter.py"],"env":[{"name":"MODE","value":"critical"},{"name":"CLUSTER_NAME","value":"aiot2"},{"name":"MM_WEBHOOK","valueFrom":{"secretKeyRef":{"key":"webhook","name":"mm-webhook"}}}],"image":"python:3.12-slim","name":"reporter","volumeMounts":[{"mountPath":"/scripts","name":"script"}]}],"restartPolicy":"OnFailure","serviceAccountName":"cluster-twin","volumes":[{"configMap":{"defaultMode":493,"name":"cluster-twin-script"},"name":"script"}]}}}},"schedule":"*/10 * * * *","successfulJobsHistoryLimit":1}}
+    name: critical-checker
+    namespace: cluster-twin
+  spec:
+    concurrencyPolicy: Forbid
+    failedJobsHistoryLimit: 3
+    jobTemplate:
+      metadata:
+      spec:
+        backoffLimit: 1
+        template:
+          metadata:
+          spec:
+            containers:
+            - command:
+              - python3
+              - /scripts/reporter.py
+              env:
+              - name: MODE
+                value: critical
+              - name: CLUSTER_NAME
+                value: aiot2
+              - name: MM_WEBHOOK
+                valueFrom:
+                  secretKeyRef:
+                    key: webhook
+                    name: mm-webhook
+              image: python:3.12-slim
+              imagePullPolicy: IfNotPresent
+              name: reporter
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+              - mountPath: /scripts
+                name: script
+            dnsPolicy: ClusterFirst
+            restartPolicy: OnFailure
+            schedulerName: default-scheduler
+            securityContext: {}
+            serviceAccount: cluster-twin
+            serviceAccountName: cluster-twin
+            terminationGracePeriodSeconds: 30
+            volumes:
+            - configMap:
+                defaultMode: 493
+                name: cluster-twin-script
+              name: script
+    schedule: '*/10 * * * *'
+    successfulJobsHistoryLimit: 1
+    suspend: false
+  status:
+    lastScheduleTime: "2026-04-22T08:20:00Z"
+    lastSuccessfulTime: "2026-04-22T08:20:04Z"
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"batch/v1","kind":"CronJob","metadata":{"annotations":{},"name":"daily-digest","namespace":"cluster-twin"},"spec":{"concurrencyPolicy":"Forbid","failedJobsHistoryLimit":3,"jobTemplate":{"spec":{"backoffLimit":1,"template":{"spec":{"containers":[{"command":["python3","/scripts/reporter.py"],"env":[{"name":"MODE","value":"daily"},{"name":"CLUSTER_NAME","value":"aiot2"},{"name":"MM_WEBHOOK","valueFrom":{"secretKeyRef":{"key":"webhook","name":"mm-webhook"}}}],"image":"python:3.12-slim","name":"reporter","volumeMounts":[{"mountPath":"/scripts","name":"script"}]}],"restartPolicy":"OnFailure","serviceAccountName":"cluster-twin","volumes":[{"configMap":{"defaultMode":493,"name":"cluster-twin-script"},"name":"script"}]}}}},"schedule":"0 6 * * *","successfulJobsHistoryLimit":1}}
+    name: daily-digest
+    namespace: cluster-twin
+  spec:
+    concurrencyPolicy: Forbid
+    failedJobsHistoryLimit: 3
+    jobTemplate:
+      metadata:
+      spec:
+        backoffLimit: 1
+        template:
+          metadata:
+          spec:
+            containers:
+            - command:
+              - python3
+              - /scripts/reporter.py
+              env:
+              - name: MODE
+                value: daily
+              - name: CLUSTER_NAME
+                value: aiot2
+              - name: MM_WEBHOOK
+                valueFrom:
+                  secretKeyRef:
+                    key: webhook
+                    name: mm-webhook
+              image: python:3.12-slim
+              imagePullPolicy: IfNotPresent
+              name: reporter
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+              - mountPath: /scripts
+                name: script
+            dnsPolicy: ClusterFirst
+            restartPolicy: OnFailure
+            schedulerName: default-scheduler
+            securityContext: {}
+            serviceAccount: cluster-twin
+            serviceAccountName: cluster-twin
+            terminationGracePeriodSeconds: 30
+            volumes:
+            - configMap:
+                defaultMode: 493
+                name: cluster-twin-script
+              name: script
+    schedule: 0 6 * * *
+    successfulJobsHistoryLimit: 1
+    suspend: false
+  status:
+    lastScheduleTime: "2026-04-22T06:00:00Z"
+    lastSuccessfulTime: "2026-04-22T06:00:05Z"
+kind: List
+metadata:

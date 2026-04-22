@@ -1,0 +1,135 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  clusterName: local
+  kind: ClusterRoleTemplateBinding
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.cluster-crtb-sync_local: "true"
+      lifecycle.cattle.io/create.mgmt-auth-crtb-controller: "true"
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4SRQU7DMBBFr4JmHTckTRpqiRVLJMSCC4ztoTU4dmRPgqqqd0chSRUW0KXlN99v/M+gXZ+Y4gu2BBJc0Oggg5YYDTKCPAN6HxjZBp/GY1AfpDkRb6ING43MjjY25NaAXNKEjoRMkP1Jhy9PURyGT5DQxTDYZIO3/rBChiK7e7bePD5NoTfT/O8dbsOpQz1OvDsiFtPcJQOHity/ux4xHUFC81Ch2dV7pe73tdKqMKY0WJZbQ7u6xErVCouiUWPoWk6sHhQ/OjABi9BVJQZHb9R2DpnmipYvXuYSI/ej7SWDPl2b7EUbmmZ7YuYKppvXaL22HboZSafE1Mo8XxeQr9zy2eM7AAD///YdL24mAgAA
+      objectset.rio.cattle.io/id: cluster-create
+      objectset.rio.cattle.io/owner-gvk: provisioning.cattle.io/v1, Kind=Cluster
+      objectset.rio.cattle.io/owner-name: local
+      objectset.rio.cattle.io/owner-namespace: fleet-local
+    finalizers:
+    - controller.cattle.io/mgmt-auth-crtb-controller
+    - clusterscoped.controller.cattle.io/cluster-crtb-sync_local
+    labels:
+      auth.management.cattle.io/crb-rb-labels-updated: "true"
+      authz.cluster.cattle.io/crb-rb-labels-updated: "true"
+      objectset.rio.cattle.io/hash: 784ad659bb095bcb1dd2da223de652a4b5ba117b
+    name: local-fleet-local-owner
+    namespace: local
+  roleTemplateName: cluster-owner
+  status:
+    lastUpdateTime: "2026-04-19T20:51:55Z"
+    localConditions:
+    - lastTransitionTime: "2026-04-19T20:51:55Z"
+      message: ""
+      reason: SubjectExists
+      status: "True"
+      type: SubjectExists
+    - lastTransitionTime: "2026-04-19T20:51:55Z"
+      message: ""
+      reason: LabelsReconciled
+      status: "True"
+      type: LabelsReconciled
+    - lastTransitionTime: "2026-04-19T20:51:55Z"
+      message: ""
+      reason: BindingExists
+      status: "True"
+      type: BindingExists
+    observedGenerationLocal: 1
+    observedGenerationRemote: 1
+    remoteConditions:
+    - lastTransitionTime: "2026-04-19T20:51:55Z"
+      message: ""
+      reason: CRTBLabelsUpdated
+      status: "True"
+      type: CRTBLabelsUpdated
+    - lastTransitionTime: "2026-04-19T20:51:55Z"
+      message: ""
+      reason: ClusterRolesExists
+      status: "True"
+      type: ClusterRolesExists
+    - lastTransitionTime: "2026-04-19T20:51:55Z"
+      message: ""
+      reason: ClusterRoleBindingsExists
+      status: "True"
+      type: ClusterRoleBindingsExists
+    - lastTransitionTime: "2026-04-19T20:51:55Z"
+      message: ""
+      reason: ServiceAccountImpersonatorExists
+      status: "True"
+      type: ServiceAccountImpersonatorExists
+    summary: Completed
+    summaryLocal: Completed
+    summaryRemote: Completed
+  userName: u-mo773yttt4
+  userPrincipalName: system://provisioning/fleet-local/local
+- apiVersion: management.cattle.io/v3
+  clusterName: local
+  kind: ClusterRoleTemplateBinding
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.cluster-crtb-sync_local: "true"
+      lifecycle.cattle.io/create.mgmt-auth-crtb-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-crtb-controller
+    - clusterscoped.controller.cattle.io/cluster-crtb-sync_local
+    labels:
+      auth.management.cattle.io/crb-rb-labels-updated: "true"
+      authz.cluster.cattle.io/crb-rb-labels-updated: "true"
+      cattle.io/creator: norman
+    name: u-b4qkhsnliz-admin
+    namespace: local
+  roleTemplateName: cluster-owner
+  status:
+    lastUpdateTime: "2026-04-19T20:51:54Z"
+    localConditions:
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: SubjectExists
+      status: "True"
+      type: SubjectExists
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: LabelsReconciled
+      status: "True"
+      type: LabelsReconciled
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: BindingExists
+      status: "True"
+      type: BindingExists
+    observedGenerationLocal: 2
+    observedGenerationRemote: 2
+    remoteConditions:
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: CRTBLabelsUpdated
+      status: "True"
+      type: CRTBLabelsUpdated
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: ClusterRolesExists
+      status: "True"
+      type: ClusterRolesExists
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: ClusterRoleBindingsExists
+      status: "True"
+      type: ClusterRoleBindingsExists
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: ServiceAccountImpersonatorExists
+      status: "True"
+      type: ServiceAccountImpersonatorExists
+    summary: Completed
+    summaryLocal: Completed
+    summaryRemote: Completed
+  userName: u-b4qkhsnliz
+  userPrincipalName: local://u-b4qkhsnliz
+kind: List
+metadata:

@@ -1,0 +1,356 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM python:3.11-slim
+      RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev curl && rm -rf /var/lib/apt/lists/*
+      RUN pip install --no-cache-dir fastapi "uvicorn[standard]" flask requests redis paho-mqtt psycopg2-binary numpy qdrant-client
+      WORKDIR /app
+      CMD ["python"]
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"Dockerfile":"FROM python:3.11-slim\nRUN apt-get update \u0026\u0026 apt-get install -y --no-install-recommends gcc libpq-dev curl \u0026\u0026 rm -rf /var/lib/apt/lists/*\nRUN pip install --no-cache-dir fastapi \"uvicorn[standard]\" flask requests redis paho-mqtt psycopg2-binary numpy qdrant-client\nWORKDIR /app\nCMD [\"python\"]\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"aiot-dockerfile","namespace":"registry"}}
+    name: aiot-dockerfile
+    namespace: registry
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: registry
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: registry
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM python:3.11-slim
+      RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
+      RUN pip install --no-cache-dir scikit-learn==1.6.1 xgboost==2.1.4 lightgbm==4.6.0 mlflow==2.21.3 psycopg2-binary==2.9.10 pandas==2.2.3 numpy==2.2.4 fastapi==0.135.3 uvicorn==0.44.0
+      WORKDIR /app
+      COPY serve.py /app/serve.py
+      EXPOSE 8000
+      CMD python /app/serve.py
+    serve.py: |-
+      #!/usr/bin/env python3
+      """Predictive Maintenance Inference Server."""
+      import os, logging
+      import mlflow, mlflow.pyfunc
+      import numpy as np
+      import pandas as pd
+      import psycopg2
+      from fastapi import FastAPI, HTTPException
+      from pydantic import BaseModel
+      from typing import List, Optional
+
+      logging.basicConfig(level=logging.INFO)
+      log = logging.getLogger("inference")
+
+      app = FastAPI(title="Maintenance Predictor")
+
+      MODEL = None
+      FEATURES = ["temperature","vibration","pressure","rpm","humidity",
+                  "anomaly_score","machine_type_enc","machine_id_enc"]
+      MACHINE_TYPE_MAP = {}
+      MACHINE_ID_MAP = {}
+
+      def load_model():
+          global MODEL
+          uri = os.environ.get("MLFLOW_TRACKING_URI","http://mlflow-server.mlflow.svc.cluster.local:5000")
+          mlflow.set_tracking_uri(uri)
+          model_name = os.environ.get("MODEL_NAME","maintenance-predictor")
+          stage = os.environ.get("MODEL_STAGE","Production")
+          log.info(f"Loading model {model_name}/{stage} from {uri}")
+          try:
+              MODEL = mlflow.pyfunc.load_model(f"models:/{model_name}/{stage}")
+              log.info("Model loaded successfully")
+          except Exception as e:
+              log.warning(f"Could not load from stage {stage}: {e}")
+              try:
+                  MODEL = mlflow.pyfunc.load_model(f"models:/{model_name}/None")
+                  log.info("Loaded latest model version")
+              except Exception as e2:
+                  log.error(f"Failed to load model: {e2}")
+
+      def init_encoders():
+          global MACHINE_TYPE_MAP, MACHINE_ID_MAP
+          try:
+              conn = psycopg2.connect(
+                  host=os.environ.get("DB_HOST","postgres.aiot.svc.cluster.local"),
+                  dbname=os.environ.get("DB_NAME","aiot"),
+                  user=os.environ.get("DB_USER","aiot"),
+                  password=os.environ.get("DB_PASSWORD","aiot123"))
+              cur = conn.cursor()
+              cur.execute("SELECT DISTINCT machine_type FROM sensor_data ORDER BY machine_type")
+              for i,row in enumerate(cur.fetchall()):
+                  MACHINE_TYPE_MAP[row[0]] = i
+              cur.execute("SELECT DISTINCT machine_id FROM sensor_data ORDER BY machine_id")
+              for i,row in enumerate(cur.fetchall()):
+                  MACHINE_ID_MAP[row[0]] = i
+              conn.close()
+              log.info(f"Encoders: {len(MACHINE_TYPE_MAP)} types, {len(MACHINE_ID_MAP)} machines")
+          except Exception as e:
+              log.warning(f"Could not init encoders: {e}")
+
+      class PredictRequest(BaseModel):
+          instances: Optional[List[dict]] = None
+          machine_id: Optional[str] = None
+          machine_type: Optional[str] = None
+          temperature: Optional[float] = None
+          vibration: Optional[float] = None
+          pressure: Optional[float] = None
+          rpm: Optional[float] = None
+          humidity: Optional[float] = None
+          anomaly_score: Optional[float] = 0.0
+
+      class PredictResponse(BaseModel):
+          predictions: list
+
+      @app.on_event("startup")
+      def startup():
+          load_model()
+          init_encoders()
+
+      @app.get("/health")
+      @app.get("/v1/models/maintenance-predictor")
+      def health():
+          return {"status":"ready","model_loaded": MODEL is not None}
+
+      @app.post("/v1/models/maintenance-predictor:predict")
+      @app.post("/predict")
+      def predict(req: PredictRequest):
+          if MODEL is None:
+              raise HTTPException(503, "Model not loaded")
+          if req.instances:
+              rows = []
+              for inst in req.instances:
+                  rows.append(_encode(inst))
+              df = pd.DataFrame(rows, columns=FEATURES)
+          else:
+              row = _encode(req.dict())
+              df = pd.DataFrame([row], columns=FEATURES)
+          preds = MODEL.predict(df)
+          return PredictResponse(predictions=preds.tolist())
+
+      @app.get("/predict/latest")
+      def predict_latest():
+          if MODEL is None:
+              raise HTTPException(503, "Model not loaded")
+          try:
+              conn = psycopg2.connect(
+                  host=os.environ.get("DB_HOST","postgres.aiot.svc.cluster.local"),
+                  dbname=os.environ.get("DB_NAME","aiot"),
+                  user=os.environ.get("DB_USER","aiot"),
+                  password=os.environ.get("DB_PASSWORD","aiot123"))
+              df = pd.read_sql("SELECT machine_id, machine_type, temperature, vibration, pressure, rpm, humidity, anomaly_score FROM sensor_data WHERE temperature IS NOT NULL ORDER BY ts DESC LIMIT 10", conn)
+              conn.close()
+          except Exception as e:
+              raise HTTPException(500, str(e))
+          for c in ["machine_type","machine_id"]:
+              enc = MACHINE_TYPE_MAP if c=="machine_type" else MACHINE_ID_MAP
+              df[c+"_enc"] = df[c].map(enc).fillna(0).astype(int)
+          X = df[FEATURES].fillna(0)
+          preds = MODEL.predict(X)
+          results = []
+          for i, row in df.iterrows():
+              results.append({"machine_id":row["machine_id"],"prediction":int(preds[i]),"label":"MAINTENANCE" if preds[i]==1 else "OK"})
+          return {"predictions":results}
+
+      def _encode(d):
+          mt = d.get("machine_type","")
+          mi = d.get("machine_id","")
+          return [d.get("temperature",0), d.get("vibration",0), d.get("pressure",0),
+                  d.get("rpm",0), d.get("humidity",0), d.get("anomaly_score",0),
+                  MACHINE_TYPE_MAP.get(mt,0), MACHINE_ID_MAP.get(mi,0)]
+
+      if __name__ == "__main__":
+          import uvicorn
+          uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT","8000")))
+  kind: ConfigMap
+  metadata:
+    name: ml-serve-build
+    namespace: registry
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM python:3.11-slim
+
+      RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
+
+      RUN pip install --no-cache-dir \
+          scikit-learn==1.6.1 \
+          xgboost==2.1.4 \
+          lightgbm==4.6.0 \
+          mlflow==2.21.3 \
+          psycopg2-binary==2.9.10 \
+          pandas==2.2.3 \
+          numpy==2.2.4
+
+      WORKDIR /app
+      COPY train.py /app/train.py
+
+      ENTRYPOINT ["python", "/app/train.py"]
+    train.py: "#!/usr/bin/env python3\r\n\"\"\"\r\nPredictive Maintenance Trainer
+      — multi-model HP search for Katib.\r\nSupports: RandomForest, XGBoost, LightGBM.\r\nLogs
+      to MLflow. Prints metrics for Katib Bayesian Optimization.\r\n\"\"\"\r\nimport
+      argparse\r\nimport os\r\nimport sys\r\nimport warnings\r\n\r\nimport mlflow\r\nimport
+      mlflow.sklearn\r\nimport numpy as np\r\nimport pandas as pd\r\nimport psycopg2\r\nfrom
+      sklearn.ensemble import RandomForestClassifier\r\nfrom sklearn.metrics import
+      (\r\n    classification_report,\r\n    f1_score,\r\n    precision_score,\r\n
+      \   recall_score,\r\n    roc_auc_score,\r\n)\r\nfrom sklearn.model_selection
+      import train_test_split\r\nfrom sklearn.preprocessing import LabelEncoder\r\n\r\nwarnings.filterwarnings(\"ignore\")\r\n\r\n\r\ndef
+      parse_args():\r\n    p = argparse.ArgumentParser()\r\n    p.add_argument(\"--model_type\",
+      type=str, default=\"RandomForest\",\r\n                   choices=[\"RandomForest\",
+      \"XGBoost\", \"LightGBM\"])\r\n    p.add_argument(\"--n_estimators\", type=int,
+      default=100)\r\n    p.add_argument(\"--max_depth\", type=int, default=10)\r\n
+      \   p.add_argument(\"--min_samples_split\", type=int, default=5)\r\n    p.add_argument(\"--max_features\",
+      type=str, default=\"sqrt\")\r\n    p.add_argument(\"--learning_rate\", type=float,
+      default=0.1)\r\n    p.add_argument(\"--subsample\", type=float, default=0.8)\r\n
+      \   return p.parse_args()\r\n\r\n\r\ndef load_data():\r\n    conn = psycopg2.connect(\r\n
+      \       host=os.environ.get(\"PG_HOST\", \"pg-ha-rw.aiot.svc.cluster.local\"),\r\n
+      \       port=int(os.environ.get(\"PG_PORT\", \"5432\")),\r\n        dbname=os.environ.get(\"PG_DB\",
+      \"aiot\"),\r\n        user=os.environ.get(\"PG_USER\", \"aiot\"),\r\n        password=os.environ.get(\"PG_PASS\",
+      \"aiot123\"),\r\n    )\r\n    query = \"\"\"\r\n    SELECT machine_id, machine_type,
+      temperature, vibration, pressure,\r\n           rpm, humidity, anomaly_score,
+      status\r\n    FROM sensor_data\r\n    WHERE temperature IS NOT NULL\r\n      AND
+      vibration IS NOT NULL\r\n    ORDER BY ts DESC\r\n    LIMIT 80000\r\n    \"\"\"\r\n
+      \   df = pd.read_sql(query, conn)\r\n    conn.close()\r\n    return df\r\n\r\n\r\ndef
+      feature_engineering(df):\r\n    le_machine = LabelEncoder()\r\n    df[\"machine_type_enc\"]
+      = le_machine.fit_transform(df[\"machine_type\"])\r\n    le_machine_id = LabelEncoder()\r\n
+      \   df[\"machine_id_enc\"] = le_machine_id.fit_transform(df[\"machine_id\"])\r\n\r\n
+      \   # Binary target: 1 = needs maintenance (WARNING/CRITICAL), 0 = OK\r\n    df[\"target\"]
+      = (df[\"status\"] != \"OK\").astype(int)\r\n\r\n    features = [\r\n        \"temperature\",
+      \"vibration\", \"pressure\", \"rpm\", \"humidity\",\r\n        \"anomaly_score\",
+      \"machine_type_enc\", \"machine_id_enc\",\r\n    ]\r\n    X = df[features].fillna(0)\r\n
+      \   y = df[\"target\"]\r\n    return X, y, features\r\n\r\n\r\ndef build_model(args):\r\n
+      \   if args.model_type == \"RandomForest\":\r\n        max_feat = args.max_features\r\n
+      \       if max_feat not in (\"sqrt\", \"log2\"):\r\n            try:\r\n                max_feat
+      = float(max_feat)\r\n            except ValueError:\r\n                max_feat
+      = \"sqrt\"\r\n        return RandomForestClassifier(\r\n            n_estimators=args.n_estimators,\r\n
+      \           max_depth=args.max_depth,\r\n            min_samples_split=args.min_samples_split,\r\n
+      \           max_features=max_feat,\r\n            n_jobs=-1,\r\n            random_state=42,\r\n
+      \       )\r\n    elif args.model_type == \"XGBoost\":\r\n        import xgboost
+      as xgb\r\n        return xgb.XGBClassifier(\r\n            n_estimators=args.n_estimators,\r\n
+      \           max_depth=args.max_depth,\r\n            learning_rate=args.learning_rate,\r\n
+      \           subsample=args.subsample,\r\n            tree_method=\"hist\",\r\n
+      \           eval_metric=\"logloss\",\r\n            random_state=42,\r\n        )\r\n
+      \   elif args.model_type == \"LightGBM\":\r\n        import lightgbm as lgb\r\n
+      \       return lgb.LGBMClassifier(\r\n            n_estimators=args.n_estimators,\r\n
+      \           max_depth=args.max_depth,\r\n            learning_rate=args.learning_rate,\r\n
+      \           subsample=args.subsample,\r\n            random_state=42,\r\n            verbosity=-1,\r\n
+      \       )\r\n\r\n\r\ndef main():\r\n    args = parse_args()\r\n    mlflow_uri
+      = os.environ.get(\"MLFLOW_TRACKING_URI\",\r\n                                \"http://mlflow-server.mlflow.svc.cluster.local:5000\")\r\n
+      \   mlflow.set_tracking_uri(mlflow_uri)\r\n    mlflow.set_experiment(\"maintenance-bayesian\")\r\n\r\n
+      \   print(\"Loading data...\")\r\n    df = load_data()\r\n    print(f\"Loaded
+      {len(df)} rows, target distribution: {df['status'].value_counts().to_dict()}\"
+      if 'status' in df.columns else f\"Loaded {len(df)} rows\")\r\n\r\n    X, y,
+      features = feature_engineering(df)\r\n    X_train, X_test, y_train, y_test =
+      train_test_split(\r\n        X, y, test_size=0.2, random_state=42, stratify=y\r\n
+      \   )\r\n\r\n    print(f\"Training {args.model_type} with n_estimators={args.n_estimators},
+      \"\r\n          f\"max_depth={args.max_depth}...\")\r\n    model = build_model(args)\r\n
+      \   model.fit(X_train, y_train)\r\n\r\n    y_pred = model.predict(X_test)\r\n
+      \   y_proba = model.predict_proba(X_test)\r\n\r\n    f1 = f1_score(y_test, y_pred,
+      average=\"weighted\")\r\n    precision = precision_score(y_test, y_pred, average=\"weighted\")\r\n
+      \   recall = recall_score(y_test, y_pred, average=\"weighted\")\r\n\r\n    if
+      y_proba.shape[1] == 2:\r\n        auc = roc_auc_score(y_test, y_proba[:, 1])\r\n
+      \   else:\r\n        auc = roc_auc_score(y_test, y_proba, multi_class=\"ovr\",
+      average=\"weighted\")\r\n\r\n    # Log to MLflow\r\n    with mlflow.start_run():\r\n
+      \       mlflow.log_param(\"model_type\", args.model_type)\r\n        mlflow.log_param(\"n_estimators\",
+      args.n_estimators)\r\n        mlflow.log_param(\"max_depth\", args.max_depth)\r\n
+      \       mlflow.log_param(\"learning_rate\", args.learning_rate)\r\n        mlflow.log_param(\"subsample\",
+      args.subsample)\r\n        mlflow.log_param(\"max_features\", args.max_features)\r\n
+      \       mlflow.log_param(\"min_samples_split\", args.min_samples_split)\r\n
+      \       mlflow.log_param(\"train_size\", len(X_train))\r\n        mlflow.log_param(\"test_size\",
+      len(X_test))\r\n\r\n        mlflow.log_metric(\"f1_score\", f1)\r\n        mlflow.log_metric(\"precision\",
+      precision)\r\n        mlflow.log_metric(\"recall\", recall)\r\n        mlflow.log_metric(\"roc_auc\",
+      auc)\r\n\r\n        # Feature importance\r\n        if hasattr(model, \"feature_importances_\"):\r\n
+      \           for fname, imp in zip(features, model.feature_importances_):\r\n
+      \               mlflow.log_metric(f\"importance_{fname}\", imp)\r\n\r\n        mlflow.sklearn.log_model(model,
+      \"model\",\r\n                                 registered_model_name=\"maintenance-predictor\")\r\n\r\n
+      \   print(f\"\\nClassification Report:\\n{classification_report(y_test, y_pred)}\")\r\n\r\n
+      \   # Katib reads these from stdout\r\n    print(f\"f1_score={f1:.4f}\")\r\n
+      \   print(f\"roc_auc={auc:.4f}\")\r\n    print(f\"precision={precision:.4f}\")\r\n
+      \   print(f\"recall={recall:.4f}\")\r\n\r\n\r\nif __name__ == \"__main__\":\r\n
+      \   main()\r\n"
+  kind: ConfigMap
+  metadata:
+    name: ml-trainer-build
+    namespace: registry
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+      RUN pip install --no-cache-dir redis
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"Dockerfile":"FROM 10.132.0.2:30500/aiot/aiot-python-runtime:latest\nRUN pip install --no-cache-dir redis\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"py-runtime-build","namespace":"registry"}}
+    name: py-runtime-build
+    namespace: registry
+- apiVersion: v1
+  data:
+    Dockerfile: |
+      FROM 10.132.0.2:30500/aiot/aiot-python-runtime:v2
+      RUN pip install --no-cache-dir paho-mqtt
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"Dockerfile":"FROM 10.132.0.2:30500/aiot/aiot-python-runtime:v2\nRUN pip install --no-cache-dir paho-mqtt\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"py-runtime-build-v3","namespace":"registry"}}
+    name: py-runtime-build-v3
+    namespace: registry
+kind: List
+metadata:

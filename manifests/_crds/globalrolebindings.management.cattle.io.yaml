@@ -1,0 +1,94 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  globalRoleName: admin
+  kind: GlobalRoleBinding
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-grb-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-grb-controller
+    generateName: globalrolebinding-
+    labels:
+      authz.management.cattle.io/bootstrapping: admin-user
+    name: globalrolebinding-slfzz
+  status:
+    lastUpdateTime: "2026-04-19T20:51:12Z"
+    localConditions:
+    - lastTransitionTime: "2026-04-19T20:51:10Z"
+      message: ""
+      reason: SubjectExists
+      status: "True"
+      type: SubjectReconciled
+    - lastTransitionTime: "2026-04-19T20:51:10Z"
+      message: ""
+      reason: ClusterPermissionsReconciled
+      status: "True"
+      type: ClusterPermissionsReconciled
+    - lastTransitionTime: "2026-04-19T20:51:10Z"
+      message: ""
+      reason: GlobalRoleBindingReconciled
+      status: "True"
+      type: GlobalRoleBindingReconciled
+    - lastTransitionTime: "2026-04-19T20:51:10Z"
+      message: ""
+      reason: NamespacedRoleBindingReconciled
+      status: "True"
+      type: NamespacedRoleBindingReconciled
+    observedGenerationLocal: 1
+    observedGenerationRemote: 2
+    remoteConditions:
+    - lastTransitionTime: "2026-04-19T20:51:12Z"
+      message: ""
+      reason: ClusterAdminRoleExists
+      status: "True"
+      type: ClusterAdminRoleExists
+    summary: Completed
+    summaryLocal: Completed
+    summaryRemote: Completed
+  userName: user-b2zsr
+  userPrincipalName: local://user-b2zsr
+- apiVersion: management.cattle.io/v3
+  globalRoleName: user
+  kind: GlobalRoleBinding
+  metadata:
+    annotations:
+      lifecycle.cattle.io/create.mgmt-auth-grb-controller: "true"
+    finalizers:
+    - controller.cattle.io/mgmt-auth-grb-controller
+    generateName: grb-
+    name: grb-7dw9c
+    ownerReferences:
+    - apiVersion: management.cattle.io/v3
+      kind: GlobalRole
+      name: user
+  status:
+    lastUpdateTime: "2026-04-19T20:51:54Z"
+    localConditions:
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: SubjectExists
+      status: "True"
+      type: SubjectReconciled
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: ClusterPermissionsReconciled
+      status: "True"
+      type: ClusterPermissionsReconciled
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: GlobalRoleBindingReconciled
+      status: "True"
+      type: GlobalRoleBindingReconciled
+    - lastTransitionTime: "2026-04-19T20:51:54Z"
+      message: ""
+      reason: NamespacedRoleBindingReconciled
+      status: "True"
+      type: NamespacedRoleBindingReconciled
+    observedGenerationLocal: 1
+    summary: Completed
+    summaryLocal: Completed
+  userName: u-b4qkhsnliz
+  userPrincipalName: local://u-b4qkhsnliz
+kind: List
+metadata:

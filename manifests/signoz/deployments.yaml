@@ -1,0 +1,635 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "5"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"otel-deployment","app.kubernetes.io/instance":"k8s-infra","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"k8s-infra","app.kubernetes.io/version":"0.139.0","helm.sh/chart":"k8s-infra-0.15.0"},"name":"k8s-infra-otel-deployment","namespace":"signoz"},"spec":{"minReadySeconds":5,"progressDeadlineSeconds":120,"replicas":null,"selector":{"matchLabels":{"app.kubernetes.io/component":"otel-deployment","app.kubernetes.io/instance":"k8s-infra","app.kubernetes.io/name":"k8s-infra"}},"template":{"metadata":{"annotations":{"checksum/config":"37a9c0a773111d3ceacab6c26290d0bf0e34871a1de43f8364162c993c80b4f4"},"labels":{"app.kubernetes.io/component":"otel-deployment","app.kubernetes.io/instance":"k8s-infra","app.kubernetes.io/name":"k8s-infra"}},"spec":{"containers":[{"args":["--config=/conf/otel-deployment-config.yaml"],"command":["/otelcol-contrib"],"env":[{"name":"OTEL_EXPORTER_OTLP_ENDPOINT","value":null},{"name":"OTEL_SECRETS_PATH","value":"/secrets"},{"name":"K8S_CLUSTER_NAME","value":"aiot-cluster"},{"name":"K8S_NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"K8S_POD_IP","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"status.podIP"}}},{"name":"K8S_HOST_IP","valueFrom":{"fieldRef":{"fieldPath":"status.hostIP"}}},{"name":"K8S_POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"K8S_POD_UID","valueFrom":{"fieldRef":{"fieldPath":"metadata.uid"}}},{"name":"K8S_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"SIGNOZ_COMPONENT","value":"otel-deployment"},{"name":"OTEL_RESOURCE_ATTRIBUTES","value":"signoz.component=$(SIGNOZ_COMPONENT),k8s.cluster.name=$(K8S_CLUSTER_NAME)"}],"image":"docker.io/otel/opentelemetry-collector-contrib:0.139.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":6,"httpGet":{"path":"/","port":13133},"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"name":"k8s-infra-otel-deployment","ports":[{"containerPort":13133,"name":"health-check","protocol":"TCP"}],"readinessProbe":{"failureThreshold":6,"httpGet":{"path":"/","port":13133},"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{"requests":{"cpu":"100m","memory":"100Mi"}},"securityContext":{},"volumeMounts":[{"mountPath":"/conf","name":"otel-deployment-config-vol"}]}],"priorityClassName":"","securityContext":{},"serviceAccountName":"k8s-infra-otel-deployment","volumes":[{"configMap":{"name":"k8s-infra-otel-deployment"},"name":"otel-deployment-config-vol"}]}}}}
+    labels:
+      app.kubernetes.io/component: otel-deployment
+      app.kubernetes.io/instance: k8s-infra
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: k8s-infra
+      app.kubernetes.io/version: 0.139.0
+      helm.sh/chart: k8s-infra-0.15.0
+    name: k8s-infra-otel-deployment
+    namespace: signoz
+  spec:
+    minReadySeconds: 5
+    progressDeadlineSeconds: 120
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: otel-deployment
+        app.kubernetes.io/instance: k8s-infra
+        app.kubernetes.io/name: k8s-infra
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          checksum/config: 37a9c0a773111d3ceacab6c26290d0bf0e34871a1de43f8364162c993c80b4f4
+          kubectl.kubernetes.io/restartedAt: "2026-04-21T03:12:07Z"
+        labels:
+          app.kubernetes.io/component: otel-deployment
+          app.kubernetes.io/instance: k8s-infra
+          app.kubernetes.io/name: k8s-infra
+      spec:
+        containers:
+        - args:
+          - --config=/conf/otel-deployment-config.yaml
+          command:
+          - /otelcol-contrib
+          env:
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: http://signoz-otel-collector.signoz.svc.cluster.local:4317
+          - name: OTEL_SECRETS_PATH
+            value: /secrets
+          - name: K8S_CLUSTER_NAME
+            value: aiot-cluster
+          - name: K8S_NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: K8S_POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: K8S_HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+          - name: K8S_POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: K8S_POD_UID
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.uid
+          - name: K8S_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: SIGNOZ_COMPONENT
+            value: otel-deployment
+          - name: OTEL_RESOURCE_ATTRIBUTES
+            value: signoz.component=$(SIGNOZ_COMPONENT),k8s.cluster.name=$(K8S_CLUSTER_NAME)
+          image: docker.io/otel/opentelemetry-collector-contrib:0.139.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /
+              port: 13133
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: k8s-infra-otel-deployment
+          ports:
+          - containerPort: 13133
+            name: health-check
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /
+              port: 13133
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          securityContext: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /conf
+            name: otel-deployment-config-vol
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: k8s-infra-otel-deployment
+        serviceAccountName: k8s-infra-otel-deployment
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: k8s-infra-otel-deployment
+          name: otel-deployment-config-vol
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-20T16:20:29Z"
+      lastUpdateTime: "2026-04-20T16:20:29Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-21T03:12:07Z"
+      lastUpdateTime: "2026-04-21T03:12:24Z"
+      message: ReplicaSet "k8s-infra-otel-deployment-6955655f8b" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 5
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"operator","app.kubernetes.io/instance":"signoz","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"clickhouse","app.kubernetes.io/version":"24.1.2","clickhouse.altinity.com/chop":"0.21.2","helm.sh/chart":"clickhouse-24.1.18"},"name":"signoz-clickhouse-operator","namespace":"signoz"},"spec":{"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/component":"operator","app.kubernetes.io/instance":"signoz","app.kubernetes.io/name":"clickhouse"}},"template":{"metadata":{"annotations":{"checksum/confd-files":"94f3e09ff7956c5a88558260c7c4f78b39abaac064f1753a0d7783178237f648","checksum/configd-files":"cf3d35a6112c36b0b929dbd91bd08e819e859f4a83044514f65976416c60d95c","checksum/files":"c8d653d0277e2f36fadae729f5508e66acfb92307c8990324f56169d68566179","checksum/templatesd-files":"d65e4c1431979c24903978a1679116472d94ea7e063f98fd8b83ef163a00c446","checksum/usersd-files":"7924fd74a6d6fc630e48a6e867b458ebe2011175b536950821c5ccb05619ece7","signoz.io/port":"8888","signoz.io/scrape":"true"},"labels":{"app.kubernetes.io/component":"operator","app.kubernetes.io/instance":"signoz","app.kubernetes.io/name":"clickhouse"}},"spec":{"containers":[{"env":[{"name":"OPERATOR_POD_NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"OPERATOR_POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"OPERATOR_POD_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"OPERATOR_POD_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"OPERATOR_POD_SERVICE_ACCOUNT","valueFrom":{"fieldRef":{"fieldPath":"spec.serviceAccountName"}}},{"name":"OPERATOR_CONTAINER_CPU_REQUEST","valueFrom":{"resourceFieldRef":{"containerName":"operator","resource":"requests.cpu"}}},{"name":"OPERATOR_CONTAINER_CPU_LIMIT","valueFrom":{"resourceFieldRef":{"containerName":"operator","resource":"limits.cpu"}}},{"name":"OPERATOR_CONTAINER_MEM_REQUEST","valueFrom":{"resourceFieldRef":{"containerName":"operator","resource":"requests.memory"}}},{"name":"OPERATOR_CONTAINER_MEM_LIMIT","valueFrom":{"resourceFieldRef":{"containerName":"operator","resource":"limits.memory"}}}],"image":"docker.io/altinity/clickhouse-operator:0.21.2","imagePullPolicy":"IfNotPresent","name":"operator","resources":null,"volumeMounts":[{"mountPath":"/etc/clickhouse-operator","name":"etc-clickhouse-operator-folder"},{"mountPath":"/etc/clickhouse-operator/conf.d","name":"etc-clickhouse-operator-confd-folder"},{"mountPath":"/etc/clickhouse-operator/config.d","name":"etc-clickhouse-operator-configd-folder"},{"mountPath":"/etc/clickhouse-operator/templates.d","name":"etc-clickhouse-operator-templatesd-folder"},{"mountPath":"/etc/clickhouse-operator/users.d","name":"etc-clickhouse-operator-usersd-folder"}]},{"env":[{"name":"OPERATOR_POD_NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"OPERATOR_POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"OPERATOR_POD_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"OPERATOR_POD_IP","valueFrom":{"fieldRef":{"fieldPath":"status.podIP"}}},{"name":"OPERATOR_POD_SERVICE_ACCOUNT","valueFrom":{"fieldRef":{"fieldPath":"spec.serviceAccountName"}}},{"name":"OPERATOR_CONTAINER_CPU_REQUEST","valueFrom":{"resourceFieldRef":{"containerName":"operator","resource":"requests.cpu"}}},{"name":"OPERATOR_CONTAINER_CPU_LIMIT","valueFrom":{"resourceFieldRef":{"containerName":"operator","resource":"limits.cpu"}}},{"name":"OPERATOR_CONTAINER_MEM_REQUEST","valueFrom":{"resourceFieldRef":{"containerName":"operator","resource":"requests.memory"}}},{"name":"OPERATOR_CONTAINER_MEM_LIMIT","valueFrom":{"resourceFieldRef":{"containerName":"operator","resource":"limits.memory"}}}],"image":"docker.io/altinity/metrics-exporter:0.21.2","imagePullPolicy":"IfNotPresent","name":"metrics-exporter","ports":[{"containerPort":8888,"name":"metrics"}],"resources":null,"volumeMounts":[{"mountPath":"/etc/clickhouse-operator","name":"etc-clickhouse-operator-folder"},{"mountPath":"/etc/clickhouse-operator/conf.d","name":"etc-clickhouse-operator-confd-folder"},{"mountPath":"/etc/clickhouse-operator/config.d","name":"etc-clickhouse-operator-configd-folder"},{"mountPath":"/etc/clickhouse-operator/templates.d","name":"etc-clickhouse-operator-templatesd-folder"},{"mountPath":"/etc/clickhouse-operator/users.d","name":"etc-clickhouse-operator-usersd-folder"}]}],"priorityClassName":"","securityContext":{},"serviceAccountName":"signoz-clickhouse-operator","volumes":[{"configMap":{"name":"signoz-clickhouse-operator-etc-files"},"name":"etc-clickhouse-operator-folder"},{"configMap":{"name":"signoz-clickhouse-operator-etc-confd-files"},"name":"etc-clickhouse-operator-confd-folder"},{"configMap":{"name":"signoz-clickhouse-operator-etc-configd-files"},"name":"etc-clickhouse-operator-configd-folder"},{"configMap":{"name":"signoz-clickhouse-operator-etc-templatesd-files"},"name":"etc-clickhouse-operator-templatesd-folder"},{"configMap":{"name":"signoz-clickhouse-operator-etc-usersd-files"},"name":"etc-clickhouse-operator-usersd-folder"}]}}}}
+      meta.helm.sh/release-name: signoz
+      meta.helm.sh/release-namespace: signoz
+    labels:
+      app.kubernetes.io/component: operator
+      app.kubernetes.io/instance: signoz
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: clickhouse
+      app.kubernetes.io/version: 24.1.2
+      clickhouse.altinity.com/app: chop
+      clickhouse.altinity.com/chop: 0.21.2
+      clickhouse.altinity.com/chop-commit: 19d8376
+      clickhouse.altinity.com/chop-date: 2023-06-29T12.45.30
+      helm.sh/chart: clickhouse-24.1.18
+    name: signoz-clickhouse-operator
+    namespace: signoz
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/name: clickhouse
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          checksum/confd-files: 94f3e09ff7956c5a88558260c7c4f78b39abaac064f1753a0d7783178237f648
+          checksum/configd-files: cf3d35a6112c36b0b929dbd91bd08e819e859f4a83044514f65976416c60d95c
+          checksum/files: c8d653d0277e2f36fadae729f5508e66acfb92307c8990324f56169d68566179
+          checksum/templatesd-files: d65e4c1431979c24903978a1679116472d94ea7e063f98fd8b83ef163a00c446
+          checksum/usersd-files: 7924fd74a6d6fc630e48a6e867b458ebe2011175b536950821c5ccb05619ece7
+          signoz.io/port: "8888"
+          signoz.io/scrape: "true"
+        labels:
+          app.kubernetes.io/component: operator
+          app.kubernetes.io/instance: signoz
+          app.kubernetes.io/name: clickhouse
+      spec:
+        containers:
+        - env:
+          - name: OPERATOR_POD_NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: OPERATOR_POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: OPERATOR_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: OPERATOR_POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: OPERATOR_POD_SERVICE_ACCOUNT
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.serviceAccountName
+          - name: OPERATOR_CONTAINER_CPU_REQUEST
+            valueFrom:
+              resourceFieldRef:
+                containerName: operator
+                divisor: "0"
+                resource: requests.cpu
+          - name: OPERATOR_CONTAINER_CPU_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                containerName: operator
+                divisor: "0"
+                resource: limits.cpu
+          - name: OPERATOR_CONTAINER_MEM_REQUEST
+            valueFrom:
+              resourceFieldRef:
+                containerName: operator
+                divisor: "0"
+                resource: requests.memory
+          - name: OPERATOR_CONTAINER_MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                containerName: operator
+                divisor: "0"
+                resource: limits.memory
+          image: docker.io/altinity/clickhouse-operator:0.21.2
+          imagePullPolicy: IfNotPresent
+          name: operator
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/clickhouse-operator
+            name: etc-clickhouse-operator-folder
+          - mountPath: /etc/clickhouse-operator/conf.d
+            name: etc-clickhouse-operator-confd-folder
+          - mountPath: /etc/clickhouse-operator/config.d
+            name: etc-clickhouse-operator-configd-folder
+          - mountPath: /etc/clickhouse-operator/templates.d
+            name: etc-clickhouse-operator-templatesd-folder
+          - mountPath: /etc/clickhouse-operator/users.d
+            name: etc-clickhouse-operator-usersd-folder
+        - env:
+          - name: OPERATOR_POD_NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: OPERATOR_POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: OPERATOR_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: OPERATOR_POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: OPERATOR_POD_SERVICE_ACCOUNT
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.serviceAccountName
+          - name: OPERATOR_CONTAINER_CPU_REQUEST
+            valueFrom:
+              resourceFieldRef:
+                containerName: operator
+                divisor: "0"
+                resource: requests.cpu
+          - name: OPERATOR_CONTAINER_CPU_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                containerName: operator
+                divisor: "0"
+                resource: limits.cpu
+          - name: OPERATOR_CONTAINER_MEM_REQUEST
+            valueFrom:
+              resourceFieldRef:
+                containerName: operator
+                divisor: "0"
+                resource: requests.memory
+          - name: OPERATOR_CONTAINER_MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                containerName: operator
+                divisor: "0"
+                resource: limits.memory
+          image: docker.io/altinity/metrics-exporter:0.21.2
+          imagePullPolicy: IfNotPresent
+          name: metrics-exporter
+          ports:
+          - containerPort: 8888
+            name: metrics
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/clickhouse-operator
+            name: etc-clickhouse-operator-folder
+          - mountPath: /etc/clickhouse-operator/conf.d
+            name: etc-clickhouse-operator-confd-folder
+          - mountPath: /etc/clickhouse-operator/config.d
+            name: etc-clickhouse-operator-configd-folder
+          - mountPath: /etc/clickhouse-operator/templates.d
+            name: etc-clickhouse-operator-templatesd-folder
+          - mountPath: /etc/clickhouse-operator/users.d
+            name: etc-clickhouse-operator-usersd-folder
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: signoz-clickhouse-operator
+        serviceAccountName: signoz-clickhouse-operator
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: signoz-clickhouse-operator-etc-files
+          name: etc-clickhouse-operator-folder
+        - configMap:
+            defaultMode: 420
+            name: signoz-clickhouse-operator-etc-confd-files
+          name: etc-clickhouse-operator-confd-folder
+        - configMap:
+            defaultMode: 420
+            name: signoz-clickhouse-operator-etc-configd-files
+          name: etc-clickhouse-operator-configd-folder
+        - configMap:
+            defaultMode: 420
+            name: signoz-clickhouse-operator-etc-templatesd-files
+          name: etc-clickhouse-operator-templatesd-folder
+        - configMap:
+            defaultMode: 420
+            name: signoz-clickhouse-operator-etc-usersd-files
+          name: etc-clickhouse-operator-usersd-folder
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-19T21:40:43Z"
+      lastUpdateTime: "2026-04-19T21:42:27Z"
+      message: ReplicaSet "signoz-clickhouse-operator-554f9bcb98" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-20T16:21:24Z"
+      lastUpdateTime: "2026-04-20T16:21:24Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 2
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"otel-collector","app.kubernetes.io/instance":"signoz","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"signoz","app.kubernetes.io/version":"v0.117.1","helm.sh/chart":"signoz-0.117.1"},"name":"signoz-otel-collector","namespace":"signoz"},"spec":{"minReadySeconds":5,"progressDeadlineSeconds":600,"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/component":"otel-collector","app.kubernetes.io/instance":"signoz","app.kubernetes.io/name":"signoz"}},"strategy":{"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"checksum/config":"843b4c663a4eb1058edf4f9d4c44d6ed5930212154e6110163127ae76f6f2f88","signoz.io/port":"8888","signoz.io/scrape":"true"},"labels":{"app.kubernetes.io/component":"otel-collector","app.kubernetes.io/instance":"signoz","app.kubernetes.io/name":"signoz"}},"spec":{"containers":[{"args":["--config=/conf/otel-collector-config.yaml","--manager-config=/conf/otel-collector-opamp-config.yaml","--copy-path=/var/tmp/collector-config.yaml"],"command":["/signoz-otel-collector"],"env":[{"name":"CLICKHOUSE_HOST","value":"signoz-clickhouse"},{"name":"CLICKHOUSE_PORT","value":"9000"},{"name":"CLICKHOUSE_HTTP_PORT","value":"8123"},{"name":"CLICKHOUSE_CLUSTER","value":"cluster"},{"name":"CLICKHOUSE_USER","value":"admin"},{"name":"CLICKHOUSE_PASSWORD","value":"27ff0399-0d3a-4bd8-919d-17c2181e6fb9"},{"name":"CLICKHOUSE_SECURE","value":"false"},{"name":"CLICKHOUSE_DATABASE","value":"signoz_metrics"},{"name":"CLICKHOUSE_TRACE_DATABASE","value":"signoz_traces"},{"name":"CLICKHOUSE_LOG_DATABASE","value":"signoz_logs"},{"name":"CLICKHOUSE_METER_DATABASE","value":"signoz_meter"},{"name":"CLICKHOUSE_VERIFY","value":"false"},{"name":"K8S_NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"K8S_POD_IP","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"status.podIP"}}},{"name":"K8S_HOST_IP","valueFrom":{"fieldRef":{"fieldPath":"status.hostIP"}}},{"name":"K8S_POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"K8S_POD_UID","valueFrom":{"fieldRef":{"fieldPath":"metadata.uid"}}},{"name":"K8S_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"LOW_CARDINAL_EXCEPTION_GROUPING","value":"false"}],"image":"docker.io/signoz/signoz-otel-collector:v0.144.2","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":6,"httpGet":{"path":"/","port":13133},"initialDelaySeconds":5,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"name":"collector","ports":[{"containerPort":14250,"name":"jaeger-grpc","protocol":"TCP"},{"containerPort":14268,"name":"jaeger-thrift","protocol":"TCP"},{"containerPort":8081,"name":"logsheroku","protocol":"TCP"},{"containerPort":8082,"name":"logsjson","protocol":"TCP"},{"containerPort":8888,"name":"metrics","protocol":"TCP"},{"containerPort":4317,"name":"otlp","protocol":"TCP"},{"containerPort":4318,"name":"otlp-http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":6,"httpGet":{"path":"/","port":13133},"initialDelaySeconds":5,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{"requests":{"cpu":"100m","memory":"200Mi"}},"volumeMounts":[{"mountPath":"/conf","name":"otel-collector-config-vol"}]}],"initContainers":[{"args":["migrate","sync","check"],"command":["/signoz-otel-collector"],"env":[{"name":"CLICKHOUSE_HOST","value":"signoz-clickhouse"},{"name":"CLICKHOUSE_PORT","value":"9000"},{"name":"CLICKHOUSE_HTTP_PORT","value":"8123"},{"name":"CLICKHOUSE_CLUSTER","value":"cluster"},{"name":"CLICKHOUSE_USER","value":"admin"},{"name":"CLICKHOUSE_PASSWORD","value":"27ff0399-0d3a-4bd8-919d-17c2181e6fb9"},{"name":"CLICKHOUSE_SECURE","value":"false"},{"name":"SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN","value":"tcp://$(CLICKHOUSE_USER):$(CLICKHOUSE_PASSWORD)@$(CLICKHOUSE_HOST):$(CLICKHOUSE_PORT)"},{"name":"SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER","value":"$(CLICKHOUSE_CLUSTER)"},{"name":"SIGNOZ_OTEL_COLLECTOR_TIMEOUT","value":"10m"},{"name":"SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION","value":"true"}],"image":"docker.io/signoz/signoz-otel-collector:v0.144.2","imagePullPolicy":"IfNotPresent","name":"check"}],"priorityClassName":"","securityContext":{},"serviceAccountName":"signoz-otel-collector","topologySpreadConstraints":[{"labelSelector":{"matchLabels":{"app.kubernetes.io/component":"otel-collector"}},"maxSkew":1,"topologyKey":"kubernetes.io/hostname","whenUnsatisfiable":"ScheduleAnyway"}],"volumes":[{"configMap":{"name":"signoz-otel-collector"},"name":"otel-collector-config-vol"}]}}}}
+      meta.helm.sh/release-name: signoz
+      meta.helm.sh/release-namespace: signoz
+    labels:
+      app.kubernetes.io/component: otel-collector
+      app.kubernetes.io/instance: signoz
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: signoz
+      app.kubernetes.io/version: v0.117.1
+      helm.sh/chart: signoz-0.117.1
+    name: signoz-otel-collector
+    namespace: signoz
+  spec:
+    minReadySeconds: 5
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: otel-collector
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/name: signoz
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          checksum/config: da5c0b9327283bf2613f58d5472b139cfad2607fe97dedee9e3941ddc7f3abcc
+          kubectl.kubernetes.io/restartedAt: "2026-04-21T06:39:30Z"
+          signoz.io/port: "8888"
+          signoz.io/scrape: "true"
+        labels:
+          app.kubernetes.io/component: otel-collector
+          app.kubernetes.io/instance: signoz
+          app.kubernetes.io/name: signoz
+      spec:
+        containers:
+        - args:
+          - --config=/conf/otel-collector-config.yaml
+          - --manager-config=/conf/otel-collector-opamp-config.yaml
+          - --copy-path=/var/tmp/collector-config.yaml
+          command:
+          - /signoz-otel-collector
+          env:
+          - name: CLICKHOUSE_HOST
+            value: signoz-clickhouse
+          - name: CLICKHOUSE_PORT
+            value: "9000"
+          - name: CLICKHOUSE_HTTP_PORT
+            value: "8123"
+          - name: CLICKHOUSE_CLUSTER
+            value: cluster
+          - name: CLICKHOUSE_USER
+            value: admin
+          - name: CLICKHOUSE_PASSWORD
+            value: 27ff0399-0d3a-4bd8-919d-17c2181e6fb9
+          - name: CLICKHOUSE_SECURE
+            value: "false"
+          - name: CLICKHOUSE_DATABASE
+            value: signoz_metrics
+          - name: CLICKHOUSE_TRACE_DATABASE
+            value: signoz_traces
+          - name: CLICKHOUSE_LOG_DATABASE
+            value: signoz_logs
+          - name: CLICKHOUSE_METER_DATABASE
+            value: signoz_meter
+          - name: CLICKHOUSE_VERIFY
+            value: "false"
+          - name: K8S_NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: K8S_POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: K8S_HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+          - name: K8S_POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: K8S_POD_UID
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.uid
+          - name: K8S_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: LOW_CARDINAL_EXCEPTION_GROUPING
+            value: "false"
+          image: docker.io/signoz/signoz-otel-collector:v0.144.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /
+              port: 13133
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: collector
+          ports:
+          - containerPort: 14250
+            name: jaeger-grpc
+            protocol: TCP
+          - containerPort: 14268
+            name: jaeger-thrift
+            protocol: TCP
+          - containerPort: 8081
+            name: logsheroku
+            protocol: TCP
+          - containerPort: 8082
+            name: logsjson
+            protocol: TCP
+          - containerPort: 8888
+            name: metrics
+            protocol: TCP
+          - containerPort: 4317
+            name: otlp
+            protocol: TCP
+          - containerPort: 4318
+            name: otlp-http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /
+              port: 13133
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /conf
+            name: otel-collector-config-vol
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - migrate
+          - sync
+          - check
+          command:
+          - /signoz-otel-collector
+          env:
+          - name: CLICKHOUSE_HOST
+            value: signoz-clickhouse
+          - name: CLICKHOUSE_PORT
+            value: "9000"
+          - name: CLICKHOUSE_HTTP_PORT
+            value: "8123"
+          - name: CLICKHOUSE_CLUSTER
+            value: cluster
+          - name: CLICKHOUSE_USER
+            value: admin
+          - name: CLICKHOUSE_PASSWORD
+            value: 27ff0399-0d3a-4bd8-919d-17c2181e6fb9
+          - name: CLICKHOUSE_SECURE
+            value: "false"
+          - name: SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN
+            value: tcp://$(CLICKHOUSE_USER):$(CLICKHOUSE_PASSWORD)@$(CLICKHOUSE_HOST):$(CLICKHOUSE_PORT)
+          - name: SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER
+            value: $(CLICKHOUSE_CLUSTER)
+          - name: SIGNOZ_OTEL_COLLECTOR_TIMEOUT
+            value: 10m
+          - name: SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION
+            value: "true"
+          image: docker.io/signoz/signoz-otel-collector:v0.144.2
+          imagePullPolicy: IfNotPresent
+          name: check
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: signoz-otel-collector
+        serviceAccountName: signoz-otel-collector
+        terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: otel-collector
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: signoz-otel-collector
+          name: otel-collector-config-vol
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-20T11:19:53Z"
+      lastUpdateTime: "2026-04-20T11:19:53Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-19T21:43:31Z"
+      lastUpdateTime: "2026-04-21T06:40:04Z"
+      message: ReplicaSet "signoz-otel-collector-7b5978d7f7" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 3
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:

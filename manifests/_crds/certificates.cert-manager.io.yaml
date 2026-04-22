@@ -1,0 +1,1032 @@
+apiVersion: v1
+items:
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-api-gateway
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: api-gateway
+  spec:
+    dnsNames:
+    - api.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-api-gateway
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:51:51Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:18Z"
+    notBefore: "2026-04-14T08:53:19Z"
+    renewalTime: "2026-06-13T08:53:18Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-cloudbeaver
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: cloudbeaver
+  spec:
+    dnsNames:
+    - cloudbeaver.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-cloudbeaver
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:51:56Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:23Z"
+    notBefore: "2026-04-14T08:53:24Z"
+    renewalTime: "2026-06-13T08:53:23Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-digital-twin
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: digital-twin
+  spec:
+    dnsNames:
+    - twin.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-digital-twin
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:51:49Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:16Z"
+    notBefore: "2026-04-14T08:53:17Z"
+    renewalTime: "2026-06-13T08:53:16Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-ngrok-proxy
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: ngrok-proxy
+  spec:
+    dnsNames:
+    - ngrok.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-ngrok-proxy
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:00Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:27Z"
+    notBefore: "2026-04-14T08:53:28Z"
+    renewalTime: "2026-06-13T08:53:27Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-open-webui
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: open-webui
+  spec:
+    dnsNames:
+    - chat.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-open-webui
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:03Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:29Z"
+    notBefore: "2026-04-14T08:53:30Z"
+    renewalTime: "2026-06-13T08:53:29Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-pgadmin
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: pgadmin
+  spec:
+    dnsNames:
+    - pgadmin.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-pgadmin
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:07Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:35Z"
+    notBefore: "2026-04-14T08:53:36Z"
+    renewalTime: "2026-06-13T08:53:35Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-qdrant
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: qdrant
+  spec:
+    dnsNames:
+    - qdrant.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-qdrant
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:28Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:56Z"
+    notBefore: "2026-04-14T08:53:57Z"
+    renewalTime: "2026-06-13T08:53:56Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-rag
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: rag
+  spec:
+    dnsNames:
+    - rag.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-rag
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:03Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:28Z"
+    notBefore: "2026-04-14T08:53:29Z"
+    renewalTime: "2026-06-13T08:53:28Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    labels:
+      app: rancher
+      app.kubernetes.io/managed-by: Helm
+      chart: rancher-2.13.3
+      heritage: Helm
+      release: rancher
+    name: tls-rancher-ingress
+    namespace: cattle-system
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: rancher
+  spec:
+    dnsNames:
+    - rancher.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-rancher-ingress
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-19T20:41:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-18T19:42:59Z"
+    notBefore: "2026-04-19T19:43:00Z"
+    renewalTime: "2026-06-18T19:42:59Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-webhook
+    namespace: chef-webhook
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: webhook-ingress
+  spec:
+    dnsNames:
+    - webhook.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-webhook
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:54:07Z"
+    notBefore: "2026-04-14T08:54:08Z"
+    renewalTime: "2026-06-13T08:54:07Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-chef
+    namespace: chef
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: chef
+  spec:
+    dnsNames:
+    - chef.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-chef
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:57Z"
+    notBefore: "2026-04-14T08:53:58Z"
+    renewalTime: "2026-06-13T08:53:57Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-pe-console
+    namespace: chef
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: pe-console
+  spec:
+    dnsNames:
+    - pe.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-pe-console
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T16:30:20Z"
+    notBefore: "2026-04-14T16:30:21Z"
+    renewalTime: "2026-06-13T16:30:20Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-emqx
+    namespace: emqx
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: emqx
+  spec:
+    dnsNames:
+    - emqx.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-emqx
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:40Z"
+    notBefore: "2026-04-14T08:53:41Z"
+    renewalTime: "2026-06-13T08:53:40Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-gitea
+    namespace: gitea
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: gitea
+  spec:
+    dnsNames:
+    - gitea.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-gitea
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-19T04:02:46Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-18T03:04:13Z"
+    notBefore: "2026-04-19T03:04:14Z"
+    renewalTime: "2026-06-18T03:04:13Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-headlamp
+    namespace: headlamp
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: headlamp
+  spec:
+    dnsNames:
+    - headlamp.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-headlamp
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:47:50Z"
+    notBefore: "2026-04-14T08:47:51Z"
+    renewalTime: "2026-06-13T08:47:50Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-inference
+    namespace: inference
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: inference
+  spec:
+    dnsNames:
+    - inference.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-inference
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:12Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:41Z"
+    notBefore: "2026-04-14T08:53:42Z"
+    renewalTime: "2026-06-13T08:53:41Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-kubeflow
+    namespace: istio-system
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: kubeflow-ingress
+  spec:
+    dnsNames:
+    - kubeflow.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-kubeflow
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:39Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:54:05Z"
+    notBefore: "2026-04-14T08:54:06Z"
+    renewalTime: "2026-06-13T08:54:05Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    labels:
+      app.kubernetes.io/component: jenkins-controller
+      app.kubernetes.io/instance: jenkins
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: jenkins
+      helm.sh/chart: jenkins-5.9.18
+    name: tls-jenkins
+    namespace: jenkins
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: jenkins
+  spec:
+    dnsNames:
+    - jenkins.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-jenkins
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:46:23Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:47:49Z"
+    notBefore: "2026-04-14T08:47:50Z"
+    renewalTime: "2026-06-13T08:47:49Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"labels":{"app":"poddefaults","app.kubernetes.io/component":"poddefaults","app.kubernetes.io/name":"poddefaults","kustomize.component":"poddefaults"},"name":"admission-webhook-cert","namespace":"kubeflow"},"spec":{"commonName":"admission-webhook-service.kubeflow.svc","dnsNames":["admission-webhook-service.kubeflow.svc","admission-webhook-service.kubeflow.svc.cluster.local"],"isCA":true,"issuerRef":{"kind":"Issuer","name":"admission-webhook-selfsigned-issuer"},"secretName":"webhook-certs"}}
+    labels:
+      app: poddefaults
+      app.kubernetes.io/component: poddefaults
+      app.kubernetes.io/name: poddefaults
+      kustomize.component: poddefaults
+    name: admission-webhook-cert
+    namespace: kubeflow
+  spec:
+    commonName: admission-webhook-service.kubeflow.svc
+    dnsNames:
+    - admission-webhook-service.kubeflow.svc
+    - admission-webhook-service.kubeflow.svc.cluster.local
+    isCA: true
+    issuerRef:
+      kind: Issuer
+      name: admission-webhook-selfsigned-issuer
+    secretName: webhook-certs
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:30:30Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T02:30:30Z"
+    notBefore: "2026-04-14T02:30:30Z"
+    renewalTime: "2026-06-13T02:30:30Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"name":"katib-webhook-cert","namespace":"kubeflow"},"spec":{"commonName":"katib-controller.kubeflow.svc","dnsNames":["katib-controller.kubeflow.svc","katib-controller.kubeflow.svc.cluster.local"],"isCA":true,"issuerRef":{"kind":"Issuer","name":"katib-selfsigned-issuer"},"secretName":"katib-webhook-cert"}}
+    name: katib-webhook-cert
+    namespace: kubeflow
+  spec:
+    commonName: katib-controller.kubeflow.svc
+    dnsNames:
+    - katib-controller.kubeflow.svc
+    - katib-controller.kubeflow.svc.cluster.local
+    isCA: true
+    issuerRef:
+      kind: Issuer
+      name: katib-selfsigned-issuer
+    secretName: katib-webhook-cert
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:30:28Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T02:30:28Z"
+    notBefore: "2026-04-14T02:30:28Z"
+    renewalTime: "2026-06-13T02:30:28Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"labels":{"app":"cache-server-cert-manager"},"name":"kfp-cache-cert","namespace":"kubeflow"},"spec":{"commonName":"kfp-cache-cert","dnsNames":["cache-server","cache-server.kubeflow","cache-server.kubeflow.svc"],"isCA":true,"issuerRef":{"kind":"Issuer","name":"kfp-cache-selfsigned-issuer"},"secretName":"webhook-server-tls"}}
+    labels:
+      app: cache-server-cert-manager
+    name: kfp-cache-cert
+    namespace: kubeflow
+  spec:
+    commonName: kfp-cache-cert
+    dnsNames:
+    - cache-server
+    - cache-server.kubeflow
+    - cache-server.kubeflow.svc
+    isCA: true
+    issuerRef:
+      kind: Issuer
+      name: kfp-cache-selfsigned-issuer
+    secretName: webhook-server-tls
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:26:43Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T02:26:43Z"
+    notBefore: "2026-04-14T02:26:43Z"
+    renewalTime: "2026-06-13T02:26:43Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"labels":{"app":"kserve","app.kubernetes.io/name":"kserve"},"name":"serving-cert","namespace":"kubeflow"},"spec":{"commonName":"kserve-webhook-server-service.kubeflow.svc","dnsNames":["kserve-webhook-server-service.kubeflow.svc"],"issuerRef":{"kind":"Issuer","name":"selfsigned-issuer"},"secretName":"kserve-webhook-server-cert"}}
+    labels:
+      app: kserve
+      app.kubernetes.io/name: kserve
+    name: serving-cert
+    namespace: kubeflow
+  spec:
+    commonName: kserve-webhook-server-service.kubeflow.svc
+    dnsNames:
+    - kserve-webhook-server-service.kubeflow.svc
+    issuerRef:
+      kind: Issuer
+      name: selfsigned-issuer
+    secretName: kserve-webhook-server-cert
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T02:27:24Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T02:27:24Z"
+    notBefore: "2026-04-14T02:27:24Z"
+    renewalTime: "2026-06-13T02:27:24Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-mattermost
+    namespace: mattermost
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: mattermost
+  spec:
+    dnsNames:
+    - mm.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-mattermost
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:53:57Z"
+    notBefore: "2026-04-14T08:53:58Z"
+    renewalTime: "2026-06-13T08:53:57Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-mlflow
+    namespace: mlflow
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: mlflow
+  spec:
+    dnsNames:
+    - mlflow.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-mlflow
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:54:06Z"
+    notBefore: "2026-04-14T08:54:07Z"
+    renewalTime: "2026-06-13T08:54:06Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-tensorboard
+    namespace: mlflow
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: tensorboard
+  spec:
+    dnsNames:
+    - tensorboard.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-tensorboard
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-15T12:18:02Z"
+    notBefore: "2026-04-16T12:18:03Z"
+    renewalTime: "2026-06-15T12:18:02Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    labels:
+      app.kubernetes.io/instance: prometheus
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/version: 12.4.2
+      helm.sh/chart: grafana-11.6.0
+    name: tls-grafana
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: prometheus-grafana
+  spec:
+    dnsNames:
+    - grafana.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-grafana
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:45Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:54:12Z"
+    notBefore: "2026-04-14T08:54:13Z"
+    renewalTime: "2026-06-13T08:54:12Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-prometheus
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: prometheus
+  spec:
+    dnsNames:
+    - prometheus.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-prometheus
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-14T09:52:40Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:54:07Z"
+    notBefore: "2026-04-14T08:54:08Z"
+    renewalTime: "2026-06-13T08:54:07Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"webhook","app.kubernetes.io/instance":"opentelemetry-operator","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"opentelemetry-operator","app.kubernetes.io/part-of":"opentelemetry-operator","app.kubernetes.io/version":"0.148.0","helm.sh/chart":"opentelemetry-operator-0.109.2"},"name":"opentelemetry-operator-serving-cert","namespace":"opentelemetry-operator-system"},"spec":{"dnsNames":["opentelemetry-operator-webhook.opentelemetry-operator-system.svc","opentelemetry-operator-webhook.opentelemetry-operator-system.svc.cluster.local"],"issuerRef":{"kind":"Issuer","name":"opentelemetry-operator-selfsigned-issuer"},"secretName":"opentelemetry-operator-controller-manager-service-cert","subject":{"organizationalUnits":["opentelemetry-operator"]}}}
+      meta.helm.sh/release-name: opentelemetry-operator
+      meta.helm.sh/release-namespace: opentelemetry-operator-system
+    labels:
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/instance: opentelemetry-operator
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: opentelemetry-operator
+      app.kubernetes.io/part-of: opentelemetry-operator
+      app.kubernetes.io/version: 0.148.0
+      helm.sh/chart: opentelemetry-operator-0.109.2
+    name: opentelemetry-operator-serving-cert
+    namespace: opentelemetry-operator-system
+  spec:
+    dnsNames:
+    - opentelemetry-operator-webhook.opentelemetry-operator-system.svc
+    - opentelemetry-operator-webhook.opentelemetry-operator-system.svc.cluster.local
+    issuerRef:
+      kind: Issuer
+      name: opentelemetry-operator-selfsigned-issuer
+    secretName: opentelemetry-operator-controller-manager-service-cert
+    subject:
+      organizationalUnits:
+      - opentelemetry-operator
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-15T20:01:38Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-14T20:01:38Z"
+    notBefore: "2026-04-15T20:01:38Z"
+    renewalTime: "2026-06-14T20:01:38Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: tls-signoz
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: signoz
+  spec:
+    dnsNames:
+    - signoz.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: tls-signoz
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-13T08:54:01Z"
+    notBefore: "2026-04-14T08:54:02Z"
+    renewalTime: "2026-06-13T08:54:01Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: zabbix-tls
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: zabbix-web
+  spec:
+    dnsNames:
+    - zabbix.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: zabbix-tls
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-21T19:30:33Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-19T05:58:40Z"
+    notBefore: "2026-04-20T05:58:41Z"
+    renewalTime: "2026-06-19T05:58:40Z"
+kind: List
+metadata:

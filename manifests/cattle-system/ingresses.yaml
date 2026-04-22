@@ -1,0 +1,46 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"cattle-system:rancher","ingressName":"cattle-system:rancher","hostname":"rancher.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"nginx.ingress.kubernetes.io/proxy-connect-timeout":"30","nginx.ingress.kubernetes.io/proxy-read-timeout":"1800","nginx.ingress.kubernetes.io/proxy-send-timeout":"1800"},"labels":{"app":"rancher","chart":"rancher-2.13.3","heritage":"Helm","release":"rancher"},"name":"rancher","namespace":"cattle-system"},"spec":{"rules":[{"host":"rancher.35.241.255.137.nip.io","http":{"paths":[{"backend":{"service":{"name":"rancher","port":{"number":80}}},"path":"/","pathType":"ImplementationSpecific"}]}}],"tls":[{"hosts":["rancher.35.241.255.137.nip.io"],"secretName":"tls-rancher-ingress"}]}}
+      meta.helm.sh/release-name: rancher
+      meta.helm.sh/release-namespace: cattle-system
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
+    labels:
+      app: rancher
+      app.kubernetes.io/managed-by: Helm
+      chart: rancher-2.13.3
+      heritage: Helm
+      release: rancher
+    name: rancher
+    namespace: cattle-system
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: rancher.35.241.255.137.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: rancher
+              port:
+                number: 80
+          path: /
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - rancher.35.241.255.137.nip.io
+      secretName: tls-rancher-ingress
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 35.241.255.137
+kind: List
+metadata:

@@ -1,0 +1,101 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  authProvider: local
+  current: false
+  description: UI session
+  expired: false
+  expiresAt: ""
+  isDerived: false
+  kind: Token
+  lastUsedAt: "2026-04-22T08:28:02Z"
+  metadata:
+    generateName: token-
+    labels:
+      authn.management.cattle.io/kind: session
+      authn.management.cattle.io/token-userId: user-b2zsr
+    name: token-5nztq
+  token: vxl2tf9fl8l2qlczmgjnftb8kjqfdmgx9xzvwsp9mptcf7c5pzg6mz
+  ttl: 0
+  userId: user-b2zsr
+  userPrincipal:
+    displayName: Default Admin
+    loginName: admin
+    me: true
+    metadata:
+      name: local://user-b2zsr
+    principalType: user
+    provider: local
+- apiVersion: management.cattle.io/v3
+  authProvider: local
+  current: false
+  description: UI session
+  expired: false
+  expiresAt: ""
+  isDerived: false
+  kind: Token
+  lastUsedAt: "2026-04-21T03:58:26Z"
+  metadata:
+    generateName: token-
+    labels:
+      authn.management.cattle.io/kind: session
+      authn.management.cattle.io/token-userId: user-b2zsr
+    name: token-nd989
+  token: gb769cnstl87rnzj4gdkr8jvrtpmktv4tl42jdsgq8szhstfx2bp42
+  ttl: 0
+  userId: user-b2zsr
+  userPrincipal:
+    displayName: Default Admin
+    loginName: admin
+    me: true
+    metadata:
+      name: local://user-b2zsr
+    principalType: user
+    provider: local
+- apiVersion: management.cattle.io/v3
+  authProvider: local
+  current: false
+  description: UI session
+  expired: false
+  expiresAt: ""
+  isDerived: false
+  kind: Token
+  lastUsedAt: "2026-04-21T21:15:33Z"
+  metadata:
+    generateName: token-
+    labels:
+      authn.management.cattle.io/kind: session
+      authn.management.cattle.io/token-userId: user-b2zsr
+    name: token-tbsxn
+  token: r5hfd2djvvfttf8kgc4hpgrt8nd58gwpq8mztbcxhvqh8lz5pb2j2t
+  ttl: 0
+  userId: user-b2zsr
+  userPrincipal:
+    displayName: Default Admin
+    loginName: admin
+    me: true
+    metadata:
+      name: local://user-b2zsr
+    principalType: user
+    provider: local
+- apiVersion: management.cattle.io/v3
+  authProvider: local
+  current: false
+  description: ""
+  expired: false
+  expiresAt: ""
+  isDerived: true
+  kind: Token
+  lastUsedAt: "2026-04-19T20:52:01Z"
+  metadata:
+    labels:
+      authn.management.cattle.io/kind: provisioning
+      authn.management.cattle.io/token-userId: u-mo773yttt4
+    name: u-mo773yttt4
+  token: v9gd5j4pl62ct69h4prcmmdztfn2nlwbfn6dfwrzwp78kxdnvrgtzc
+  ttl: 0
+  userId: u-mo773yttt4
+  userPrincipal:
+    metadata: {}
+kind: List
+metadata:

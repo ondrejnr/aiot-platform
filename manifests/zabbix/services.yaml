@@ -1,0 +1,116 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: zabbix
+      meta.helm.sh/release-namespace: zabbix
+    labels:
+      app.kubernetes.io/component: server
+      app.kubernetes.io/instance: zabbix
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: zabbix
+      app.kubernetes.io/version: 7.0.16
+      helm.sh/chart: zabbix-7.0.12
+    name: zabbix-zabbix-server
+    namespace: zabbix
+  spec:
+    clusterIP: 10.111.192.100
+    clusterIPs:
+    - 10.111.192.100
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: zabbix-server
+      port: 10051
+      protocol: TCP
+      targetPort: 10051
+    - name: zabbix-jmx
+      port: 10052
+      protocol: TCP
+      targetPort: 10052
+    selector:
+      app.kubernetes.io/component: server
+      app.kubernetes.io/instance: zabbix
+      app.kubernetes.io/name: zabbix
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: zabbix
+      meta.helm.sh/release-namespace: zabbix
+    labels:
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: zabbix
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: zabbix
+      app.kubernetes.io/version: 7.0.16
+      helm.sh/chart: zabbix-7.0.12
+    name: zabbix-zabbix-web
+    namespace: zabbix
+  spec:
+    clusterIP: 10.103.150.229
+    clusterIPs:
+    - 10.103.150.229
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: zabbix-web
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: zabbix
+      app.kubernetes.io/name: zabbix
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: zabbix
+      meta.helm.sh/release-namespace: zabbix
+    labels:
+      app.kubernetes.io/component: webservice
+      app.kubernetes.io/instance: zabbix
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: zabbix
+      app.kubernetes.io/version: 7.0.16
+      helm.sh/chart: zabbix-7.0.12
+    name: zabbix-zabbix-webservice
+    namespace: zabbix
+  spec:
+    clusterIP: 10.107.114.36
+    clusterIPs:
+    - 10.107.114.36
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: webservice
+      port: 10053
+      protocol: TCP
+      targetPort: 10053
+    selector:
+      app.kubernetes.io/component: webservice
+      app.kubernetes.io/instance: zabbix
+      app.kubernetes.io/name: zabbix
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:

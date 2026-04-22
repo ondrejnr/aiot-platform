@@ -1,0 +1,32 @@
+apiVersion: v1
+items:
+- apiVersion: fleet.cattle.io/v1alpha1
+  kind: BundleDeployment
+  metadata:
+    finalizers:
+    - fleet.cattle.io/bundle-deployment-finalizer
+    labels:
+      fleet.cattle.io/bundle-name: fleet-agent-local
+      fleet.cattle.io/bundle-namespace: fleet-local
+      fleet.cattle.io/cluster: local
+      fleet.cattle.io/cluster-namespace: fleet-local
+      fleet.cattle.io/content-name: s-3a2cfd886b3786c332dbd664879bc469a4f9d62d8e279435d21450476c6e4
+      fleet.cattle.io/managed: "true"
+    name: fleet-agent-local
+    namespace: cluster-fleet-local-local-1a3d67d0a899
+  spec:
+    deploymentID: s-3a2cfd886b3786c332dbd664879bc469a4f9d62d8e279435d21450476c6e4:8a42b4463e55a59ce2ccdf3c53c32455ce5fd0f601587bf57b5624b3cf8bb623
+    options:
+      defaultNamespace: cattle-fleet-local-system
+      helm:
+        takeOwnership: true
+    stagedDeploymentID: s-3a2cfd886b3786c332dbd664879bc469a4f9d62d8e279435d21450476c6e4:8a42b4463e55a59ce2ccdf3c53c32455ce5fd0f601587bf57b5624b3cf8bb623
+    stagedOptions:
+      defaultNamespace: cattle-fleet-local-system
+      helm:
+        takeOwnership: true
+  status:
+    display:
+      state: WaitApplied
+kind: List
+metadata:

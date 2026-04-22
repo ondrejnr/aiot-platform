@@ -1,0 +1,274 @@
+apiVersion: v1
+items:
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: aggregated-roletemplates
+  spec:
+    value: null
+  status:
+    default: false
+    description: '[Experimental] Make RoleTemplates use aggregation for generated
+      RBAC roles'
+    dynamic: false
+    lockedValue: false
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: clean-stale-secrets
+  spec:
+    value: null
+  status:
+    default: true
+    description: Remove unused impersonation secrets from the cattle-impersonation
+      namespace
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: cluster-agent-scheduling-customization
+  spec:
+    value: null
+  status:
+    default: false
+    description: Enables the automatic deployment of Pod Disruption Budgets and Priority
+      Classes when deploying the cattle-cluster-agent. Disabling this feature will
+      not impact existing clusters.
+    dynamic: true
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: cluster-autoscaling
+  spec:
+    value: null
+  status:
+    default: false
+    description: Enable Rancher cluster-autoscaler support
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: continuous-delivery
+  spec:
+    value: null
+  status:
+    default: true
+    description: Gitops components in fleet
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: fleet
+  spec:
+    value: null
+  status:
+    default: true
+    description: Install Fleet when starting Rancher
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: harvester
+  spec:
+    value: null
+  status:
+    default: true
+    description: Enable Harvester integration, with ability to import and manage Harvester
+      clusters
+    dynamic: true
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    annotations:
+      feature.cattle.io/experimental: "true"
+    name: harvester-baremetal-container-workload
+  spec:
+    value: null
+  status:
+    default: false
+    description: '[Experimental]: Deploy container workloads to underlying harvester
+      cluster'
+    dynamic: true
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: istio-virtual-service-ui
+  spec:
+    value: null
+  status:
+    default: true
+    description: Exposes a UI that enables users to create, read, update and delete
+      virtual services and destination rules, which are traffic management features
+      of Istio.
+    dynamic: true
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: legacy
+  spec:
+    value: null
+  status:
+    default: false
+    description: Enable legacy features
+    dynamic: true
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: multi-cluster-management
+  spec:
+    value: null
+  status:
+    default: true
+    description: Multi-cluster provisioning and management of Kubernetes clusters.
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: oidc-provider
+  spec:
+    value: null
+  status:
+    default: false
+    description: Provide an OIDC provider embedded in Rancher. Required to enable
+      SSO in Rancher Prime components.
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: provisioningprebootstrap
+  spec:
+    value: null
+  status:
+    default: false
+    description: Support running pre-bootstrap workloads on downstream clusters
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: provisioningv2-fleet-workspace-back-population
+  spec:
+    value: null
+  status:
+    default: false
+    description: '[Experimental]: Allow Fleet workspace name to be changed on clusters
+      administrated by provisioning v2'
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: rancher-scc-registration-extension
+  spec:
+    value: null
+  status:
+    default: false
+    description: Enable Rancher's SCC registration extension to register the system(s)
+      for customer support
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: rke1-custom-node-cleanup
+  spec:
+    value: null
+  status:
+    default: true
+    description: Enable cleanup RKE1 custom cluster nodes when they are deleted
+    dynamic: true
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: rke1-ui
+  spec:
+    value: null
+  status:
+    default: true
+    description: Enable RKE1 provisioning in the Rancher UI
+    dynamic: true
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: rke2
+  spec:
+    value: null
+  status:
+    default: true
+    description: Enable provisioning of RKE2
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: token-hashing
+  spec:
+    value: null
+  status:
+    default: false
+    description: Enable one way hashing of tokens. Once enabled token hashing can
+      not be disabled
+    dynamic: true
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: ui-sql-cache
+  spec:
+    value: null
+  status:
+    default: true
+    description: Improve performance by enabling SQLite-backed caching. This also
+      enables server-side pagination and other scaling based performance improvements.
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: uiextension
+  spec:
+    value: null
+  status:
+    default: true
+    description: Enable UI Extensions when starting Rancher
+    dynamic: false
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: unsupported-storage-drivers
+  spec:
+    value: null
+  status:
+    default: false
+    description: Allows the use of types for storage providers and provisioners that
+      are not enabled by default.
+    dynamic: true
+    lockedValue: null
+- apiVersion: management.cattle.io/v3
+  kind: Feature
+  metadata:
+    name: v2prov-etcd-snapshot-backpopulate
+  spec:
+    value: null
+  status:
+    default: true
+    description: Allow Rancher to create ETCD Snapshot CRs for downstream clusters
+      in the local cluster
+    dynamic: false
+    lockedValue: null
+kind: List
+metadata:
