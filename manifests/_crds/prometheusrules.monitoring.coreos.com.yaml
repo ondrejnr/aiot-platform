@@ -29,6 +29,217 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"monitoring.coreos.com/v1","kind":"PrometheusRule","metadata":{"annotations":{},"labels":{"app.kubernetes.io/part-of":"kube-prometheus-stack","release":"prometheus"},"name":"aiot-platform-rules","namespace":"monitoring"},"spec":{"groups":[{"name":"nodes","rules":[{"alert":"NodeDown","annotations":{"summary":"Node {{ $labels.instance }} down"},"expr":"up{job=\"node-exporter\"} == 0","for":"5m","labels":{"severity":"critical"}},{"alert":"NodeHighCPU","annotations":{"summary":"CPU \u003e90% on {{ $labels.instance }}"},"expr":"(1 - avg by(instance)(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))) \u003e 0.9","for":"15m","labels":{"severity":"warning"}},{"alert":"NodeHighMemory","annotations":{"summary":"Memory \u003e90% on {{ $labels.instance }}"},"expr":"(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes \u003e 0.9","for":"15m","labels":{"severity":"warning"}},{"alert":"NodeDiskPressure","annotations":{"summary":"DiskPressure on {{ $labels.node }}"},"expr":"kube_node_status_condition{condition=\"DiskPressure\",status=\"true\"} == 1","for":"5m","labels":{"severity":"critical"}},{"alert":"NodeNotReady","annotations":{"summary":"Node {{ $labels.node }} NotReady"},"expr":"kube_node_status_condition{condition=\"Ready\",status=\"true\"} == 0","for":"5m","labels":{"severity":"critical"}}]},{"name":"pods","rules":[{"alert":"PodCrashLooping","annotations":{"summary":"Pod {{ $labels.namespace }}/{{ $labels.pod }} crashlooping"},"expr":"rate(kube_pod_container_status_restarts_total[10m]) * 600 \u003e 3","for":"10m","labels":{"severity":"warning"}},{"alert":"PodOOMKilled","annotations":{"summary":"OOMKilled: {{ $labels.namespace }}/{{ $labels.pod }}"},"expr":"increase(kube_pod_container_status_last_terminated_reason{reason=\"OOMKilled\"}[10m]) \u003e 0","labels":{"severity":"warning"}},{"alert":"PodImagePullBackOff","annotations":{"summary":"ImagePull fail: {{ $labels.namespace }}/{{ $labels.pod }}"},"expr":"kube_pod_container_status_waiting_reason{reason=~\"ImagePullBackOff|ErrImagePull\"} == 1","for":"10m","labels":{"severity":"warning"}},{"alert":"DeploymentReplicasMismatch","annotations":{"summary":"Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replicas mismatch"},"expr":"kube_deployment_spec_replicas != kube_deployment_status_replicas_available","for":"15m","labels":{"severity":"warning"}},{"alert":"StatefulSetReplicasMismatch","annotations":{"summary":"StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} degraded"},"expr":"kube_statefulset_status_replicas_ready != kube_statefulset_status_replicas","for":"15m","labels":{"severity":"warning"}}]},{"name":"storage","rules":[{"alert":"PVCAlmostFull","annotations":{"summary":"PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} \u003e85% full"},"expr":"(kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes) \u003e 0.85","for":"10m","labels":{"severity":"warning"}},{"alert":"PVCFull","annotations":{"summary":"PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} \u003e95% FULL"},"expr":"(kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes) \u003e 0.95","for":"5m","labels":{"severity":"critical"}},{"alert":"PiraeusResourceBad","annotations":{"summary":"Piraeus resource {{ $labels.resource }} not UpToDate on {{ $labels.node }}"},"expr":"linstor_resource_state{state!=\"UpToDate\"} == 1","for":"10m","labels":{"severity":"warning"}}]},{"name":"workloads","rules":[{"alert":"JobFailed","annotations":{"summary":"Job {{ $labels.namespace }}/{{ $labels.job_name }} failed"},"expr":"kube_job_failed \u003e 0","for":"5m","labels":{"severity":"warning"}},{"alert":"CronJobMissed","annotations":{"summary":"CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} missed schedule"},"expr":"(time() - kube_cronjob_status_last_schedule_time) / 60 \u003e kube_cronjob_spec_suspend == 0 and ON(cronjob,namespace) kube_cronjob_next_schedule_time - time() \u003c -600","for":"15m","labels":{"severity":"warning"}}]},{"name":"ingress-certs","rules":[{"alert":"IngressHigh5xx","annotations":{"summary":"Ingress {{ $labels.namespace }}/{{ $labels.ingress }} 5xx spike"},"expr":"sum(rate(nginx_ingress_controller_requests{status=~\"5..\"}[5m])) by (ingress,namespace) \u003e 1","for":"10m","labels":{"severity":"warning"}},{"alert":"CertExpiringSoon","annotations":{"summary":"Cert {{ $labels.namespace }}/{{ $labels.name }} expires in \u003c14d"},"expr":"(certmanager_certificate_expiration_timestamp_seconds - time()) / 86400 \u003c 14","for":"1h","labels":{"severity":"warning"}}]},{"name":"databases","rules":[{"alert":"PostgresDown","annotations":{"summary":"Postgres {{ $labels.instance }} down"},"expr":"up{job=~\".*postgres.*\"} == 0","for":"5m","labels":{"severity":"critical"}},{"alert":"RedisDown","annotations":{"summary":"Redis {{ $labels.instance }} down"},"expr":"up{job=~\".*redis.*\"} == 0","for":"5m","labels":{"severity":"critical"}},{"alert":"ClickhouseTooManyParts","annotations":{"summary":"ClickHouse too many parts: {{ $value }}"},"expr":"ClickHouseAsyncMetrics_MaxPartCountForPartition \u003e 300","for":"10m","labels":{"severity":"warning"}}]},{"name":"platform","rules":[{"alert":"KyvernoPolicyViolation","annotations":{"summary":"Kyverno policy violation: {{ $labels.policy_name }}"},"expr":"increase(kyverno_policy_results_total{policy_validation_mode=\"enforce\",policy_result=\"fail\"}[15m]) \u003e 0","labels":{"severity":"warning"}},{"alert":"LonghornVolumeDegraded","annotations":{"summary":"Longhorn volume {{ $labels.volume }} degraded"},"expr":"longhorn_volume_robustness == 2","for":"10m","labels":{"severity":"warning"}},{"alert":"LonghornVolumeFaulted","annotations":{"summary":"Longhorn volume {{ $labels.volume }} FAULTED"},"expr":"longhorn_volume_robustness == 3","for":"2m","labels":{"severity":"critical"}},{"alert":"BackupStale","annotations":{"summary":"Backup {{ $labels.job }} stale \u003e24h"},"expr":"(time() - max by(job)(backrest_last_success_timestamp_seconds)) / 3600 \u003e 24","for":"30m","labels":{"severity":"warning"}}]}]}}
+      prometheus-operator-validated: "true"
+    labels:
+      app.kubernetes.io/part-of: kube-prometheus-stack
+      release: prometheus
+    name: aiot-platform-rules
+    namespace: monitoring
+  spec:
+    groups:
+    - name: nodes
+      rules:
+      - alert: NodeDown
+        annotations:
+          summary: Node {{ $labels.instance }} down
+        expr: up{job="node-exporter"} == 0
+        for: 5m
+        labels:
+          severity: critical
+      - alert: NodeHighCPU
+        annotations:
+          summary: CPU >90% on {{ $labels.instance }}
+        expr: (1 - avg by(instance)(rate(node_cpu_seconds_total{mode="idle"}[5m])))
+          > 0.9
+        for: 15m
+        labels:
+          severity: warning
+      - alert: NodeHighMemory
+        annotations:
+          summary: Memory >90% on {{ $labels.instance }}
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes
+          > 0.9
+        for: 15m
+        labels:
+          severity: warning
+      - alert: NodeDiskPressure
+        annotations:
+          summary: DiskPressure on {{ $labels.node }}
+        expr: kube_node_status_condition{condition="DiskPressure",status="true"} ==
+          1
+        for: 5m
+        labels:
+          severity: critical
+      - alert: NodeNotReady
+        annotations:
+          summary: Node {{ $labels.node }} NotReady
+        expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+        for: 5m
+        labels:
+          severity: critical
+    - name: pods
+      rules:
+      - alert: PodCrashLooping
+        annotations:
+          summary: Pod {{ $labels.namespace }}/{{ $labels.pod }} crashlooping
+        expr: rate(kube_pod_container_status_restarts_total[10m]) * 600 > 3
+        for: 10m
+        labels:
+          severity: warning
+      - alert: PodOOMKilled
+        annotations:
+          summary: 'OOMKilled: {{ $labels.namespace }}/{{ $labels.pod }}'
+        expr: increase(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m])
+          > 0
+        labels:
+          severity: warning
+      - alert: PodImagePullBackOff
+        annotations:
+          summary: 'ImagePull fail: {{ $labels.namespace }}/{{ $labels.pod }}'
+        expr: kube_pod_container_status_waiting_reason{reason=~"ImagePullBackOff|ErrImagePull"}
+          == 1
+        for: 10m
+        labels:
+          severity: warning
+      - alert: DeploymentReplicasMismatch
+        annotations:
+          summary: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replicas
+            mismatch
+        expr: kube_deployment_spec_replicas != kube_deployment_status_replicas_available
+        for: 15m
+        labels:
+          severity: warning
+      - alert: StatefulSetReplicasMismatch
+        annotations:
+          summary: StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} degraded
+        expr: kube_statefulset_status_replicas_ready != kube_statefulset_status_replicas
+        for: 15m
+        labels:
+          severity: warning
+    - name: storage
+      rules:
+      - alert: PVCAlmostFull
+        annotations:
+          summary: PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }}
+            >85% full
+        expr: (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes)
+          > 0.85
+        for: 10m
+        labels:
+          severity: warning
+      - alert: PVCFull
+        annotations:
+          summary: PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }}
+            >95% FULL
+        expr: (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes)
+          > 0.95
+        for: 5m
+        labels:
+          severity: critical
+      - alert: PiraeusResourceBad
+        annotations:
+          summary: Piraeus resource {{ $labels.resource }} not UpToDate on {{ $labels.node
+            }}
+        expr: linstor_resource_state{state!="UpToDate"} == 1
+        for: 10m
+        labels:
+          severity: warning
+    - name: workloads
+      rules:
+      - alert: JobFailed
+        annotations:
+          summary: Job {{ $labels.namespace }}/{{ $labels.job_name }} failed
+        expr: kube_job_failed > 0
+        for: 5m
+        labels:
+          severity: warning
+      - alert: CronJobMissed
+        annotations:
+          summary: CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} missed schedule
+        expr: (time() - kube_cronjob_status_last_schedule_time) / 60 > kube_cronjob_spec_suspend
+          == 0 and ON(cronjob,namespace) kube_cronjob_next_schedule_time - time()
+          < -600
+        for: 15m
+        labels:
+          severity: warning
+    - name: ingress-certs
+      rules:
+      - alert: IngressHigh5xx
+        annotations:
+          summary: Ingress {{ $labels.namespace }}/{{ $labels.ingress }} 5xx spike
+        expr: sum(rate(nginx_ingress_controller_requests{status=~"5.."}[5m])) by (ingress,namespace)
+          > 1
+        for: 10m
+        labels:
+          severity: warning
+      - alert: CertExpiringSoon
+        annotations:
+          summary: Cert {{ $labels.namespace }}/{{ $labels.name }} expires in <14d
+        expr: (certmanager_certificate_expiration_timestamp_seconds - time()) / 86400
+          < 14
+        for: 1h
+        labels:
+          severity: warning
+    - name: databases
+      rules:
+      - alert: PostgresDown
+        annotations:
+          summary: Postgres {{ $labels.instance }} down
+        expr: up{job=~".*postgres.*"} == 0
+        for: 5m
+        labels:
+          severity: critical
+      - alert: RedisDown
+        annotations:
+          summary: Redis {{ $labels.instance }} down
+        expr: up{job=~".*redis.*"} == 0
+        for: 5m
+        labels:
+          severity: critical
+      - alert: ClickhouseTooManyParts
+        annotations:
+          summary: 'ClickHouse too many parts: {{ $value }}'
+        expr: ClickHouseAsyncMetrics_MaxPartCountForPartition > 300
+        for: 10m
+        labels:
+          severity: warning
+    - name: platform
+      rules:
+      - alert: KyvernoPolicyViolation
+        annotations:
+          summary: 'Kyverno policy violation: {{ $labels.policy_name }}'
+        expr: increase(kyverno_policy_results_total{policy_validation_mode="enforce",policy_result="fail"}[15m])
+          > 0
+        labels:
+          severity: warning
+      - alert: LonghornVolumeDegraded
+        annotations:
+          summary: Longhorn volume {{ $labels.volume }} degraded
+        expr: longhorn_volume_robustness == 2
+        for: 10m
+        labels:
+          severity: warning
+      - alert: LonghornVolumeFaulted
+        annotations:
+          summary: Longhorn volume {{ $labels.volume }} FAULTED
+        expr: longhorn_volume_robustness == 3
+        for: 2m
+        labels:
+          severity: critical
+      - alert: BackupStale
+        annotations:
+          summary: Backup {{ $labels.job }} stale >24h
+        expr: (time() - max by(job)(backrest_last_success_timestamp_seconds)) / 3600
+          > 24
+        for: 30m
+        labels:
+          severity: warning
+- apiVersion: monitoring.coreos.com/v1
+  kind: PrometheusRule
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"monitoring.coreos.com/v1","kind":"PrometheusRule","metadata":{"annotations":{},"labels":{"app":"kube-prometheus-stack","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/part-of":"kube-prometheus-stack","app.kubernetes.io/version":"83.4.1","chart":"kube-prometheus-stack-83.4.1","heritage":"Helm","release":"prometheus"},"name":"prometheus-kube-prometheus-alertmanager.rules","namespace":"monitoring"},"spec":{"groups":[{"name":"alertmanager.rules","rules":[{"alert":"AlertmanagerFailedReload","annotations":{"description":"Configuration has failed to load for {{ $labels.namespace }}/{{ $labels.pod}}.","runbook_url":"https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerfailedreload","summary":"Reloading an Alertmanager configuration has failed."},"expr":"# Without max_over_time, failed scrapes could create false negatives, see\n# https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.\nmax_over_time(alertmanager_config_last_reload_successful{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"}[5m]) == 0","for":"10m","labels":{"severity":"critical"}},{"alert":"AlertmanagerMembersInconsistent","annotations":{"description":"Alertmanager {{ $labels.namespace }}/{{ $labels.pod}} has only found {{ $value }} members of the {{$labels.job}} cluster.","runbook_url":"https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagermembersinconsistent","summary":"A member of an Alertmanager cluster has not found all other cluster members."},"expr":"# Without max_over_time, failed scrapes could create false negatives, see\n# https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.\n  max_over_time(alertmanager_cluster_members{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"}[5m])\n\u003c on (namespace,service,cluster) group_left\n  count by (namespace,service,cluster) (max_over_time(alertmanager_cluster_members{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"}[5m]))","for":"15m","labels":{"severity":"critical"}},{"alert":"AlertmanagerFailedToSendAlerts","annotations":{"description":"Alertmanager {{ $labels.namespace }}/{{ $labels.pod}} failed to send {{ $value | humanizePercentage }} of notifications to {{ $labels.integration }}.","runbook_url":"https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerfailedtosendalerts","summary":"An Alertmanager instance failed to send notifications."},"expr":"(\n  rate(alertmanager_notifications_failed_total{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"}[15m])\n/\n  ignoring (reason) group_left rate(alertmanager_notifications_total{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"}[15m])\n)\n\u003e 0.01","for":"5m","labels":{"severity":"warning"}},{"alert":"AlertmanagerClusterFailedToSendAlerts","annotations":{"description":"The minimum notification failure rate to {{ $labels.integration }} sent from any instance in the {{$labels.job}} cluster is {{ $value | humanizePercentage }}.","runbook_url":"https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerclusterfailedtosendalerts","summary":"All Alertmanager instances in a cluster failed to send notifications to a critical integration."},"expr":"min by (namespace,service, integration) (\n  rate(alertmanager_notifications_failed_total{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\", integration=~`.*`}[15m])\n/\n  ignoring (reason) group_left rate(alertmanager_notifications_total{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\", integration=~`.*`}[15m]) \u003e 0\n)\n\u003e 0.01","for":"5m","labels":{"severity":"critical"}},{"alert":"AlertmanagerClusterFailedToSendAlerts","annotations":{"description":"The minimum notification failure rate to {{ $labels.integration }} sent from any instance in the {{$labels.job}} cluster is {{ $value | humanizePercentage }}.","runbook_url":"https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerclusterfailedtosendalerts","summary":"All Alertmanager instances in a cluster failed to send notifications to a non-critical integration."},"expr":"min by (namespace,service, integration) (\n  rate(alertmanager_notifications_failed_total{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\", integration!~`.*`}[15m])\n/\n  ignoring (reason) group_left rate(alertmanager_notifications_total{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\", integration!~`.*`}[15m]) \u003e 0\n)\n\u003e 0.01","for":"5m","labels":{"severity":"warning"}},{"alert":"AlertmanagerConfigInconsistent","annotations":{"description":"Alertmanager instances within the {{$labels.job}} cluster have different configurations.","runbook_url":"https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerconfiginconsistent","summary":"Alertmanager instances within the same cluster have different configurations."},"expr":"count by (namespace,service,cluster) (\n  count_values by (namespace,service,cluster) (\"config_hash\", alertmanager_config_hash{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"})\n)\n!= 1","for":"20m","labels":{"severity":"critical"}},{"alert":"AlertmanagerClusterDown","annotations":{"description":"{{ $value | humanizePercentage }} of Alertmanager instances within the {{$labels.job}} cluster have been up for less than half of the last 5m.","runbook_url":"https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerclusterdown","summary":"Half or more of the Alertmanager instances within the same cluster are down."},"expr":"(\n  count by (namespace,service,cluster) (\n    avg_over_time(up{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"}[5m]) \u003c 0.5\n  )\n/\n  count by (namespace,service,cluster) (\n    up{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"}\n  )\n)\n\u003e= 0.5","for":"5m","labels":{"severity":"critical"}},{"alert":"AlertmanagerClusterCrashlooping","annotations":{"description":"{{ $value | humanizePercentage }} of Alertmanager instances within the {{$labels.job}} cluster have restarted at least 5 times in the last 10m.","runbook_url":"https://runbooks.prometheus-operator.dev/runbooks/alertmanager/alertmanagerclustercrashlooping","summary":"Half or more of the Alertmanager instances within the same cluster are crashlooping."},"expr":"(\n  count by (namespace,service,cluster) (\n    changes(process_start_time_seconds{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"}[10m]) \u003e 4\n  )\n/\n  count by (namespace,service,cluster) (\n    up{job=\"prometheus-kube-prometheus-alertmanager\",container=\"alertmanager\",namespace=\"monitoring\"}\n  )\n)\n\u003e= 0.5","for":"5m","labels":{"severity":"critical"}}]}]}}
       meta.helm.sh/release-name: prometheus
       meta.helm.sh/release-namespace: monitoring

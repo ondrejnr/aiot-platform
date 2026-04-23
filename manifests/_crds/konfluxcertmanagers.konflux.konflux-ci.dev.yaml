@@ -1,0 +1,27 @@
+apiVersion: v1
+items:
+- apiVersion: konflux.konflux-ci.dev/v1alpha1
+  kind: KonfluxCertManager
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: konflux
+      konflux.konflux-ci.dev/owner: konflux
+    name: konflux-cert-manager
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Konflux
+      name: konflux
+  spec:
+    createClusterIssuer: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T14:20:02Z"
+      message: Component ready (no deployments to track)
+      observedGeneration: 1
+      reason: AllComponentsReady
+      status: "True"
+      type: Ready
+kind: List
+metadata:

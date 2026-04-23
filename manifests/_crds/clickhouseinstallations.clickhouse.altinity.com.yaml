@@ -250,23 +250,23 @@ items:
           resources:
             requests:
               storage: 10Gi
-          storageClassName: local-path
+          storageClassName: piraeus-r2
   status:
-    action: 'reconcile completed successfully, task id: b3ba8123-4ccc-4b74-84b8-b45dd3decfb0'
+    action: Update ConfigMap signoz/chi-signoz-clickhouse-common-usersd
     actions:
+    - '2026-04-22T14:18:26.700821578Z reconcile completed successfully, task id: b84bf9d3-7057-49ef-aec7-152047c6acf9'
+    - '2026-04-22T14:18:16.705806778Z reconcile started, task id: b84bf9d3-7057-49ef-aec7-152047c6acf9'
+    - '2026-04-22T13:22:33.206239375Z reconcile completed successfully, task id: ce3f4ee1-189f-48df-9728-340ebd54a819'
+    - '2026-04-22T13:21:24.511121429Z reconcile started, task id: ce3f4ee1-189f-48df-9728-340ebd54a819'
+    - '2026-04-22T10:38:58.133384642Z reconcile completed successfully, task id: cf9959c7-55ba-49c7-b9a6-c8801c773162'
+    - '2026-04-22T10:38:48.018755447Z reconcile started, task id: cf9959c7-55ba-49c7-b9a6-c8801c773162'
+    - '2026-04-22T10:31:32.657374729Z reconcile completed successfully, task id: 07d48c1b-dd72-4d5b-8133-cc2814b24ba7'
+    - '2026-04-22T10:29:04.489734007Z reconcile started, task id: 07d48c1b-dd72-4d5b-8133-cc2814b24ba7'
     - '2026-04-20T16:20:48.670718844Z reconcile completed successfully, task id: b3ba8123-4ccc-4b74-84b8-b45dd3decfb0'
     - '2026-04-20T16:20:39.921329385Z reconcile started, task id: b3ba8123-4ccc-4b74-84b8-b45dd3decfb0'
-    - '2026-04-19T21:46:23.528184423Z reconcile completed successfully, task id: f4e325ad-9e7e-4209-9c59-b19c8d2ae08e'
-    - '2026-04-19T21:43:32.816382876Z reconcile started, task id: f4e325ad-9e7e-4209-9c59-b19c8d2ae08e'
-    - '2026-04-19T21:41:10.345806679Z reconcile completed successfully, task id: 65fd3629-b94e-433f-ae79-15eadc4371e9'
-    - '2026-04-19T21:41:00.320205864Z reconcile started, task id: 65fd3629-b94e-433f-ae79-15eadc4371e9'
-    - '2026-04-18T04:57:39.158930031Z reconcile completed successfully, task id: 0ae6c3b6-9d97-44e4-a852-652a973790ab'
-    - '2026-04-18T04:57:30.08188325Z reconcile started, task id: 0ae6c3b6-9d97-44e4-a852-652a973790ab'
-    - '2026-04-17T20:37:54.767046679Z reconcile completed successfully, task id: f9003776-f2cf-4435-a823-2694b49f43b7'
-    - '2026-04-17T20:36:45.956496154Z reconcile started, task id: f9003776-f2cf-4435-a823-2694b49f43b7'
     chop-commit: 19d8376
     chop-date: 2023-06-29T12:45:30
-    chop-ip: 10.244.2.139
+    chop-ip: 10.244.2.45
     chop-version: 0.21.2
     clusters: 1
     endpoint: signoz-clickhouse.signoz.svc.cluster.local
@@ -282,6 +282,338 @@ items:
     hosts: 1
     hostsWithTablesCreated:
     - chi-signoz-clickhouse-cluster-0-0.signoz.svc.cluster.local
+    normalized:
+      apiVersion: clickhouse.altinity.com/v1
+      kind: ClickHouseInstallation
+      metadata:
+        annotations:
+          clickhouse-operator-reconcile: force-2
+          meta.helm.sh/release-name: signoz
+          meta.helm.sh/release-namespace: signoz
+        finalizers:
+        - finalizer.clickhouseinstallation.altinity.com
+        labels:
+          app.kubernetes.io/component: clickhouse
+          app.kubernetes.io/instance: signoz
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: clickhouse
+          app.kubernetes.io/version: 24.1.2
+          helm.sh/chart: clickhouse-24.1.18
+        name: signoz-clickhouse
+        namespace: signoz
+      spec:
+        configuration:
+          clusters:
+          - layout:
+              replicas:
+              - name: "0"
+                shards:
+                - httpPort: 8123
+                  interserverHTTPPort: 9009
+                  name: 0-0
+                  tcpPort: 9000
+                  templates:
+                    dataVolumeClaimTemplate: data-volumeclaim-template
+                    podTemplate: pod-template
+                    serviceTemplate: service-template
+                shardsCount: 1
+                templates:
+                  dataVolumeClaimTemplate: data-volumeclaim-template
+                  podTemplate: pod-template
+                  serviceTemplate: service-template
+              replicasCount: 1
+              shards:
+              - internalReplication: "False"
+                name: "0"
+                replicas:
+                - httpPort: 8123
+                  interserverHTTPPort: 9009
+                  name: 0-0
+                  tcpPort: 9000
+                  templates:
+                    dataVolumeClaimTemplate: data-volumeclaim-template
+                    podTemplate: pod-template
+                    serviceTemplate: service-template
+                replicasCount: 1
+                templates:
+                  dataVolumeClaimTemplate: data-volumeclaim-template
+                  podTemplate: pod-template
+                  serviceTemplate: service-template
+              shardsCount: 1
+            name: cluster
+            schemaPolicy:
+              replica: All
+              shard: All
+            templates:
+              dataVolumeClaimTemplate: data-volumeclaim-template
+              podTemplate: pod-template
+              serviceTemplate: service-template
+            zookeeper:
+              nodes:
+              - host: signoz-zookeeper-0.signoz-zookeeper-headless
+                port: 2181
+          files:
+            config.d/crash.xml: |
+              <clickhouse>
+                <send_crash_reports replace="replace">
+                  <enabled>false</enabled>
+                </send_crash_reports>
+              </clickhouse>
+            config.d/formatting.xml: |
+              <clickhouse>
+                <logger>
+                  <formatting replace="replace">
+                    <type>json</type>
+                    <names>
+                      <date_time>date_time</date_time>
+                      <thread_name>thread_name</thread_name>
+                      <thread_id>thread_id</thread_id>
+                      <level>level</level>
+                      <query_id>query_id</query_id>
+                      <logger_name>logger_name</logger_name>
+                      <message>message</message>
+                      <source_file>source_file</source_file>
+                      <source_line>source_line</source_line>
+                    </names>
+                  </formatting>
+                </logger>
+              </clickhouse>
+            config.d/load.xml: |
+              <clickhouse>
+                <async_load_databases replace="replace">false</async_load_databases>
+              </clickhouse>
+            config.d/system_log.xml: |
+              <clickhouse>
+                <text_log>
+                  <ttl>event_date + INTERVAL 3 DAY DELETE</ttl>
+                </text_log>
+                <latency_log>
+                  <ttl>event_date + INTERVAL 3 DAY DELETE</ttl>
+                </latency_log>
+                <error_log>
+                  <ttl>event_date + INTERVAL 7 DAY DELETE</ttl>
+                </error_log>
+                <query_metric_log>
+                  <ttl>event_date + INTERVAL 3 DAY DELETE</ttl>
+                </query_metric_log>
+              </clickhouse>
+            events.proto: "syntax = \"proto3\";\nmessage Event {\n  string uuid =
+              1;\n  string event = 2;\n  string properties = 3;\n  string timestamp
+              = 4;\n  uint64 team_id = 5;\n  string distinct_id = 6;\n  string created_at
+              = 7;\n  string elements_chain = 8;\n}\n    \n"
+          profiles:
+            admin/query_plan_max_limit_for_lazy_materialization: "0"
+            admin/secondary_indices_enable_bulk_filtering: "0"
+            default/allow_experimental_window_functions: "1"
+            default/allow_nondeterministic_mutations: "1"
+            default/query_plan_max_limit_for_lazy_materialization: "0"
+            default/secondary_indices_enable_bulk_filtering: "0"
+          settings:
+            format_schema_path: /etc/clickhouse-server/config.d/
+            max_server_memory_usage: "7516192768"
+            prometheus/endpoint: /metrics
+            prometheus/port: "9363"
+            user_defined_executable_functions_config: /etc/clickhouse-server/functions/custom-functions.xml
+            user_scripts_path: /var/lib/clickhouse/user_scripts/
+          users:
+            admin/networks/host_regexp: (chi-signoz-clickhouse-[^.]+\d+-\d+|clickhouse\-signoz-clickhouse)\.signoz\.svc\.cluster\.local$
+            admin/networks/ip:
+            - ::1
+            - 127.0.0.1
+            - 10.0.0.0/8
+            - 100.64.0.0/10
+            - 172.16.0.0/12
+            - 192.0.0.0/24
+            - 198.18.0.0/15
+            - 192.168.0.0/16
+            admin/password_sha256_hex: da90cf0836f8ac8f8a298293eafe856634b622df0c1ac2c82538f2cbe5406a6c
+            admin/profile: default
+            admin/quota: default
+            clickhouse_operator/networks/ip:
+            - 10.244.2.45
+            clickhouse_operator/password_sha256_hex: 716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448
+            clickhouse_operator/profile: clickhouse_operator
+            default/networks/host_regexp: (chi-signoz-clickhouse-[^.]+\d+-\d+|clickhouse\-signoz-clickhouse)\.signoz\.svc\.cluster\.local$
+            default/networks/ip:
+            - ::1
+            - 127.0.0.1
+            - 10.244.2.75
+            default/profile: default
+            default/quota: default
+          zookeeper:
+            nodes:
+            - host: signoz-zookeeper-0.signoz-zookeeper-headless
+              port: 2181
+        defaults:
+          replicasUseFQDN: "False"
+          storageManagement: {}
+          templates:
+            dataVolumeClaimTemplate: data-volumeclaim-template
+            podTemplate: signoz-clickhouse
+            serviceTemplate: service-template
+        reconciling:
+          cleanup:
+            reconcileFailedObjects:
+              configMap: Retain
+              pvc: Retain
+              service: Retain
+              statefulSet: Retain
+            unknownObjects:
+              configMap: Delete
+              pvc: Delete
+              service: Delete
+              statefulSet: Delete
+          configMapPropagationTimeout: 10
+          policy: unspecified
+        stop: "False"
+        taskID: 4c59111e-88d2-4230-a479-0fabc8263a91
+        templates:
+          PodTemplatesIndex: {}
+          ServiceTemplatesIndex: {}
+          VolumeClaimTemplatesIndex: {}
+          podTemplates:
+          - metadata:
+              annotations:
+                signoz.io/path: /metrics
+                signoz.io/port: "9363"
+                signoz.io/scrape: "true"
+              labels:
+                app.kubernetes.io/component: clickhouse
+                app.kubernetes.io/instance: signoz
+                app.kubernetes.io/managed-by: Helm
+                app.kubernetes.io/name: clickhouse
+                app.kubernetes.io/version: 24.1.2
+                helm.sh/chart: clickhouse-24.1.18
+            name: pod-template
+            spec:
+              containers:
+              - command:
+                - /bin/bash
+                - -c
+                - /usr/bin/clickhouse-server --config-file=/etc/clickhouse-server/config.xml
+                image: docker.io/clickhouse/clickhouse-server:25.5.6
+                imagePullPolicy: IfNotPresent
+                livenessProbe:
+                  failureThreshold: 10
+                  httpGet:
+                    path: /ping
+                    port: http
+                  initialDelaySeconds: 60
+                  periodSeconds: 3
+                  successThreshold: 1
+                  timeoutSeconds: 1
+                name: clickhouse
+                ports:
+                - containerPort: 8123
+                  name: http
+                - containerPort: 9000
+                  name: client
+                - containerPort: 9009
+                  name: interserver
+                readinessProbe:
+                  failureThreshold: 3
+                  httpGet:
+                    path: /ping
+                    port: http
+                  initialDelaySeconds: 10
+                  periodSeconds: 3
+                  successThreshold: 1
+                  timeoutSeconds: 1
+                resources:
+                  requests:
+                    cpu: 100m
+                    memory: 200Mi
+                startupProbe:
+                  failureThreshold: 30
+                  httpGet:
+                    path: /ping
+                    port: http
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  successThreshold: 1
+                  timeoutSeconds: 5
+                volumeMounts:
+                - mountPath: /var/lib/clickhouse/user_scripts
+                  name: shared-binary-volume
+                - mountPath: /etc/clickhouse-server/functions
+                  name: custom-functions-volume
+                - mountPath: /scripts
+                  name: scripts
+                - mountPath: /var/lib/clickhouse
+                  name: data-volumeclaim-template
+              initContainers:
+              - command:
+                - sh
+                - -c
+                - |
+                  set -e
+                  version="v0.0.1"
+                  node_os=$(uname -s | tr '[:upper:]' '[:lower:]')
+                  node_arch=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/)
+                  echo "Fetching histogram-binary for ${node_os}/${node_arch}"
+                  cd /tmp
+                  wget -O histogram-quantile.tar.gz "https://github.com/SigNoz/signoz/releases/download/histogram-quantile%2F${version}/histogram-quantile_${node_os}_${node_arch}.tar.gz"
+                  tar -xzf histogram-quantile.tar.gz
+                  chmod +x histogram-quantile
+                  mv histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile
+                  echo "histogram-quantile installed successfully"
+                image: docker.io/alpine:3.18.2
+                imagePullPolicy: IfNotPresent
+                name: signoz-clickhouse-udf-init
+                resources: {}
+                volumeMounts:
+                - mountPath: /var/lib/clickhouse/user_scripts
+                  name: shared-binary-volume
+              securityContext:
+                fsGroup: 101
+                fsGroupChangePolicy: OnRootMismatch
+                runAsGroup: 101
+                runAsUser: 101
+              serviceAccountName: signoz-clickhouse
+              volumes:
+              - emptyDir: {}
+                name: shared-binary-volume
+              - configMap:
+                  name: signoz-clickhouse-custom-functions
+                name: custom-functions-volume
+              - configMap:
+                  name: signoz-clickhouse-scripts
+                name: scripts
+            zone: {}
+          serviceTemplates:
+          - generateName: signoz-clickhouse
+            metadata:
+              labels:
+                app.kubernetes.io/component: clickhouse
+                app.kubernetes.io/instance: signoz
+                app.kubernetes.io/managed-by: Helm
+                app.kubernetes.io/name: clickhouse
+                app.kubernetes.io/version: 24.1.2
+                helm.sh/chart: clickhouse-24.1.18
+            name: service-template
+            spec:
+              ports:
+              - name: http
+                port: 8123
+                targetPort: 0
+              - name: tcp
+                port: 9000
+                targetPort: 0
+              type: ClusterIP
+          volumeClaimTemplates:
+          - metadata:
+            name: data-volumeclaim-template
+            reclaimPolicy: Retain
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 10Gi
+              storageClassName: piraeus-r2
+        templating:
+          policy: manual
+        troubleshoot: "False"
     normalizedCompleted:
       apiVersion: clickhouse.altinity.com/v1
       kind: ClickHouseInstallation
@@ -430,14 +762,14 @@ items:
             admin/profile: default
             admin/quota: default
             clickhouse_operator/networks/ip:
-            - 10.244.2.139
+            - 10.244.2.45
             clickhouse_operator/password_sha256_hex: 716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448
             clickhouse_operator/profile: clickhouse_operator
             default/networks/host_regexp: (chi-signoz-clickhouse-[^.]+\d+-\d+|clickhouse\-signoz-clickhouse)\.signoz\.svc\.cluster\.local$
             default/networks/ip:
             - ::1
             - 127.0.0.1
-            - 10.244.4.173
+            - 10.244.1.163
             default/profile: default
             default/quota: default
           zookeeper:
@@ -466,7 +798,7 @@ items:
           configMapPropagationTimeout: 10
           policy: unspecified
         stop: "False"
-        taskID: ea8addc3-bb39-4636-b562-cfe0abfc9db2
+        taskID: 0ca8a1ba-2600-4ddd-acd3-cb80a77b60b9
         templates:
           PodTemplatesIndex: {}
           ServiceTemplatesIndex: {}
@@ -610,38 +942,38 @@ items:
               resources:
                 requests:
                   storage: 10Gi
-              storageClassName: local-path
+              storageClassName: piraeus-r2
         templating:
           policy: manual
         troubleshoot: "False"
     pod-ips:
-    - 10.244.4.173
+    - 10.244.2.75
     pods:
     - chi-signoz-clickhouse-cluster-0-0-0
     shards: 1
     status: Completed
-    taskID: ea8addc3-bb39-4636-b562-cfe0abfc9db2
+    taskID: 0ca8a1ba-2600-4ddd-acd3-cb80a77b60b9
     taskIDsCompleted:
+    - 0ca8a1ba-2600-4ddd-acd3-cb80a77b60b9
+    - c434dd70-e6dd-4d73-93e3-2e55fe4b6bd3
+    - 1742a952-3f8b-40fc-aef5-9dc20f906b04
+    - ac05a11d-4ef6-4670-8cc9-add10389e13d
     - ea8addc3-bb39-4636-b562-cfe0abfc9db2
     - a798f8f8-e2c3-44de-bd32-c0cda4af3ea9
     - 1a48e067-9158-42d7-b40d-a8c708514c6f
     - b81cc4f6-8128-4c56-9a86-f84de7403bb2
     - 6308fc82-8d66-4df5-b6f1-032e17f50c2f
     - 5ef5932a-ee70-451e-9acf-e18c4f596918
-    - faf69842-fe5c-4bcc-a57d-cd72eb541ded
-    - 234ef15b-a06a-4455-9ab7-9ab9fd343e56
-    - 58889e20-9486-4b2a-bd3a-ecadac600d38
-    - 5aea6b10-8f16-4273-bc6e-0ea6ff114a6a
     taskIDsStarted:
+    - b84bf9d3-7057-49ef-aec7-152047c6acf9
+    - ce3f4ee1-189f-48df-9728-340ebd54a819
+    - cf9959c7-55ba-49c7-b9a6-c8801c773162
+    - 07d48c1b-dd72-4d5b-8133-cc2814b24ba7
     - b3ba8123-4ccc-4b74-84b8-b45dd3decfb0
     - f4e325ad-9e7e-4209-9c59-b19c8d2ae08e
     - 65fd3629-b94e-433f-ae79-15eadc4371e9
     - 0ae6c3b6-9d97-44e4-a852-652a973790ab
     - f9003776-f2cf-4435-a823-2694b49f43b7
     - 1493053c-c3b9-4c8c-8f45-78b50075fde2
-    - 4d55fe59-d193-42bd-953b-7e4f3180dd37
-    - 234ef15b-a06a-4455-9ab7-9ab9fd343e56
-    - be781c9c-0c77-4bbf-963c-7236166e6f9e
-    - d04284ba-482d-4842-8554-5a2ff53ec432
 kind: List
 metadata:

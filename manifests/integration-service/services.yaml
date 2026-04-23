@@ -1,0 +1,76 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      control-plane: controller-manager
+      konflux.konflux-ci.dev/component: integration
+      konflux.konflux-ci.dev/owner: konflux-integration-service
+    name: integration-service-controller-manager-metrics-service
+    namespace: integration-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxIntegrationService
+      name: konflux-integration-service
+  spec:
+    clusterIP: 10.106.60.194
+    clusterIPs:
+    - 10.106.60.194
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      control-plane: controller-manager
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/created-by: integration-service
+      app.kubernetes.io/instance: webhook-service
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/name: service
+      app.kubernetes.io/part-of: integration-service
+      konflux.konflux-ci.dev/component: integration
+      konflux.konflux-ci.dev/owner: konflux-integration-service
+    name: integration-service-webhook-service
+    namespace: integration-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxIntegrationService
+      name: konflux-integration-service
+  spec:
+    clusterIP: 10.98.109.201
+    clusterIPs:
+    - 10.98.109.201
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 9443
+    selector:
+      control-plane: controller-manager
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:

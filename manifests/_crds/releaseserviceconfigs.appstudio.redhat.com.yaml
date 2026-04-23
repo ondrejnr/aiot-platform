@@ -1,0 +1,20 @@
+apiVersion: v1
+items:
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: ReleaseServiceConfig
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: release
+      konflux.konflux-ci.dev/owner: konflux-release-service
+    name: release-service-config
+    namespace: release-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxReleaseService
+      name: konflux-release-service
+  spec:
+    debug: true
+kind: List
+metadata:

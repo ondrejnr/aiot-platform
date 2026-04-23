@@ -1,0 +1,56 @@
+apiVersion: v1
+items:
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: ClusterPolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: baf1c291-ce4a-4558-85b2-ff1b769f7022
+    ownerReferences:
+    - apiVersion: v1
+      kind: Namespace
+      name: default-tenant
+  results:
+  - message: Validation rule 'deny-virtual-domain-labels-annotations' passed.
+    policy: deny-virtual-domain
+    properties:
+      process: background scan
+    result: pass
+    rule: deny-virtual-domain-labels-annotations
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1776903530
+  - policy: init-ns-integration
+    properties:
+      process: background scan
+    result: pass
+    rule: create-konflux-integration-runner-rolebinding
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1776903499
+  - policy: init-ns-integration
+    properties:
+      process: background scan
+    result: pass
+    rule: create-konflux-integration-runner-serviceaccount
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1776903499
+  scope:
+    apiVersion: v1
+    kind: Namespace
+    name: default-tenant
+  summary:
+    error: 0
+    fail: 0
+    pass: 3
+    skip: 0
+    warn: 0
+kind: List
+metadata:

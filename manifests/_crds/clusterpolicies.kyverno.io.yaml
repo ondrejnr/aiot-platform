@@ -1,0 +1,285 @@
+apiVersion: v1
+items:
+- apiVersion: kyverno.io/v1
+  kind: ClusterPolicy
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: namespace-lister
+      konflux.konflux-ci.dev/owner: konflux-namespace-lister
+    name: deny-virtual-domain
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxNamespaceLister
+      name: konflux-namespace-lister
+  spec:
+    admission: true
+    background: true
+    emitWarning: false
+    rules:
+    - match:
+        any:
+        - resources:
+            kinds:
+            - /v1/Namespace
+            operations:
+            - CREATE
+            - UPDATE
+            selector:
+              matchLabels:
+                konflux-ci.dev/type: tenant
+      name: deny-virtual-domain-labels-annotations
+      skipBackgroundRequests: true
+      validate:
+        allowExistingViolations: true
+        cel:
+          expressions:
+          - expression: '!object.metadata.labels.exists(key, key.startsWith("virtual.konflux-ci.dev/"))'
+            message: Tenant namespaces can not have labels with domain 'virtual.konflux-ci.dev'
+          - expression: '!has(object.metadata.annotations) || !object.metadata.annotations.exists(key,
+              key.startsWith("virtual.konflux-ci.dev/"))'
+            message: Tenant namespaces can not have annotations with domain 'virtual.konflux-ci.dev'
+          generate: false
+    validationFailureAction: Enforce
+  status:
+    autogen: {}
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:18:28Z"
+      message: Ready
+      reason: Succeeded
+      status: "True"
+      type: Ready
+    rulecount:
+      generate: 0
+      mutate: 0
+      validate: 1
+      verifyimages: 0
+    validatingadmissionpolicy:
+      generated: false
+      message: 'skip generating ValidatingAdmissionPolicy: validate.cel.generate is
+        not set to true.'
+- apiVersion: kyverno.io/v1
+  kind: ClusterPolicy
+  metadata:
+    annotations:
+      policies.kyverno.io/description: |
+        This policy creates a service account named konflux-integration-runner and
+        binds it to the konflux-integration-runner cluster role in tenant namespaces.
+    labels:
+      konflux.konflux-ci.dev/component: integration
+      konflux.konflux-ci.dev/owner: konflux-integration-service
+    name: init-ns-integration
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxIntegrationService
+      name: konflux-integration-service
+  spec:
+    admission: true
+    background: true
+    emitWarning: false
+    rules:
+    - generate:
+        apiVersion: v1
+        generateExisting: true
+        kind: ServiceAccount
+        name: konflux-integration-runner
+        namespace: '{{request.object.metadata.name}}'
+        synchronize: false
+      match:
+        any:
+        - resources:
+            kinds:
+            - Namespace
+            selector:
+              matchLabels:
+                konflux-ci.dev/type: tenant
+      name: create-konflux-integration-runner-serviceaccount
+      skipBackgroundRequests: true
+    - generate:
+        apiVersion: rbac.authorization.k8s.io/v1
+        data:
+          roleRef:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: konflux-integration-runner
+          subjects:
+          - kind: ServiceAccount
+            name: konflux-integration-runner
+            namespace: '{{request.object.metadata.name}}'
+        generateExisting: true
+        kind: RoleBinding
+        name: konflux-integration-runner-rolebinding
+        namespace: '{{request.object.metadata.name}}'
+        synchronize: false
+      match:
+        any:
+        - resources:
+            kinds:
+            - Namespace
+            selector:
+              matchLabels:
+                konflux-ci.dev/type: tenant
+      name: create-konflux-integration-runner-rolebinding
+      skipBackgroundRequests: true
+    validationFailureAction: Audit
+  status:
+    autogen: {}
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:18:28Z"
+      message: Ready
+      reason: Succeeded
+      status: "True"
+      type: Ready
+    rulecount:
+      generate: 2
+      mutate: 0
+      validate: 0
+      verifyimages: 0
+    validatingadmissionpolicy:
+      generated: false
+      message: ""
+- apiVersion: kyverno.io/v1
+  kind: ClusterPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"kyverno.io/v1","kind":"ClusterPolicy","metadata":{"annotations":{"policies.kyverno.io/description":"This policy applies to pods created for the build and EC pipelines running for the e2e tests. It will apply a small set value for CPU requests whenever memory is defined and vice versa (the underlying assumption is that either both are defined or neither are). It will also update the imagePullPolicy of all containers to IfNotPresent."},"name":"reduce-tekton-pr-taskrun-resource-requests"},"spec":{"background":false,"rules":[{"match":{"any":[{"resources":{"kinds":["Pod"],"names":["*-pod"],"operations":["CREATE"],"selector":{"matchLabels":{"pipelines.appstudio.openshift.io/type":"build"}}}},{"resources":{"kinds":["Pod"],"names":["*-pod"],"operations":["CREATE"],"selector":{"matchLabels":{"tekton.dev/task":"verify-enterprise-contract"}}}}]},"mutate":{"foreach":[{"list":"request.object.spec.containers","patchesJson6902":"- op: add\n  path: /spec/containers/{{elementIndex}}/resources/requests\n  value:\n    memory: 1Mi\n    cpu: 1m","preconditions":{"any":[{"key":"{{ element.resources.requests.memory || '' }}","operator":"NotEquals","value":""},{"key":"{{ element.resources.requests.cpu || '' }}","operator":"NotEquals","value":""}]}},{"list":"request.object.spec.containers","patchesJson6902":"- op: remove\n  path: /spec/containers/{{elementIndex}}/imagePullPolicy\n- op: add\n  path: /spec/containers/{{elementIndex}}/imagePullPolicy\n  value: IfNotPresent"}]},"name":"reduce-tekton-pr-taskrun-resource-requests"}]}}
+      policies.kyverno.io/description: This policy applies to pods created for the
+        build and EC pipelines running for the e2e tests. It will apply a small set
+        value for CPU requests whenever memory is defined and vice versa (the underlying
+        assumption is that either both are defined or neither are). It will also update
+        the imagePullPolicy of all containers to IfNotPresent.
+    name: reduce-tekton-pr-taskrun-resource-requests
+  spec:
+    admission: true
+    background: false
+    emitWarning: false
+    rules:
+    - match:
+        any:
+        - resources:
+            kinds:
+            - Pod
+            names:
+            - '*-pod'
+            operations:
+            - CREATE
+            selector:
+              matchLabels:
+                pipelines.appstudio.openshift.io/type: build
+        - resources:
+            kinds:
+            - Pod
+            names:
+            - '*-pod'
+            operations:
+            - CREATE
+            selector:
+              matchLabels:
+                tekton.dev/task: verify-enterprise-contract
+      mutate:
+        foreach:
+        - list: request.object.spec.containers
+          patchesJson6902: |-
+            - op: add
+              path: /spec/containers/{{elementIndex}}/resources/requests
+              value:
+                memory: 1Mi
+                cpu: 1m
+          preconditions:
+            any:
+            - key: '{{ element.resources.requests.memory || '''' }}'
+              operator: NotEquals
+              value: ""
+            - key: '{{ element.resources.requests.cpu || '''' }}'
+              operator: NotEquals
+              value: ""
+        - list: request.object.spec.containers
+          patchesJson6902: |-
+            - op: remove
+              path: /spec/containers/{{elementIndex}}/imagePullPolicy
+            - op: add
+              path: /spec/containers/{{elementIndex}}/imagePullPolicy
+              value: IfNotPresent
+      name: reduce-tekton-pr-taskrun-resource-requests
+      skipBackgroundRequests: true
+    validationFailureAction: Audit
+  status:
+    autogen: {}
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:18:28Z"
+      message: Ready
+      reason: Succeeded
+      status: "True"
+      type: Ready
+    rulecount:
+      generate: 0
+      mutate: 1
+      validate: 0
+      verifyimages: 0
+    validatingadmissionpolicy:
+      generated: false
+      message: ""
+- apiVersion: kyverno.io/v1
+  kind: ClusterPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"kyverno.io/v1","kind":"ClusterPolicy","metadata":{"annotations":{"policies.kyverno.io/description":"This policy changes the default value of the skip-checks parameter to true in the pipelineSpec for Tekton PipelineRuns with the label pipelines.appstudio.openshift.io/type=build. This skips security scanning tasks including clair-scan, which is useful for CI environments where these steps consume excessive resources and frequently timeout."},"name":"set-skip-checks-parameter"},"spec":{"background":false,"rules":[{"match":{"any":[{"resources":{"kinds":["PipelineRun"],"operations":["CREATE"],"selector":{"matchLabels":{"pipelinesascode.tekton.dev/original-prname":"konflux-ci-upstream-*-on-push"}}}}]},"mutate":{"foreach":[{"list":"request.object.spec.pipelineSpec.params","patchesJson6902":"- path: /spec/pipelineSpec/params/{{elementIndex}}/default\n  op: replace\n  value: \"true\"","preconditions":{"any":[{"key":"{{ element.name }}","operator":"Equals","value":"skip-checks"}]}}]},"name":"change-skip-checks-default"}]}}
+      policies.kyverno.io/description: This policy changes the default value of the
+        skip-checks parameter to true in the pipelineSpec for Tekton PipelineRuns
+        with the label pipelines.appstudio.openshift.io/type=build. This skips security
+        scanning tasks including clair-scan, which is useful for CI environments where
+        these steps consume excessive resources and frequently timeout.
+    name: set-skip-checks-parameter
+  spec:
+    admission: true
+    background: false
+    emitWarning: false
+    rules:
+    - match:
+        any:
+        - resources:
+            kinds:
+            - PipelineRun
+            operations:
+            - CREATE
+            selector:
+              matchLabels:
+                pipelinesascode.tekton.dev/original-prname: konflux-ci-upstream-*-on-push
+      mutate:
+        foreach:
+        - list: request.object.spec.pipelineSpec.params
+          patchesJson6902: |-
+            - path: /spec/pipelineSpec/params/{{elementIndex}}/default
+              op: replace
+              value: "true"
+          preconditions:
+            any:
+            - key: '{{ element.name }}'
+              operator: Equals
+              value: skip-checks
+      name: change-skip-checks-default
+      skipBackgroundRequests: true
+    validationFailureAction: Audit
+  status:
+    autogen: {}
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:18:28Z"
+      message: Ready
+      reason: Succeeded
+      status: "True"
+      type: Ready
+    rulecount:
+      generate: 0
+      mutate: 1
+      validate: 0
+      verifyimages: 0
+    validatingadmissionpolicy:
+      generated: false
+      message: ""
+kind: List
+metadata:

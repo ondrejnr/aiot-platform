@@ -1,0 +1,45 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"konflux-ui:proxy","ingressName":"konflux-ui:konflux-ui","hostname":"konflux.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      route.openshift.io/destination-ca-certificate-secret: ui-ca
+      route.openshift.io/termination: reencrypt
+    labels:
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
+    name: konflux-ui
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: konflux.35.241.255.137.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: proxy
+              port:
+                name: web-tls
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - konflux.35.241.255.137.nip.io
+      secretName: konflux-ingress-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 35.241.255.137
+kind: List
+metadata:

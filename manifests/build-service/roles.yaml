@@ -1,0 +1,75 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: build-service
+      konflux.konflux-ci.dev/owner: konflux-build-service
+    name: build-service-build-pipeline-config-read-only
+    namespace: build-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxBuildService
+      name: konflux-build-service
+  rules:
+  - apiGroups:
+    - ""
+    resourceNames:
+    - build-pipeline-config
+    resources:
+    - configmaps
+    verbs:
+    - get
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/name: build-service
+      konflux.konflux-ci.dev/component: build-service
+      konflux.konflux-ci.dev/owner: konflux-build-service
+    name: build-service-leader-election-role
+    namespace: build-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxBuildService
+      name: konflux-build-service
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - configmaps
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+  - apiGroups:
+    - coordination.k8s.io
+    resources:
+    - leases
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+    - patch
+kind: List
+metadata:

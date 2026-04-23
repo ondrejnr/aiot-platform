@@ -1,0 +1,33 @@
+apiVersion: v1
+items:
+- apiVersion: konflux.konflux-ci.dev/v1alpha1
+  kind: KonfluxInfo
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: konflux
+      konflux.konflux-ci.dev/owner: konflux
+    name: konflux-info
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Konflux
+      name: konflux
+  spec:
+    banner:
+      items:
+      - summary: AIoT Konflux dev instance - default demo creds, change in production
+        type: warning
+    publicInfo:
+      environment: development
+      visibility: public
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T13:35:44Z"
+      message: Component ready (no deployments to track)
+      observedGeneration: 1
+      reason: AllComponentsReady
+      status: "True"
+      type: Ready
+kind: List
+metadata:

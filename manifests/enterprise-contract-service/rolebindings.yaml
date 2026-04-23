@@ -1,0 +1,48 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: enterprise-contract
+      konflux.konflux-ci.dev/owner: konflux-enterprise-contract
+    name: public-ec-cm
+    namespace: enterprise-contract-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxEnterpriseContract
+      name: konflux-enterprise-contract
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: enterprisecontract-configmap-viewer-role
+  subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: system:authenticated
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: enterprise-contract
+      konflux.konflux-ci.dev/owner: konflux-enterprise-contract
+    name: public-ecp
+    namespace: enterprise-contract-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxEnterpriseContract
+      name: konflux-enterprise-contract
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: enterprisecontractpolicy-viewer-role
+  subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: system:authenticated
+kind: List
+metadata:

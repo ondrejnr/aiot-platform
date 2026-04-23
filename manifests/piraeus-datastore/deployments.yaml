@@ -1,0 +1,1044 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+    labels:
+      app.kubernetes.io/component: linstor-affinity-controller
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: linstor-affinity-controller
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: linstor-affinity-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/name: piraeus-datastore
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/default-container: linstor-affinity-controller
+        labels:
+          app.kubernetes.io/component: linstor-affinity-controller
+          app.kubernetes.io/instance: linstorcluster
+          app.kubernetes.io/name: piraeus-datastore
+      spec:
+        containers:
+        - args:
+          - /linstor-affinity-controller
+          - --v=$(VERBOSE)
+          - --leader-election=$(LEADER_ELECTION)
+          - --property-namespace=$(PROPERTY_NAMESPACE)
+          - --bind-address=$(BIND_ADDRESS)
+          - --metrics-address=$(METRICS_ADDRESS)
+          env:
+          - name: LS_CONTROLLERS
+            value: http://linstor-controller:3370
+          - name: VERBOSE
+            value: "1"
+          - name: LEADER_ELECTION
+            value: "true"
+          - name: PROPERTY_NAMESPACE
+            value: Aux/topology
+          - name: BIND_ADDRESS
+            value: :8000
+          - name: METRICS_ADDRESS
+            value: :8081
+          - name: LEASE_LOCK_NAME
+            value: linstor-affinity-controller
+          - name: LEASE_HOLDER_IDENTITY
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: quay.io/piraeusdatastore/linstor-affinity-controller:v1.3.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: health
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: linstor-affinity-controller
+          ports:
+          - containerPort: 8000
+            name: health
+            protocol: TCP
+          - containerPort: 8081
+            name: metrics
+            protocol: TCP
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /healthz
+              port: health
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: false
+        nodeSelector:
+          piraeus.io/storage: "yes"
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: linstor-affinity-controller
+        serviceAccountName: linstor-affinity-controller
+        shareProcessNamespace: true
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: drbd.linbit.com/force-io-error
+          operator: Exists
+        - effect: NoSchedule
+          key: drbd.linbit.com/lost-quorum
+          operator: Exists
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-22T08:46:38Z"
+      lastUpdateTime: "2026-04-22T08:47:30Z"
+      message: ReplicaSet "linstor-affinity-controller-b6fd7f7b8" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T14:17:44Z"
+      lastUpdateTime: "2026-04-22T14:17:44Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+    labels:
+      app.kubernetes.io/component: linstor-controller
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: linstor-controller
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: linstor-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/name: piraeus-datastore
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/default-container: linstor-controller
+        labels:
+          app.kubernetes.io/component: linstor-controller
+          app.kubernetes.io/instance: linstorcluster
+          app.kubernetes.io/name: piraeus-datastore
+      spec:
+        containers:
+        - args:
+          - startController
+          env:
+          - name: JAVA_OPTS
+            value: -Djdk.tls.acknowledgeCloseNotify=true
+          - name: K8S_AWAIT_ELECTION_ENABLED
+            value: "1"
+          - name: K8S_AWAIT_ELECTION_NAME
+            value: linstor-controller
+          - name: K8S_AWAIT_ELECTION_LOCK_NAME
+            value: linstor-controller
+          - name: K8S_AWAIT_ELECTION_LOCK_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: K8S_AWAIT_ELECTION_IDENTITY
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: quay.io/piraeusdatastore/piraeus-server:v1.33.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: api
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: linstor-controller
+          ports:
+          - containerPort: 3370
+            name: api
+            protocol: TCP
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /health
+              port: api
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/log/linstor-controller
+            name: var-log-linstor-controller
+          - mountPath: /etc/linstor
+            name: etc-linstor
+            readOnly: true
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: false
+        initContainers:
+        - args:
+          - runMigration
+          env:
+          - name: K8S_AWAIT_ELECTION_ENABLED
+            value: "1"
+          - name: K8S_AWAIT_ELECTION_NAME
+            value: linstor-controller
+          - name: K8S_AWAIT_ELECTION_LOCK_NAME
+            value: linstor-controller
+          - name: K8S_AWAIT_ELECTION_LOCK_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: K8S_AWAIT_ELECTION_IDENTITY
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: quay.io/piraeusdatastore/piraeus-server:v1.33.1
+          imagePullPolicy: IfNotPresent
+          name: run-migration
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /run/migration
+            name: migration
+          - mountPath: /etc/linstor
+            name: etc-linstor
+            readOnly: true
+          - mountPath: /tmp
+            name: tmp
+        nodeSelector:
+          piraeus.io/storage: "yes"
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: linstor-controller
+        serviceAccountName: linstor-controller
+        shareProcessNamespace: true
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoExecute
+          key: node.kubernetes.io/unreachable
+          operator: Exists
+          tolerationSeconds: 30
+        - effect: NoExecute
+          key: node.kubernetes.io/not-ready
+          operator: Exists
+          tolerationSeconds: 30
+        - effect: NoSchedule
+          key: drbd.linbit.com/force-io-error
+          operator: Exists
+        - effect: NoSchedule
+          key: drbd.linbit.com/lost-quorum
+          operator: Exists
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: linstor-controller-config
+          name: etc-linstor
+        - emptyDir: {}
+          name: var-log-linstor-controller
+        - emptyDir: {}
+          name: tmp
+        - emptyDir: {}
+          name: migration
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-22T08:46:37Z"
+      lastUpdateTime: "2026-04-22T08:50:07Z"
+      message: ReplicaSet "linstor-controller-7d7575b865" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T17:19:11Z"
+      lastUpdateTime: "2026-04-22T17:19:11Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+    labels:
+      app.kubernetes.io/component: linstor-csi-controller
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: linstor-csi-controller
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: linstor-csi-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/name: piraeus-datastore
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/default-container: linstor-csi
+        labels:
+          app.kubernetes.io/component: linstor-csi-controller
+          app.kubernetes.io/instance: linstorcluster
+          app.kubernetes.io/name: piraeus-datastore
+      spec:
+        containers:
+        - args:
+          - --csi-endpoint=unix://$(ADDRESS)
+          - --property-namespace=$(PROPERTY_NAMESPACE)
+          - --label-by-storage-pool=$(LABEL_BY_STORAGE_POOL)
+          - --enable-rwx=$(ENABLE_RWX)
+          - --nfs-reactor-config-map-name=$(NFS_REACTOR_CONFIG_MAP_NAME)
+          env:
+          - name: LS_CONTROLLERS
+            value: http://linstor-controller:3370
+          - name: ADDRESS
+            value: /csi/csi.sock
+          - name: PROPERTY_NAMESPACE
+            value: Aux/topology
+          - name: LABEL_BY_STORAGE_POOL
+            value: "false"
+          - name: ENABLE_RWX
+            value: "true"
+          - name: NFS_REACTOR_CONFIG_MAP_NAME
+            value: linstor-csi-nfs-server-reactor-config
+          image: quay.io/piraeusdatastore/piraeus-csi:v1.10.6
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: healthz
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: linstor-csi
+          ports:
+          - containerPort: 9808
+            name: healthz
+            protocol: TCP
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+        - args:
+          - --v=$(VERBOSE)
+          - --csi-address=$(ADDRESS)
+          - --timeout=$(TIMEOUT)
+          - --leader-election=$(LEADER_ELECTION)
+          - --leader-election-namespace=$(NAMESPACE)
+          - --worker-threads=$(WORKER_THREADS)
+          - --http-endpoint=$(HTTP_ENDPOINT)
+          env:
+          - name: VERBOSE
+            value: "5"
+          - name: ADDRESS
+            value: /csi/csi.sock
+          - name: TIMEOUT
+            value: 1m
+          - name: LEADER_ELECTION
+            value: "true"
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: WORKER_THREADS
+            value: "10"
+          - name: HTTP_ENDPOINT
+            value: :9809
+          image: registry.k8s.io/sig-storage/csi-attacher:v4.11.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz/leader-election
+              port: 9809
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: csi-attacher
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+        - args:
+          - --csi-address=$(ADDRESS)
+          env:
+          - name: ADDRESS
+            value: /csi/csi.sock
+          image: registry.k8s.io/sig-storage/livenessprobe:v2.18.0
+          imagePullPolicy: IfNotPresent
+          name: csi-livenessprobe
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+        - args:
+          - --v=$(VERBOSE)
+          - --csi-address=$(ADDRESS)
+          - --timeout=$(TIMEOUT)
+          - --leader-election=$(LEADER_ELECTION)
+          - --leader-election-namespace=$(NAMESPACE)
+          - --worker-threads=$(WORKER_THREADS)
+          - --http-endpoint=$(HTTP_ENDPOINT)
+          - --default-fstype=$(DEFAULT_FS_TYPE)
+          - --enable-capacity=$(ENABLE_CAPACITY)
+          - --extra-create-metadata=$(EXTRA_CREATE_METADATA)
+          - --capacity-ownerref-level=$(CAPACITY_OWNERREF_LEVEL)
+          env:
+          - name: VERBOSE
+            value: "5"
+          - name: ADDRESS
+            value: /csi/csi.sock
+          - name: TIMEOUT
+            value: 1m
+          - name: LEADER_ELECTION
+            value: "true"
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: WORKER_THREADS
+            value: "10"
+          - name: HTTP_ENDPOINT
+            value: :9810
+          - name: DEFAULT_FS_TYPE
+            value: ext4
+          - name: ENABLE_CAPACITY
+            value: "true"
+          - name: EXTRA_CREATE_METADATA
+            value: "true"
+          - name: CAPACITY_OWNERREF_LEVEL
+            value: "2"
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          image: registry.k8s.io/sig-storage/csi-provisioner:v6.2.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz/leader-election
+              port: 9810
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: csi-provisioner
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+        - args:
+          - --v=$(VERBOSE)
+          - --csi-address=$(ADDRESS)
+          - --timeout=$(TIMEOUT)
+          - --leader-election=$(LEADER_ELECTION)
+          - --leader-election-namespace=$(NAMESPACE)
+          - --worker-threads=$(WORKER_THREADS)
+          - --http-endpoint=$(HTTP_ENDPOINT)
+          - --feature-gates=CSIVolumeGroupSnapshot=$(FEATURE_GATE_CSI_VOLUME_GROUP_SNAPSHOT),$(FEATURE_GATES)
+          env:
+          - name: FEATURE_GATE_CSI_VOLUME_GROUP_SNAPSHOT
+            value: "false"
+          - name: VERBOSE
+            value: "5"
+          - name: ADDRESS
+            value: /csi/csi.sock
+          - name: TIMEOUT
+            value: 1m
+          - name: LEADER_ELECTION
+            value: "true"
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: WORKER_THREADS
+            value: "10"
+          - name: HTTP_ENDPOINT
+            value: :9811
+          - name: FEATURE_GATES
+          image: registry.k8s.io/sig-storage/csi-snapshotter:v8.5.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz/leader-election
+              port: 9811
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: csi-snapshotter
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+        - args:
+          - --v=$(VERBOSE)
+          - --csi-address=$(ADDRESS)
+          - --timeout=$(TIMEOUT)
+          - --leader-election=$(LEADER_ELECTION)
+          - --leader-election-namespace=$(NAMESPACE)
+          - --workers=$(WORKER_THREADS)
+          - --http-endpoint=$(HTTP_ENDPOINT)
+          - --handle-volume-inuse-error=$(HANDLE_VOLUME_INUSE_ERROR)
+          env:
+          - name: VERBOSE
+            value: "5"
+          - name: ADDRESS
+            value: /csi/csi.sock
+          - name: TIMEOUT
+            value: 1m
+          - name: LEADER_ELECTION
+            value: "true"
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: WORKER_THREADS
+            value: "10"
+          - name: HTTP_ENDPOINT
+            value: :9812
+          - name: HANDLE_VOLUME_INUSE_ERROR
+            value: "false"
+          image: registry.k8s.io/sig-storage/csi-resizer:v2.1.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz/leader-election
+              port: 9812
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: csi-resizer
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+        - args:
+          - --v=$(VERBOSE)
+          - --csi-address=$(ADDRESS)
+          - --timeout=$(TIMEOUT)
+          - --leader-election=$(LEADER_ELECTION)
+          - --leader-election-namespace=$(NAMESPACE)
+          - --worker-threads=$(WORKER_THREADS)
+          - --http-endpoint=$(HTTP_ENDPOINT)
+          env:
+          - name: VERBOSE
+            value: "5"
+          - name: ADDRESS
+            value: /csi/csi.sock
+          - name: TIMEOUT
+            value: 1m
+          - name: LEADER_ELECTION
+            value: "true"
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: WORKER_THREADS
+            value: "10"
+          - name: HTTP_ENDPOINT
+            value: :9813
+          image: registry.k8s.io/sig-storage/csi-external-health-monitor-controller:v0.17.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz/leader-election
+              port: 9813
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: csi-health-monitor
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /csi
+            name: socket-dir
+        dnsPolicy: ClusterFirst
+        enableServiceLinks: false
+        initContainers:
+        - command:
+          - /linstor-wait-until
+          - api-online
+          env:
+          - name: LS_CONTROLLERS
+            value: http://linstor-controller:3370
+          image: quay.io/piraeusdatastore/piraeus-csi:v1.10.6
+          imagePullPolicy: IfNotPresent
+          name: linstor-wait-api-online
+          resources: {}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        nodeSelector:
+          piraeus.io/storage: "yes"
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: linstor-csi-controller
+        serviceAccountName: linstor-csi-controller
+        shareProcessNamespace: true
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: drbd.linbit.com/force-io-error
+          operator: Exists
+        - effect: NoSchedule
+          key: drbd.linbit.com/lost-quorum
+          operator: Exists
+        volumes:
+        - emptyDir: {}
+          name: socket-dir
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-22T08:46:37Z"
+      lastUpdateTime: "2026-04-22T08:50:27Z"
+      message: ReplicaSet "linstor-csi-controller-67d9b548d" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T17:20:28Z"
+      lastUpdateTime: "2026-04-22T17:20:28Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+    labels:
+      app.kubernetes.io/component: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+    name: piraeus-operator-controller-manager
+    namespace: piraeus-datastore
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/default-container: manager
+        labels:
+          app.kubernetes.io/component: piraeus-operator
+          app.kubernetes.io/name: piraeus-datastore
+      spec:
+        containers:
+        - args:
+          - --leader-elect
+          - --metrics-bind-address=0
+          - --namespace=$(NAMESPACE)
+          - --zap-devel=$(ZAP_DEVEL)
+          - --image-config-map-name=$(IMAGE_CONFIG_MAP_NAME)
+          - --requeue-interval=$(REQUEUE_INTERVAL)
+          - --cluster-api-kubeconfig=$(CLUSTER_API_KUBECONFIG)
+          command:
+          - /manager
+          env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: ZAP_DEVEL
+            value: "false"
+          - name: IMAGE_CONFIG_MAP_NAME
+            value: piraeus-operator-image-config
+          - name: REQUEUE_INTERVAL
+            value: 1m
+          - name: CLUSTER_API_KUBECONFIG
+          image: quay.io/piraeusdatastore/piraeus-operator:v2.10.5
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: manager
+          ports:
+          - containerPort: 9443
+            name: webhook-server
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp/k8s-webhook-server/serving-certs
+            name: cert
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsNonRoot: true
+        serviceAccount: piraeus-operator-controller-manager
+        serviceAccountName: piraeus-operator-controller-manager
+        terminationGracePeriodSeconds: 10
+        tolerations:
+        - effect: NoSchedule
+          key: drbd.linbit.com/lost-quorum
+        - effect: NoSchedule
+          key: drbd.linbit.com/force-io-error
+        volumes:
+        - name: cert
+          secret:
+            defaultMode: 420
+            secretName: webhook-server-cert
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-22T08:45:31Z"
+      lastUpdateTime: "2026-04-22T08:46:15Z"
+      message: ReplicaSet "piraeus-operator-controller-manager-55bf9797fd" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T14:17:54Z"
+      lastUpdateTime: "2026-04-22T14:17:54Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+    labels:
+      app.kubernetes.io/component: piraeus-operator-gencert
+      app.kubernetes.io/name: piraeus-datastore
+    name: piraeus-operator-gencert
+    namespace: piraeus-datastore
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: piraeus-operator-gencert
+        app.kubernetes.io/name: piraeus-datastore
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/default-container: gencert
+        labels:
+          app.kubernetes.io/component: piraeus-operator-gencert
+          app.kubernetes.io/name: piraeus-datastore
+      spec:
+        containers:
+        - args:
+          - --leader-elect
+          - --namespace=$(NAMESPACE)
+          - --zap-devel=$(ZAP_DEVEL)
+          - --webhook-configuration-name=$(WEBHOOK_CONFIGURATION_NAME)
+          - --webhook-service-name=$(WEBHOOK_SERVICE_NAME)
+          - --webhook-tls-secret-name=$(WEBHOOK_TLS_SECRET_NAME)
+          command:
+          - /gencert
+          env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: WEBHOOK_CONFIGURATION_NAME
+            value: piraeus-operator-validating-webhook-configuration
+          - name: WEBHOOK_SERVICE_NAME
+            value: piraeus-operator-webhook-service
+          - name: WEBHOOK_TLS_SECRET_NAME
+            value: webhook-server-cert
+          - name: ZAP_DEVEL
+            value: "false"
+          image: quay.io/piraeusdatastore/piraeus-operator:v2.10.5
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: gencert
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 50m
+              memory: 128Mi
+            requests:
+              cpu: 5m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsNonRoot: true
+        serviceAccount: piraeus-operator-gencert
+        serviceAccountName: piraeus-operator-gencert
+        terminationGracePeriodSeconds: 10
+        tolerations:
+        - effect: NoSchedule
+          key: drbd.linbit.com/lost-quorum
+        - effect: NoSchedule
+          key: drbd.linbit.com/force-io-error
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-22T08:45:31Z"
+      lastUpdateTime: "2026-04-22T08:45:49Z"
+      message: ReplicaSet "piraeus-operator-gencert-7c6b88d8f8" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T14:18:31Z"
+      lastUpdateTime: "2026-04-22T14:18:31Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:

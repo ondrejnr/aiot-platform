@@ -83,6 +83,32 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"hello-aiot","namespace":"aiot"},"spec":{"ports":[{"port":80,"targetPort":8000}],"selector":{"app":"hello-aiot"}}}
+    name: hello-aiot
+    namespace: aiot
+  spec:
+    clusterIP: 10.103.95.125
+    clusterIPs:
+    - 10.103.95.125
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8000
+    selector:
+      app: hello-aiot
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"ngrok-proxy","namespace":"aiot"},"spec":{"ports":[{"port":8090,"targetPort":8090}],"selector":{"app":"ngrok-proxy"}}}
     name: ngrok-proxy
     namespace: aiot

@@ -406,11 +406,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T06:05:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T23:05:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-partition-mgr-29613965
-      job-name: pg-partition-mgr-29613965
-    name: pg-partition-mgr-29613965
+      batch.kubernetes.io/job-name: pg-partition-mgr-29614985
+      job-name: pg-partition-mgr-29614985
+    name: pg-partition-mgr-29614985
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -432,8 +432,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-partition-mgr-29613965
-          job-name: pg-partition-mgr-29613965
+          batch.kubernetes.io/job-name: pg-partition-mgr-29614985
+          job-name: pg-partition-mgr-29614985
       spec:
         containers:
         - command:
@@ -492,22 +492,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-22T06:05:06Z"
+    completionTime: "2026-04-22T23:05:03Z"
     conditions:
-    - lastProbeTime: "2026-04-22T06:05:06Z"
-      lastTransitionTime: "2026-04-22T06:05:06Z"
+    - lastProbeTime: "2026-04-22T23:05:03Z"
+      lastTransitionTime: "2026-04-22T23:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T06:05:06Z"
-      lastTransitionTime: "2026-04-22T06:05:06Z"
+    - lastProbeTime: "2026-04-22T23:05:03Z"
+      lastTransitionTime: "2026-04-22T23:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T06:05:00Z"
+    startTime: "2026-04-22T23:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -515,11 +515,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T07:05:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T00:05:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-partition-mgr-29614025
-      job-name: pg-partition-mgr-29614025
-    name: pg-partition-mgr-29614025
+      batch.kubernetes.io/job-name: pg-partition-mgr-29615045
+      job-name: pg-partition-mgr-29615045
+    name: pg-partition-mgr-29615045
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -541,8 +541,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-partition-mgr-29614025
-          job-name: pg-partition-mgr-29614025
+          batch.kubernetes.io/job-name: pg-partition-mgr-29615045
+          job-name: pg-partition-mgr-29615045
       spec:
         containers:
         - command:
@@ -601,22 +601,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-22T07:05:05Z"
+    completionTime: "2026-04-23T00:05:03Z"
     conditions:
-    - lastProbeTime: "2026-04-22T07:05:05Z"
-      lastTransitionTime: "2026-04-22T07:05:05Z"
+    - lastProbeTime: "2026-04-23T00:05:03Z"
+      lastTransitionTime: "2026-04-23T00:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T07:05:05Z"
-      lastTransitionTime: "2026-04-22T07:05:05Z"
+    - lastProbeTime: "2026-04-23T00:05:03Z"
+      lastTransitionTime: "2026-04-23T00:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T07:05:00Z"
+    startTime: "2026-04-23T00:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -624,11 +624,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T08:05:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T01:05:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-partition-mgr-29614085
-      job-name: pg-partition-mgr-29614085
-    name: pg-partition-mgr-29614085
+      batch.kubernetes.io/job-name: pg-partition-mgr-29615105
+      job-name: pg-partition-mgr-29615105
+    name: pg-partition-mgr-29615105
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -650,8 +650,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-partition-mgr-29614085
-          job-name: pg-partition-mgr-29614085
+          batch.kubernetes.io/job-name: pg-partition-mgr-29615105
+          job-name: pg-partition-mgr-29615105
       spec:
         containers:
         - command:
@@ -710,22 +710,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-22T08:05:04Z"
+    completionTime: "2026-04-23T01:05:03Z"
     conditions:
-    - lastProbeTime: "2026-04-22T08:05:04Z"
-      lastTransitionTime: "2026-04-22T08:05:04Z"
+    - lastProbeTime: "2026-04-23T01:05:03Z"
+      lastTransitionTime: "2026-04-23T01:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T08:05:04Z"
-      lastTransitionTime: "2026-04-22T08:05:04Z"
+    - lastProbeTime: "2026-04-23T01:05:03Z"
+      lastTransitionTime: "2026-04-23T01:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T08:05:00Z"
+    startTime: "2026-04-23T01:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -733,11 +733,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T04:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T20:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-sensor-cleanup-29613840
-      job-name: pg-sensor-cleanup-29613840
-    name: pg-sensor-cleanup-29613840
+      batch.kubernetes.io/job-name: pg-sensor-cleanup-29614800
+      job-name: pg-sensor-cleanup-29614800
+    name: pg-sensor-cleanup-29614800
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -759,8 +759,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-sensor-cleanup-29613840
-          job-name: pg-sensor-cleanup-29613840
+          batch.kubernetes.io/job-name: pg-sensor-cleanup-29614800
+          job-name: pg-sensor-cleanup-29614800
       spec:
         containers:
         - command:
@@ -794,22 +794,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-22T04:00:04Z"
+    completionTime: "2026-04-22T20:00:03Z"
     conditions:
-    - lastProbeTime: "2026-04-22T04:00:04Z"
-      lastTransitionTime: "2026-04-22T04:00:04Z"
+    - lastProbeTime: "2026-04-22T20:00:03Z"
+      lastTransitionTime: "2026-04-22T20:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T04:00:04Z"
-      lastTransitionTime: "2026-04-22T04:00:04Z"
+    - lastProbeTime: "2026-04-22T20:00:03Z"
+      lastTransitionTime: "2026-04-22T20:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T04:00:00Z"
+    startTime: "2026-04-22T20:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -817,11 +817,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T08:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T00:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-sensor-cleanup-29614080
-      job-name: pg-sensor-cleanup-29614080
-    name: pg-sensor-cleanup-29614080
+      batch.kubernetes.io/job-name: pg-sensor-cleanup-29615040
+      job-name: pg-sensor-cleanup-29615040
+    name: pg-sensor-cleanup-29615040
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -843,8 +843,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-sensor-cleanup-29614080
-          job-name: pg-sensor-cleanup-29614080
+          batch.kubernetes.io/job-name: pg-sensor-cleanup-29615040
+          job-name: pg-sensor-cleanup-29615040
       spec:
         containers:
         - command:
@@ -878,22 +878,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-22T08:00:04Z"
+    completionTime: "2026-04-23T00:00:04Z"
     conditions:
-    - lastProbeTime: "2026-04-22T08:00:04Z"
-      lastTransitionTime: "2026-04-22T08:00:04Z"
+    - lastProbeTime: "2026-04-23T00:00:04Z"
+      lastTransitionTime: "2026-04-23T00:00:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T08:00:04Z"
-      lastTransitionTime: "2026-04-22T08:00:04Z"
+    - lastProbeTime: "2026-04-23T00:00:04Z"
+      lastTransitionTime: "2026-04-23T00:00:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T08:00:00Z"
+    startTime: "2026-04-23T00:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -1127,13 +1127,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-17T18:00:00Z"
-      revisions: '{"1":{"status":"failed","reasons":["DeadlineExceeded"],"messages":["Job
-        was active longer than specified deadline"],"desire":1,"failed":1,"uid":"19d4f6b5-1367-45f7-b5ca-3074bc61954b","start-time":"2026-04-17T18:00:00Z","completion-time":"0001-01-01T00:00:00Z"}}'
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T18:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: sensor-data-retention-29607480
-      job-name: sensor-data-retention-29607480
-    name: sensor-data-retention-29607480
+      batch.kubernetes.io/job-name: sensor-data-retention-29614680
+      job-name: sensor-data-retention-29614680
+    name: sensor-data-retention-29614680
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -1155,8 +1153,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: sensor-data-retention-29607480
-          job-name: sensor-data-retention-29607480
+          batch.kubernetes.io/job-name: sensor-data-retention-29614680
+          job-name: sensor-data-retention-29614680
       spec:
         containers:
         - command:
@@ -1168,9 +1166,8 @@ items:
                                      password=os.environ['PG_PASS'], dbname='aiot')
             conn.autocommit = True
             cur = conn.cursor()
-            for t in ['sensor_data','predictions']:
-                cur.execute(f"DELETE FROM {t} WHERE ts < NOW() - INTERVAL '10 days'")
-                print(f"Cleaned {t}: {cur.rowcount} rows")
+            cur.execute("DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '14 days'")
+            print(f"Cleaned sensor_data: {cur.rowcount} rows")
             cur.close(); conn.close()
           env:
           - name: PG_HOST
@@ -1194,109 +1191,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
+    completionTime: "2026-04-22T18:00:03Z"
     conditions:
-    - lastProbeTime: "2026-04-17T18:30:00Z"
-      lastTransitionTime: "2026-04-17T18:30:00Z"
-      message: Job was active longer than specified deadline
-      reason: DeadlineExceeded
-      status: "True"
-      type: FailureTarget
-    - lastProbeTime: "2026-04-17T18:30:01Z"
-      lastTransitionTime: "2026-04-17T18:30:01Z"
-      message: Job was active longer than specified deadline
-      reason: DeadlineExceeded
-      status: "True"
-      type: Failed
-    failed: 1
-    ready: 0
-    startTime: "2026-04-17T18:00:00Z"
-    terminating: 0
-    uncountedTerminatedPods: {}
-- apiVersion: batch/v1
-  kind: Job
-  metadata:
-    annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T00:00:00Z"
-    labels:
-      batch.kubernetes.io/job-name: sensor-data-retention-29613600
-      job-name: sensor-data-retention-29613600
-    name: sensor-data-retention-29613600
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: batch/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: CronJob
-      name: sensor-data-retention
-  spec:
-    activeDeadlineSeconds: 1800
-    backoffLimit: 1
-    completionMode: NonIndexed
-    completions: 1
-    manualSelector: false
-    parallelism: 1
-    podReplacementPolicy: TerminatingOrFailed
-    selector:
-      matchLabels:
-    suspend: false
-    template:
-      metadata:
-        labels:
-          batch.kubernetes.io/job-name: sensor-data-retention-29613600
-          job-name: sensor-data-retention-29613600
-      spec:
-        containers:
-        - command:
-          - python3
-          - -c
-          - |
-            import psycopg2, os
-            conn = psycopg2.connect(host=os.environ['PG_HOST'], user=os.environ['PG_USER'],
-                                     password=os.environ['PG_PASS'], dbname='aiot')
-            conn.autocommit = True
-            cur = conn.cursor()
-            for t in ['sensor_data','predictions']:
-                cur.execute(f"DELETE FROM {t} WHERE ts < NOW() - INTERVAL '14 days'")
-                print(f"Cleaned {t}: {cur.rowcount} rows")
-            cur.close(); conn.close()
-          env:
-          - name: PG_HOST
-            value: postgres.aiot.svc.cluster.local
-          - name: PG_USER
-            value: aiot_admin
-          - name: PG_PASS
-            valueFrom:
-              secretKeyRef:
-                key: PG_PASS
-                name: pg-credentials
-          image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
-          imagePullPolicy: Always
-          name: retention
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-        dnsPolicy: ClusterFirst
-        restartPolicy: Never
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-  status:
-    completionTime: "2026-04-22T00:00:07Z"
-    conditions:
-    - lastProbeTime: "2026-04-22T00:00:07Z"
-      lastTransitionTime: "2026-04-22T00:00:07Z"
+    - lastProbeTime: "2026-04-22T18:00:03Z"
+      lastTransitionTime: "2026-04-22T18:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T00:00:07Z"
-      lastTransitionTime: "2026-04-22T00:00:07Z"
+    - lastProbeTime: "2026-04-22T18:00:03Z"
+      lastTransitionTime: "2026-04-22T18:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T00:00:00Z"
+    startTime: "2026-04-22T18:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -1304,11 +1214,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T06:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T00:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: sensor-data-retention-29613960
-      job-name: sensor-data-retention-29613960
-    name: sensor-data-retention-29613960
+      batch.kubernetes.io/job-name: sensor-data-retention-29615040
+      job-name: sensor-data-retention-29615040
+    name: sensor-data-retention-29615040
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -1330,8 +1240,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: sensor-data-retention-29613960
-          job-name: sensor-data-retention-29613960
+          batch.kubernetes.io/job-name: sensor-data-retention-29615040
+          job-name: sensor-data-retention-29615040
       spec:
         containers:
         - command:
@@ -1343,9 +1253,8 @@ items:
                                      password=os.environ['PG_PASS'], dbname='aiot')
             conn.autocommit = True
             cur = conn.cursor()
-            for t in ['sensor_data','predictions']:
-                cur.execute(f"DELETE FROM {t} WHERE ts < NOW() - INTERVAL '14 days'")
-                print(f"Cleaned {t}: {cur.rowcount} rows")
+            cur.execute("DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '14 days'")
+            print(f"Cleaned sensor_data: {cur.rowcount} rows")
             cur.close(); conn.close()
           env:
           - name: PG_HOST
@@ -1369,22 +1278,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-22T06:00:27Z"
+    completionTime: "2026-04-23T00:00:03Z"
     conditions:
-    - lastProbeTime: "2026-04-22T06:00:27Z"
-      lastTransitionTime: "2026-04-22T06:00:27Z"
+    - lastProbeTime: "2026-04-23T00:00:03Z"
+      lastTransitionTime: "2026-04-23T00:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T06:00:27Z"
-      lastTransitionTime: "2026-04-22T06:00:27Z"
+    - lastProbeTime: "2026-04-23T00:00:03Z"
+      lastTransitionTime: "2026-04-23T00:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T06:00:00Z"
+    startTime: "2026-04-23T00:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

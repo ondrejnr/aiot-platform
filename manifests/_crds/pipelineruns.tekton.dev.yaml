@@ -1,0 +1,983 @@
+apiVersion: v1
+items:
+- apiVersion: tekton.dev/v1
+  kind: PipelineRun
+  metadata:
+    annotations:
+      chains.tekton.dev/signed: "true"
+      pipelinesascode.tekton.dev/branch: refs/heads/main
+      pipelinesascode.tekton.dev/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pipelinesascode.tekton.dev/event-type: push
+      pipelinesascode.tekton.dev/git-auth-secret: pac-gitauth-nxbcne
+      pipelinesascode.tekton.dev/git-provider: gitea
+      pipelinesascode.tekton.dev/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-89p8g
+      pipelinesascode.tekton.dev/max-keep-runs: "5"
+      pipelinesascode.tekton.dev/on-event: '[push]'
+      pipelinesascode.tekton.dev/on-target-branch: '[main]'
+      pipelinesascode.tekton.dev/original-prname: hello-aiot-push
+      pipelinesascode.tekton.dev/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pipelinesascode.tekton.dev/repository: hello-aiot
+      pipelinesascode.tekton.dev/scm-reporting-plr-started: "true"
+      pipelinesascode.tekton.dev/sender: admin
+      pipelinesascode.tekton.dev/sha: cef878c1f7eedb16fa9f57991cbd39dbb608865f
+      pipelinesascode.tekton.dev/sha-title: |
+        add konflux build labels
+      pipelinesascode.tekton.dev/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cef878c1f7eedb16fa9f57991cbd39dbb608865f
+      pipelinesascode.tekton.dev/source-branch: refs/heads/main
+      pipelinesascode.tekton.dev/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pipelinesascode.tekton.dev/state: completed
+      pipelinesascode.tekton.dev/url-org: aiot
+      pipelinesascode.tekton.dev/url-repository: hello-aiot
+      results.tekton.dev/record: default-tenant/results/54a45587-4d7f-46cd-9144-22c0bb61d095/records/54a45587-4d7f-46cd-9144-22c0bb61d095
+      results.tekton.dev/recordSummaryAnnotations: '{"repo":"hello-aiot","commit":"cef878c1f7eedb16fa9f57991cbd39dbb608865f","eventType":"push"}'
+      results.tekton.dev/result: default-tenant/results/54a45587-4d7f-46cd-9144-22c0bb61d095
+      results.tekton.dev/stored: "true"
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-22T17:46:23Z"}'
+      test.appstudio.openshift.io/create-snapshot-status: '{"message":"Failed to create
+        snapshot. Error: Missing info IMAGE_URL from pipelinerun hello-aiot-push-89p8g","status":"failed"}'
+    finalizers:
+    - pipelinesascode.tekton.dev/finalizer
+    - chains.tekton.dev/pipelinerun
+    - results.tekton.dev/pipelinerun
+    generateName: hello-aiot-push-
+    labels:
+      app.kubernetes.io/managed-by: pipelinesascode.tekton.dev
+      app.kubernetes.io/version: v0.42.0
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/component: hello-aiot
+      pipelines.appstudio.openshift.io/type: build
+      pipelinesascode.tekton.dev/event-type: push
+      pipelinesascode.tekton.dev/original-prname: hello-aiot-push
+      pipelinesascode.tekton.dev/repository: hello-aiot
+      pipelinesascode.tekton.dev/sha: cef878c1f7eedb16fa9f57991cbd39dbb608865f
+      pipelinesascode.tekton.dev/state: completed
+      pipelinesascode.tekton.dev/url-org: aiot
+      pipelinesascode.tekton.dev/url-repository: hello-aiot
+      tekton.dev/pipeline: hello-aiot-push-89p8g
+    name: hello-aiot-push-89p8g
+    namespace: default-tenant
+  spec:
+    params:
+    - name: repo-url
+      value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+    - name: revision
+      value: cef878c1f7eedb16fa9f57991cbd39dbb608865f
+    - name: image
+      value: internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot
+    - name: tag
+      value: cef878c1f7eedb16fa9f57991cbd39dbb608865f
+    pipelineSpec:
+      params:
+      - name: repo-url
+        type: string
+      - name: revision
+        type: string
+      - name: image
+        type: string
+      - name: tag
+        type: string
+      tasks:
+      - name: build-and-push
+        params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: image
+          value: $(params.image)
+        - name: tag
+          value: $(params.tag)
+        taskSpec:
+          metadata: {}
+          params:
+          - name: repo-url
+            type: string
+          - name: revision
+            type: string
+          - name: image
+            type: string
+          - name: tag
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: alpine/git:2.45.2
+            name: clone
+            script: |
+              #!/bin/sh
+              set -e
+              URL="$(params.repo-url)"
+              # Swap public host for in-cluster svc to avoid ingress dependency
+              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
+              echo "cloning $CLUSTER_URL"
+              git clone "$CLUSTER_URL" src
+              cd src
+              git checkout "$(params.revision)"
+              git log -1 --oneline
+            workingDir: $(workspaces.source.path)
+          - computeResources: {}
+            image: quay.io/buildah/stable:v1.38
+            name: buildah
+            script: |
+              #!/usr/bin/env bash
+              set -euo pipefail
+              IMAGE="$(params.image):$(params.tag)"
+              LATEST="$(params.image):latest"
+              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
+              buildah push --storage-driver=vfs --tls-verify=false "$IMAGE"
+              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
+              echo "pushed $IMAGE and $LATEST"
+            securityContext:
+              privileged: true
+            workingDir: $(workspaces.source.path)/src
+          workspaces:
+          - name: source
+        workspaces:
+        - name: source
+          workspace: source
+      workspaces:
+      - name: source
+    taskRunTemplate:
+      serviceAccountName: default
+    timeouts:
+      pipeline: 1h0m0s
+    workspaces:
+    - name: source
+      volumeClaimTemplate:
+        metadata: {}
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+        status: {}
+  status:
+    childReferences:
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: hello-aiot-push-89p8g-build-and-push
+      pipelineTaskName: build-and-push
+    completionTime: "2026-04-22T17:46:21Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:46:21Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    pipelineSpec:
+      params:
+      - name: repo-url
+        type: string
+      - name: revision
+        type: string
+      - name: image
+        type: string
+      - name: tag
+        type: string
+      tasks:
+      - name: build-and-push
+        params:
+        - name: repo-url
+          value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+        - name: revision
+          value: cef878c1f7eedb16fa9f57991cbd39dbb608865f
+        - name: image
+          value: internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot
+        - name: tag
+          value: cef878c1f7eedb16fa9f57991cbd39dbb608865f
+        taskSpec:
+          metadata: {}
+          params:
+          - name: repo-url
+            type: string
+          - name: revision
+            type: string
+          - name: image
+            type: string
+          - name: tag
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: alpine/git:2.45.2
+            name: clone
+            script: |
+              #!/bin/sh
+              set -e
+              URL="https://gitea.35.241.255.137.nip.io/aiot/hello-aiot"
+              # Swap public host for in-cluster svc to avoid ingress dependency
+              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
+              echo "cloning $CLUSTER_URL"
+              git clone "$CLUSTER_URL" src
+              cd src
+              git checkout "cef878c1f7eedb16fa9f57991cbd39dbb608865f"
+              git log -1 --oneline
+            workingDir: $(workspaces.source.path)
+          - computeResources: {}
+            image: quay.io/buildah/stable:v1.38
+            name: buildah
+            script: |
+              #!/usr/bin/env bash
+              set -euo pipefail
+              IMAGE="internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot:cef878c1f7eedb16fa9f57991cbd39dbb608865f"
+              LATEST="internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot:latest"
+              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
+              buildah push --storage-driver=vfs --tls-verify=false "$IMAGE"
+              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
+              echo "pushed $IMAGE and $LATEST"
+            securityContext:
+              privileged: true
+            workingDir: $(workspaces.source.path)/src
+          workspaces:
+          - name: source
+        workspaces:
+        - name: source
+          workspace: source
+      workspaces:
+      - name: source
+    provenance:
+      featureFlags:
+        awaitSidecarReadiness: true
+        coschedule: workspaces
+        enableAPIFields: beta
+        enableProvenanceInStatus: true
+        enforceNonfalsifiability: none
+        maxResultSize: 4096
+        resultExtractionMethod: termination-message
+        runningInEnvWithInjectedSidecars: true
+        verificationNoMatchPolicy: ignore
+    startTime: "2026-04-22T17:45:37Z"
+- apiVersion: tekton.dev/v1
+  kind: PipelineRun
+  metadata:
+    annotations:
+      appstudio.openshift.io/snapshot: hello-aiot-20260422-174948-000
+      appstudio.openshift.io/snapshots: hello-aiot-20260422-174948-000
+      chains.tekton.dev/signed: "true"
+      pipelinesascode.tekton.dev/branch: refs/heads/main
+      pipelinesascode.tekton.dev/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pipelinesascode.tekton.dev/event-type: push
+      pipelinesascode.tekton.dev/git-auth-secret: pac-gitauth-eyjyse
+      pipelinesascode.tekton.dev/git-provider: gitea
+      pipelinesascode.tekton.dev/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-9pjx9
+      pipelinesascode.tekton.dev/max-keep-runs: "5"
+      pipelinesascode.tekton.dev/on-event: '[push]'
+      pipelinesascode.tekton.dev/on-target-branch: '[main]'
+      pipelinesascode.tekton.dev/original-prname: hello-aiot-push
+      pipelinesascode.tekton.dev/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pipelinesascode.tekton.dev/repository: hello-aiot
+      pipelinesascode.tekton.dev/scm-reporting-plr-started: "true"
+      pipelinesascode.tekton.dev/sender: admin
+      pipelinesascode.tekton.dev/sha: 5e8056762053ed1f311d1e9fa479ca03b2280645
+      pipelinesascode.tekton.dev/sha-title: |
+        feat: add pipeline results (IMAGE_URL, IMAGE_DIGEST) for Konflux snapshot
+      pipelinesascode.tekton.dev/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/5e8056762053ed1f311d1e9fa479ca03b2280645
+      pipelinesascode.tekton.dev/source-branch: refs/heads/main
+      pipelinesascode.tekton.dev/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pipelinesascode.tekton.dev/state: completed
+      pipelinesascode.tekton.dev/url-org: aiot
+      pipelinesascode.tekton.dev/url-repository: hello-aiot
+      results.tekton.dev/record: default-tenant/results/10928f65-9249-4cad-a00c-d5cf3cd80b34/records/10928f65-9249-4cad-a00c-d5cf3cd80b34
+      results.tekton.dev/recordSummaryAnnotations: '{"repo":"hello-aiot","commit":"5e8056762053ed1f311d1e9fa479ca03b2280645","eventType":"push"}'
+      results.tekton.dev/result: default-tenant/results/10928f65-9249-4cad-a00c-d5cf3cd80b34
+      results.tekton.dev/stored: "true"
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-22T17:50:33Z"}'
+      test.appstudio.openshift.io/create-snapshot-status: '{"message":"Sucessfully
+        created snapshot. See annotation appstudio.openshift.io/snapshot for name","status":"success"}'
+    finalizers:
+    - pipelinesascode.tekton.dev/finalizer
+    - results.tekton.dev/pipelinerun
+    - chains.tekton.dev/pipelinerun
+    generateName: hello-aiot-push-
+    labels:
+      app.kubernetes.io/managed-by: pipelinesascode.tekton.dev
+      app.kubernetes.io/version: v0.42.0
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/component: hello-aiot
+      pipelines.appstudio.openshift.io/type: build
+      pipelinesascode.tekton.dev/event-type: push
+      pipelinesascode.tekton.dev/original-prname: hello-aiot-push
+      pipelinesascode.tekton.dev/repository: hello-aiot
+      pipelinesascode.tekton.dev/sha: 5e8056762053ed1f311d1e9fa479ca03b2280645
+      pipelinesascode.tekton.dev/state: completed
+      pipelinesascode.tekton.dev/url-org: aiot
+      pipelinesascode.tekton.dev/url-repository: hello-aiot
+      tekton.dev/pipeline: hello-aiot-push-9pjx9
+    name: hello-aiot-push-9pjx9
+    namespace: default-tenant
+  spec:
+    params:
+    - name: repo-url
+      value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+    - name: revision
+      value: 5e8056762053ed1f311d1e9fa479ca03b2280645
+    - name: image
+      value: internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot
+    - name: tag
+      value: 5e8056762053ed1f311d1e9fa479ca03b2280645
+    pipelineSpec:
+      params:
+      - name: repo-url
+        type: string
+      - name: revision
+        type: string
+      - name: image
+        type: string
+      - name: tag
+        type: string
+      results:
+      - description: ""
+        name: IMAGE_URL
+        value: $(tasks.build-and-push.results.IMAGE_URL)
+      - description: ""
+        name: IMAGE_DIGEST
+        value: $(tasks.build-and-push.results.IMAGE_DIGEST)
+      - description: ""
+        name: CHAINS-GIT_URL
+        value: $(tasks.build-and-push.results.CHAINS-GIT_URL)
+      - description: ""
+        name: CHAINS-GIT_COMMIT
+        value: $(tasks.build-and-push.results.CHAINS-GIT_COMMIT)
+      tasks:
+      - name: build-and-push
+        params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: image
+          value: $(params.image)
+        - name: tag
+          value: $(params.tag)
+        taskSpec:
+          metadata: {}
+          params:
+          - name: repo-url
+            type: string
+          - name: revision
+            type: string
+          - name: image
+            type: string
+          - name: tag
+            type: string
+          results:
+          - name: IMAGE_URL
+            type: string
+          - name: IMAGE_DIGEST
+            type: string
+          - name: CHAINS-GIT_URL
+            type: string
+          - name: CHAINS-GIT_COMMIT
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: alpine/git:2.45.2
+            name: clone
+            script: |
+              #!/bin/sh
+              set -e
+              URL="$(params.repo-url)"
+              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
+              echo "cloning $CLUSTER_URL"
+              git clone "$CLUSTER_URL" src
+              cd src
+              git checkout "$(params.revision)"
+              git log -1 --oneline
+              printf '%s' "$URL" > $(results.CHAINS-GIT_URL.path)
+              printf '%s' "$(params.revision)" > $(results.CHAINS-GIT_COMMIT.path)
+            workingDir: $(workspaces.source.path)
+          - computeResources: {}
+            image: quay.io/buildah/stable:v1.38
+            name: buildah
+            script: |
+              #!/usr/bin/env bash
+              set -euo pipefail
+              IMAGE="$(params.image):$(params.tag)"
+              LATEST="$(params.image):latest"
+              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
+              buildah push --storage-driver=vfs --tls-verify=false --digestfile /tmp/digest "$IMAGE"
+              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
+              DIGEST=$(cat /tmp/digest)
+              echo "pushed $IMAGE@$DIGEST"
+              printf '%s' "$IMAGE" > $(results.IMAGE_URL.path)
+              printf '%s' "$DIGEST" > $(results.IMAGE_DIGEST.path)
+            securityContext:
+              privileged: true
+            workingDir: $(workspaces.source.path)/src
+          workspaces:
+          - name: source
+        workspaces:
+        - name: source
+          workspace: source
+      workspaces:
+      - name: source
+    taskRunTemplate:
+      serviceAccountName: default
+    timeouts:
+      pipeline: 1h0m0s
+    workspaces:
+    - name: source
+      volumeClaimTemplate:
+        metadata: {}
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+        status: {}
+  status:
+    childReferences:
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: hello-aiot-push-9pjx9-build-and-push
+      pipelineTaskName: build-and-push
+    completionTime: "2026-04-22T17:50:30Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:50:30Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    pipelineSpec:
+      params:
+      - name: repo-url
+        type: string
+      - name: revision
+        type: string
+      - name: image
+        type: string
+      - name: tag
+        type: string
+      results:
+      - description: ""
+        name: IMAGE_URL
+        value: $(tasks.build-and-push.results.IMAGE_URL)
+      - description: ""
+        name: IMAGE_DIGEST
+        value: $(tasks.build-and-push.results.IMAGE_DIGEST)
+      - description: ""
+        name: CHAINS-GIT_URL
+        value: $(tasks.build-and-push.results.CHAINS-GIT_URL)
+      - description: ""
+        name: CHAINS-GIT_COMMIT
+        value: $(tasks.build-and-push.results.CHAINS-GIT_COMMIT)
+      tasks:
+      - name: build-and-push
+        params:
+        - name: repo-url
+          value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+        - name: revision
+          value: 5e8056762053ed1f311d1e9fa479ca03b2280645
+        - name: image
+          value: internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot
+        - name: tag
+          value: 5e8056762053ed1f311d1e9fa479ca03b2280645
+        taskSpec:
+          metadata: {}
+          params:
+          - name: repo-url
+            type: string
+          - name: revision
+            type: string
+          - name: image
+            type: string
+          - name: tag
+            type: string
+          results:
+          - name: IMAGE_URL
+            type: string
+          - name: IMAGE_DIGEST
+            type: string
+          - name: CHAINS-GIT_URL
+            type: string
+          - name: CHAINS-GIT_COMMIT
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: alpine/git:2.45.2
+            name: clone
+            script: |
+              #!/bin/sh
+              set -e
+              URL="https://gitea.35.241.255.137.nip.io/aiot/hello-aiot"
+              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
+              echo "cloning $CLUSTER_URL"
+              git clone "$CLUSTER_URL" src
+              cd src
+              git checkout "5e8056762053ed1f311d1e9fa479ca03b2280645"
+              git log -1 --oneline
+              printf '%s' "$URL" > $(results.CHAINS-GIT_URL.path)
+              printf '%s' "5e8056762053ed1f311d1e9fa479ca03b2280645" > $(results.CHAINS-GIT_COMMIT.path)
+            workingDir: $(workspaces.source.path)
+          - computeResources: {}
+            image: quay.io/buildah/stable:v1.38
+            name: buildah
+            script: |
+              #!/usr/bin/env bash
+              set -euo pipefail
+              IMAGE="internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot:5e8056762053ed1f311d1e9fa479ca03b2280645"
+              LATEST="internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot:latest"
+              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
+              buildah push --storage-driver=vfs --tls-verify=false --digestfile /tmp/digest "$IMAGE"
+              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
+              DIGEST=$(cat /tmp/digest)
+              echo "pushed $IMAGE@$DIGEST"
+              printf '%s' "$IMAGE" > $(results.IMAGE_URL.path)
+              printf '%s' "$DIGEST" > $(results.IMAGE_DIGEST.path)
+            securityContext:
+              privileged: true
+            workingDir: $(workspaces.source.path)/src
+          workspaces:
+          - name: source
+        workspaces:
+        - name: source
+          workspace: source
+      workspaces:
+      - name: source
+    provenance:
+      featureFlags:
+        awaitSidecarReadiness: true
+        coschedule: workspaces
+        enableAPIFields: beta
+        enableProvenanceInStatus: true
+        enforceNonfalsifiability: none
+        maxResultSize: 4096
+        resultExtractionMethod: termination-message
+        runningInEnvWithInjectedSidecars: true
+        verificationNoMatchPolicy: ignore
+    results:
+    - name: IMAGE_URL
+      value: internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot:5e8056762053ed1f311d1e9fa479ca03b2280645
+    - name: IMAGE_DIGEST
+      value: sha256:53db511f95578740d4f1449be753eee8a2af2eada14d18a39484fd56439bcf65
+    - name: CHAINS-GIT_URL
+      value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+    - name: CHAINS-GIT_COMMIT
+      value: 5e8056762053ed1f311d1e9fa479ca03b2280645
+    startTime: "2026-04-22T17:49:48Z"
+- apiVersion: tekton.dev/v1
+  kind: PipelineRun
+  metadata:
+    annotations:
+      build.appstudio.redhat.com/commit_sha: 617772d980bf1c0647fe594d0f9bcce2309ee425
+      build.appstudio.redhat.com/target_branch: main
+      chains.tekton.dev/signed: "true"
+      pipelinesascode.tekton.dev/branch: refs/heads/main
+      pipelinesascode.tekton.dev/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pipelinesascode.tekton.dev/event-type: push
+      pipelinesascode.tekton.dev/git-auth-secret: pac-gitauth-nnnryn
+      pipelinesascode.tekton.dev/git-provider: gitea
+      pipelinesascode.tekton.dev/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-hwhj9
+      pipelinesascode.tekton.dev/max-keep-runs: "5"
+      pipelinesascode.tekton.dev/on-event: '[push]'
+      pipelinesascode.tekton.dev/on-target-branch: '[main]'
+      pipelinesascode.tekton.dev/original-prname: hello-aiot-push
+      pipelinesascode.tekton.dev/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pipelinesascode.tekton.dev/repository: hello-aiot
+      pipelinesascode.tekton.dev/scm-reporting-plr-started: "true"
+      pipelinesascode.tekton.dev/sender: admin
+      pipelinesascode.tekton.dev/sha: 617772d980bf1c0647fe594d0f9bcce2309ee425
+      pipelinesascode.tekton.dev/sha-title: |
+        fix: inline pipeline (no hub resolver)
+      pipelinesascode.tekton.dev/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/617772d980bf1c0647fe594d0f9bcce2309ee425
+      pipelinesascode.tekton.dev/source-branch: refs/heads/main
+      pipelinesascode.tekton.dev/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pipelinesascode.tekton.dev/state: completed
+      pipelinesascode.tekton.dev/url-org: aiot
+      pipelinesascode.tekton.dev/url-repository: hello-aiot
+      results.tekton.dev/record: default-tenant/results/f5cc5094-4fac-491e-b8ac-ade1843b65a8/records/f5cc5094-4fac-491e-b8ac-ade1843b65a8
+      results.tekton.dev/recordSummaryAnnotations: '{"repo":"hello-aiot","commit":"617772d980bf1c0647fe594d0f9bcce2309ee425","eventType":"push"}'
+      results.tekton.dev/result: default-tenant/results/f5cc5094-4fac-491e-b8ac-ade1843b65a8
+      results.tekton.dev/stored: "true"
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-22T17:43:44Z"}'
+      test.appstudio.openshift.io/create-snapshot-status: '{"message":"Failed to create
+        snapshot. Error: Missing info IMAGE_URL from pipelinerun hello-aiot-push-hwhj9","status":"failed"}'
+    finalizers:
+    - chains.tekton.dev/pipelinerun
+    - pipelinesascode.tekton.dev/finalizer
+    - results.tekton.dev/pipelinerun
+    generateName: hello-aiot-push-
+    labels:
+      app.kubernetes.io/managed-by: pipelinesascode.tekton.dev
+      app.kubernetes.io/version: v0.42.0
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/component: hello-aiot
+      pipelines.appstudio.openshift.io/type: build
+      pipelinesascode.tekton.dev/event-type: push
+      pipelinesascode.tekton.dev/original-prname: hello-aiot-push
+      pipelinesascode.tekton.dev/repository: hello-aiot
+      pipelinesascode.tekton.dev/sha: 617772d980bf1c0647fe594d0f9bcce2309ee425
+      pipelinesascode.tekton.dev/state: completed
+      pipelinesascode.tekton.dev/url-org: aiot
+      pipelinesascode.tekton.dev/url-repository: hello-aiot
+      tekton.dev/pipeline: hello-aiot-push-hwhj9
+    name: hello-aiot-push-hwhj9
+    namespace: default-tenant
+  spec:
+    params:
+    - name: repo-url
+      value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+    - name: revision
+      value: 617772d980bf1c0647fe594d0f9bcce2309ee425
+    - name: image
+      value: internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot
+    - name: tag
+      value: 617772d980bf1c0647fe594d0f9bcce2309ee425
+    pipelineSpec:
+      params:
+      - name: repo-url
+        type: string
+      - name: revision
+        type: string
+      - name: image
+        type: string
+      - name: tag
+        type: string
+      tasks:
+      - name: build-and-push
+        params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: image
+          value: $(params.image)
+        - name: tag
+          value: $(params.tag)
+        taskSpec:
+          metadata: {}
+          params:
+          - name: repo-url
+            type: string
+          - name: revision
+            type: string
+          - name: image
+            type: string
+          - name: tag
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: alpine/git:2.45.2
+            name: clone
+            script: |
+              #!/bin/sh
+              set -e
+              URL="$(params.repo-url)"
+              # Swap public host for in-cluster svc to avoid ingress dependency
+              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
+              echo "cloning $CLUSTER_URL"
+              git clone "$CLUSTER_URL" src
+              cd src
+              git checkout "$(params.revision)"
+              git log -1 --oneline
+            workingDir: $(workspaces.source.path)
+          - computeResources: {}
+            image: quay.io/buildah/stable:v1.38
+            name: buildah
+            script: |
+              #!/usr/bin/env bash
+              set -euo pipefail
+              IMAGE="$(params.image):$(params.tag)"
+              LATEST="$(params.image):latest"
+              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
+              buildah push --storage-driver=vfs --tls-verify=false "$IMAGE"
+              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
+              echo "pushed $IMAGE and $LATEST"
+            securityContext:
+              privileged: true
+            workingDir: $(workspaces.source.path)/src
+          workspaces:
+          - name: source
+        workspaces:
+        - name: source
+          workspace: source
+      workspaces:
+      - name: source
+    taskRunTemplate:
+      serviceAccountName: default
+    timeouts:
+      pipeline: 1h0m0s
+    workspaces:
+    - name: source
+      volumeClaimTemplate:
+        metadata: {}
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+        status: {}
+  status:
+    childReferences:
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: hello-aiot-push-hwhj9-build-and-push
+      pipelineTaskName: build-and-push
+    completionTime: "2026-04-22T16:52:14Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T16:52:14Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    pipelineSpec:
+      params:
+      - name: repo-url
+        type: string
+      - name: revision
+        type: string
+      - name: image
+        type: string
+      - name: tag
+        type: string
+      tasks:
+      - name: build-and-push
+        params:
+        - name: repo-url
+          value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+        - name: revision
+          value: 617772d980bf1c0647fe594d0f9bcce2309ee425
+        - name: image
+          value: internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot
+        - name: tag
+          value: 617772d980bf1c0647fe594d0f9bcce2309ee425
+        taskSpec:
+          metadata: {}
+          params:
+          - name: repo-url
+            type: string
+          - name: revision
+            type: string
+          - name: image
+            type: string
+          - name: tag
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: alpine/git:2.45.2
+            name: clone
+            script: |
+              #!/bin/sh
+              set -e
+              URL="https://gitea.35.241.255.137.nip.io/aiot/hello-aiot"
+              # Swap public host for in-cluster svc to avoid ingress dependency
+              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
+              echo "cloning $CLUSTER_URL"
+              git clone "$CLUSTER_URL" src
+              cd src
+              git checkout "617772d980bf1c0647fe594d0f9bcce2309ee425"
+              git log -1 --oneline
+            workingDir: $(workspaces.source.path)
+          - computeResources: {}
+            image: quay.io/buildah/stable:v1.38
+            name: buildah
+            script: |
+              #!/usr/bin/env bash
+              set -euo pipefail
+              IMAGE="internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot:617772d980bf1c0647fe594d0f9bcce2309ee425"
+              LATEST="internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot:latest"
+              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
+              buildah push --storage-driver=vfs --tls-verify=false "$IMAGE"
+              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
+              echo "pushed $IMAGE and $LATEST"
+            securityContext:
+              privileged: true
+            workingDir: $(workspaces.source.path)/src
+          workspaces:
+          - name: source
+        workspaces:
+        - name: source
+          workspace: source
+      workspaces:
+      - name: source
+    provenance:
+      featureFlags:
+        awaitSidecarReadiness: true
+        coschedule: workspaces
+        enableAPIFields: beta
+        enableProvenanceInStatus: true
+        enforceNonfalsifiability: none
+        maxResultSize: 4096
+        resultExtractionMethod: termination-message
+        runningInEnvWithInjectedSidecars: true
+        verificationNoMatchPolicy: ignore
+    startTime: "2026-04-22T16:51:02Z"
+- apiVersion: tekton.dev/v1
+  kind: PipelineRun
+  metadata:
+    annotations:
+      chains.tekton.dev/signed: "true"
+      operator-sdk/primary-resource: default-tenant/hello-aiot-manual-fpcnc
+      operator-sdk/primary-resource-type: Release.appstudio.redhat.com
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-eyjyse
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-9pjx9
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 5e8056762053ed1f311d1e9fa479ca03b2280645
+      pac.test.appstudio.openshift.io/sha-title: |
+        feat: add pipeline results (IMAGE_URL, IMAGE_DIGEST) for Konflux snapshot
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/5e8056762053ed1f311d1e9fa479ca03b2280645
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      results.tekton.dev/record: default-tenant/results/fe74b8d1-37b5-4c18-a536-cc4e8f54b3d5/records/fe74b8d1-37b5-4c18-a536-cc4e8f54b3d5
+      results.tekton.dev/result: default-tenant/results/fe74b8d1-37b5-4c18-a536-cc4e8f54b3d5
+      results.tekton.dev/stored: "true"
+    finalizers:
+    - results.tekton.dev/pipelinerun
+    - chains.tekton.dev/pipelinerun
+    generateName: managed-
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/service: release
+      appstudio.openshift.io/snapshot: hello-aiot-20260422-174948-000
+      pipelines.appstudio.openshift.io/type: managed
+      release.appstudio.openshift.io/name: hello-aiot-manual-fpcnc
+      release.appstudio.openshift.io/namespace: default-tenant
+      tekton.dev/pipeline: release-noop
+    name: managed-gj95z
+    namespace: default-tenant
+  spec:
+    params:
+    - name: release
+      value: default-tenant/hello-aiot-manual-fpcnc
+    - name: releasePlan
+      value: default-tenant/hello-aiot-dev
+    - name: releasePlanAdmission
+      value: default-tenant/hello-aiot-dev-rpa
+    - name: releaseServiceConfig
+      value: release-service/release-service-config
+    - name: snapshot
+      value: default-tenant/hello-aiot-20260422-174948-000
+    - name: enterpriseContractPolicy
+      value: '{"description":"Minimal policy (no checks) for hello-aiot dev releases","sources":[{"name":"empty","policy":["github.com/enterprise-contract/ec-policies//policy/release?ref=main"]}],"configuration":{"exclude":["*"]}}'
+    - name: verify_ec_task_bundle
+      value: quay.io/enterprise-contract/ec-task-bundle@sha256:c9aef67023cec2bef31d93f2161920d4205722eda1b4876f2d46cdbb4d6db7c5
+    - name: verify_ec_task_git_revision
+      value: b1ede77ff694522a917dea2b4bde14b2cc1839f2
+    pipelineRef:
+      params:
+      - name: kind
+        value: pipeline
+      - name: name
+        value: release-noop
+      - name: namespace
+        value: default-tenant
+      resolver: cluster
+    taskRunTemplate:
+      serviceAccountName: release-service-account
+    timeouts:
+      pipeline: 1h0m0s
+    workspaces:
+    - name: release-workspace
+      volumeClaimTemplate:
+        metadata: {}
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+        status: {}
+  status:
+    childReferences:
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: managed-gj95z-log-snapshot
+      pipelineTaskName: log-snapshot
+    completionTime: "2026-04-22T18:05:21Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T18:05:21Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    pipelineSpec:
+      params:
+      - default: ""
+        description: Snapshot spec as JSON string
+        name: snapshot
+        type: string
+      - default: ""
+        name: release
+        type: string
+      - default: ""
+        name: releasePlan
+        type: string
+      - default: ""
+        name: releasePlanAdmission
+        type: string
+      - default: ""
+        name: enterpriseContractPolicy
+        type: string
+      - default: ""
+        name: enterpriseContractExtraRuleData
+        type: string
+      - default: ""
+        name: taskGitUrl
+        type: string
+      - default: ""
+        name: taskGitRevision
+        type: string
+      tasks:
+      - name: log-snapshot
+        params:
+        - name: snapshot
+          value: default-tenant/hello-aiot-20260422-174948-000
+        taskSpec:
+          metadata: {}
+          params:
+          - name: snapshot
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+            name: log
+            script: |
+              #!/bin/sh
+              echo "release-noop invoked"
+              echo "snapshot param:"
+              echo "default-tenant/hello-aiot-20260422-174948-000"
+              echo "Release OK"
+    provenance:
+      featureFlags:
+        awaitSidecarReadiness: true
+        coschedule: workspaces
+        enableAPIFields: beta
+        enableProvenanceInStatus: true
+        enforceNonfalsifiability: none
+        maxResultSize: 4096
+        resultExtractionMethod: termination-message
+        runningInEnvWithInjectedSidecars: true
+        verificationNoMatchPolicy: ignore
+      refSource:
+        digest:
+          sha256: e046401b0a16da6eef53f05b1f1e85a7e904d2567b4213410f59a942eba683eb
+        uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/release-noop@f6615e83-b12c-4d65-824b-74b7a35fc747
+    startTime: "2026-04-22T18:05:08Z"
+kind: List
+metadata:

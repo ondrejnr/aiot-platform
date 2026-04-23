@@ -35,17 +35,16 @@ items:
   kind: PersistentVolumeClaim
   metadata:
     annotations:
-      k8up.io/backup: "true"
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"jenkins-lp","namespace":"jenkins"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"8Gi"}},"storageClassName":"local-path"}}
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"jenkins-lp-piraeus","namespace":"jenkins"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"8Gi"}},"storageClassName":"piraeus-r2"}}
       pv.kubernetes.io/bind-completed: "yes"
       pv.kubernetes.io/bound-by-controller: "yes"
-      volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-      volume.kubernetes.io/selected-node: oci-e5-node1
-      volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: aiot-worker-01
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
     finalizers:
     - kubernetes.io/pvc-protection
-    name: jenkins-lp
+    name: jenkins-lp-piraeus
     namespace: jenkins
   spec:
     accessModes:
@@ -53,9 +52,9 @@ items:
     resources:
       requests:
         storage: 8Gi
-    storageClassName: local-path
+    storageClassName: piraeus-r2
     volumeMode: Filesystem
-    volumeName: pvc-398e2403-7c85-4ffa-8982-8e65f521902e
+    volumeName: pvc-7496d803-a21d-484b-9756-4327047b07bd
   status:
     accessModes:
     - ReadWriteOnce

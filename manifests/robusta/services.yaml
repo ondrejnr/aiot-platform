@@ -1,0 +1,118 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"holmes","namespace":"robusta"},"spec":{"ports":[{"name":"http","port":80,"targetPort":5050}],"selector":{"app":"holmes"}}}
+    name: holmes
+    namespace: robusta
+  spec:
+    clusterIP: 10.105.140.144
+    clusterIPs:
+    - 10.105.140.144
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 5050
+    selector:
+      app: holmes
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"mm-relay","namespace":"robusta"},"spec":{"ports":[{"port":80,"targetPort":8080}],"selector":{"app":"mm-relay"}}}
+    name: mm-relay
+    namespace: robusta
+  spec:
+    clusterIP: 10.109.199.131
+    clusterIPs:
+    - 10.109.199.131
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: mm-relay
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: robusta
+      meta.helm.sh/release-namespace: robusta
+    labels:
+      app: robusta-forwarder
+      app.kubernetes.io/managed-by: Helm
+    name: robusta-forwarder
+    namespace: robusta
+  spec:
+    clusterIP: 10.102.203.184
+    clusterIPs:
+    - 10.102.203.184
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: forwarder-metrics
+      port: 80
+      protocol: TCP
+      targetPort: 2112
+    selector:
+      app: robusta-forwarder
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: robusta
+      meta.helm.sh/release-namespace: robusta
+    labels:
+      app: robusta-runner
+      app.kubernetes.io/managed-by: Helm
+      target: robusta-runner
+    name: robusta-runner
+    namespace: robusta
+  spec:
+    clusterIP: 10.106.64.45
+    clusterIPs:
+    - 10.106.64.45
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 5000
+    selector:
+      app: robusta-runner
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:

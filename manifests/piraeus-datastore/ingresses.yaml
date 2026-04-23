@@ -1,0 +1,37 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"piraeus-datastore:linstor-controller","ingressName":"piraeus-datastore:linstor-ui","hostname":"linstor.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"cert-manager.io/cluster-issuer":"letsencrypt-prod","nginx.ingress.kubernetes.io/configuration-snippet":"if ($uri = \"/\") { return 302 /ui/; }\n"},"name":"linstor-ui","namespace":"piraeus-datastore"},"spec":{"ingressClassName":"nginx","rules":[{"host":"linstor.35.241.255.137.nip.io","http":{"paths":[{"backend":{"service":{"name":"linstor-controller","port":{"number":3370}}},"path":"/","pathType":"Prefix"}]}}],"tls":[{"hosts":["linstor.35.241.255.137.nip.io"],"secretName":"linstor-ui-tls"}]}}
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        if ($uri = "/") { return 302 /ui/; }
+    name: linstor-ui
+    namespace: piraeus-datastore
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: linstor.35.241.255.137.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: linstor-controller
+              port:
+                number: 3370
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - linstor.35.241.255.137.nip.io
+      secretName: linstor-ui-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 35.241.255.137
+kind: List
+metadata:

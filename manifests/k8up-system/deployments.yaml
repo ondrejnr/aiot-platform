@@ -84,18 +84,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T06:00:22Z"
-      lastUpdateTime: "2026-04-22T06:00:22Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-22T05:59:58Z"
       lastUpdateTime: "2026-04-22T06:00:22Z"
       message: ReplicaSet "k8up-59d575445" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T14:17:31Z"
+      lastUpdateTime: "2026-04-22T14:17:31Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 1
     readyReplicas: 1
     replicas: 1

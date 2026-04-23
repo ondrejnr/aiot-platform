@@ -1,0 +1,102 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app.kubernetes.io/component: linstor-controller
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: linstor-controller
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+  spec:
+    clusterIP: 10.103.163.10
+    clusterIPs:
+    - 10.103.163.10
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: PreferDualStack
+    ports:
+    - name: api
+      port: 3370
+      protocol: TCP
+      targetPort: 3370
+    selector:
+      app.kubernetes.io/component: linstor-controller
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/name: piraeus-datastore
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app.kubernetes.io/component: linstor-csi-nfs
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: linstor-csi-nfs
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+  spec:
+    clusterIP: 10.102.217.208
+    clusterIPs:
+    - 10.102.217.208
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: metrics
+      port: 999
+      protocol: TCP
+      targetPort: 999
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app.kubernetes.io/name: piraeus-datastore
+    name: piraeus-operator-webhook-service
+    namespace: piraeus-datastore
+  spec:
+    clusterIP: 10.97.231.95
+    clusterIPs:
+    - 10.97.231.95
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 9443
+    selector:
+      app.kubernetes.io/component: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:

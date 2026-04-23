@@ -6,6 +6,8 @@ items:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"kubeflow.org/v1beta1","kind":"Profile","metadata":{"annotations":{},"name":"kubeflow-user-example-com"},"spec":{"owner":{"kind":"User","name":"user@example.com"}}}
+    deletionGracePeriodSeconds: 0
+    deletionTimestamp: "2026-04-22T10:38:03Z"
     finalizers:
     - profile-finalizer
     name: kubeflow-user-example-com

@@ -1,0 +1,106 @@
+apiVersion: v1
+items:
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Release
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-eyjyse
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-9pjx9
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 5e8056762053ed1f311d1e9fa479ca03b2280645
+      pac.test.appstudio.openshift.io/sha-title: |
+        feat: add pipeline results (IMAGE_URL, IMAGE_DIGEST) for Konflux snapshot
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/5e8056762053ed1f311d1e9fa479ca03b2280645
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+    finalizers:
+    - appstudio.redhat.com/release-finalizer
+    generateName: hello-aiot-manual-
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-9pjx9
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: 5e8056762053ed1f311d1e9fa479ca03b2280645
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      release.appstudio.openshift.io/author: kubernetes-admin
+      release.appstudio.openshift.io/releasePlan: hello-aiot-dev
+      release.appstudio.openshift.io/snapshot: hello-aiot-20260422-174948-000
+    name: hello-aiot-manual-fpcnc
+    namespace: default-tenant
+  spec:
+    gracePeriodDays: 7
+    releasePlan: hello-aiot-dev
+    snapshot: hello-aiot-20260422-174948-000
+  status:
+    attribution:
+      author: kubernetes-admin
+    completionTime: "2026-04-22T18:05:21Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T18:05:21Z"
+      message: ""
+      reason: Succeeded
+      status: "True"
+      type: Released
+    - lastTransitionTime: "2026-04-22T18:05:08Z"
+      message: ""
+      reason: Succeeded
+      status: "True"
+      type: Validated
+    - lastTransitionTime: "2026-04-22T18:05:08Z"
+      message: ""
+      reason: Skipped
+      status: "True"
+      type: TenantCollectorsPipelineProcessed
+    - lastTransitionTime: "2026-04-22T18:05:08Z"
+      message: ""
+      reason: Skipped
+      status: "True"
+      type: ManagedCollectorsPipelineProcessed
+    - lastTransitionTime: "2026-04-22T18:05:08Z"
+      message: ""
+      reason: Skipped
+      status: "True"
+      type: TenantPipelineProcessed
+    - lastTransitionTime: "2026-04-22T18:05:21Z"
+      message: ""
+      reason: Succeeded
+      status: "True"
+      type: ManagedPipelineProcessed
+    - lastTransitionTime: "2026-04-22T18:05:21Z"
+      message: ""
+      reason: Skipped
+      status: "True"
+      type: FinalPipelineProcessed
+    expirationTime: "2026-04-29T18:05:08Z"
+    managedProcessing:
+      completionTime: "2026-04-22T18:05:21Z"
+      pipelineRun: default-tenant/managed-gj95z
+      roleBindings:
+        tenantRoleBinding: default-tenant/hello-aiot-manual-fpcnc-rolebinding-for-release-pipeline-rr2pfs
+      startTime: "2026-04-22T18:05:08Z"
+    startTime: "2026-04-22T18:05:08Z"
+    target: default-tenant
+    validation:
+      time: "2026-04-22T18:05:08Z"
+kind: List
+metadata:

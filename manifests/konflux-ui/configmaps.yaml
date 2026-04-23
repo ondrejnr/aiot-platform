@@ -1,0 +1,296 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    config.yaml: |
+      enablePasswordDB: true
+      issuer: https://konflux.35.241.255.137.nip.io/idp/
+      oauth2:
+        passwordConnector: local
+        skipApprovalScreen: true
+      staticClients:
+      - id: oauth2-proxy
+        name: oauth2-proxy
+        redirectURIs:
+        - https://konflux.35.241.255.137.nip.io/oauth2/callback
+        secretEnv: CLIENT_SECRET
+      staticPasswords:
+      - email: user@example.com
+        hash: $2a$10$ANfRnLuV0mBjBPujXG9qp.qcCr3uGOmw.YgvdVVR/GlexzczyvvaG
+        userID: 11111111-2222-3333-4444-555555555555
+        username: user
+      storage:
+        config:
+          inCluster: true
+        type: kubernetes
+      telemetry:
+        http: 0.0.0.0:5558
+      web:
+        https: 0.0.0.0:9443
+        tlsCert: /etc/dex/tls/tls.crt
+        tlsKey: /etc/dex/tls/tls.key
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by-konflux-ui-reconciler: "true"
+    name: dex-7b40dd2274
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: konflux-ui
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: konflux-ui
+- apiVersion: v1
+  data:
+    nginx.conf: |
+      worker_processes auto;
+      error_log /var/log/nginx/error.log;
+      pid /run/nginx.pid;
+
+      # Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+      include /usr/share/nginx/modules/*.conf;
+
+      events {
+          worker_connections 1024;
+      }
+
+      http {
+          log_format upstreamlog '[$time_local] $remote_addr - $remote_user - $server_name $host to: $proxy_host  $upstream_addr: $request $status upstream_response_time $upstream_response_time msec $msec request_time $request_time';
+          access_log /dev/stderr upstreamlog;
+          error_log /dev/stderr;
+
+          sendfile on;
+          tcp_nopush on;
+          tcp_nodelay on;
+          keepalive_timeout 65;
+          types_hash_max_size 4096;
+
+          default_type application/octet-stream;
+          include /etc/nginx/mime.types;
+
+          map $http_upgrade $connection_upgrade {
+              default upgrade;
+              '' close;
+          }
+
+          map $request_method $ns_target {
+              GET     @namespacelister;
+              default @kubeapi;
+          }
+
+          server {
+              listen 9443 ssl;
+              ssl_certificate /mnt/tls.crt;
+              ssl_certificate_key /mnt/tls.key;
+              server_name _;
+              root /opt/app-root/src;
+
+              location / {
+                  alias /opt/app-root/src/static-content/;
+                  try_files $uri /index.html;
+              }
+
+              location = /404.html {
+              }
+
+              location /segment {
+                  default_type text/plain;
+              }
+
+              location = /oauth2/auth {
+                  internal;
+                  proxy_pass       http://127.0.0.1:6000;
+                  proxy_set_header Host             $host;
+                  proxy_set_header X-Real-IP        $remote_addr;
+                  proxy_set_header X-Scheme         $scheme;
+                  # nginx auth_request includes headers but not body
+                  proxy_set_header Content-Length   "";
+                  proxy_pass_request_body           off;
+              }
+
+              location /oauth2/ {
+                  proxy_pass       http://127.0.0.1:6000/oauth2/;
+                  proxy_set_header Host             $host;
+                  proxy_set_header X-Real-IP        $remote_addr;
+                  proxy_set_header X-Scheme         $scheme;
+              }
+
+              location /api/k8s/ {
+                  # Kube-API
+                  auth_request /oauth2/auth;
+
+                  proxy_pass https://kubernetes.default.svc/;
+                  proxy_read_timeout 30m;
+                  include /mnt/nginx-generated-config/auth.conf;
+              }
+
+              location /wss/k8s/ {
+                  auth_request /oauth2/auth;
+
+                  proxy_pass https://kubernetes.default.svc/;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection $connection_upgrade;
+                  proxy_read_timeout 30m;
+                  include /mnt/nginx-generated-config/auth.conf;
+              }
+
+              location /health {
+                  # Used for liveness probes
+                  return 200;
+              }
+
+              # GET requests to /api/k8s/api/v1/namespaces and /api/k8s/api/v1/namespaces/
+              # are handled from the namespace-lister.
+              # Requests with other methods are handled by the Kube-API
+              location = /api/k8s/api/v1/namespaces {
+                  try_files /dev/null $ns_target;
+              }
+              location = /api/k8s/api/v1/namespaces/ {
+                  try_files /dev/null $ns_target;
+              }
+
+              location @namespacelister {
+                  auth_request_set $email  $upstream_http_x_auth_request_email;
+                  auth_request /oauth2/auth;
+                  proxy_read_timeout 30m;
+                  proxy_set_header X-User $email;
+                  proxy_set_header X-Group system:authenticated;
+                  proxy_hide_header X-Correlation-ID;
+
+                  rewrite ^.*$ /api/v1/namespaces break;
+
+                  proxy_pass https://namespace-lister.namespace-lister.svc.cluster.local:8080;
+              }
+
+              location @kubeapi {
+                  auth_request /oauth2/auth;
+                  proxy_read_timeout 30m;
+
+                  rewrite ^/api/k8s/(.*)/$ /$1 break;
+
+                  proxy_pass https://kubernetes.default.svc;
+                  include /mnt/nginx-generated-config/auth.conf;
+              }
+
+              location /idp/ {
+                  # Identity Provider
+                  proxy_set_header    Host               $host;
+                  proxy_set_header    X-Real-IP          $remote_addr;
+                  proxy_set_header    X-Forwarded-For    $proxy_add_x_forwarded_for;
+                  proxy_set_header    X-Forwarded-Host   $host;
+                  proxy_set_header    X-Forwarded-Server $host;
+                  proxy_set_header    X-Forwarded-Port   9443;
+                  proxy_set_header    X-Forwarded-Proto  $scheme;
+                  proxy_pass https://dex.konflux-ui.svc.cluster.local:9443;
+              }
+
+              include /mnt/nginx-generated-location-config/*.conf;
+
+              include /mnt/nginx-additional-location-configs/*.conf;
+          }
+      }
+  kind: ConfigMap
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
+    name: proxy-5f87fc6759
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
+- apiVersion: v1
+  data:
+    auth.conf: |
+      # Auth configuration with impersonate headers
+      auth_request_set $user  $upstream_http_x_auth_request_email;
+      proxy_set_header Impersonate-User $user;
+      proxy_set_header Impersonate-Group system:authenticated;
+      proxy_set_header Authorization "Bearer __BEARER_TOKEN__";
+    tekton-results.conf: |
+      location /api/k8s/plugins/tekton-results/ {
+          auth_request /oauth2/auth;
+
+          rewrite /api/k8s/plugins/tekton-results/(.+) /$1 break;
+          proxy_read_timeout 30m;
+          proxy_pass https://__TEKTON_RESULTS_HOSTNAME__:8080;
+          include /mnt/nginx-generated-config/auth.conf;
+      }
+  kind: ConfigMap
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
+    name: proxy-nginx-templates-dt292585th
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
+kind: List
+metadata:

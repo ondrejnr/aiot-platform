@@ -1,0 +1,20 @@
+apiVersion: v1
+items:
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecConfiguration
+  metadata:
+    name: 16d322f7606586323d97ce609b0e0ccd53921319395f779f5394c588b3537b84
+  spec:
+    entry_dsp_key: AuthRequired
+    entry_key: AUTHREQUIRED
+    entry_value: "false"
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecConfiguration
+  metadata:
+    name: dba41c42c9e7ed5153467a4c700c1029d538d90b81628c41c11589de8efee734
+  spec:
+    entry_dsp_key: SecurityLevel
+    entry_key: SECURITYLEVEL
+    entry_value: NO_SECURITY
+kind: List
+metadata:

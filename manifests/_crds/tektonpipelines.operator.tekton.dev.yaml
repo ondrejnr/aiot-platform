@@ -1,0 +1,99 @@
+apiVersion: v1
+items:
+- apiVersion: operator.tekton.dev/v1alpha1
+  kind: TektonPipeline
+  metadata:
+    finalizers:
+    - tektonpipelines.operator.tekton.dev
+    labels:
+      operator.tekton.dev/release-version: v0.79.0
+    name: pipeline
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonConfig
+      name: config
+  spec:
+    await-sidecar-readiness: true
+    config: {}
+    coschedule: workspaces
+    default-service-account: default
+    disable-creds-init: false
+    enable-api-fields: beta
+    enable-bundles-resolver: true
+    enable-cel-in-whenexpression: false
+    enable-cluster-resolver: true
+    enable-custom-tasks: true
+    enable-git-resolver: true
+    enable-hub-resolver: true
+    enable-param-enum: false
+    enable-provenance-in-status: true
+    enable-step-actions: true
+    enforce-nonfalsifiability: none
+    keep-pod-on-cancel: false
+    max-result-size: 4096
+    metrics.count.enable-reason: false
+    metrics.pipelinerun.duration-type: histogram
+    metrics.pipelinerun.level: pipeline
+    metrics.taskrun.duration-type: histogram
+    metrics.taskrun.level: task
+    options:
+      deployments:
+        tekton-pipelines-remote-resolvers:
+          metadata:
+          spec:
+            selector: null
+            strategy: {}
+            template:
+              metadata:
+              spec:
+                containers:
+                - env:
+                  - name: GIT_SSL_CAINFO
+                    value: /etc/ssl/certs/ca-bundle.crt
+                  name: controller
+                  resources: {}
+                  volumeMounts:
+                  - mountPath: /etc/ssl/certs
+                    name: trusted-ca
+                    readOnly: true
+                volumes:
+                - configMap:
+                    items:
+                    - key: ca-bundle.crt
+                      path: ca-bundle.crt
+                    name: trusted-ca
+                    optional: true
+                  name: trusted-ca
+          status: {}
+      disabled: false
+    performance:
+      disable-ha: false
+    require-git-ssh-secret-known-hosts: false
+    results-from: termination-message
+    running-in-environment-with-injected-sidecars: true
+    send-cloudevents-for-runs: false
+    set-security-context: false
+    targetNamespace: tekton-pipelines
+    trusted-resources-verification-no-match-policy: ignore
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T11:40:10Z"
+      status: "True"
+      type: InstallerSetAvailable
+    - lastTransitionTime: "2026-04-22T14:21:48Z"
+      status: "True"
+      type: InstallerSetReady
+    - lastTransitionTime: "2026-04-22T11:40:47Z"
+      status: "True"
+      type: PostReconciler
+    - lastTransitionTime: "2026-04-22T11:39:57Z"
+      status: "True"
+      type: PreReconciler
+    - lastTransitionTime: "2026-04-22T14:21:48Z"
+      status: "True"
+      type: Ready
+    version: v1.10.0
+kind: List
+metadata:

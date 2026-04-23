@@ -5,19 +5,20 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"cert-manager.io/v1","kind":"Issuer","metadata":{"annotations":{},"labels":{"app":"poddefaults","app.kubernetes.io/component":"poddefaults","app.kubernetes.io/name":"poddefaults","kustomize.component":"poddefaults"},"name":"admission-webhook-selfsigned-issuer","namespace":"kubeflow"},"spec":{"selfSigned":{}}}
+        {"apiVersion":"cert-manager.io/v1","kind":"Issuer","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"trust-manager","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"trust-manager","app.kubernetes.io/version":"v0.21.0","helm.sh/chart":"trust-manager-v0.21.0"},"name":"trust-manager","namespace":"cert-manager"},"spec":{"selfSigned":{}}}
     labels:
-      app: poddefaults
-      app.kubernetes.io/component: poddefaults
-      app.kubernetes.io/name: poddefaults
-      kustomize.component: poddefaults
-    name: admission-webhook-selfsigned-issuer
-    namespace: kubeflow
+      app.kubernetes.io/instance: trust-manager
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: trust-manager
+      app.kubernetes.io/version: v0.21.0
+      helm.sh/chart: trust-manager-v0.21.0
+    name: trust-manager
+    namespace: cert-manager
   spec:
     selfSigned: {}
   status:
     conditions:
-    - lastTransitionTime: "2026-04-14T02:30:29Z"
+    - lastTransitionTime: "2026-04-22T11:39:08Z"
       observedGeneration: 1
       reason: IsReady
       status: "True"
@@ -25,57 +26,52 @@ items:
 - apiVersion: cert-manager.io/v1
   kind: Issuer
   metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"cert-manager.io/v1","kind":"Issuer","metadata":{"annotations":{},"name":"katib-selfsigned-issuer","namespace":"kubeflow"},"spec":{"selfSigned":{}}}
-    name: katib-selfsigned-issuer
-    namespace: kubeflow
-  spec:
-    selfSigned: {}
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T02:30:28Z"
-      observedGeneration: 1
-      reason: IsReady
-      status: "True"
-      type: Ready
-- apiVersion: cert-manager.io/v1
-  kind: Issuer
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"cert-manager.io/v1","kind":"Issuer","metadata":{"annotations":{},"labels":{"app":"cache-server-cert-manager"},"name":"kfp-cache-selfsigned-issuer","namespace":"kubeflow"},"spec":{"selfSigned":{}}}
     labels:
-      app: cache-server-cert-manager
-    name: kfp-cache-selfsigned-issuer
-    namespace: kubeflow
-  spec:
-    selfSigned: {}
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T02:26:43Z"
-      observedGeneration: 1
-      reason: IsReady
-      status: "True"
-      type: Ready
-- apiVersion: cert-manager.io/v1
-  kind: Issuer
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"cert-manager.io/v1","kind":"Issuer","metadata":{"annotations":{},"labels":{"app":"kserve","app.kubernetes.io/name":"kserve"},"name":"selfsigned-issuer","namespace":"kubeflow"},"spec":{"selfSigned":{}}}
-    labels:
-      app: kserve
-      app.kubernetes.io/name: kserve
+      app.kubernetes.io/component: certificate
+      app.kubernetes.io/instance: serving-cert
+      app.kubernetes.io/name: certificate
+      konflux.konflux-ci.dev/component: integration
+      konflux.konflux-ci.dev/owner: konflux-integration-service
     name: selfsigned-issuer
-    namespace: kubeflow
+    namespace: integration-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxIntegrationService
+      name: konflux-integration-service
   spec:
     selfSigned: {}
   status:
     conditions:
-    - lastTransitionTime: "2026-04-14T02:27:24Z"
+    - lastTransitionTime: "2026-04-22T12:02:18Z"
       observedGeneration: 1
       reason: IsReady
+      status: "True"
+      type: Ready
+- apiVersion: cert-manager.io/v1
+  kind: Issuer
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
+    name: ui-ca-issuer
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
+  spec:
+    ca:
+      secretName: ui-ca
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T12:02:21Z"
+      message: Signing CA verified
+      observedGeneration: 1
+      reason: KeyPairVerified
       status: "True"
       type: Ready
 - apiVersion: cert-manager.io/v1
@@ -101,6 +97,32 @@ items:
   status:
     conditions:
     - lastTransitionTime: "2026-04-15T20:01:38Z"
+      observedGeneration: 1
+      reason: IsReady
+      status: "True"
+      type: Ready
+- apiVersion: cert-manager.io/v1
+  kind: Issuer
+  metadata:
+    labels:
+      app.kubernetes.io/component: certificate
+      app.kubernetes.io/instance: serving-cert
+      app.kubernetes.io/name: certificate
+      konflux.konflux-ci.dev/component: release
+      konflux.konflux-ci.dev/owner: konflux-release-service
+    name: selfsigned-issuer
+    namespace: release-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxReleaseService
+      name: konflux-release-service
+  spec:
+    selfSigned: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T12:02:19Z"
       observedGeneration: 1
       reason: IsReady
       status: "True"

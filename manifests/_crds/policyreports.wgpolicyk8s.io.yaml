@@ -1,0 +1,72 @@
+apiVersion: v1
+items:
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 328e84a3-a78f-42ca-a856-f23fb407a635
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: hello-aiot-push-9pjx9-build-and-push-pod
+  results:
+  - message: 0 elements processed
+    policy: reduce-tekton-pr-taskrun-resource-requests
+    properties:
+      process: admission review
+    result: skip
+    rule: reduce-tekton-pr-taskrun-resource-requests
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1776880188
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: hello-aiot-push-9pjx9-build-and-push-pod
+    namespace: default-tenant
+  summary:
+    error: 0
+    fail: 0
+    pass: 0
+    skip: 1
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 89818df2-8ff2-41ba-8b9d-dde42a279494
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: hello-aiot-push-89p8g-build-and-push-pod
+  results:
+  - message: 0 elements processed
+    policy: reduce-tekton-pr-taskrun-resource-requests
+    properties:
+      process: admission review
+    result: skip
+    rule: reduce-tekton-pr-taskrun-resource-requests
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1776879938
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: hello-aiot-push-89p8g-build-and-push-pod
+    namespace: default-tenant
+  summary:
+    error: 0
+    fail: 0
+    pass: 0
+    skip: 1
+    warn: 0
+kind: List
+metadata:

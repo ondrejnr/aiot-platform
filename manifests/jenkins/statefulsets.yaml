@@ -246,6 +246,7 @@ items:
             name: tmp-volume
         nodeSelector:
           node-role.kubernetes.io/worker: ""
+          piraeus.io/storage: "yes"
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext:
@@ -280,7 +281,7 @@ items:
           name: jenkins-cache
         - name: jenkins-home
           persistentVolumeClaim:
-            claimName: jenkins-lp
+            claimName: jenkins-lp-piraeus
         - emptyDir: {}
           name: sc-config-volume
         - emptyDir: {}
@@ -293,11 +294,11 @@ items:
     availableReplicas: 1
     collisionCount: 0
     currentReplicas: 1
-    currentRevision: jenkins-6f44b577d
-    observedGeneration: 40
+    currentRevision: jenkins-f77969df6
+    observedGeneration: 44
     readyReplicas: 1
     replicas: 1
-    updateRevision: jenkins-6f44b577d
+    updateRevision: jenkins-f77969df6
     updatedReplicas: 1
 kind: List
 metadata:

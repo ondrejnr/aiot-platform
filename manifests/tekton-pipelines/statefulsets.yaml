@@ -1,0 +1,118 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    labels:
+      app.kubernetes.io/name: tekton-results-postgres
+      app.kubernetes.io/part-of: tekton-results
+      app.kubernetes.io/version: devel
+      operator.tekton.dev/operand-name: tektoncd-results
+    name: tekton-results-postgres
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: result-4d4wx
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: tekton-results-postgres
+        app.kubernetes.io/version: devel
+    serviceName: postgres
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/name: tekton-results-postgres
+          app.kubernetes.io/version: devel
+      spec:
+        containers:
+        - envFrom:
+          - configMapRef:
+              name: tekton-results-postgres
+          - secretRef:
+              name: tekton-results-postgres
+          image: bitnami/postgresql@sha256:ac8dd0d6512c4c5fb146c16b1c5f05862bd5f600d73348506ab4252587e7fcc6
+          imagePullPolicy: IfNotPresent
+          name: postgres
+          ports:
+          - containerPort: 5432
+            name: postgredb
+            protocol: TCP
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /bitnami/postgresql
+            name: postgredb
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /opt/bitnami/postgresql/conf
+            name: postgresql-conf
+          - mountPath: /opt/bitnami/postgresql/tmp
+            name: postgresql-tmp
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: tmp
+        - emptyDir: {}
+          name: postgresql-conf
+        - emptyDir: {}
+          name: postgresql-tmp
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        labels:
+          app.kubernetes.io/version: devel
+        name: postgredb
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 1
+    collisionCount: 0
+    currentReplicas: 1
+    currentRevision: tekton-results-postgres-7b65c45cbf
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updateRevision: tekton-results-postgres-7b65c45cbf
+    updatedReplicas: 1
+kind: List
+metadata:

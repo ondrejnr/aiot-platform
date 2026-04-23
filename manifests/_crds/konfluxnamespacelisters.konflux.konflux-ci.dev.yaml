@@ -1,0 +1,42 @@
+apiVersion: v1
+items:
+- apiVersion: konflux.konflux-ci.dev/v1alpha1
+  kind: KonfluxNamespaceLister
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: konflux
+      konflux.konflux-ci.dev/owner: konflux
+    name: konflux-namespace-lister
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Konflux
+      name: konflux
+  spec:
+    namespaceLister:
+      namespaceLister:
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      replicas: 1
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T12:02:29Z"
+      message: Deployment has 1/1 replicas ready
+      observedGeneration: 1
+      reason: DeploymentReady
+      status: "True"
+      type: namespace-lister/namespace-lister
+    - lastTransitionTime: "2026-04-22T14:20:03Z"
+      message: All 1 deployments are ready
+      observedGeneration: 1
+      reason: AllComponentsReady
+      status: "True"
+      type: Ready
+kind: List
+metadata:

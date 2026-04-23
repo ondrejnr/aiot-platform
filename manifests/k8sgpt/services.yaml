@@ -96,32 +96,5 @@ items:
     type: ClusterIP
   status:
     loadBalancer: {}
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"k8sgpt-robusta-bridge","namespace":"k8sgpt"},"spec":{"ports":[{"name":"http","port":8090,"targetPort":8090}],"selector":{"app":"k8sgpt-robusta-bridge"}}}
-    name: k8sgpt-robusta-bridge
-    namespace: k8sgpt
-  spec:
-    clusterIP: 10.98.197.92
-    clusterIPs:
-    - 10.98.197.92
-    internalTrafficPolicy: Cluster
-    ipFamilies:
-    - IPv4
-    ipFamilyPolicy: SingleStack
-    ports:
-    - name: http
-      port: 8090
-      protocol: TCP
-      targetPort: 8090
-    selector:
-      app: k8sgpt-robusta-bridge
-    sessionAffinity: None
-    type: ClusterIP
-  status:
-    loadBalancer: {}
 kind: List
 metadata:

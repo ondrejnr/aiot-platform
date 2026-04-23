@@ -1,0 +1,62 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: konflux-operator
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: konflux-operator
+kind: List
+metadata:

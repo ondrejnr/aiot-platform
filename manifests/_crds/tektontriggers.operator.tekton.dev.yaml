@@ -1,0 +1,45 @@
+apiVersion: v1
+items:
+- apiVersion: operator.tekton.dev/v1alpha1
+  kind: TektonTrigger
+  metadata:
+    finalizers:
+    - tektontriggers.operator.tekton.dev
+    labels:
+      operator.tekton.dev/release-version: v0.79.0
+    name: trigger
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonConfig
+      name: config
+  spec:
+    config: {}
+    disabled: false
+    enable-api-fields: stable
+    options: {}
+    targetNamespace: tekton-pipelines
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T14:21:49Z"
+      status: "True"
+      type: DependenciesInstalled
+    - lastTransitionTime: "2026-04-22T11:40:52Z"
+      status: "True"
+      type: InstallerSetAvailable
+    - lastTransitionTime: "2026-04-22T11:41:18Z"
+      status: "True"
+      type: InstallerSetReady
+    - lastTransitionTime: "2026-04-22T11:41:18Z"
+      status: "True"
+      type: PostReconciler
+    - lastTransitionTime: "2026-04-22T11:40:48Z"
+      status: "True"
+      type: PreReconciler
+    - lastTransitionTime: "2026-04-22T14:21:49Z"
+      status: "True"
+      type: Ready
+    version: v0.35.0
+kind: List
+metadata:

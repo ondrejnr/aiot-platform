@@ -1,0 +1,50 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: build-service
+      konflux.konflux-ci.dev/owner: konflux-build-service
+    name: build-pipeline-config-read-only-binding
+    namespace: build-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxBuildService
+      name: konflux-build-service
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: build-service-build-pipeline-config-read-only
+  subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: system:authenticated
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/name: build-service
+      konflux.konflux-ci.dev/component: build-service
+      konflux.konflux-ci.dev/owner: konflux-build-service
+    name: build-service-leader-election-rolebinding
+    namespace: build-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxBuildService
+      name: konflux-build-service
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: build-service-leader-election-role
+  subjects:
+  - kind: ServiceAccount
+    name: build-service-controller-manager
+    namespace: build-service
+kind: List
+metadata:

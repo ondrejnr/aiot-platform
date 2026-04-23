@@ -1,0 +1,222 @@
+apiVersion: v1
+items:
+- apiVersion: piraeus.io/v1
+  kind: LinstorSatellite
+  metadata:
+    annotations:
+      piraeus.io/applied-configurations: storage-pool-lvm
+    finalizers:
+    - piraeus.io/satellite-protection
+    labels:
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: aiot-worker-01
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+  spec:
+    clusterRef:
+      name: linstorcluster
+    deletionPolicy: Retain
+    evacuationStrategy:
+      attachedVolumeReattachTimeout: 5m
+      unattachedVolumeAttachTimeout: 5m
+    patches:
+    - patch: |
+        apiVersion: apps/v1
+        kind: DaemonSet
+        metadata:
+          name: linstor-satellite
+        spec:
+          template:
+            spec:
+              tolerations:
+              - effect: NoSchedule
+                key: drbd.linbit.com/force-io-error
+                operator: Exists
+              - effect: NoSchedule
+                key: drbd.linbit.com/lost-quorum
+                operator: Exists
+              - effect: NoSchedule
+                operator: Exists
+      target:
+        kind: DaemonSet
+        name: linstor-satellite
+    properties:
+    - name: Aux/topology/linbit.com/hostname
+      valueFrom:
+        nodeFieldRef: metadata.name
+    - name: Aux/topology/kubernetes.io/hostname
+      valueFrom:
+        nodeFieldRef: metadata.labels['kubernetes.io/hostname']
+    - name: Aux/topology/topology.kubernetes.io/region
+      optional: true
+      valueFrom:
+        nodeFieldRef: metadata.labels['topology.kubernetes.io/region']
+    - name: Aux/topology/topology.kubernetes.io/zone
+      optional: true
+      valueFrom:
+        nodeFieldRef: metadata.labels['topology.kubernetes.io/zone']
+    repository: ""
+    storagePools:
+    - lvmThinPool:
+        thinPool: thinpool
+        volumeGroup: linstor_vg
+      name: lvm-thin
+  status:
+    availableCapacityBytes: 51539607552
+    capacity: 12/52GiB
+    conditions:
+    - lastTransitionTime: "2026-04-22T15:13:09Z"
+      message: Resources applied
+      observedGeneration: 3
+      reason: AsExpected
+      status: "True"
+      type: Applied
+    - lastTransitionTime: "2026-04-22T17:19:16Z"
+      message: ONLINE
+      observedGeneration: 3
+      reason: AsExpected
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-22T17:19:16Z"
+      message: Pools configured
+      observedGeneration: 3
+      reason: AsExpected
+      status: "True"
+      type: Configured
+    deviceLayers:
+    - CACHE
+    - DRBD
+    - LUKS
+    - NVME
+    - STORAGE
+    - WRITECACHE
+    freeCapacityBytes: 39737036800
+    numberOfSnapshots: 0
+    numberOfVolumes: 10
+    storageProviders:
+    - DISKLESS
+    - EBS_INIT
+    - EBS_TARGET
+    - FILE
+    - FILE_THIN
+    - LVM
+    - LVM_THIN
+    - REMOTE_SPDK
+- apiVersion: piraeus.io/v1
+  kind: LinstorSatellite
+  metadata:
+    annotations:
+      piraeus.io/applied-configurations: storage-pool-lvm
+    finalizers:
+    - piraeus.io/satellite-protection
+    labels:
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: aiot-worker-02
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+  spec:
+    clusterRef:
+      name: linstorcluster
+    deletionPolicy: Retain
+    evacuationStrategy:
+      attachedVolumeReattachTimeout: 5m
+      unattachedVolumeAttachTimeout: 5m
+    patches:
+    - patch: |
+        apiVersion: apps/v1
+        kind: DaemonSet
+        metadata:
+          name: linstor-satellite
+        spec:
+          template:
+            spec:
+              tolerations:
+              - effect: NoSchedule
+                key: drbd.linbit.com/force-io-error
+                operator: Exists
+              - effect: NoSchedule
+                key: drbd.linbit.com/lost-quorum
+                operator: Exists
+              - effect: NoSchedule
+                operator: Exists
+      target:
+        kind: DaemonSet
+        name: linstor-satellite
+    properties:
+    - name: Aux/topology/linbit.com/hostname
+      valueFrom:
+        nodeFieldRef: metadata.name
+    - name: Aux/topology/kubernetes.io/hostname
+      valueFrom:
+        nodeFieldRef: metadata.labels['kubernetes.io/hostname']
+    - name: Aux/topology/topology.kubernetes.io/region
+      optional: true
+      valueFrom:
+        nodeFieldRef: metadata.labels['topology.kubernetes.io/region']
+    - name: Aux/topology/topology.kubernetes.io/zone
+      optional: true
+      valueFrom:
+        nodeFieldRef: metadata.labels['topology.kubernetes.io/zone']
+    repository: ""
+    storagePools:
+    - lvmThinPool:
+        thinPool: thinpool
+        volumeGroup: linstor_vg
+      name: lvm-thin
+  status:
+    availableCapacityBytes: 51539607552
+    capacity: 13/52GiB
+    conditions:
+    - lastTransitionTime: "2026-04-22T13:49:55Z"
+      message: Resources applied
+      observedGeneration: 3
+      reason: AsExpected
+      status: "True"
+      type: Applied
+    - lastTransitionTime: "2026-04-22T17:20:19Z"
+      message: ONLINE
+      observedGeneration: 3
+      reason: AsExpected
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-22T17:20:19Z"
+      message: Pools configured
+      observedGeneration: 3
+      reason: AsExpected
+      status: "True"
+      type: Configured
+    deviceLayers:
+    - CACHE
+    - DRBD
+    - LUKS
+    - NVME
+    - STORAGE
+    - WRITECACHE
+    freeCapacityBytes: 38706244608
+    numberOfSnapshots: 0
+    numberOfVolumes: 10
+    storageProviders:
+    - DISKLESS
+    - EBS_INIT
+    - EBS_TARGET
+    - FILE
+    - FILE_THIN
+    - LVM
+    - LVM_THIN
+    - REMOTE_SPDK
+kind: List
+metadata:

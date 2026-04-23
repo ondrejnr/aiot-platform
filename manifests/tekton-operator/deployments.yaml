@@ -1,0 +1,262 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"operator.tekton.dev/release":"v0.79.0","version":"v0.79.0"},"name":"tekton-operator","namespace":"tekton-operator"},"spec":{"replicas":1,"selector":{"matchLabels":{"name":"tekton-operator"}},"template":{"metadata":{"labels":{"app":"tekton-operator","name":"tekton-operator"}},"spec":{"containers":[{"args":["-controllers","tektonconfig,tektonpipeline,tektontrigger,tektonhub,tektonchain,tektonresult,tektondashboard,manualapprovalgate,tektonpruner,tektonscheduler,tektonmulticlusterproxyaae","-unique-process-name","tekton-operator-lifecycle"],"env":[{"name":"KUBERNETES_MIN_VERSION","value":"v1.0.0"},{"name":"SYSTEM_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"OPERATOR_NAME","value":"tekton-operator"},{"name":"IMAGE_PIPELINES_PROXY","value":"ghcr.io/tektoncd/operator/proxy-webhook-f6167da7bc41b96a27c5529f850e63d1:v0.79.0@sha256:fd1311731585e2be65571d04a6a6c5b822723236aa76a0768bb42f2477bee3f1"},{"name":"IMAGE_JOB_PRUNER_TKN","value":"ghcr.io/tektoncd/plumbing/tkn@sha256:233de6c8b8583a34c2379fa98d42dba739146c9336e8d41b66030484357481ed"},{"name":"METRICS_DOMAIN","value":"tekton.dev/operator"},{"name":"VERSION","value":"v0.79.0"},{"name":"CONFIG_OBSERVABILITY_NAME","value":"tekton-config-observability"},{"name":"CONFIG_LEADERELECTION_NAME","value":"tekton-operator-controller-config-leader-election"},{"name":"AUTOINSTALL_COMPONENTS","valueFrom":{"configMapKeyRef":{"key":"AUTOINSTALL_COMPONENTS","name":"tekton-config-defaults"}}},{"name":"DEFAULT_TARGET_NAMESPACE","valueFrom":{"configMapKeyRef":{"key":"DEFAULT_TARGET_NAMESPACE","name":"tekton-config-defaults"}}}],"image":"ghcr.io/tektoncd/operator/operator-303303c315a48490ba6517859ef65b77:v0.79.0@sha256:bc90657a93a35b4046ef4fbfc236ecd38c0ea46feea20a44a69f44110731de01","imagePullPolicy":"IfNotPresent","name":"tekton-operator-lifecycle","resources":{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"10Mi"}},"securityContext":{"readOnlyRootFilesystem":true,"runAsNonRoot":true}},{"args":["-controllers","tektoninstallerset","-unique-process-name","tekton-operator-cluster-operations"],"env":[{"name":"KUBERNETES_MIN_VERSION","value":"v1.0.0"},{"name":"SYSTEM_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"OPERATOR_NAME","value":"tekton-operator"},{"name":"PROFILING_PORT","value":"9009"},{"name":"VERSION","value":"v0.79.0"},{"name":"METRICS_DOMAIN","value":"tekton.dev/operator"},{"name":"CONFIG_LEADERELECTION_NAME","value":"tekton-operator-controller-config-leader-election"}],"image":"ghcr.io/tektoncd/operator/operator-303303c315a48490ba6517859ef65b77:v0.79.0@sha256:bc90657a93a35b4046ef4fbfc236ecd38c0ea46feea20a44a69f44110731de01","imagePullPolicy":"IfNotPresent","name":"tekton-operator-cluster-operations","resources":{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"10Mi"}},"securityContext":{"readOnlyRootFilesystem":true,"runAsNonRoot":true}}],"serviceAccountName":"tekton-operator"}}}}
+    labels:
+      operator.tekton.dev/release: v0.79.0
+      version: v0.79.0
+    name: tekton-operator
+    namespace: tekton-operator
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        name: tekton-operator
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: tekton-operator
+          name: tekton-operator
+      spec:
+        containers:
+        - args:
+          - -controllers
+          - tektonconfig,tektonpipeline,tektontrigger,tektonhub,tektonchain,tektonresult,tektondashboard,manualapprovalgate,tektonpruner,tektonscheduler,tektonmulticlusterproxyaae
+          - -unique-process-name
+          - tekton-operator-lifecycle
+          env:
+          - name: KUBERNETES_MIN_VERSION
+            value: v1.0.0
+          - name: SYSTEM_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: OPERATOR_NAME
+            value: tekton-operator
+          - name: IMAGE_PIPELINES_PROXY
+            value: ghcr.io/tektoncd/operator/proxy-webhook-f6167da7bc41b96a27c5529f850e63d1:v0.79.0@sha256:fd1311731585e2be65571d04a6a6c5b822723236aa76a0768bb42f2477bee3f1
+          - name: IMAGE_JOB_PRUNER_TKN
+            value: ghcr.io/tektoncd/plumbing/tkn@sha256:233de6c8b8583a34c2379fa98d42dba739146c9336e8d41b66030484357481ed
+          - name: METRICS_DOMAIN
+            value: tekton.dev/operator
+          - name: VERSION
+            value: v0.79.0
+          - name: CONFIG_OBSERVABILITY_NAME
+            value: tekton-config-observability
+          - name: CONFIG_LEADERELECTION_NAME
+            value: tekton-operator-controller-config-leader-election
+          - name: AUTOINSTALL_COMPONENTS
+            valueFrom:
+              configMapKeyRef:
+                key: AUTOINSTALL_COMPONENTS
+                name: tekton-config-defaults
+          - name: DEFAULT_TARGET_NAMESPACE
+            valueFrom:
+              configMapKeyRef:
+                key: DEFAULT_TARGET_NAMESPACE
+                name: tekton-config-defaults
+          image: ghcr.io/tektoncd/operator/operator-303303c315a48490ba6517859ef65b77:v0.79.0@sha256:bc90657a93a35b4046ef4fbfc236ecd38c0ea46feea20a44a69f44110731de01
+          imagePullPolicy: IfNotPresent
+          name: tekton-operator-lifecycle
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 10Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - args:
+          - -controllers
+          - tektoninstallerset
+          - -unique-process-name
+          - tekton-operator-cluster-operations
+          env:
+          - name: KUBERNETES_MIN_VERSION
+            value: v1.0.0
+          - name: SYSTEM_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: OPERATOR_NAME
+            value: tekton-operator
+          - name: PROFILING_PORT
+            value: "9009"
+          - name: VERSION
+            value: v0.79.0
+          - name: METRICS_DOMAIN
+            value: tekton.dev/operator
+          - name: CONFIG_LEADERELECTION_NAME
+            value: tekton-operator-controller-config-leader-election
+          image: ghcr.io/tektoncd/operator/operator-303303c315a48490ba6517859ef65b77:v0.79.0@sha256:bc90657a93a35b4046ef4fbfc236ecd38c0ea46feea20a44a69f44110731de01
+          imagePullPolicy: IfNotPresent
+          name: tekton-operator-cluster-operations
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 10Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: tekton-operator
+        serviceAccountName: tekton-operator
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-22T11:39:36Z"
+      lastUpdateTime: "2026-04-22T11:39:42Z"
+      message: ReplicaSet "tekton-operator-6b96d7c975" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T14:20:22Z"
+      lastUpdateTime: "2026-04-22T14:20:22Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      ignore-check.kube-linter.io/env-var-secret: This is the name of the secret rather
+        than the secret
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"ignore-check.kube-linter.io/env-var-secret":"This is the name of the secret rather than the secret"},"labels":{"operator.tekton.dev/release":"v0.79.0","version":"v0.79.0"},"name":"tekton-operator-webhook","namespace":"tekton-operator"},"spec":{"replicas":1,"selector":{"matchLabels":{"name":"tekton-operator-webhook"}},"template":{"metadata":{"labels":{"app":"tekton-operator","name":"tekton-operator-webhook"}},"spec":{"containers":[{"env":[{"name":"KUBERNETES_MIN_VERSION","value":"v1.0.0"},{"name":"SYSTEM_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"WEBHOOK_POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"CONFIG_LOGGING_NAME","value":"config-logging"},{"name":"CONFIG_LEADERELECTION_NAME","value":"tekton-operator-webhook-config-leader-election"},{"name":"WEBHOOK_SERVICE_NAME","value":"tekton-operator-webhook"},{"name":"WEBHOOK_SECRET_NAME","value":"tekton-operator-webhook-certs"},{"name":"METRICS_DOMAIN","value":"tekton.dev/operator"}],"image":"ghcr.io/tektoncd/operator/webhook-f2bb711aa8f0c0892856a4cbf6d9ddd8:v0.79.0@sha256:1096920eeb1ad279f4f7e69cec6bf96d8b48a4f038b02f36f7b54ce073e6b0a5","name":"tekton-operator-webhook","ports":[{"containerPort":8443,"name":"https-webhook"}],"resources":{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"10Mi"}},"securityContext":{"readOnlyRootFilesystem":true,"runAsNonRoot":true}}],"serviceAccountName":"tekton-operator"}}}}
+    labels:
+      operator.tekton.dev/release: v0.79.0
+      version: v0.79.0
+    name: tekton-operator-webhook
+    namespace: tekton-operator
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        name: tekton-operator-webhook
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: tekton-operator
+          name: tekton-operator-webhook
+      spec:
+        containers:
+        - env:
+          - name: KUBERNETES_MIN_VERSION
+            value: v1.0.0
+          - name: SYSTEM_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: WEBHOOK_POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: CONFIG_LOGGING_NAME
+            value: config-logging
+          - name: CONFIG_LEADERELECTION_NAME
+            value: tekton-operator-webhook-config-leader-election
+          - name: WEBHOOK_SERVICE_NAME
+            value: tekton-operator-webhook
+          - name: WEBHOOK_SECRET_NAME
+            value: tekton-operator-webhook-certs
+          - name: METRICS_DOMAIN
+            value: tekton.dev/operator
+          image: ghcr.io/tektoncd/operator/webhook-f2bb711aa8f0c0892856a4cbf6d9ddd8:v0.79.0@sha256:1096920eeb1ad279f4f7e69cec6bf96d8b48a4f038b02f36f7b54ce073e6b0a5
+          imagePullPolicy: IfNotPresent
+          name: tekton-operator-webhook
+          ports:
+          - containerPort: 8443
+            name: https-webhook
+            protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 10Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: tekton-operator
+        serviceAccountName: tekton-operator
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-22T11:39:36Z"
+      lastUpdateTime: "2026-04-22T11:39:46Z"
+      message: ReplicaSet "tekton-operator-webhook-65d7569769" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T14:19:41Z"
+      lastUpdateTime: "2026-04-22T14:19:41Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:

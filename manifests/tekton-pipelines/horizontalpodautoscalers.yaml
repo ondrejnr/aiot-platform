@@ -1,0 +1,126 @@
+apiVersion: v1
+items:
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 758a8437aef99da4ede4cb9d64cf6cac7442c8c400d924cc5ebecc11afae37de
+    labels:
+      app.kubernetes.io/instance: default
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+      operator.tekton.dev/release: devel
+      version: devel
+    name: tekton-operator-proxy-webhook
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+  spec:
+    maxReplicas: 5
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 85
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-operator-proxy-webhook
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T11:40:26Z"
+      message: recommended size matches current size
+      reason: ReadyForNewScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-04-22T14:20:39Z"
+      message: the HPA was able to successfully calculate a replica count from cpu
+        resource utilization (percentage of request)
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-04-22T11:41:11Z"
+      message: the desired count is within the acceptable range
+      reason: DesiredWithinRange
+      status: "False"
+      type: ScalingLimited
+    currentMetrics:
+    - resource:
+        current:
+          averageUtilization: 1
+          averageValue: 1m
+        name: cpu
+      type: Resource
+    currentReplicas: 1
+    desiredReplicas: 1
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 30fa41d644fc1d5e5b488b5c00e3fbddb13a35151387289ff1c941dbc5c0bc61
+    labels:
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/name: webhook
+      app.kubernetes.io/part-of: tekton-pipelines
+      app.kubernetes.io/version: v1.10.0
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+      pipeline.tekton.dev/release: v1.10.0
+      version: v1.10.0
+    name: tekton-pipelines-webhook
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+  spec:
+    maxReplicas: 5
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 100
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-pipelines-webhook
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T11:40:23Z"
+      message: recommended size matches current size
+      reason: ReadyForNewScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-04-22T14:21:24Z"
+      message: the HPA was able to successfully calculate a replica count from cpu
+        resource utilization (percentage of request)
+      reason: ValidMetricFound
+      status: "True"
+      type: ScalingActive
+    - lastTransitionTime: "2026-04-22T11:41:09Z"
+      message: the desired count is within the acceptable range
+      reason: DesiredWithinRange
+      status: "False"
+      type: ScalingLimited
+    currentMetrics:
+    - resource:
+        current:
+          averageUtilization: 1
+          averageValue: 1m
+        name: cpu
+      type: Resource
+    currentReplicas: 1
+    desiredReplicas: 1
+kind: List
+metadata:

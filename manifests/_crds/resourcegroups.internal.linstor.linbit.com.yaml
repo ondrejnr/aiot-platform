@@ -1,0 +1,30 @@
+apiVersion: v1
+items:
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: ResourceGroups
+  metadata:
+    name: b0b5b06aad38476ee4baadbc306003e3d41b08c1f80b653d8ca3c93ff32f39c3
+  spec:
+    allowed_provider_list: '[]'
+    description: ""
+    do_not_place_with_rsc_list: '[]'
+    layer_stack: '["DRBD","STORAGE"]'
+    node_name_list: '[]'
+    pool_name: '["lvm-thin"]'
+    pool_name_diskless: '[]'
+    replica_count: 2
+    replicas_on_different: '[]'
+    replicas_on_same: '[]'
+    resource_group_dsp_name: sc-3ba5b71f-7c6d-50fb-ab0a-19062e56b1a8
+    resource_group_name: SC-3BA5B71F-7C6D-50FB-AB0A-19062E56B1A8
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: ResourceGroups
+  metadata:
+    name: fa9caf795d18b93f6b418ffee6b6bd6e36536e0af0c70d3e47aca3f5e989540c
+  spec:
+    node_name_list: '[]'
+    replica_count: 2
+    resource_group_dsp_name: DfltRscGrp
+    resource_group_name: DFLTRSCGRP
+kind: List
+metadata:

@@ -229,6 +229,26 @@ items:
     namespace: zabbix
 - apiVersion: v1
   data:
+    zbx-fix.py: "import json, os, urllib.request, ssl\r\n\r\nURL = \"http://zabbix-zabbix-web.zabbix.svc.cluster.local/api_jsonrpc.php\"\r\n\r\ndef
+      call(method, params, auth=None):\r\n    body = {\"jsonrpc\":\"2.0\",\"method\":method,\"params\":params,\"id\":1}\r\n
+      \   if auth: body[\"auth\"] = auth\r\n    req = urllib.request.Request(URL,
+      data=json.dumps(body).encode(),\r\n                                 headers={\"Content-Type\":\"application/json-rpc\"})\r\n
+      \   with urllib.request.urlopen(req, timeout=15) as r:\r\n        return json.loads(r.read())\r\n\r\nresp
+      = call(\"user.login\", {\"username\":\"Admin\",\"password\":\"zabbix\"})\r\nprint(\"login
+      resp:\", resp)\r\ntok = resp[\"result\"]\r\n\r\n# find host oci-test-node1\r\nr
+      = call(\"host.get\", {\"filter\":{\"host\":[\"oci-test-node1\"]}}, tok)[\"result\"]\r\nprint(\"hosts:\",
+      r)\r\nif r:\r\n    hid = r[0][\"hostid\"]\r\n    res = call(\"host.delete\",
+      [hid], tok)\r\n    print(\"deleted:\", res)\r\nelse:\r\n    print(\"not found\")\r\n\r\ncall(\"user.logout\",
+      [], tok)\r\n"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"zbx-fix.py":"import json, os, urllib.request, ssl\r\n\r\nURL = \"http://zabbix-zabbix-web.zabbix.svc.cluster.local/api_jsonrpc.php\"\r\n\r\ndef call(method, params, auth=None):\r\n    body = {\"jsonrpc\":\"2.0\",\"method\":method,\"params\":params,\"id\":1}\r\n    if auth: body[\"auth\"] = auth\r\n    req = urllib.request.Request(URL, data=json.dumps(body).encode(),\r\n                                 headers={\"Content-Type\":\"application/json-rpc\"})\r\n    with urllib.request.urlopen(req, timeout=15) as r:\r\n        return json.loads(r.read())\r\n\r\nresp = call(\"user.login\", {\"username\":\"Admin\",\"password\":\"zabbix\"})\r\nprint(\"login resp:\", resp)\r\ntok = resp[\"result\"]\r\n\r\n# find host oci-test-node1\r\nr = call(\"host.get\", {\"filter\":{\"host\":[\"oci-test-node1\"]}}, tok)[\"result\"]\r\nprint(\"hosts:\", r)\r\nif r:\r\n    hid = r[0][\"hostid\"]\r\n    res = call(\"host.delete\", [hid], tok)\r\n    print(\"deleted:\", res)\r\nelse:\r\n    print(\"not found\")\r\n\r\ncall(\"user.logout\", [], tok)\r\n"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"zbx-del-py","namespace":"zabbix"}}
+    name: zbx-del-py
+    namespace: zabbix
+- apiVersion: v1
+  data:
     zbx-fix.py: "#!/usr/bin/env python3\r\nimport json, urllib.request\r\nURL = \"http://zabbix-zabbix-web.zabbix.svc.cluster.local/api_jsonrpc.php\"\r\ndef
       api(method, params, token=None):\r\n    p = {\"jsonrpc\":\"2.0\",\"method\":method,\"params\":params,\"id\":1}\r\n
       \   if token: p[\"auth\"] = token\r\n    r = urllib.request.urlopen(urllib.request.Request(URL,\r\n

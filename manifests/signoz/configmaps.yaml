@@ -1033,7 +1033,7 @@ items:
               </admin>
               <clickhouse_operator>
                   <networks>
-                      <ip>10.244.2.139</ip>
+                      <ip>10.244.2.45</ip>
                   </networks>
                   <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>
                   <profile>clickhouse_operator</profile>
@@ -1043,7 +1043,7 @@ items:
                       <host_regexp>(chi-signoz-clickhouse-[^.]+\d+-\d+|clickhouse\-signoz-clickhouse)\.signoz\.svc\.cluster\.local$</host_regexp>
                       <ip>::1</ip>
                       <ip>127.0.0.1</ip>
-                      <ip>10.244.4.173</ip>
+                      <ip>10.244.2.75</ip>
                   </networks>
                   <profile>default</profile>
                   <quota>default</quota>
@@ -1066,7 +1066,7 @@ items:
       clickhouse.altinity.com/app: chop
       clickhouse.altinity.com/chi: signoz-clickhouse
       clickhouse.altinity.com/namespace: signoz
-      clickhouse.altinity.com/object-version: c09494b8554c9c41e7be2a6fd597b1a2596b1111
+      clickhouse.altinity.com/object-version: 9ae373c7f39ce4f0b4275227f0f845b5697ec735
       helm.sh/chart: clickhouse-24.1.18
     name: chi-signoz-clickhouse-common-usersd
     namespace: signoz

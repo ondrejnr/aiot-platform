@@ -59,18 +59,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T23:13:19Z"
-      lastUpdateTime: "2026-04-19T23:13:19Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T23:12:58Z"
       lastUpdateTime: "2026-04-20T10:02:50Z"
       message: ReplicaSet "event-exporter-966688d5d" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T14:17:56Z"
+      lastUpdateTime: "2026-04-22T14:17:56Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 3
     readyReplicas: 1
     replicas: 1

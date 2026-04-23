@@ -315,6 +315,84 @@ items:
 - apiVersion: cert-manager.io/v1
   kind: Certificate
   metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"name":"selfsigned-ca","namespace":"cert-manager"},"spec":{"commonName":"selfsigned-ca","isCA":true,"issuerRef":{"group":"cert-manager.io","kind":"ClusterIssuer","name":"self-signed-cluster-issuer"},"privateKey":{"algorithm":"ECDSA","size":256},"secretName":"root-secret"}}
+    labels:
+      konflux.konflux-ci.dev/component: cert-manager
+      konflux.konflux-ci.dev/owner: konflux-cert-manager
+    name: selfsigned-ca
+    namespace: cert-manager
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxCertManager
+      name: konflux-cert-manager
+  spec:
+    commonName: selfsigned-ca
+    isCA: true
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: self-signed-cluster-issuer
+    privateKey:
+      algorithm: ECDSA
+      size: 256
+    secretName: root-secret
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T11:39:34Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-21T11:39:33Z"
+    notBefore: "2026-04-22T11:39:33Z"
+    renewalTime: "2026-06-21T11:39:33Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"trust-manager","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"trust-manager","app.kubernetes.io/version":"v0.21.0","helm.sh/chart":"trust-manager-v0.21.0"},"name":"trust-manager","namespace":"cert-manager"},"spec":{"commonName":"trust-manager.cert-manager.svc","dnsNames":["trust-manager.cert-manager.svc"],"issuerRef":{"group":"cert-manager.io","kind":"Issuer","name":"trust-manager"},"privateKey":{"rotationPolicy":"Always"},"revisionHistoryLimit":1,"secretName":"trust-manager-tls"}}
+    labels:
+      app.kubernetes.io/instance: trust-manager
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: trust-manager
+      app.kubernetes.io/version: v0.21.0
+      helm.sh/chart: trust-manager-v0.21.0
+    name: trust-manager
+    namespace: cert-manager
+  spec:
+    commonName: trust-manager.cert-manager.svc
+    dnsNames:
+    - trust-manager.cert-manager.svc
+    issuerRef:
+      group: cert-manager.io
+      kind: Issuer
+      name: trust-manager
+    privateKey:
+      rotationPolicy: Always
+    revisionHistoryLimit: 1
+    secretName: trust-manager-tls
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T11:39:11Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-21T11:39:11Z"
+    notBefore: "2026-04-22T11:39:11Z"
+    renewalTime: "2026-06-21T11:39:11Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
     name: tls-webhook
     namespace: chef-webhook
     ownerReferences:
@@ -514,36 +592,39 @@ items:
 - apiVersion: cert-manager.io/v1
   kind: Certificate
   metadata:
-    name: tls-inference
-    namespace: inference
+    labels:
+      app.kubernetes.io/component: certificate
+      app.kubernetes.io/instance: serving-cert
+      app.kubernetes.io/name: certificate
+      konflux.konflux-ci.dev/component: integration
+      konflux.konflux-ci.dev/owner: konflux-integration-service
+    name: serving-cert
+    namespace: integration-service
     ownerReferences:
-    - apiVersion: networking.k8s.io/v1
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
       blockOwnerDeletion: true
       controller: true
-      kind: Ingress
-      name: inference
+      kind: KonfluxIntegrationService
+      name: konflux-integration-service
   spec:
     dnsNames:
-    - inference.35.241.255.137.nip.io
+    - integration-service-webhook-service.integration-service.svc
+    - integration-service-webhook-service.integration-service.svc.cluster.local
     issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-inference
-    usages:
-    - digital signature
-    - key encipherment
+      kind: Issuer
+      name: selfsigned-issuer
+    secretName: webhook-server-cert
   status:
     conditions:
-    - lastTransitionTime: "2026-04-14T09:52:12Z"
+    - lastTransitionTime: "2026-04-22T12:02:25Z"
       message: Certificate is up to date and has not expired
       observedGeneration: 1
       reason: Ready
       status: "True"
       type: Ready
-    notAfter: "2026-07-13T08:53:41Z"
-    notBefore: "2026-04-14T08:53:42Z"
-    renewalTime: "2026-06-13T08:53:41Z"
+    notAfter: "2026-07-21T12:02:25Z"
+    notBefore: "2026-04-22T12:02:25Z"
+    renewalTime: "2026-06-21T12:02:25Z"
     revision: 1
 - apiVersion: cert-manager.io/v1
   kind: Certificate
@@ -622,131 +703,182 @@ items:
 - apiVersion: cert-manager.io/v1
   kind: Certificate
   metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"labels":{"app":"poddefaults","app.kubernetes.io/component":"poddefaults","app.kubernetes.io/name":"poddefaults","kustomize.component":"poddefaults"},"name":"admission-webhook-cert","namespace":"kubeflow"},"spec":{"commonName":"admission-webhook-service.kubeflow.svc","dnsNames":["admission-webhook-service.kubeflow.svc","admission-webhook-service.kubeflow.svc.cluster.local"],"isCA":true,"issuerRef":{"kind":"Issuer","name":"admission-webhook-selfsigned-issuer"},"secretName":"webhook-certs"}}
     labels:
-      app: poddefaults
-      app.kubernetes.io/component: poddefaults
-      app.kubernetes.io/name: poddefaults
-      kustomize.component: poddefaults
-    name: admission-webhook-cert
-    namespace: kubeflow
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
+    name: dex-cert
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
   spec:
-    commonName: admission-webhook-service.kubeflow.svc
     dnsNames:
-    - admission-webhook-service.kubeflow.svc
-    - admission-webhook-service.kubeflow.svc.cluster.local
+    - localhost
+    - dex.konflux-ui
+    - dex.konflux-ui.svc.cluster.local
     isCA: true
     issuerRef:
       kind: Issuer
-      name: admission-webhook-selfsigned-issuer
-    secretName: webhook-certs
+      name: ui-ca-issuer
+    secretName: dex-cert
+    subject:
+      organizations:
+      - konflux
   status:
     conditions:
-    - lastTransitionTime: "2026-04-14T02:30:30Z"
+    - lastTransitionTime: "2026-04-22T12:02:25Z"
       message: Certificate is up to date and has not expired
       observedGeneration: 1
       reason: Ready
       status: "True"
       type: Ready
-    notAfter: "2026-07-13T02:30:30Z"
-    notBefore: "2026-04-14T02:30:30Z"
-    renewalTime: "2026-06-13T02:30:30Z"
+    notAfter: "2026-07-21T12:02:25Z"
+    notBefore: "2026-04-22T12:02:25Z"
+    renewalTime: "2026-06-21T12:02:25Z"
     revision: 1
 - apiVersion: cert-manager.io/v1
   kind: Certificate
   metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"name":"katib-webhook-cert","namespace":"kubeflow"},"spec":{"commonName":"katib-controller.kubeflow.svc","dnsNames":["katib-controller.kubeflow.svc","katib-controller.kubeflow.svc.cluster.local"],"isCA":true,"issuerRef":{"kind":"Issuer","name":"katib-selfsigned-issuer"},"secretName":"katib-webhook-cert"}}
-    name: katib-webhook-cert
-    namespace: kubeflow
+    labels:
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
+    name: konflux-ingress-tls
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: konflux-ui
   spec:
-    commonName: katib-controller.kubeflow.svc
     dnsNames:
-    - katib-controller.kubeflow.svc
-    - katib-controller.kubeflow.svc.cluster.local
-    isCA: true
+    - konflux.35.241.255.137.nip.io
     issuerRef:
-      kind: Issuer
-      name: katib-selfsigned-issuer
-    secretName: katib-webhook-cert
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: konflux-ingress-tls
+    usages:
+    - digital signature
+    - key encipherment
   status:
     conditions:
-    - lastTransitionTime: "2026-04-14T02:30:28Z"
+    - lastTransitionTime: "2026-04-22T12:15:00Z"
       message: Certificate is up to date and has not expired
       observedGeneration: 1
       reason: Ready
       status: "True"
       type: Ready
-    notAfter: "2026-07-13T02:30:28Z"
-    notBefore: "2026-04-14T02:30:28Z"
-    renewalTime: "2026-06-13T02:30:28Z"
-    revision: 1
+    notAfter: "2026-07-21T11:07:17Z"
+    notBefore: "2026-04-22T11:07:18Z"
+    renewalTime: "2026-06-21T11:07:17Z"
 - apiVersion: cert-manager.io/v1
   kind: Certificate
   metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"labels":{"app":"cache-server-cert-manager"},"name":"kfp-cache-cert","namespace":"kubeflow"},"spec":{"commonName":"kfp-cache-cert","dnsNames":["cache-server","cache-server.kubeflow","cache-server.kubeflow.svc"],"isCA":true,"issuerRef":{"kind":"Issuer","name":"kfp-cache-selfsigned-issuer"},"secretName":"webhook-server-tls"}}
     labels:
-      app: cache-server-cert-manager
-    name: kfp-cache-cert
-    namespace: kubeflow
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
+    name: oauth2-proxy-cert
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
   spec:
-    commonName: kfp-cache-cert
     dnsNames:
-    - cache-server
-    - cache-server.kubeflow
-    - cache-server.kubeflow.svc
-    isCA: true
+    - localhost
     issuerRef:
       kind: Issuer
-      name: kfp-cache-selfsigned-issuer
-    secretName: webhook-server-tls
+      name: ui-ca-issuer
+    secretName: oauth2-proxy-cert
   status:
     conditions:
-    - lastTransitionTime: "2026-04-14T02:26:43Z"
+    - lastTransitionTime: "2026-04-22T12:02:27Z"
       message: Certificate is up to date and has not expired
       observedGeneration: 1
       reason: Ready
       status: "True"
       type: Ready
-    notAfter: "2026-07-13T02:26:43Z"
-    notBefore: "2026-04-14T02:26:43Z"
-    renewalTime: "2026-06-13T02:26:43Z"
+    notAfter: "2026-07-21T12:02:27Z"
+    notBefore: "2026-04-22T12:02:27Z"
+    renewalTime: "2026-06-21T12:02:27Z"
     revision: 1
 - apiVersion: cert-manager.io/v1
   kind: Certificate
   metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"labels":{"app":"kserve","app.kubernetes.io/name":"kserve"},"name":"serving-cert","namespace":"kubeflow"},"spec":{"commonName":"kserve-webhook-server-service.kubeflow.svc","dnsNames":["kserve-webhook-server-service.kubeflow.svc"],"issuerRef":{"kind":"Issuer","name":"selfsigned-issuer"},"secretName":"kserve-webhook-server-cert"}}
     labels:
-      app: kserve
-      app.kubernetes.io/name: kserve
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
     name: serving-cert
-    namespace: kubeflow
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
   spec:
-    commonName: kserve-webhook-server-service.kubeflow.svc
     dnsNames:
-    - kserve-webhook-server-service.kubeflow.svc
+    - localhost
+    - proxy.konflux-ui.svc
+    - proxy.konflux-ui.svc.cluster.local
     issuerRef:
       kind: Issuer
-      name: selfsigned-issuer
-    secretName: kserve-webhook-server-cert
+      name: ui-ca-issuer
+    secretName: serving-cert
   status:
     conditions:
-    - lastTransitionTime: "2026-04-14T02:27:24Z"
+    - lastTransitionTime: "2026-04-22T12:02:25Z"
       message: Certificate is up to date and has not expired
       observedGeneration: 1
       reason: Ready
       status: "True"
       type: Ready
-    notAfter: "2026-07-13T02:27:24Z"
-    notBefore: "2026-04-14T02:27:24Z"
-    renewalTime: "2026-06-13T02:27:24Z"
+    notAfter: "2026-07-21T12:02:24Z"
+    notBefore: "2026-04-22T12:02:24Z"
+    renewalTime: "2026-06-21T12:02:24Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
+    name: ui-ca
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
+  spec:
+    commonName: ui-ca
+    isCA: true
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: self-signed-cluster-issuer
+    privateKey:
+      algorithm: ECDSA
+      size: 256
+    secretName: ui-ca
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T12:02:21Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-21T12:02:19Z"
+    notBefore: "2026-04-22T12:02:19Z"
+    renewalTime: "2026-06-21T12:02:19Z"
     revision: 1
 - apiVersion: cert-manager.io/v1
   kind: Certificate
@@ -781,72 +913,6 @@ items:
     notAfter: "2026-07-13T08:53:57Z"
     notBefore: "2026-04-14T08:53:58Z"
     renewalTime: "2026-06-13T08:53:57Z"
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    name: tls-mlflow
-    namespace: mlflow
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: mlflow
-  spec:
-    dnsNames:
-    - mlflow.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-mlflow
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-21T19:30:33Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:54:06Z"
-    notBefore: "2026-04-14T08:54:07Z"
-    renewalTime: "2026-06-13T08:54:06Z"
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    name: tls-tensorboard
-    namespace: mlflow
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: tensorboard
-  spec:
-    dnsNames:
-    - tensorboard.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-tensorboard
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-21T19:30:33Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-15T12:18:02Z"
-    notBefore: "2026-04-16T12:18:03Z"
-    renewalTime: "2026-06-15T12:18:02Z"
 - apiVersion: cert-manager.io/v1
   kind: Certificate
   metadata:
@@ -924,6 +990,40 @@ items:
 - apiVersion: cert-manager.io/v1
   kind: Certificate
   metadata:
+    labels:
+      konflux.konflux-ci.dev/component: namespace-lister
+      konflux.konflux-ci.dev/owner: konflux-namespace-lister
+    name: namespace-lister
+    namespace: namespace-lister
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxNamespaceLister
+      name: konflux-namespace-lister
+  spec:
+    dnsNames:
+    - namespace-lister.namespace-lister.svc
+    - namespace-lister.namespace-lister.svc.cluster.local
+    issuerRef:
+      kind: ClusterIssuer
+      name: ca-issuer
+    secretName: namespace-lister-tls
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T12:02:20Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-21T12:02:18Z"
+    notBefore: "2026-04-22T12:02:18Z"
+    renewalTime: "2026-06-21T12:02:18Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"cert-manager.io/v1","kind":"Certificate","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"webhook","app.kubernetes.io/instance":"opentelemetry-operator","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"opentelemetry-operator","app.kubernetes.io/part-of":"opentelemetry-operator","app.kubernetes.io/version":"0.148.0","helm.sh/chart":"opentelemetry-operator-0.109.2"},"name":"opentelemetry-operator-serving-cert","namespace":"opentelemetry-operator-system"},"spec":{"dnsNames":["opentelemetry-operator-webhook.opentelemetry-operator-system.svc","opentelemetry-operator-webhook.opentelemetry-operator-system.svc.cluster.local"],"issuerRef":{"kind":"Issuer","name":"opentelemetry-operator-selfsigned-issuer"},"secretName":"opentelemetry-operator-controller-manager-service-cert","subject":{"organizationalUnits":["opentelemetry-operator"]}}}
@@ -961,6 +1061,110 @@ items:
     notAfter: "2026-07-14T20:01:38Z"
     notBefore: "2026-04-15T20:01:38Z"
     renewalTime: "2026-06-14T20:01:38Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: linstor-ui-tls
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: linstor-ui
+  spec:
+    dnsNames:
+    - linstor.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: linstor-ui-tls
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T13:06:43Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-21T12:07:38Z"
+    notBefore: "2026-04-22T12:07:39Z"
+    renewalTime: "2026-06-21T12:07:38Z"
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    labels:
+      app.kubernetes.io/component: certificate
+      app.kubernetes.io/instance: serving-cert
+      app.kubernetes.io/name: certificate
+      konflux.konflux-ci.dev/component: release
+      konflux.konflux-ci.dev/owner: konflux-release-service
+    name: serving-cert
+    namespace: release-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxReleaseService
+      name: konflux-release-service
+  spec:
+    dnsNames:
+    - release-service-webhook-service.release-service.svc
+    - release-service-webhook-service.release-service.svc.cluster.local
+    issuerRef:
+      kind: Issuer
+      name: selfsigned-issuer
+    secretName: webhook-server-cert
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T12:02:25Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-21T12:02:24Z"
+    notBefore: "2026-04-22T12:02:24Z"
+    renewalTime: "2026-06-21T12:02:24Z"
+    revision: 1
+- apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: holmes-tls
+    namespace: robusta
+    ownerReferences:
+    - apiVersion: networking.k8s.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Ingress
+      name: holmes
+  spec:
+    dnsNames:
+    - holmes.35.241.255.137.nip.io
+    issuerRef:
+      group: cert-manager.io
+      kind: ClusterIssuer
+      name: letsencrypt-prod
+    secretName: holmes-tls
+    usages:
+    - digital signature
+    - key encipherment
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T16:21:39Z"
+      message: Certificate is up to date and has not expired
+      observedGeneration: 1
+      reason: Ready
+      status: "True"
+      type: Ready
+    notAfter: "2026-07-21T15:23:06Z"
+    notBefore: "2026-04-22T15:23:07Z"
+    renewalTime: "2026-06-21T15:23:06Z"
     revision: 1
 - apiVersion: cert-manager.io/v1
   kind: Certificate

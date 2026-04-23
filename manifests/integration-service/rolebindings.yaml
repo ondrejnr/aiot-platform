@@ -1,0 +1,26 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: integration
+      konflux.konflux-ci.dev/owner: konflux-integration-service
+    name: integration-service-leader-election-rolebinding
+    namespace: integration-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxIntegrationService
+      name: konflux-integration-service
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: integration-service-leader-election-role
+  subjects:
+  - kind: ServiceAccount
+    name: integration-service-controller-manager
+    namespace: integration-service
+kind: List
+metadata:

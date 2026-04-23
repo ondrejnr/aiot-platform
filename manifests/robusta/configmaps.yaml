@@ -1,0 +1,213 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    config.yaml: |
+      # LLM endpoint -> k8sgpt-llm-proxy (OpenAI-compatible)
+      # Holmes používa litellm pod kapotou -> nastaví sa cez env premenne
+      # (MODEL, OPENAI_API_BASE, OPENAI_API_KEY)
+      toolsets:
+        kubernetes/core: { enabled: true }
+        kubernetes/logs: { enabled: true }
+        robusta:         { enabled: false }   # self-hosted, bez Robusta cloud
+        prometheus:
+          enabled: true
+          config:
+            prometheus_url: "http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"config.yaml":"# LLM endpoint -\u003e k8sgpt-llm-proxy (OpenAI-compatible)\n# Holmes používa litellm pod kapotou -\u003e nastaví sa cez env premenne\n# (MODEL, OPENAI_API_BASE, OPENAI_API_KEY)\ntoolsets:\n  kubernetes/core: { enabled: true }\n  kubernetes/logs: { enabled: true }\n  robusta:         { enabled: false }   # self-hosted, bez Robusta cloud\n  prometheus:\n    enabled: true\n    config:\n      prometheus_url: \"http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090\"\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"holmes-config","namespace":"robusta"}}
+    name: holmes-config
+    namespace: robusta
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: robusta
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: robusta
+- apiVersion: v1
+  data:
+    relay.py: |
+      import os, json, requests
+      from fastapi import FastAPI, Request
+      from uvicorn import run
+      MM_URL = os.environ["MM_URL"]
+      CHANNEL = os.environ.get("MM_CHANNEL", "k8s")
+      USERNAME = os.environ.get("MM_USERNAME", "robusta")
+      app = FastAPI()
+
+      def flatten(finding: dict) -> str:
+          title = finding.get("title") or finding.get("aggregation_key") or "Robusta alert"
+          desc = finding.get("description", "")
+          severity = finding.get("severity", "")
+          source = finding.get("source", "")
+          subject = finding.get("subject", {})
+          sname = subject.get("name") if isinstance(subject, dict) else ""
+          skind = subject.get("subject_type") if isinstance(subject, dict) else ""
+          sns = subject.get("namespace") if isinstance(subject, dict) else ""
+          cluster = finding.get("cluster", "")
+
+          lines = [f"**[{severity.upper()}] {title}**"]
+          if sname:
+              lines.append(f"- {skind} `{sns}/{sname}` ({cluster})")
+          if source:
+              lines.append(f"- source: {source}")
+          if desc:
+              lines.append(f"\n{desc[:1500]}")
+
+          # Enrichments
+          enrichments = finding.get("enrichments") or []
+          for e in enrichments[:3]:
+              blocks = e.get("blocks") or []
+              for b in blocks[:3]:
+                  btype = b.get("block_type", "")
+                  if btype == "markdown":
+                      text = b.get("text", "")[:1000]
+                      if text:
+                          lines.append(f"\n> {text}")
+                  elif btype == "header":
+                      lines.append(f"\n_{b.get('text','')}_")
+                  elif btype == "file":
+                      lines.append(f"\n_(file: {b.get('filename','')})_")
+          return "\n".join(lines)
+
+      @app.post("/webhook")
+      async def webhook(req: Request):
+          ctype = req.headers.get("content-type", "")
+          body = await req.body()
+          text = ""
+          if "application/json" in ctype:
+              try:
+                  data = json.loads(body)
+                  findings = data if isinstance(data, list) else [data]
+                  for f in findings:
+                      text += flatten(f) + "\n---\n"
+              except Exception:
+                  text = body.decode("utf-8", errors="replace")
+          else:
+              text = body.decode("utf-8", errors="replace")
+          text = text.strip()
+          if not text:
+              return {"ok": True, "empty": True}
+          payload = {"text": text[:6000], "channel": CHANNEL, "username": USERNAME, "icon_emoji": ":robot_face:"}
+          try:
+              r = requests.post(MM_URL, json=payload, timeout=10)
+              if r.status_code >= 400:
+                  print(f"MM error {r.status_code}: {r.text[:200]}", flush=True)
+                  return {"ok": False, "mm_status": r.status_code}
+          except Exception as ex:
+              print(f"MM exception: {ex}", flush=True)
+              return {"ok": False, "err": str(ex)}
+          return {"ok": True}
+
+      @app.get("/health")
+      def health():
+          return {"ok": True}
+
+      if __name__ == "__main__":
+          run(app, host="0.0.0.0", port=8080)
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"relay.py":"import os, json, requests\nfrom fastapi import FastAPI, Request\nfrom uvicorn import run\nMM_URL = os.environ[\"MM_URL\"]\nCHANNEL = os.environ.get(\"MM_CHANNEL\", \"k8s\")\nUSERNAME = os.environ.get(\"MM_USERNAME\", \"robusta\")\napp = FastAPI()\n\ndef flatten(finding: dict) -\u003e str:\n    title = finding.get(\"title\") or finding.get(\"aggregation_key\") or \"Robusta alert\"\n    desc = finding.get(\"description\", \"\")\n    severity = finding.get(\"severity\", \"\")\n    source = finding.get(\"source\", \"\")\n    subject = finding.get(\"subject\", {})\n    sname = subject.get(\"name\") if isinstance(subject, dict) else \"\"\n    skind = subject.get(\"subject_type\") if isinstance(subject, dict) else \"\"\n    sns = subject.get(\"namespace\") if isinstance(subject, dict) else \"\"\n    cluster = finding.get(\"cluster\", \"\")\n\n    lines = [f\"**[{severity.upper()}] {title}**\"]\n    if sname:\n        lines.append(f\"- {skind} `{sns}/{sname}` ({cluster})\")\n    if source:\n        lines.append(f\"- source: {source}\")\n    if desc:\n        lines.append(f\"\\n{desc[:1500]}\")\n\n    # Enrichments\n    enrichments = finding.get(\"enrichments\") or []\n    for e in enrichments[:3]:\n        blocks = e.get(\"blocks\") or []\n        for b in blocks[:3]:\n            btype = b.get(\"block_type\", \"\")\n            if btype == \"markdown\":\n                text = b.get(\"text\", \"\")[:1000]\n                if text:\n                    lines.append(f\"\\n\u003e {text}\")\n            elif btype == \"header\":\n                lines.append(f\"\\n_{b.get('text','')}_\")\n            elif btype == \"file\":\n                lines.append(f\"\\n_(file: {b.get('filename','')})_\")\n    return \"\\n\".join(lines)\n\n@app.post(\"/webhook\")\nasync def webhook(req: Request):\n    ctype = req.headers.get(\"content-type\", \"\")\n    body = await req.body()\n    text = \"\"\n    if \"application/json\" in ctype:\n        try:\n            data = json.loads(body)\n            findings = data if isinstance(data, list) else [data]\n            for f in findings:\n                text += flatten(f) + \"\\n---\\n\"\n        except Exception:\n            text = body.decode(\"utf-8\", errors=\"replace\")\n    else:\n        text = body.decode(\"utf-8\", errors=\"replace\")\n    text = text.strip()\n    if not text:\n        return {\"ok\": True, \"empty\": True}\n    payload = {\"text\": text[:6000], \"channel\": CHANNEL, \"username\": USERNAME, \"icon_emoji\": \":robot_face:\"}\n    try:\n        r = requests.post(MM_URL, json=payload, timeout=10)\n        if r.status_code \u003e= 400:\n            print(f\"MM error {r.status_code}: {r.text[:200]}\", flush=True)\n            return {\"ok\": False, \"mm_status\": r.status_code}\n    except Exception as ex:\n        print(f\"MM exception: {ex}\", flush=True)\n        return {\"ok\": False, \"err\": str(ex)}\n    return {\"ok\": True}\n\n@app.get(\"/health\")\ndef health():\n    return {\"ok\": True}\n\nif __name__ == \"__main__\":\n    run(app, host=\"0.0.0.0\", port=8080)\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"mm-relay-code","namespace":"robusta"}}
+    name: mm-relay-code
+    namespace: robusta
+- apiVersion: v1
+  data:
+    .kubewatch.yaml: |-
+      handler:
+        cloudevent:
+          url: "http://robusta-runner:80/api/handle"
+      namespace: ""
+      resource:
+        clusterrole: true
+        clusterrolebinding: true
+        configmap: true
+        coreevent: false
+        daemonset: true
+        deployment: true
+        event: true
+        hpa: true
+        ingress: true
+        job: true
+        namespace: true
+        node: true
+        persistentvolume: true
+        pod: true
+        replicaset: true
+        replicationcontroller: false
+        secret: false
+        serviceaccount: true
+        services: true
+        statefulset: true
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: robusta
+      meta.helm.sh/release-namespace: robusta
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: robusta-kubewatch-config
+    namespace: robusta
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: scheduled-jobs
+    namespace: robusta
+kind: List
+metadata:

@@ -1,0 +1,144 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: kyverno
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: kyverno
+- apiVersion: v1
+  data:
+    defaultRegistry: docker.io
+    enableDefaultRegistryMutation: "true"
+    excludeGroups: system:nodes
+    generateSuccessEvents: "false"
+    resourceFilters: '[*/*,kyverno,*] [Event,*,*] [*/*,kube-system,*] [*/*,kube-public,*]
+      [*/*,kube-node-lease,*] [Node,*,*] [Node/?*,*,*] [APIService,*,*] [APIService/?*,*,*]
+      [TokenReview,*,*] [SubjectAccessReview,*,*] [SelfSubjectAccessReview,*,*] [Binding,*,*]
+      [Pod/binding,*,*] [ReplicaSet,*,*] [ReplicaSet/?*,*,*] [EphemeralReport,*,*]
+      [ClusterEphemeralReport,*,*] [ClusterRole,*,kyverno:admission-controller] [ClusterRole,*,kyverno:admission-controller:core]
+      [ClusterRole,*,kyverno:admission-controller:additional] [ClusterRole,*,kyverno:background-controller]
+      [ClusterRole,*,kyverno:background-controller:core] [ClusterRole,*,kyverno:background-controller:additional]
+      [ClusterRole,*,kyverno:cleanup-controller] [ClusterRole,*,kyverno:cleanup-controller:core]
+      [ClusterRole,*,kyverno:cleanup-controller:additional] [ClusterRole,*,kyverno:reports-controller]
+      [ClusterRole,*,kyverno:reports-controller:core] [ClusterRole,*,kyverno:reports-controller:additional]
+      [ClusterRoleBinding,*,kyverno:admission-controller] [ClusterRoleBinding,*,kyverno:background-controller]
+      [ClusterRoleBinding,*,kyverno:cleanup-controller] [ClusterRoleBinding,*,kyverno:reports-controller]
+      [ServiceAccount,kyverno,kyverno-admission-controller] [ServiceAccount/?*,kyverno,kyverno-admission-controller]
+      [ServiceAccount,kyverno,kyverno-background-controller] [ServiceAccount/?*,kyverno,kyverno-background-controller]
+      [ServiceAccount,kyverno,kyverno-cleanup-controller] [ServiceAccount/?*,kyverno,kyverno-cleanup-controller]
+      [ServiceAccount,kyverno,kyverno-reports-controller] [ServiceAccount/?*,kyverno,kyverno-reports-controller]
+      [Role,kyverno,kyverno:admission-controller] [Role,kyverno,kyverno:background-controller]
+      [Role,kyverno,kyverno:cleanup-controller] [Role,kyverno,kyverno:reports-controller]
+      [RoleBinding,kyverno,kyverno:admission-controller] [RoleBinding,kyverno,kyverno:background-controller]
+      [RoleBinding,kyverno,kyverno:cleanup-controller] [RoleBinding,kyverno,kyverno:reports-controller]
+      [ConfigMap,kyverno,kyverno] [ConfigMap,kyverno,kyverno-metrics] [Deployment,kyverno,kyverno-admission-controller]
+      [Deployment/?*,kyverno,kyverno-admission-controller] [Deployment,kyverno,kyverno-background-controller]
+      [Deployment/?*,kyverno,kyverno-background-controller] [Deployment,kyverno,kyverno-cleanup-controller]
+      [Deployment/?*,kyverno,kyverno-cleanup-controller] [Deployment,kyverno,kyverno-reports-controller]
+      [Deployment/?*,kyverno,kyverno-reports-controller] [Pod,kyverno,kyverno-admission-controller-*]
+      [Pod/?*,kyverno,kyverno-admission-controller-*] [Pod,kyverno,kyverno-background-controller-*]
+      [Pod/?*,kyverno,kyverno-background-controller-*] [Pod,kyverno,kyverno-cleanup-controller-*]
+      [Pod/?*,kyverno,kyverno-cleanup-controller-*] [Pod,kyverno,kyverno-reports-controller-*]
+      [Pod/?*,kyverno,kyverno-reports-controller-*] [Job,kyverno,kyverno-hook-pre-delete]
+      [Job/?*,kyverno,kyverno-hook-pre-delete] [NetworkPolicy,kyverno,kyverno-admission-controller]
+      [NetworkPolicy/?*,kyverno,kyverno-admission-controller] [NetworkPolicy,kyverno,kyverno-background-controller]
+      [NetworkPolicy/?*,kyverno,kyverno-background-controller] [NetworkPolicy,kyverno,kyverno-cleanup-controller]
+      [NetworkPolicy/?*,kyverno,kyverno-cleanup-controller] [NetworkPolicy,kyverno,kyverno-reports-controller]
+      [NetworkPolicy/?*,kyverno,kyverno-reports-controller] [PodDisruptionBudget,kyverno,kyverno-admission-controller]
+      [PodDisruptionBudget/?*,kyverno,kyverno-admission-controller] [PodDisruptionBudget,kyverno,kyverno-background-controller]
+      [PodDisruptionBudget/?*,kyverno,kyverno-background-controller] [PodDisruptionBudget,kyverno,kyverno-cleanup-controller]
+      [PodDisruptionBudget/?*,kyverno,kyverno-cleanup-controller] [PodDisruptionBudget,kyverno,kyverno-reports-controller]
+      [PodDisruptionBudget/?*,kyverno,kyverno-reports-controller] [Service,kyverno,kyverno-svc]
+      [Service/?*,kyverno,kyverno-svc] [Service,kyverno,kyverno-svc-metrics] [Service/?*,kyverno,kyverno-svc-metrics]
+      [Service,kyverno,kyverno-background-controller-metrics] [Service/?*,kyverno,kyverno-background-controller-metrics]
+      [Service,kyverno,kyverno-cleanup-controller] [Service/?*,kyverno,kyverno-cleanup-controller]
+      [Service,kyverno,kyverno-cleanup-controller-metrics] [Service/?*,kyverno,kyverno-cleanup-controller-metrics]
+      [Service,kyverno,kyverno-reports-controller-metrics] [Service/?*,kyverno,kyverno-reports-controller-metrics]
+      [ServiceMonitor,kyverno,kyverno-admission-controller] [ServiceMonitor,kyverno,kyverno-background-controller]
+      [ServiceMonitor,kyverno,kyverno-cleanup-controller] [ServiceMonitor,kyverno,kyverno-reports-controller]
+      [Secret,kyverno,kyverno-svc.kyverno.svc.*] [Secret,kyverno,kyverno-cleanup-controller.kyverno.svc.*]
+      [*/*,kube-flannel,*] [*/*,piraeus-datastore,*]'
+    updateRequestThreshold: "1000"
+    webhookAnnotations: '{"admissions.enforcer/disabled":"true"}'
+    webhooks: '{"namespaceSelector":{"matchExpressions":[{"key":"kubernetes.io/metadata.name","operator":"NotIn","values":["kube-system"]},{"key":"kubernetes.io/metadata.name","operator":"NotIn","values":["kyverno"]}],"matchLabels":null}}'
+  kind: ConfigMap
+  metadata:
+    annotations:
+      helm.sh/resource-policy: keep
+    labels:
+      app.kubernetes.io/component: config
+      app.kubernetes.io/instance: kyverno
+      app.kubernetes.io/part-of: kyverno
+      app.kubernetes.io/version: v1.17.1
+    name: kyverno
+    namespace: kyverno
+- apiVersion: v1
+  data:
+    bucketBoundaries: 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 15,
+      20, 25, 30
+    metricsExposure: '{"kyverno_admission_requests_total":{"disabledLabelDimensions":["resource_namespace"]},"kyverno_admission_review_duration_seconds":{"disabledLabelDimensions":["resource_namespace"]},"kyverno_cleanup_controller_deletedobjects_total":{"disabledLabelDimensions":["resource_namespace","policy_namespace"]},"kyverno_generating_policy_execution_duration_seconds":{"disabledLabelDimensions":["resource_namespace","resource_request_operation"]},"kyverno_image_validating_policy_execution_duration_seconds":{"disabledLabelDimensions":["resource_namespace","resource_request_operation"]},"kyverno_mutating_policy_execution_duration_seconds":{"disabledLabelDimensions":["resource_namespace","resource_request_operation"]},"kyverno_policy_execution_duration_seconds":{"disabledLabelDimensions":["resource_namespace","resource_request_operation"]},"kyverno_policy_results_total":{"disabledLabelDimensions":["resource_namespace","policy_namespace"]},"kyverno_policy_rule_info_total":{"disabledLabelDimensions":["resource_namespace","policy_namespace"]},"kyverno_validating_policy_execution_duration_seconds":{"disabledLabelDimensions":["resource_namespace","resource_request_operation"]}}'
+    namespaces: '{"exclude":[],"include":[]}'
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/component: config
+      app.kubernetes.io/instance: kyverno
+      app.kubernetes.io/part-of: kyverno
+      app.kubernetes.io/version: v1.17.1
+    name: kyverno-metrics
+    namespace: kyverno
+kind: List
+metadata:

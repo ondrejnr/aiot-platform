@@ -5,7 +5,7 @@ items:
   metadata:
     annotations:
       deployment.kubernetes.io/revision: "1"
-      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":80,"protocol":"HTTP","serviceName":"semaphore:semaphore","ingressName":"semaphore:semaphore","hostname":"semaphore.35.241.255.137.nip.io","path":"/","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":3000,"protocol":"TCP","podName":"semaphore:semaphore-75b85ff97b-2m74z","allNodes":false}]'
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":80,"protocol":"HTTP","serviceName":"semaphore:semaphore","ingressName":"semaphore:semaphore","hostname":"semaphore.35.241.255.137.nip.io","path":"/","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":3000,"protocol":"TCP","podName":"semaphore:semaphore-75b85ff97b-h4p8t","allNodes":false}]'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"semaphore","namespace":"semaphore"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"semaphore"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-18T22:34:49Z"},"labels":{"app":"semaphore"}},"spec":{"containers":[{"env":[{"name":"SEMAPHORE_DB_DIALECT","value":"bolt"},{"name":"SEMAPHORE_ADMIN_PASSWORD","value":"AioT2026ansible"},{"name":"SEMAPHORE_ADMIN_NAME","value":"admin"},{"name":"SEMAPHORE_ADMIN_EMAIL","value":"admin@aiot.local"},{"name":"SEMAPHORE_ADMIN","value":"admin"},{"name":"SEMAPHORE_ACCESS_KEY_ENCRYPTION","value":"mKf8jMRxEv3LQ5e9UgWxPz7TN4aOhGBc"},{"name":"SEMAPHORE_PORT","value":"3000"},{"name":"SEMAPHORE_HOST"}],"image":"semaphoreui/semaphore:v2.12.6","imagePullPolicy":"IfNotPresent","name":"semaphore","ports":[{"containerPort":3000,"protocol":"TCP"}],"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/var/lib/semaphore","name":"data"},{"mountPath":"/etc/semaphore/config.json","name":"config","readOnly":true,"subPath":"config.json"}]}],"dnsPolicy":"ClusterFirstWithHostNet","hostNetwork":true,"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"semaphore-data"}},{"name":"config","secret":{"defaultMode":420,"secretName":"semaphore-config"}}]}}}}
     name: semaphore
@@ -88,13 +88,13 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-20T16:35:18Z"
-      lastUpdateTime: "2026-04-20T16:35:18Z"
+    - lastTransitionTime: "2026-04-22T15:12:43Z"
+      lastUpdateTime: "2026-04-22T15:12:43Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 6
+    observedGeneration: 12
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1

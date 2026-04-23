@@ -1,0 +1,329 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: piraeus-datastore
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: piraeus-datastore
+- apiVersion: v1
+  data:
+    linstor.toml: |
+      [db]
+        connection_url = "k8s"
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/component: linstor-controller
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: linstor-controller-config
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/component: linstor-csi-nfs-server
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: linstor-csi-nfs-server-reactor-config
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+- apiVersion: v1
+  data:
+    default-config.tmpl: "NFS_Core_Param\n{\n\tProtocols = 4;\n\tNFS_Protocols = 4;\n\tDbus_Name_Prefix
+      = \"{{.DbusPrefix}}\";\n\tEnable_NLM = false;\n\tEnable_RQUOTA = false;\n\tfsid_device
+      = true;\n\tEnable_UDP = false;\n\tEnable_Metrics = false;\n\tNFS_Port = {{.Port}};\n}\n\nNFS_KRB5\n{\n\tCCacheDir
+      = \"/var/run/ganesha/{{.Resource}}\";\n\tActive_krb5 = false;\n}\n\nNFSV4\n{\n\tRecoveryRoot
+      = \"/var/lib/nfs/ganesha/{{.Resource}}\";\n\tRecoveryBackend = \"fs_ng\";\n\tGrace_Period
+      = 60;\n\tServer_Scope = \"{{.Resource}}\";\n}\n\nEXPORT\n{\n\tExport_Id = {{.ExportID}};\n\tPath
+      = \"/srv/exports/{{.Resource}}\";\n\tPseudo = \"/{{.Resource}}\";\n\tAccess_Type
+      = RW;\n\tSecType = sys;\n\tSquash = {{.Squash}};\n\tFSAL {\n\t\tName = VFS;\n\t}\n}\n"
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/component: linstor-csi-nfs-server
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+    name: linstor-csi-nfs-server-templates
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorCluster
+      name: linstorcluster
+- apiVersion: v1
+  data:
+    0_piraeus_datastore_images.yaml: |
+      ---
+      # This is the configuration for default images used by piraeus-operator
+      #
+      # "base" is the default repository prefix to use.
+      base: quay.io/piraeusdatastore
+      # "components" is a mapping of image placeholders to actual image names with tag.
+      # For example, the image name "linstor-controller" in the kustomize-resources will be replaced by:
+      #   quay.io/piraeusdatastore/piraeus-server:v1.24.2
+      components:
+        linstor-controller:
+          tag: v1.33.1
+          image: piraeus-server
+        linstor-satellite:
+          tag: v1.33.1
+          image: piraeus-server
+        linstor-csi:
+          tag: v1.10.6
+          image: piraeus-csi
+        nfs-server:
+          tag: v1.10.6
+          image: piraeus-csi-nfs-server
+        drbd-reactor:
+          tag: v1.11.0
+          image: drbd-reactor
+        ha-controller:
+          tag: v1.3.2
+          image: piraeus-ha-controller
+        drbd-shutdown-guard:
+          tag: v1.1.2
+          image: drbd-shutdown-guard
+        ktls-utils:
+          tag: v1.2.1
+          image: ktls-utils
+        linstor-affinity-controller:
+          tag: v1.3.0
+          image: linstor-affinity-controller
+        drbd-module-loader:
+          tag: v9.3.1
+          # The special "match" attribute is used to select an image based on the node's reported OS.
+          # The operator will first check the k8s node's ".status.nodeInfo.osImage" field, and compare it against the list
+          # here. If one matches, that specific image name will be used instead of the fallback image.
+          image: drbd9-noble # Fallback image: chose a recent kernel, which can hopefully compile whatever config is actually in use
+          match:
+            - osImage: Red Hat Enterprise Linux 8\.
+              image: drbd9-almalinux8
+            - osImage: Red Hat Enterprise Linux 9\.
+              image: drbd9-almalinux9
+            - osImage: Red Hat Enterprise Linux 10\.
+              image: drbd9-almalinux10
+            - osImage: "Red Hat Enterprise Linux CoreOS 41[3-9]"
+              image: drbd9-almalinux9
+            - osImage: Red Hat Enterprise Linux CoreOS
+              image: drbd9-almalinux8
+            - osImage: CentOS Linux 8
+              image: drbd9-almalinux8
+            - osImage: AlmaLinux 8
+              image: drbd9-almalinux8
+            - osImage: AlmaLinux 9
+              image: drbd9-almalinux9
+            - osImage: AlmaLinux 10
+              image: drbd9-almalinux10
+            - osImage: Oracle Linux Server 8\.
+              image: drbd9-almalinux8
+            - osImage: Oracle Linux Server 9\.
+              image: drbd9-almalinux9
+            - osImage: Oracle Linux Server 10\.
+              image: drbd9-almalinux10
+            - osImage: Rocky Linux 8
+              image: drbd9-almalinux8
+            - osImage: Rocky Linux 9
+              image: drbd9-almalinux9
+            - osImage: Rocky Linux 10
+              image: drbd9-almalinux10
+            - osImage: Ubuntu 22\.04
+              image: drbd9-jammy
+            - osImage: Ubuntu 24\.04
+              image: drbd9-noble
+            - osImage: Debian GNU/Linux 13
+              image: drbd9-trixie
+            - osImage: Debian GNU/Linux 12
+              image: drbd9-bookworm
+            - osImage: Debian GNU/Linux 11
+              image: drbd9-bullseye
+    0_sig_storage_images.yaml: |
+      ---
+      base: registry.k8s.io/sig-storage
+      components:
+        csi-attacher:
+          tag: v4.11.0
+          image: csi-attacher
+        csi-livenessprobe:
+          tag: v2.18.0
+          image: livenessprobe
+        csi-provisioner:
+          tag: v6.2.0
+          image: csi-provisioner
+        csi-snapshotter:
+          tag: v8.5.0
+          image: csi-snapshotter
+        csi-resizer:
+          tag: v2.1.0
+          image: csi-resizer
+        csi-external-health-monitor-controller:
+          tag: v0.17.0
+          image: csi-external-health-monitor-controller
+        csi-node-driver-registrar:
+          tag: v2.16.0
+          image: csi-node-driver-registrar
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/name: piraeus-datastore
+    name: piraeus-operator-image-config
+    namespace: piraeus-datastore
+- apiVersion: v1
+  data:
+    prometheus.toml: |
+      [[prometheus]]
+      enums = true
+      address = ":9942"
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/component: linstor-satellite
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      piraeus.io/linstor-satellite: 221c3e35-7b2b-41b6-8c62-0572befb8566
+    name: reactor-config.aiot-worker-01
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorSatellite
+      name: aiot-worker-01
+- apiVersion: v1
+  data:
+    prometheus.toml: |
+      [[prometheus]]
+      enums = true
+      address = ":9942"
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/component: linstor-satellite
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      piraeus.io/linstor-satellite: b0fbbbae-44da-465f-957f-ad67caf2f2e5
+    name: reactor-config.aiot-worker-02
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorSatellite
+      name: aiot-worker-02
+- apiVersion: v1
+  data:
+    linstor_satellite.toml: ""
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/component: linstor-satellite
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      piraeus.io/linstor-satellite: 221c3e35-7b2b-41b6-8c62-0572befb8566
+    name: satellite-config.aiot-worker-01
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorSatellite
+      name: aiot-worker-01
+- apiVersion: v1
+  data:
+    linstor_satellite.toml: ""
+  kind: ConfigMap
+  metadata:
+    labels:
+      app.kubernetes.io/component: linstor-satellite
+      app.kubernetes.io/instance: linstorcluster
+      app.kubernetes.io/managed-by: piraeus-operator
+      app.kubernetes.io/name: piraeus-datastore
+      app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      piraeus.io/linstor-satellite: b0fbbbae-44da-465f-957f-ad67caf2f2e5
+    name: satellite-config.aiot-worker-02
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: piraeus.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: LinstorSatellite
+      name: aiot-worker-02
+kind: List
+metadata:

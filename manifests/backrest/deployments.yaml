@@ -84,18 +84,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T06:53:01Z"
-      lastUpdateTime: "2026-04-22T06:53:01Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-22T06:17:42Z"
       lastUpdateTime: "2026-04-22T06:53:01Z"
       message: ReplicaSet "backrest-6cd94bbdb9" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T15:17:44Z"
+      lastUpdateTime: "2026-04-22T15:17:44Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 9
     readyReplicas: 1
     replicas: 1

@@ -4,17 +4,16 @@ items:
   kind: PersistentVolumeClaim
   metadata:
     annotations:
-      k8up.io/backup: "true"
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"cloudbeaver-data-lp","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"2Gi"}},"storageClassName":"local-path"}}
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"cloudbeaver-data-lp-piraeus","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"2Gi"}},"storageClassName":"piraeus-r2"}}
       pv.kubernetes.io/bind-completed: "yes"
       pv.kubernetes.io/bound-by-controller: "yes"
-      volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
       volume.kubernetes.io/selected-node: aiot-worker-02
-      volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
     finalizers:
     - kubernetes.io/pvc-protection
-    name: cloudbeaver-data-lp
+    name: cloudbeaver-data-lp-piraeus
     namespace: aiot
   spec:
     accessModes:
@@ -22,9 +21,9 @@ items:
     resources:
       requests:
         storage: 2Gi
-    storageClassName: local-path
+    storageClassName: piraeus-r2
     volumeMode: Filesystem
-    volumeName: pvc-de93f6ca-add8-47c4-92ba-a5337cbb1ee1
+    volumeName: pvc-61a22797-a355-4f74-a517-bfe2c6257d14
   status:
     accessModes:
     - ReadWriteOnce
@@ -35,17 +34,16 @@ items:
   kind: PersistentVolumeClaim
   metadata:
     annotations:
-      k8up.io/backup: "false"
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"open-webui-data-lp","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"5Gi"}},"storageClassName":"local-path"}}
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"open-webui-data-lp-piraeus","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"5Gi"}},"storageClassName":"piraeus-r2"}}
       pv.kubernetes.io/bind-completed: "yes"
       pv.kubernetes.io/bound-by-controller: "yes"
-      volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
       volume.kubernetes.io/selected-node: aiot-worker-01
-      volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
     finalizers:
     - kubernetes.io/pvc-protection
-    name: open-webui-data-lp
+    name: open-webui-data-lp-piraeus
     namespace: aiot
   spec:
     accessModes:
@@ -53,9 +51,9 @@ items:
     resources:
       requests:
         storage: 5Gi
-    storageClassName: local-path
+    storageClassName: piraeus-r2
     volumeMode: Filesystem
-    volumeName: pvc-83ddb755-d88a-4459-ad5c-06c8c4b53d5c
+    volumeName: pvc-fc2d6ee5-7b9e-4673-a88e-7079b254bb40
   status:
     accessModes:
     - ReadWriteOnce
@@ -153,17 +151,16 @@ items:
   kind: PersistentVolumeClaim
   metadata:
     annotations:
-      k8up.io/backup: "true"
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"pgadmin-data","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"1Gi"}},"storageClassName":"local-path"}}
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"pgadmin-data-piraeus","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"1Gi"}},"storageClassName":"piraeus-r2"}}
       pv.kubernetes.io/bind-completed: "yes"
       pv.kubernetes.io/bound-by-controller: "yes"
-      volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
       volume.kubernetes.io/selected-node: aiot-worker-02
-      volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
     finalizers:
     - kubernetes.io/pvc-protection
-    name: pgadmin-data
+    name: pgadmin-data-piraeus
     namespace: aiot
   spec:
     accessModes:
@@ -171,9 +168,9 @@ items:
     resources:
       requests:
         storage: 1Gi
-    storageClassName: local-path
+    storageClassName: piraeus-r2
     volumeMode: Filesystem
-    volumeName: pvc-ec883884-7c18-44f3-a9df-ecad836c3567
+    volumeName: pvc-13780103-955c-4b47-9417-e7c91ada2649
   status:
     accessModes:
     - ReadWriteOnce
@@ -184,19 +181,16 @@ items:
   kind: PersistentVolumeClaim
   metadata:
     annotations:
-      k8up.io/backup: "false"
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"postgres-backup-data","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}},"storageClassName":"local-path"}}
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"postgres-backup-data-piraeus","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"20Gi"}},"storageClassName":"piraeus-r2"}}
       pv.kubernetes.io/bind-completed: "yes"
       pv.kubernetes.io/bound-by-controller: "yes"
-      volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
       volume.kubernetes.io/selected-node: aiot-worker-01
-      volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
     finalizers:
     - kubernetes.io/pvc-protection
-    labels:
-      velero.io/exclude-from-backup: "true"
-    name: postgres-backup-data
+    name: postgres-backup-data-piraeus
     namespace: aiot
   spec:
     accessModes:
@@ -204,9 +198,9 @@ items:
     resources:
       requests:
         storage: 20Gi
-    storageClassName: local-path
+    storageClassName: piraeus-r2
     volumeMode: Filesystem
-    volumeName: pvc-96e7b2be-c663-4d21-8a8d-62fe88d4afae
+    volumeName: pvc-17d30d0e-224f-42ef-bc00-70349e931e33
   status:
     accessModes:
     - ReadWriteOnce
@@ -217,19 +211,16 @@ items:
   kind: PersistentVolumeClaim
   metadata:
     annotations:
-      k8up.io/backup: "true"
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"qdrant-pvc","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"8Gi"}},"storageClassName":"local-path"}}
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"qdrant-pvc-piraeus","namespace":"aiot"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"8Gi"}},"storageClassName":"piraeus-r2"}}
       pv.kubernetes.io/bind-completed: "yes"
       pv.kubernetes.io/bound-by-controller: "yes"
-      volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
       volume.kubernetes.io/selected-node: aiot-worker-01
-      volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
     finalizers:
     - kubernetes.io/pvc-protection
-    labels:
-      velero.io/exclude-from-backup: "true"
-    name: qdrant-pvc
+    name: qdrant-pvc-piraeus
     namespace: aiot
   spec:
     accessModes:
@@ -237,9 +228,9 @@ items:
     resources:
       requests:
         storage: 8Gi
-    storageClassName: local-path
+    storageClassName: piraeus-r2
     volumeMode: Filesystem
-    volumeName: pvc-cb4a40e3-99ec-49df-92a3-6ce03b0d7cd7
+    volumeName: pvc-3ffcf658-4dfc-4976-8b3c-8d1329648895
   status:
     accessModes:
     - ReadWriteOnce

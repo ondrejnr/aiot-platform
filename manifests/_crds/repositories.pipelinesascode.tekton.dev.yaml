@@ -1,0 +1,108 @@
+apiVersion: v1
+items:
+- apiVersion: pipelinesascode.tekton.dev/v1alpha1
+  kind: Repository
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"pipelinesascode.tekton.dev/v1alpha1","kind":"Repository","metadata":{"annotations":{},"name":"hello-aiot","namespace":"default-tenant"},"spec":{"git_provider":{"secret":{"key":"provider.token","name":"hello-aiot-git-provider"},"type":"gitea","url":"https://gitea.35.241.255.137.nip.io","webhook_secret":{"key":"webhook.secret","name":"hello-aiot-git-provider"}},"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot"}}
+    name: hello-aiot
+    namespace: default-tenant
+  pipelinerun_status:
+  - completionTime: "2026-04-22T16:49:50Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T16:49:50Z"
+      message: 'Pipeline default-tenant/hello-aiot-push-w8xpc can''t be Run; it contains
+        Tasks that don''t exist: Couldn''t retrieve Task "resolver type hub\nname
+        = git-clone\n": error requesting remote resource: error getting "Hub" "default-tenant/hub-a7d6c694c35281099920bcb9af6c5b87":
+        fail to fetch Artifact Hub resource: requesting resource from Hub: Get "https://artifacthub.io/api/v1/packages/tekton-task/tekton/git-clone":
+        tls: failed to verify certificate: x509: certificate signed by unknown authority'
+      reason: CouldntGetTask
+      status: "False"
+      type: Succeeded
+    event_type: push
+    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-w8xpc
+    pipelineRunName: hello-aiot-push-w8xpc
+    sha: b593ce9f92ab9d36184e506104213172aa57ebbc
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/b593ce9f92ab9d36184e506104213172aa57ebbc
+    startTime: "2026-04-22T16:49:49Z"
+    target_branch: main
+    title: |
+      chore: retrigger
+  - completionTime: "2026-04-22T16:52:14Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T16:52:14Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    event_type: push
+    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-hwhj9
+    pipelineRunName: hello-aiot-push-hwhj9
+    sha: 617772d980bf1c0647fe594d0f9bcce2309ee425
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/617772d980bf1c0647fe594d0f9bcce2309ee425
+    startTime: "2026-04-22T16:51:02Z"
+    target_branch: main
+    title: |
+      fix: inline pipeline (no hub resolver)
+  - completionTime: "2026-04-22T17:46:21Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:46:21Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    event_type: push
+    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-89p8g
+    pipelineRunName: hello-aiot-push-89p8g
+    sha: cef878c1f7eedb16fa9f57991cbd39dbb608865f
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cef878c1f7eedb16fa9f57991cbd39dbb608865f
+    startTime: "2026-04-22T17:45:37Z"
+    target_branch: main
+    title: |
+      add konflux build labels
+  - completionTime: "2026-04-22T17:46:21Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:46:21Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    event_type: push
+    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-89p8g
+    pipelineRunName: hello-aiot-push-89p8g
+    sha: cef878c1f7eedb16fa9f57991cbd39dbb608865f
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cef878c1f7eedb16fa9f57991cbd39dbb608865f
+    startTime: "2026-04-22T17:45:37Z"
+    target_branch: main
+    title: |
+      add konflux build labels
+  - completionTime: "2026-04-22T17:50:30Z"
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:50:30Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    event_type: push
+    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-9pjx9
+    pipelineRunName: hello-aiot-push-9pjx9
+    sha: 5e8056762053ed1f311d1e9fa479ca03b2280645
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/5e8056762053ed1f311d1e9fa479ca03b2280645
+    startTime: "2026-04-22T17:49:48Z"
+    target_branch: main
+    title: |
+      feat: add pipeline results (IMAGE_URL, IMAGE_DIGEST) for Konflux snapshot
+  spec:
+    git_provider:
+      secret:
+        key: provider.token
+        name: hello-aiot-git-provider
+      type: gitea
+      url: https://gitea.35.241.255.137.nip.io
+      webhook_secret:
+        key: webhook.secret
+        name: hello-aiot-git-provider
+    url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+kind: List
+metadata:

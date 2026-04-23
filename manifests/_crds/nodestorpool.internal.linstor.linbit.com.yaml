@@ -1,0 +1,48 @@
+apiVersion: v1
+items:
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: NodeStorPool
+  metadata:
+    name: 8002157779f6757476a5aaa5da31de09955dad52035dea3367b5f59dbbcbb69b
+  spec:
+    driver_name: LVM_THIN
+    external_locking: false
+    free_space_mgr_dsp_name: aiot-worker-02;lvm-thin
+    free_space_mgr_name: AIOT-WORKER-02;LVM-THIN
+    node_name: AIOT-WORKER-02
+    pool_name: LVM-THIN
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: NodeStorPool
+  metadata:
+    name: c9a230ede17fe08a037a4f16d1c32f0d0733bcf73b44a2ec98168419d851a267
+  spec:
+    driver_name: DISKLESS
+    external_locking: false
+    free_space_mgr_dsp_name: aiot-worker-02;DfltDisklessStorPool
+    free_space_mgr_name: AIOT-WORKER-02;DFLTDISKLESSSTORPOOL
+    node_name: AIOT-WORKER-02
+    pool_name: DFLTDISKLESSSTORPOOL
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: NodeStorPool
+  metadata:
+    name: d444a8934c24c2911d3716c3cf245a82a762eb4bb31e0133afe249c4b9f2c4c6
+  spec:
+    driver_name: LVM_THIN
+    external_locking: false
+    free_space_mgr_dsp_name: aiot-worker-01;lvm-thin
+    free_space_mgr_name: AIOT-WORKER-01;LVM-THIN
+    node_name: AIOT-WORKER-01
+    pool_name: LVM-THIN
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: NodeStorPool
+  metadata:
+    name: e31ddc4d68c5f47d0ac4bb7c76160eb5a454ecb5ac56d9c1222ad70c895e337c
+  spec:
+    driver_name: DISKLESS
+    external_locking: false
+    free_space_mgr_dsp_name: aiot-worker-01;DfltDisklessStorPool
+    free_space_mgr_name: AIOT-WORKER-01;DFLTDISKLESSSTORPOOL
+    node_name: AIOT-WORKER-01
+    pool_name: DFLTDISKLESSSTORPOOL
+kind: List
+metadata:

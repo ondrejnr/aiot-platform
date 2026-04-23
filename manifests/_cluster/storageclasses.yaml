@@ -11,5 +11,21 @@ items:
   provisioner: rancher.io/local-path
   reclaimPolicy: Delete
   volumeBindingMode: WaitForFirstConsumer
+- allowVolumeExpansion: true
+  apiVersion: storage.k8s.io/v1
+  kind: StorageClass
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"allowVolumeExpansion":true,"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{},"name":"piraeus-r2"},"parameters":{"csi.storage.k8s.io/fstype":"ext4","linstor.csi.linbit.com/allowRemoteVolumeAccess":"true","linstor.csi.linbit.com/placementCount":"2","linstor.csi.linbit.com/storagePool":"lvm-thin"},"provisioner":"linstor.csi.linbit.com","reclaimPolicy":"Retain","volumeBindingMode":"WaitForFirstConsumer"}
+    name: piraeus-r2
+  parameters:
+    csi.storage.k8s.io/fstype: ext4
+    linstor.csi.linbit.com/allowRemoteVolumeAccess: "true"
+    linstor.csi.linbit.com/placementCount: "2"
+    linstor.csi.linbit.com/storagePool: lvm-thin
+  provisioner: linstor.csi.linbit.com
+  reclaimPolicy: Retain
+  volumeBindingMode: WaitForFirstConsumer
 kind: List
 metadata:

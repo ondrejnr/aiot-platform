@@ -23,23 +23,6 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:28:12Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:28:12Z"}]}'
-      lifecycle.cattle.io/create.namespace-auth: "true"
-    labels:
-      kubernetes.io/metadata.name: aiot-demo
-      managed-by: terraform
-      owner: platform-team
-      tier: app
-    name: aiot-demo
-  spec:
-    finalizers:
-    - kubernetes
-  status:
-    phase: Active
-- apiVersion: v1
-  kind: Namespace
-  metadata:
-    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:39Z"}]}'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"auth"}}
@@ -66,6 +49,31 @@ items:
     labels:
       kubernetes.io/metadata.name: backrest
     name: backrest
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/name: build-service
+      control-plane: controller-manager
+      konflux.konflux-ci.dev/component: build-service
+      konflux.konflux-ci.dev/owner: konflux-build-service
+      kubernetes.io/metadata.name: build-service
+    name: build-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxBuildService
+      name: konflux-build-service
   spec:
     finalizers:
     - kubernetes
@@ -249,10 +257,11 @@ items:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:43Z"}]}'
       field.cattle.io/projectId: local:p-wpbsz
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"cert-manager"}}
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"labels":{"app.kubernetes.io/name":"cert-manager"},"name":"cert-manager"}}
       lifecycle.cattle.io/create.namespace-auth: "true"
       management.cattle.io/no-default-sa-token: "true"
     labels:
+      app.kubernetes.io/name: cert-manager
       field.cattle.io/projectId: p-wpbsz
       kubernetes.io/metadata.name: cert-manager
       managed-by: terraform
@@ -321,25 +330,6 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-19T23:05:45Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-19T23:05:45Z"}]}'
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"labels":{"purpose":"cluster-observability"},"name":"cluster-twin"}}
-      lifecycle.cattle.io/create.namespace-auth: "true"
-    labels:
-      kubernetes.io/metadata.name: cluster-twin
-      managed-by: terraform
-      owner: platform-team
-      tier: app
-    name: cluster-twin
-  spec:
-    finalizers:
-    - kubernetes
-  status:
-    phase: Active
-- apiVersion: v1
-  kind: Namespace
-  metadata:
-    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:28:11Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:28:17Z"}]}'
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
@@ -347,6 +337,29 @@ items:
       kubernetes.io/metadata.name: default
     name: default
   spec: {}
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:16Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:16Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      konflux-ci.dev/type: tenant
+      konflux.konflux-ci.dev/component: default-tenant
+      konflux.konflux-ci.dev/owner: konflux-default-tenant
+      kubernetes.io/metadata.name: default-tenant
+    name: default-tenant
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxDefaultTenant
+      name: konflux-default-tenant
+  spec:
+    finalizers:
+    - kubernetes
   status:
     phase: Active
 - apiVersion: v1
@@ -379,6 +392,28 @@ items:
       owner: platform-team
       tier: app
     name: emqx
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:16Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      konflux.konflux-ci.dev/component: enterprise-contract
+      konflux.konflux-ci.dev/owner: konflux-enterprise-contract
+      kubernetes.io/metadata.name: enterprise-contract-service
+    name: enterprise-contract-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxEnterpriseContract
+      name: konflux-enterprise-contract
   spec:
     finalizers:
     - kubernetes
@@ -485,16 +520,13 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:28:11Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:28:11Z"}]}'
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T16:45:43Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T16:45:43Z"}]}'
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"habitat-demo"},"spec":{},"status":{}}
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"gitea-bootstrap"},"spec":{},"status":{}}
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
-      kubernetes.io/metadata.name: habitat-demo
-      managed-by: terraform
-      owner: platform-team
-      tier: app
-    name: habitat-demo
+      kubernetes.io/metadata.name: gitea-bootstrap
+    name: gitea-bootstrap
   spec:
     finalizers:
     - kubernetes
@@ -514,25 +546,6 @@ items:
       owner: platform-team
       tier: platform
     name: headlamp
-  spec:
-    finalizers:
-    - kubernetes
-  status:
-    phase: Active
-- apiVersion: v1
-  kind: Namespace
-  metadata:
-    annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"}]}'
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"inference"},"spec":{},"status":{}}
-      lifecycle.cattle.io/create.namespace-auth: "true"
-    labels:
-      kubernetes.io/metadata.name: inference
-      managed-by: terraform
-      owner: ml-team
-      tier: ml
-    name: inference
   spec:
     finalizers:
     - kubernetes
@@ -564,16 +577,20 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:28:11Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:28:11Z"}]}'
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"inspec-scans"},"spec":{},"status":{}}
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"}]}'
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
-      kubernetes.io/metadata.name: inspec-scans
-      managed-by: terraform
-      owner: platform-team
-      tier: platform
-    name: inspec-scans
+      control-plane: controller-manager
+      konflux.konflux-ci.dev/component: integration
+      konflux.konflux-ci.dev/owner: konflux-integration-service
+      kubernetes.io/metadata.name: integration-service
+    name: integration-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxIntegrationService
+      name: konflux-integration-service
   spec:
     finalizers:
     - kubernetes
@@ -675,6 +692,93 @@ items:
   kind: Namespace
   metadata:
     annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:16Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:16Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      konflux.konflux-ci.dev/component: cli
+      konflux.konflux-ci.dev/owner: konflux-cli
+      kubernetes.io/metadata.name: konflux-cli
+    name: konflux-cli
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxCLI
+      name: konflux-cli
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:43:19Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:43:19Z"}]}'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"konflux-info"}}
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      konflux.konflux-ci.dev/component: info
+      konflux.konflux-ci.dev/owner: konflux-info
+      kubernetes.io/metadata.name: konflux-info
+    name: konflux-info
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxInfo
+      name: konflux-info
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:48:11Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:48:11Z"}]}'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"labels":{"app.kubernetes.io/managed-by":"kustomize","app.kubernetes.io/name":"konflux-operator","control-plane":"controller-manager"},"name":"konflux-operator"}}
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/name: konflux-operator
+      control-plane: controller-manager
+      kubernetes.io/metadata.name: konflux-operator
+    name: konflux-operator
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      konflux.konflux-ci.dev/component: ui
+      konflux.konflux-ci.dev/owner: konflux-ui
+      kubernetes.io/metadata.name: konflux-ui
+    name: konflux-ui
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxUI
+      name: konflux-ui
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"}]}'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"labels":{"k8s-app":"flannel","pod-security.kubernetes.io/enforce":"privileged"},"name":"kube-flannel"}}
@@ -734,46 +838,14 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"}]}'
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"kubeflow"},"spec":{},"status":{}}
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:42:44Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:42:44Z"}]}'
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
-      istio-injection: enabled
-      kubernetes.io/metadata.name: kubeflow
-      managed-by: terraform
-      owner: ml-team
-      tier: ml
-    name: kubeflow
-  spec:
-    finalizers:
-    - kubernetes
-  status:
-    phase: Active
-- apiVersion: v1
-  kind: Namespace
-  metadata:
-    annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"}]}'
-      lifecycle.cattle.io/create.namespace-auth: "true"
-      owner: user@example.com
-    labels:
-      app.kubernetes.io/part-of: kubeflow-profile
-      istio-injection: enabled
-      katib.kubeflow.org/metrics-collector-injection: enabled
-      kubernetes.io/metadata.name: kubeflow-user-example-com
-      managed-by: terraform
-      owner: ml-team
-      pipelines.kubeflow.org/enabled: "true"
-      serving.kubeflow.org/inferenceservice: enabled
-      tier: ml
-    name: kubeflow-user-example-com
-    ownerReferences:
-    - apiVersion: kubeflow.org/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Profile
-      name: kubeflow-user-example-com
+      app.kubernetes.io/instance: kyverno
+      app.kubernetes.io/part-of: kyverno
+      app.kubernetes.io/version: v1.17.1
+      kubernetes.io/metadata.name: kyverno
+    name: kyverno
   spec:
     finalizers:
     - kubernetes
@@ -838,25 +910,6 @@ items:
     annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"}]}'
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"mlflow"},"spec":{},"status":{}}
-      lifecycle.cattle.io/create.namespace-auth: "true"
-    labels:
-      kubernetes.io/metadata.name: mlflow
-      managed-by: terraform
-      owner: ml-team
-      tier: ml
-    name: mlflow
-  spec:
-    finalizers:
-    - kubernetes
-  status:
-    phase: Active
-- apiVersion: v1
-  kind: Namespace
-  metadata:
-    annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"}]}'
-      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"monitoring"},"spec":{},"status":{}}
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
@@ -874,16 +927,35 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"}]}'
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"oauth2-proxy"}}
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"}]}'
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
-      kubernetes.io/metadata.name: oauth2-proxy
-      managed-by: terraform
-      owner: platform-team
-      tier: platform
-    name: oauth2-proxy
+      konflux.konflux-ci.dev/component: namespace-lister
+      konflux.konflux-ci.dev/owner: konflux-namespace-lister
+      kubernetes.io/metadata.name: namespace-lister
+    name: namespace-lister
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxNamespaceLister
+      name: konflux-namespace-lister
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:42:34Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:42:34Z"}]}'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"openshift-pipelines"}}
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: openshift-pipelines
+    name: openshift-pipelines
   spec:
     finalizers:
     - kubernetes
@@ -942,16 +1014,38 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T04:52:59Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T04:52:59Z"}]}'
-      description: Platform catalog and metadata (read-only)
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:42:27Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:42:27Z"}]}'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"pipelines-as-code","app.kubernetes.io/version":"v0.42.0","openshift.io/cluster-monitoring":"true"},"name":"pipelines-as-code"}}
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
-      app.kubernetes.io/name: platform-meta
-      kubernetes.io/metadata.name: platform-meta
-      managed-by: terraform
-      owner: platform-team
-      tier: platform
-    name: platform-meta
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: pipelines-as-code
+      app.kubernetes.io/version: v0.42.0
+      kubernetes.io/metadata.name: pipelines-as-code
+      openshift.io/cluster-monitoring: "true"
+    name: pipelines-as-code
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T08:45:31Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T08:45:31Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      app.kubernetes.io/name: piraeus-datastore
+      kubernetes.io/metadata.name: piraeus-datastore
+      pod-security.kubernetes.io/audit: privileged
+      pod-security.kubernetes.io/audit-version: latest
+      pod-security.kubernetes.io/enforce: privileged
+      pod-security.kubernetes.io/enforce-version: latest
+      pod-security.kubernetes.io/warn: privileged
+      pod-security.kubernetes.io/warn-version: latest
+    name: piraeus-datastore
   spec:
     finalizers:
     - kubernetes
@@ -971,6 +1065,46 @@ items:
       owner: platform-team
       tier: platform
     name: registry
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T12:02:15Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      control-plane: controller-manager
+      konflux.konflux-ci.dev/component: release
+      konflux.konflux-ci.dev/owner: konflux-release-service
+      kubernetes.io/metadata.name: release-service
+    name: release-service
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxReleaseService
+      name: konflux-release-service
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T16:19:32Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T16:19:32Z"}]}'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"labels":{"name":"robusta"},"name":"robusta"}}
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: robusta
+      name: robusta
+    name: robusta
   spec:
     finalizers:
     - kubernetes
@@ -1018,13 +1152,34 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T04:53:18Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T04:53:18Z"}]}'
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:39:36Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:39:36Z"}]}'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"tekton-operator"}}
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
-      kubernetes.io/metadata.name: tf-demo
-      managed-by: terraform
-      purpose: w4-d1-demo
-    name: tf-demo
+      kubernetes.io/metadata.name: tekton-operator
+    name: tekton-operator
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:39:57Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T11:39:58Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: tekton-pipelines
+      operator.tekton.dev/targetNamespace: "true"
+    name: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonConfig
+      name: config
   spec:
     finalizers:
     - kubernetes

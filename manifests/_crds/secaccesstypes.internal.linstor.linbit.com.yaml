@@ -1,0 +1,32 @@
+apiVersion: v1
+items:
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAccessTypes
+  metadata:
+    name: 28baebc3d12621e39673279d6837b21441f1b563cd5b9ceee9a46a8215be5538
+  spec:
+    access_type_name: VIEW
+    access_type_value: 1
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAccessTypes
+  metadata:
+    name: 6fecf9081bd58fa5a91e8a1d8093dc89d0e2d87992138ca05ec4270060e69c2c
+  spec:
+    access_type_name: CONTROL
+    access_type_value: 15
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAccessTypes
+  metadata:
+    name: 7886016c640975f8362f7bb792dd26be3af962887943f1a28658d0c4c52a8fe7
+  spec:
+    access_type_name: CHANGE
+    access_type_value: 7
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAccessTypes
+  metadata:
+    name: b3c2ed23b44e753d6bfc54b1d48ff7d0e4959624ecf1ceb1d0942bac08548634
+  spec:
+    access_type_name: USE
+    access_type_value: 3
+kind: List
+metadata:

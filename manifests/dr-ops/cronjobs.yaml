@@ -129,6 +129,13 @@ items:
     schedule: 15 1 * * *
     successfulJobsHistoryLimit: 2
     suspend: false
-  status: {}
+  status:
+    active:
+    - apiVersion: batch/v1
+      kind: Job
+      name: manifest-backup-29615115
+      namespace: dr-ops
+    lastScheduleTime: "2026-04-23T01:15:00Z"
+    lastSuccessfulTime: "2026-04-22T08:28:39Z"
 kind: List
 metadata:

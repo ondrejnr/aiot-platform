@@ -1,0 +1,186 @@
+apiVersion: v1
+items:
+- apiVersion: operator.tekton.dev/v1alpha1
+  kind: TektonConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"operator.tekton.dev/v1alpha1","kind":"TektonConfig","metadata":{"annotations":{},"name":"config"},"spec":{"chain":{"artifacts.oci.storage":"oci","artifacts.pipelinerun.enable-deep-inspection":"true","artifacts.pipelinerun.format":"in-toto","artifacts.pipelinerun.storage":"oci","artifacts.taskrun.format":"in-toto","artifacts.taskrun.storage":"","options":{"deployments":{"tekton-chains-controller":{"spec":{"template":{"spec":{"containers":[{"name":"tekton-chains-controller","volumeMounts":[{"mountPath":"/etc/ssl/certs","name":"trusted-ca","readOnly":true}]}],"volumes":[{"configMap":{"items":[{"key":"ca-bundle.crt","path":"ca-bundle.crt"}],"name":"trusted-ca","optional":true},"name":"trusted-ca"}]}}}}},"disabled":false},"transparency.enabled":"false"},"pipeline":{"default-service-account":"default","options":{"deployments":{"tekton-pipelines-remote-resolvers":{"spec":{"template":{"spec":{"containers":[{"env":[{"name":"GIT_SSL_CAINFO","value":"/etc/ssl/certs/ca-bundle.crt"}],"name":"controller","volumeMounts":[{"mountPath":"/etc/ssl/certs","name":"trusted-ca","readOnly":true}]}],"volumes":[{"configMap":{"items":[{"key":"ca-bundle.crt","path":"ca-bundle.crt"}],"name":"trusted-ca","optional":true},"name":"trusted-ca"}]}}}}},"disabled":false}},"profile":"basic","pruner":{"keep":100,"resources":["pipelinerun","taskrun"],"schedule":"0 8 * * *"},"result":{"disabled":false},"targetNamespace":"tekton-pipelines"}}
+    finalizers:
+    - tektonconfigs.operator.tekton.dev
+    labels:
+      operator.tekton.dev/release-version: v0.79.0
+    name: config
+  spec:
+    addon: {}
+    chain:
+      artifacts.oci.format: simplesigning
+      artifacts.oci.storage: oci
+      artifacts.pipelinerun.enable-deep-inspection: "true"
+      artifacts.pipelinerun.format: in-toto
+      artifacts.pipelinerun.storage: oci
+      artifacts.taskrun.format: in-toto
+      artifacts.taskrun.storage: ""
+      disabled: false
+      options:
+        deployments:
+          tekton-chains-controller:
+            metadata:
+            spec:
+              selector: null
+              strategy: {}
+              template:
+                metadata:
+                spec:
+                  containers:
+                  - name: tekton-chains-controller
+                    resources: {}
+                    volumeMounts:
+                    - mountPath: /etc/ssl/certs
+                      name: trusted-ca
+                      readOnly: true
+                  volumes:
+                  - configMap:
+                      items:
+                      - key: ca-bundle.crt
+                        path: ca-bundle.crt
+                      name: trusted-ca
+                      optional: true
+                    name: trusted-ca
+            status: {}
+        disabled: false
+      performance:
+        disable-ha: false
+      transparency.enabled: "false"
+    config: {}
+    dashboard:
+      options: {}
+      readonly: false
+    hub:
+      options: {}
+    multiclusterProxyAAE:
+      options: {}
+    pipeline:
+      await-sidecar-readiness: true
+      coschedule: workspaces
+      default-service-account: default
+      disable-creds-init: false
+      enable-api-fields: beta
+      enable-bundles-resolver: true
+      enable-cel-in-whenexpression: false
+      enable-cluster-resolver: true
+      enable-custom-tasks: true
+      enable-git-resolver: true
+      enable-hub-resolver: true
+      enable-param-enum: false
+      enable-provenance-in-status: true
+      enable-step-actions: true
+      enforce-nonfalsifiability: none
+      keep-pod-on-cancel: false
+      max-result-size: 4096
+      metrics.count.enable-reason: false
+      metrics.pipelinerun.duration-type: histogram
+      metrics.pipelinerun.level: pipeline
+      metrics.taskrun.duration-type: histogram
+      metrics.taskrun.level: task
+      options:
+        deployments:
+          tekton-pipelines-remote-resolvers:
+            metadata:
+            spec:
+              selector: null
+              strategy: {}
+              template:
+                metadata:
+                spec:
+                  containers:
+                  - env:
+                    - name: GIT_SSL_CAINFO
+                      value: /etc/ssl/certs/ca-bundle.crt
+                    name: controller
+                    resources: {}
+                    volumeMounts:
+                    - mountPath: /etc/ssl/certs
+                      name: trusted-ca
+                      readOnly: true
+                  volumes:
+                  - configMap:
+                      items:
+                      - key: ca-bundle.crt
+                        path: ca-bundle.crt
+                      name: trusted-ca
+                      optional: true
+                    name: trusted-ca
+            status: {}
+        disabled: false
+      performance:
+        disable-ha: false
+      require-git-ssh-secret-known-hosts: false
+      results-from: termination-message
+      running-in-environment-with-injected-sidecars: true
+      send-cloudevents-for-runs: false
+      set-security-context: false
+      trusted-resources-verification-no-match-policy: ignore
+    platforms:
+      openshift: {}
+    profile: basic
+    pruner:
+      disabled: false
+      keep: 100
+      resources:
+      - pipelinerun
+      - taskrun
+      schedule: 0 8 * * *
+    result:
+      disabled: false
+      is_external_db: false
+      options: {}
+      performance:
+        disable-ha: false
+      route_enabled: false
+      route_tls_termination: edge
+    scheduler:
+      config.yaml:
+        cel: {}
+        queueName: pipelines-queue
+      disabled: true
+      multi-cluster-disabled: true
+      multi-cluster-role: ""
+      options: {}
+    targetNamespace: tekton-pipelines
+    tektonpruner:
+      disabled: true
+      global-config:
+        enforcedConfigLevel: global
+        historyLimit: 100
+      options: {}
+    trigger:
+      disabled: false
+      enable-api-fields: stable
+      options: {}
+  status:
+    annotations:
+      operator.tekton.dev/post-upgrade-version: v0.79.0
+      operator.tekton.dev/pre-upgrade-version: v0.79.0
+    conditions:
+    - lastTransitionTime: "2026-04-22T15:17:40Z"
+      status: "True"
+      type: ComponentsReady
+    - lastTransitionTime: "2026-04-22T11:42:18Z"
+      status: "True"
+      type: PostInstall
+    - lastTransitionTime: "2026-04-22T11:42:22Z"
+      status: "True"
+      type: PostUpgrade
+    - lastTransitionTime: "2026-04-22T11:39:56Z"
+      status: "True"
+      type: PreInstall
+    - lastTransitionTime: "2026-04-22T11:39:56Z"
+      status: "True"
+      type: PreUpgrade
+    - lastTransitionTime: "2026-04-22T15:17:40Z"
+      status: "True"
+      type: Ready
+    version: v0.79.0
+kind: List
+metadata:

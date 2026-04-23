@@ -147,6 +147,50 @@ items:
     namespace: monitoring
 - apiVersion: v1
   data:
+    config.yaml: |
+      logLevel: warn
+      logFormat: json
+      route:
+        match:
+          - receiver: "mm"
+            type: "Warning"
+      receivers:
+        - name: "mm"
+          webhook:
+            endpoint: "https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr"
+            headers:
+              Content-Type: application/json
+            layout:
+              channel: "k8s"
+              username: "k8s-events"
+              icon_emoji: ":warning:"
+              text: |
+                ### :warning: {{ .Reason }} — {{ .InvolvedObject.Kind }} `{{ .Namespace }}/{{ .InvolvedObject.Name }}`
+                **Message:** {{ .Message }}
+                | Field | Value |
+                |---|---|
+                | Reason | `{{ .Reason }}` |
+                | Type | `{{ .Type }}` |
+                | Count | {{ .Count }} |
+                | First seen | {{ .FirstTimestamp }} |
+                | Last seen | {{ .LastTimestamp }} |
+                | Source host | `{{ .Source.Host }}` |
+                | Component | `{{ .Source.Component }}` |
+                | Reporting ctrl | `{{ .ReportingController }}` |
+                {{- if .InvolvedObject.Labels }}
+                **Labels:** {{ range $k,$v := .InvolvedObject.Labels }}`{{ $k }}={{ $v }}` {{ end }}
+                {{- end }}
+                ---
+                _Investigate:_ [Holmes](https://holmes.35.241.255.137.nip.io) · `kubectl -n {{ .Namespace }} describe {{ .InvolvedObject.Kind | lower }} {{ .InvolvedObject.Name }}` · `kubectl -n {{ .Namespace }} logs {{ .InvolvedObject.Name }} --tail=50`
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"config.yaml":"logLevel: warn\nlogFormat: json\nroute:\n  match:\n    - receiver: \"mm\"\n      type: \"Warning\"\nreceivers:\n  - name: \"mm\"\n    webhook:\n      endpoint: \"https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr\"\n      headers:\n        Content-Type: application/json\n      layout:\n        channel: \"k8s\"\n        username: \"k8s-events\"\n        icon_emoji: \":warning:\"\n        text: |\n          ### :warning: {{ .Reason }} — {{ .InvolvedObject.Kind }} `{{ .Namespace }}/{{ .InvolvedObject.Name }}`\n          **Message:** {{ .Message }}\n          | Field | Value |\n          |---|---|\n          | Reason | `{{ .Reason }}` |\n          | Type | `{{ .Type }}` |\n          | Count | {{ .Count }} |\n          | First seen | {{ .FirstTimestamp }} |\n          | Last seen | {{ .LastTimestamp }} |\n          | Source host | `{{ .Source.Host }}` |\n          | Component | `{{ .Source.Component }}` |\n          | Reporting ctrl | `{{ .ReportingController }}` |\n          {{- if .InvolvedObject.Labels }}\n          **Labels:** {{ range $k,$v := .InvolvedObject.Labels }}`{{ $k }}={{ $v }}` {{ end }}\n          {{- end }}\n          ---\n          _Investigate:_ [Holmes](https://holmes.35.241.255.137.nip.io) · `kubectl -n {{ .Namespace }} describe {{ .InvolvedObject.Kind | lower }} {{ .InvolvedObject.Name }}` · `kubectl -n {{ .Namespace }} logs {{ .InvolvedObject.Name }} --tail=50`\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"event-exporter-cfg","namespace":"monitoring"}}
+    name: event-exporter-cfg
+    namespace: monitoring
+- apiVersion: v1
+  data:
     root-cert.pem: |
       -----BEGIN CERTIFICATE-----
       MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
@@ -202,104 +246,6 @@ items:
         IP or kubernetes.default.svc. No other usage is guaranteed across distributions
         of Kubernetes clusters.
     name: kube-root-ca.crt
-    namespace: monitoring
-- apiVersion: v1
-  data:
-    collect.py: |
-      #!/usr/bin/env python3
-      import json, urllib.request, os, sys
-      from datetime import datetime, timezone
-
-      PROM = "http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090"
-      PG_DSN = "host=postgres.aiot.svc dbname=aiot user=aiot password=aiot123"
-
-      def prom_query(query):
-          url = f"{PROM}/api/v1/query?query={urllib.request.quote(query)}"
-          try:
-              with urllib.request.urlopen(url, timeout=10) as r:
-                  data = json.loads(r.read())
-                  if data["status"] == "success":
-                      return data["data"]["result"]
-          except Exception as e:
-              print(f"  Query error: {e}", file=sys.stderr)
-          return []
-
-      def get_val(results, labels=None):
-          for r in results:
-              if labels and not all(r["metric"].get(k) == v for k, v in labels.items()):
-                  continue
-              return float(r["value"][1])
-          return None
-
-      # Build node → instance mapping via kube_node_info
-      node_map = {}
-      kube_nodes = prom_query('kube_node_info')
-      for r in kube_nodes:
-          node = r["metric"].get("node", "")
-          ip = r["metric"].get("internal_ip", "")
-          if node and ip:
-              node_map[node] = f"{ip}:9100"
-      print(f"Node map: {node_map}")
-
-      # Collect all metrics at once (efficient - one query per metric for all nodes)
-      cpu_data = prom_query('100 - (avg by(instance)(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)')
-      mem_avail = prom_query('node_memory_MemAvailable_bytes')
-      mem_total = prom_query('node_memory_MemTotal_bytes')
-      disk_r = prom_query('sum by(instance)(rate(node_disk_read_bytes_total[5m]))')
-      disk_w = prom_query('sum by(instance)(rate(node_disk_written_bytes_total[5m]))')
-      net_rx = prom_query('sum by(instance)(rate(node_network_receive_bytes_total{device!="lo"}[5m]))')
-      net_tx = prom_query('sum by(instance)(rate(node_network_transmit_bytes_total{device!="lo"}[5m]))')
-      load1 = prom_query('node_load1')
-      load5 = prom_query('node_load5')
-      load15 = prom_query('node_load15')
-      fs_data = prom_query('100 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100)')
-      pods_data = prom_query('count by(node)(kube_pod_info)')
-
-      ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S+00")
-
-      import subprocess
-      rows = 0
-      for node, instance in node_map.items():
-          lbl = {"instance": instance}
-          cpu = get_val(cpu_data, lbl)
-          ma = get_val(mem_avail, lbl)
-          mt = get_val(mem_total, lbl)
-          mem_pct = ((1 - ma/mt) * 100) if ma is not None and mt else None
-          dr = get_val(disk_r, lbl)
-          dw = get_val(disk_w, lbl)
-          nr = get_val(net_rx, lbl)
-          nt = get_val(net_tx, lbl)
-          l1 = get_val(load1, lbl)
-          l5 = get_val(load5, lbl)
-          l15 = get_val(load15, lbl)
-          fs = get_val(fs_data, lbl)
-          pods = None
-          for r in pods_data:
-              if r["metric"].get("node") == node:
-                  pods = int(float(r["value"][1]))
-                  break
-
-          def s(v):
-              return "NULL" if v is None else str(round(v, 4))
-
-          sql = f"""INSERT INTO cluster_metrics (ts,node_name,cpu_usage_percent,memory_usage_percent,memory_available_bytes,disk_usage_percent,disk_io_read_bytes_rate,disk_io_write_bytes_rate,network_rx_bytes_rate,network_tx_bytes_rate,load_avg_1m,load_avg_5m,load_avg_15m,pods_running) VALUES ('{ts}','{node}',{s(cpu)},{s(mem_pct)},{s(ma)},{s(fs)},{s(dr)},{s(dw)},{s(nr)},{s(nt)},{s(l1)},{s(l5)},{s(l15)},{s(pods) if pods is not None else 'NULL'});"""
-
-          env = os.environ.copy()
-          env["PGPASSWORD"] = "aiot123"
-          result = subprocess.run(["psql", "-h", "postgres.aiot.svc", "-U", "aiot", "-d", "aiot", "-c", sql], env=env, capture_output=True, text=True)
-          if result.returncode == 0:
-              rows += 1
-              print(f"  OK: {node} cpu={s(cpu)}% mem={s(mem_pct)}% load={s(l1)} pods={pods}")
-          else:
-              print(f"  FAIL: {node}: {result.stderr.strip()}")
-
-      print(f"Inserted {rows}/{len(node_map)} nodes at {ts}")
-  kind: ConfigMap
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","data":{"collect.py":"#!/usr/bin/env python3\nimport json, urllib.request, os, sys\nfrom datetime import datetime, timezone\n\nPROM = \"http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090\"\nPG_DSN = \"host=postgres.aiot.svc dbname=aiot user=aiot password=aiot123\"\n\ndef prom_query(query):\n    url = f\"{PROM}/api/v1/query?query={urllib.request.quote(query)}\"\n    try:\n        with urllib.request.urlopen(url, timeout=10) as r:\n            data = json.loads(r.read())\n            if data[\"status\"] == \"success\":\n                return data[\"data\"][\"result\"]\n    except Exception as e:\n        print(f\"  Query error: {e}\", file=sys.stderr)\n    return []\n\ndef get_val(results, labels=None):\n    for r in results:\n        if labels and not all(r[\"metric\"].get(k) == v for k, v in labels.items()):\n            continue\n        return float(r[\"value\"][1])\n    return None\n\n# Build node → instance mapping via kube_node_info\nnode_map = {}\nkube_nodes = prom_query('kube_node_info')\nfor r in kube_nodes:\n    node = r[\"metric\"].get(\"node\", \"\")\n    ip = r[\"metric\"].get(\"internal_ip\", \"\")\n    if node and ip:\n        node_map[node] = f\"{ip}:9100\"\nprint(f\"Node map: {node_map}\")\n\n# Collect all metrics at once (efficient - one query per metric for all nodes)\ncpu_data = prom_query('100 - (avg by(instance)(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)')\nmem_avail = prom_query('node_memory_MemAvailable_bytes')\nmem_total = prom_query('node_memory_MemTotal_bytes')\ndisk_r = prom_query('sum by(instance)(rate(node_disk_read_bytes_total[5m]))')\ndisk_w = prom_query('sum by(instance)(rate(node_disk_written_bytes_total[5m]))')\nnet_rx = prom_query('sum by(instance)(rate(node_network_receive_bytes_total{device!=\"lo\"}[5m]))')\nnet_tx = prom_query('sum by(instance)(rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m]))')\nload1 = prom_query('node_load1')\nload5 = prom_query('node_load5')\nload15 = prom_query('node_load15')\nfs_data = prom_query('100 - (node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"} * 100)')\npods_data = prom_query('count by(node)(kube_pod_info)')\n\nts = datetime.now(timezone.utc).strftime(\"%Y-%m-%d %H:%M:%S+00\")\n\nimport subprocess\nrows = 0\nfor node, instance in node_map.items():\n    lbl = {\"instance\": instance}\n    cpu = get_val(cpu_data, lbl)\n    ma = get_val(mem_avail, lbl)\n    mt = get_val(mem_total, lbl)\n    mem_pct = ((1 - ma/mt) * 100) if ma is not None and mt else None\n    dr = get_val(disk_r, lbl)\n    dw = get_val(disk_w, lbl)\n    nr = get_val(net_rx, lbl)\n    nt = get_val(net_tx, lbl)\n    l1 = get_val(load1, lbl)\n    l5 = get_val(load5, lbl)\n    l15 = get_val(load15, lbl)\n    fs = get_val(fs_data, lbl)\n    pods = None\n    for r in pods_data:\n        if r[\"metric\"].get(\"node\") == node:\n            pods = int(float(r[\"value\"][1]))\n            break\n\n    def s(v):\n        return \"NULL\" if v is None else str(round(v, 4))\n\n    sql = f\"\"\"INSERT INTO cluster_metrics (ts,node_name,cpu_usage_percent,memory_usage_percent,memory_available_bytes,disk_usage_percent,disk_io_read_bytes_rate,disk_io_write_bytes_rate,network_rx_bytes_rate,network_tx_bytes_rate,load_avg_1m,load_avg_5m,load_avg_15m,pods_running) VALUES ('{ts}','{node}',{s(cpu)},{s(mem_pct)},{s(ma)},{s(fs)},{s(dr)},{s(dw)},{s(nr)},{s(nt)},{s(l1)},{s(l5)},{s(l15)},{s(pods) if pods is not None else 'NULL'});\"\"\"\n\n    env = os.environ.copy()\n    env[\"PGPASSWORD\"] = \"aiot123\"\n    result = subprocess.run([\"psql\", \"-h\", \"postgres.aiot.svc\", \"-U\", \"aiot\", \"-d\", \"aiot\", \"-c\", sql], env=env, capture_output=True, text=True)\n    if result.returncode == 0:\n        rows += 1\n        print(f\"  OK: {node} cpu={s(cpu)}% mem={s(mem_pct)}% load={s(l1)} pods={pods}\")\n    else:\n        print(f\"  FAIL: {node}: {result.stderr.strip()}\")\n\nprint(f\"Inserted {rows}/{len(node_map)} nodes at {ts}\")\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"metrics-collector-script","namespace":"monitoring"}}
-    name: metrics-collector-script
     namespace: monitoring
 - apiVersion: v1
   data:
@@ -3213,6 +3159,203 @@ items:
           labels:
             severity: warning
             source: event-exporter
+    monitoring-aiot-platform-rules-fe0e4fd9-aa64-4f61-9cd0-05e9b4b76dd3.yaml: |
+      groups:
+      - name: nodes
+        rules:
+        - alert: NodeDown
+          annotations:
+            summary: Node {{ $labels.instance }} down
+          expr: up{job="node-exporter"} == 0
+          for: 5m
+          labels:
+            severity: critical
+        - alert: NodeHighCPU
+          annotations:
+            summary: CPU >90% on {{ $labels.instance }}
+          expr: (1 - avg by(instance)(rate(node_cpu_seconds_total{mode="idle"}[5m]))) >
+            0.9
+          for: 15m
+          labels:
+            severity: warning
+        - alert: NodeHighMemory
+          annotations:
+            summary: Memory >90% on {{ $labels.instance }}
+          expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes
+            > 0.9
+          for: 15m
+          labels:
+            severity: warning
+        - alert: NodeDiskPressure
+          annotations:
+            summary: DiskPressure on {{ $labels.node }}
+          expr: kube_node_status_condition{condition="DiskPressure",status="true"} == 1
+          for: 5m
+          labels:
+            severity: critical
+        - alert: NodeNotReady
+          annotations:
+            summary: Node {{ $labels.node }} NotReady
+          expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+          for: 5m
+          labels:
+            severity: critical
+      - name: pods
+        rules:
+        - alert: PodCrashLooping
+          annotations:
+            summary: Pod {{ $labels.namespace }}/{{ $labels.pod }} crashlooping
+          expr: rate(kube_pod_container_status_restarts_total[10m]) * 600 > 3
+          for: 10m
+          labels:
+            severity: warning
+        - alert: PodOOMKilled
+          annotations:
+            summary: 'OOMKilled: {{ $labels.namespace }}/{{ $labels.pod }}'
+          expr: increase(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m])
+            > 0
+          labels:
+            severity: warning
+        - alert: PodImagePullBackOff
+          annotations:
+            summary: 'ImagePull fail: {{ $labels.namespace }}/{{ $labels.pod }}'
+          expr: kube_pod_container_status_waiting_reason{reason=~"ImagePullBackOff|ErrImagePull"}
+            == 1
+          for: 10m
+          labels:
+            severity: warning
+        - alert: DeploymentReplicasMismatch
+          annotations:
+            summary: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} replicas
+              mismatch
+          expr: kube_deployment_spec_replicas != kube_deployment_status_replicas_available
+          for: 15m
+          labels:
+            severity: warning
+        - alert: StatefulSetReplicasMismatch
+          annotations:
+            summary: StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} degraded
+          expr: kube_statefulset_status_replicas_ready != kube_statefulset_status_replicas
+          for: 15m
+          labels:
+            severity: warning
+      - name: storage
+        rules:
+        - alert: PVCAlmostFull
+          annotations:
+            summary: PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} >85%
+              full
+          expr: (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes)
+            > 0.85
+          for: 10m
+          labels:
+            severity: warning
+        - alert: PVCFull
+          annotations:
+            summary: PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} >95%
+              FULL
+          expr: (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes)
+            > 0.95
+          for: 5m
+          labels:
+            severity: critical
+        - alert: PiraeusResourceBad
+          annotations:
+            summary: Piraeus resource {{ $labels.resource }} not UpToDate on {{ $labels.node
+              }}
+          expr: linstor_resource_state{state!="UpToDate"} == 1
+          for: 10m
+          labels:
+            severity: warning
+      - name: workloads
+        rules:
+        - alert: JobFailed
+          annotations:
+            summary: Job {{ $labels.namespace }}/{{ $labels.job_name }} failed
+          expr: kube_job_failed > 0
+          for: 5m
+          labels:
+            severity: warning
+        - alert: CronJobMissed
+          annotations:
+            summary: CronJob {{ $labels.namespace }}/{{ $labels.cronjob }} missed schedule
+          expr: (time() - kube_cronjob_status_last_schedule_time) / 60 > kube_cronjob_spec_suspend
+            == 0 and ON(cronjob,namespace) kube_cronjob_next_schedule_time - time() < -600
+          for: 15m
+          labels:
+            severity: warning
+      - name: ingress-certs
+        rules:
+        - alert: IngressHigh5xx
+          annotations:
+            summary: Ingress {{ $labels.namespace }}/{{ $labels.ingress }} 5xx spike
+          expr: sum(rate(nginx_ingress_controller_requests{status=~"5.."}[5m])) by (ingress,namespace)
+            > 1
+          for: 10m
+          labels:
+            severity: warning
+        - alert: CertExpiringSoon
+          annotations:
+            summary: Cert {{ $labels.namespace }}/{{ $labels.name }} expires in <14d
+          expr: (certmanager_certificate_expiration_timestamp_seconds - time()) / 86400
+            < 14
+          for: 1h
+          labels:
+            severity: warning
+      - name: databases
+        rules:
+        - alert: PostgresDown
+          annotations:
+            summary: Postgres {{ $labels.instance }} down
+          expr: up{job=~".*postgres.*"} == 0
+          for: 5m
+          labels:
+            severity: critical
+        - alert: RedisDown
+          annotations:
+            summary: Redis {{ $labels.instance }} down
+          expr: up{job=~".*redis.*"} == 0
+          for: 5m
+          labels:
+            severity: critical
+        - alert: ClickhouseTooManyParts
+          annotations:
+            summary: 'ClickHouse too many parts: {{ $value }}'
+          expr: ClickHouseAsyncMetrics_MaxPartCountForPartition > 300
+          for: 10m
+          labels:
+            severity: warning
+      - name: platform
+        rules:
+        - alert: KyvernoPolicyViolation
+          annotations:
+            summary: 'Kyverno policy violation: {{ $labels.policy_name }}'
+          expr: increase(kyverno_policy_results_total{policy_validation_mode="enforce",policy_result="fail"}[15m])
+            > 0
+          labels:
+            severity: warning
+        - alert: LonghornVolumeDegraded
+          annotations:
+            summary: Longhorn volume {{ $labels.volume }} degraded
+          expr: longhorn_volume_robustness == 2
+          for: 10m
+          labels:
+            severity: warning
+        - alert: LonghornVolumeFaulted
+          annotations:
+            summary: Longhorn volume {{ $labels.volume }} FAULTED
+          expr: longhorn_volume_robustness == 3
+          for: 2m
+          labels:
+            severity: critical
+        - alert: BackupStale
+          annotations:
+            summary: Backup {{ $labels.job }} stale >24h
+          expr: (time() - max by(job)(backrest_last_success_timestamp_seconds)) / 3600 >
+            24
+          for: 30m
+          labels:
+            severity: warning
     monitoring-prometheus-kube-prometheus-alertmanager.rules-6670a818-1d9d-4f0c-ade1-db8782224db2.yaml: |
       groups:
       - name: alertmanager.rules

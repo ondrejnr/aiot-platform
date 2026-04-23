@@ -4,6 +4,85 @@ items:
   kind: Deployment
   metadata:
     annotations:
+      deployment.kubernetes.io/revision: "6"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"event-exporter"},"name":"event-exporter","namespace":"monitoring"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"event-exporter"}},"template":{"metadata":{"labels":{"app":"event-exporter"}},"spec":{"containers":[{"args":["-conf=/data/config.yaml"],"image":"ghcr.io/resmoio/kubernetes-event-exporter:v1.7.0","name":"event-exporter","resources":{"limits":{"cpu":"200m","memory":"128Mi"},"requests":{"cpu":"20m","memory":"64Mi"}},"volumeMounts":[{"mountPath":"/data","name":"cfg"}]}],"serviceAccountName":"event-exporter","volumes":[{"configMap":{"name":"event-exporter-cfg"},"name":"cfg"}]}}}}
+    labels:
+      app: event-exporter
+    name: event-exporter
+    namespace: monitoring
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: event-exporter
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-22T17:29:31Z"
+        labels:
+          app: event-exporter
+      spec:
+        containers:
+        - args:
+          - -conf=/data/config.yaml
+          image: ghcr.io/resmoio/kubernetes-event-exporter:v1.7
+          imagePullPolicy: IfNotPresent
+          name: event-exporter
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 20m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: cfg
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: event-exporter
+        serviceAccountName: event-exporter
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: event-exporter-cfg
+          name: cfg
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:01:41Z"
+      lastUpdateTime: "2026-04-22T17:01:41Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-04-22T17:00:27Z"
+      lastUpdateTime: "2026-04-22T17:29:33Z"
+      message: ReplicaSet "event-exporter-78c445896f" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 6
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
       deployment.kubernetes.io/revision: "2"
       field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"monitoring:prometheus-grafana","ingressName":"monitoring:prometheus-grafana","hostname":"grafana.35.241.255.137.nip.io","path":"/","allNodes":false}]'
       kubectl.kubernetes.io/last-applied-configuration: |
@@ -258,8 +337,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-20T16:21:42Z"
-      lastUpdateTime: "2026-04-20T16:21:42Z"
+    - lastTransitionTime: "2026-04-22T17:18:37Z"
+      lastUpdateTime: "2026-04-22T17:18:37Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -407,8 +486,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-20T16:20:32Z"
-      lastUpdateTime: "2026-04-20T16:20:32Z"
+    - lastTransitionTime: "2026-04-22T14:17:41Z"
+      lastUpdateTime: "2026-04-22T14:17:41Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -529,8 +608,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-20T16:20:46Z"
-      lastUpdateTime: "2026-04-20T16:20:46Z"
+    - lastTransitionTime: "2026-04-22T14:18:43Z"
+      lastUpdateTime: "2026-04-22T14:18:43Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"

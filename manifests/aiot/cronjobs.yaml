@@ -79,8 +79,8 @@ items:
     successfulJobsHistoryLimit: 3
     suspend: false
   status:
-    lastScheduleTime: "2026-04-22T08:05:00Z"
-    lastSuccessfulTime: "2026-04-22T08:05:04Z"
+    lastScheduleTime: "2026-04-23T01:05:00Z"
+    lastSuccessfulTime: "2026-04-23T01:05:03Z"
 - apiVersion: batch/v1
   kind: CronJob
   metadata:
@@ -135,8 +135,8 @@ items:
     successfulJobsHistoryLimit: 2
     suspend: false
   status:
-    lastScheduleTime: "2026-04-22T08:00:00Z"
-    lastSuccessfulTime: "2026-04-22T08:00:04Z"
+    lastScheduleTime: "2026-04-23T00:00:00Z"
+    lastSuccessfulTime: "2026-04-23T00:00:04Z"
 - apiVersion: batch/v1
   kind: CronJob
   metadata:
@@ -208,6 +208,8 @@ items:
               - mountPath: /backups
                 name: backups
             dnsPolicy: ClusterFirst
+            nodeSelector:
+              piraeus.io/storage: "yes"
             restartPolicy: OnFailure
             schedulerName: default-scheduler
             securityContext: {}
@@ -215,7 +217,7 @@ items:
             volumes:
             - name: backups
               persistentVolumeClaim:
-                claimName: postgres-backup-data
+                claimName: postgres-backup-data-piraeus
     schedule: 0 3 * * *
     successfulJobsHistoryLimit: 3
     suspend: false
@@ -251,9 +253,8 @@ items:
                                          password=os.environ['PG_PASS'], dbname='aiot')
                 conn.autocommit = True
                 cur = conn.cursor()
-                for t in ['sensor_data','predictions']:
-                    cur.execute(f"DELETE FROM {t} WHERE ts < NOW() - INTERVAL '14 days'")
-                    print(f"Cleaned {t}: {cur.rowcount} rows")
+                cur.execute("DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '14 days'")
+                print(f"Cleaned sensor_data: {cur.rowcount} rows")
                 cur.close(); conn.close()
               env:
               - name: PG_HOST
@@ -280,7 +281,7 @@ items:
     successfulJobsHistoryLimit: 2
     suspend: false
   status:
-    lastScheduleTime: "2026-04-22T06:00:00Z"
-    lastSuccessfulTime: "2026-04-22T06:00:27Z"
+    lastScheduleTime: "2026-04-23T00:00:00Z"
+    lastSuccessfulTime: "2026-04-23T00:00:03Z"
 kind: List
 metadata:

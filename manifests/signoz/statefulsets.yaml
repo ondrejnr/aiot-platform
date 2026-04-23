@@ -17,7 +17,7 @@ items:
       clickhouse.altinity.com/chi: signoz-clickhouse
       clickhouse.altinity.com/cluster: cluster
       clickhouse.altinity.com/namespace: signoz
-      clickhouse.altinity.com/object-version: 7da7cf67106ee523aca3750e688060ce6f0d37b9
+      clickhouse.altinity.com/object-version: 5eb563c5e4753a34ac6fe3246637353c80eb4e3f
       clickhouse.altinity.com/replica: "0"
       clickhouse.altinity.com/shard: "0"
       helm.sh/chart: clickhouse-24.1.18
@@ -235,7 +235,7 @@ items:
         resources:
           requests:
             storage: 10Gi
-        storageClassName: local-path
+        storageClassName: piraeus-r2
         volumeMode: Filesystem
       status:
         phase: Pending
@@ -244,7 +244,7 @@ items:
     collisionCount: 0
     currentReplicas: 1
     currentRevision: chi-signoz-clickhouse-cluster-0-0-6ccfbbbb5c
-    observedGeneration: 3
+    observedGeneration: 1
     readyReplicas: 1
     replicas: 1
     updateRevision: chi-signoz-clickhouse-cluster-0-0-6ccfbbbb5c
@@ -383,6 +383,8 @@ items:
           - mountPath: /scripts
             name: aiot-dashboard-seed-script
             readOnly: true
+        nodeSelector:
+          piraeus.io/storage: "yes"
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -423,11 +425,11 @@ items:
     availableReplicas: 1
     collisionCount: 0
     currentReplicas: 1
-    currentRevision: signoz-79b47d49db
-    observedGeneration: 25
+    currentRevision: signoz-7d9695f6d9
+    observedGeneration: 28
     readyReplicas: 1
     replicas: 1
-    updateRevision: signoz-79b47d49db
+    updateRevision: signoz-7d9695f6d9
     updatedReplicas: 1
 - apiVersion: apps/v1
   kind: StatefulSet
@@ -592,7 +594,7 @@ items:
             name: data
         dnsPolicy: ClusterFirst
         nodeSelector:
-          kubernetes.io/hostname: oci-e5-node1
+          piraeus.io/storage: "yes"
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext:
@@ -627,11 +629,11 @@ items:
     availableReplicas: 1
     collisionCount: 0
     currentReplicas: 1
-    currentRevision: signoz-zookeeper-5db7975748
-    observedGeneration: 8
+    currentRevision: signoz-zookeeper-69445b4d6b
+    observedGeneration: 12
     readyReplicas: 1
     replicas: 1
-    updateRevision: signoz-zookeeper-5db7975748
+    updateRevision: signoz-zookeeper-69445b4d6b
     updatedReplicas: 1
 kind: List
 metadata:

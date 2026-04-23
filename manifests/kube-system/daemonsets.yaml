@@ -15,6 +15,8 @@ items:
         k8s-app: kube-proxy
     template:
       metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-22T17:08:22Z"
         labels:
           k8s-app: kube-proxy
       spec:
@@ -77,12 +79,12 @@ items:
         maxUnavailable: 1
       type: RollingUpdate
   status:
-    currentNumberScheduled: 6
-    desiredNumberScheduled: 6
-    numberAvailable: 6
+    currentNumberScheduled: 5
+    desiredNumberScheduled: 5
+    numberAvailable: 5
     numberMisscheduled: 0
-    numberReady: 6
-    observedGeneration: 1
-    updatedNumberScheduled: 6
+    numberReady: 5
+    observedGeneration: 2
+    updatedNumberScheduled: 5
 kind: List
 metadata:

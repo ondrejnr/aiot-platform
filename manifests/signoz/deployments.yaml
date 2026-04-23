@@ -139,12 +139,6 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-20T16:20:29Z"
-      lastUpdateTime: "2026-04-20T16:20:29Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-21T03:12:07Z"
       lastUpdateTime: "2026-04-21T03:12:24Z"
       message: ReplicaSet "k8s-infra-otel-deployment-6955655f8b" has successfully
@@ -152,6 +146,12 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T14:17:55Z"
+      lastUpdateTime: "2026-04-22T14:17:55Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 5
     readyReplicas: 1
     replicas: 1
@@ -384,13 +384,13 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-20T16:21:24Z"
-      lastUpdateTime: "2026-04-20T16:21:24Z"
+    - lastTransitionTime: "2026-04-22T14:17:57Z"
+      lastUpdateTime: "2026-04-22T14:17:57Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 2
+    observedGeneration: 4
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -615,18 +615,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-20T11:19:53Z"
-      lastUpdateTime: "2026-04-20T11:19:53Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:43:31Z"
       lastUpdateTime: "2026-04-21T06:40:04Z"
       message: ReplicaSet "signoz-otel-collector-7b5978d7f7" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T10:53:08Z"
+      lastUpdateTime: "2026-04-22T10:53:08Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 3
     readyReplicas: 1
     replicas: 1

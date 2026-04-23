@@ -1,0 +1,44 @@
+apiVersion: v1
+items:
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecRoles
+  metadata:
+    name: 92b7b421992ef490f3b75898ec0e511f1a5c02422819d89719b20362b023ee4f
+  spec:
+    domain_name: USER
+    role_dsp_name: User
+    role_enabled: true
+    role_name: USER
+    role_privileges: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecRoles
+  metadata:
+    name: d621c1a7169f2ca51bc8674da52e9572178a66a1dde88da24da78fe4951703f9
+  spec:
+    domain_name: SYSTEM
+    role_dsp_name: SYSTEM
+    role_enabled: true
+    role_name: SYSTEM
+    role_privileges: -1
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecRoles
+  metadata:
+    name: d9262e7fb868c502061473089e5212378ac3935e2f96294266da6d7eec7d44e0
+  spec:
+    domain_name: PUBLIC
+    role_dsp_name: PUBLIC
+    role_enabled: true
+    role_name: PUBLIC
+    role_privileges: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecRoles
+  metadata:
+    name: dc6190c8b399e043b9dfbacbb0d37f2a2645e33f9938491d24b24e0298d9cd17
+  spec:
+    domain_name: SYSADM
+    role_dsp_name: SysAdm
+    role_enabled: true
+    role_name: SYSADM
+    role_privileges: -1
+kind: List
+metadata:

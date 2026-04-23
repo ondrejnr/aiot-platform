@@ -171,18 +171,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T21:41:47Z"
-      lastUpdateTime: "2026-04-19T21:41:47Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:41:11Z"
       lastUpdateTime: "2026-04-19T21:41:47Z"
       message: ReplicaSet "cluster-local-gateway-5b86b4b569" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T14:20:31Z"
+      lastUpdateTime: "2026-04-22T14:20:31Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 1
     readyReplicas: 1
     replicas: 1
@@ -436,18 +436,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T21:41:27Z"
-      lastUpdateTime: "2026-04-19T21:41:27Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:41:11Z"
       lastUpdateTime: "2026-04-19T21:41:27Z"
       message: ReplicaSet "istio-ingressgateway-6bbf5fdb6f" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T14:18:51Z"
+      lastUpdateTime: "2026-04-22T14:18:51Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 1
     readyReplicas: 1
     replicas: 1
@@ -655,13 +655,13 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-20T12:14:39Z"
-      lastUpdateTime: "2026-04-20T12:14:39Z"
+    - lastTransitionTime: "2026-04-22T10:34:15Z"
+      lastUpdateTime: "2026-04-22T10:34:15Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 7
+    observedGeneration: 11
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1

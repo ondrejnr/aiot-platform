@@ -1,0 +1,26 @@
+apiVersion: v1
+items:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    labels:
+      konflux.konflux-ci.dev/component: cli
+      konflux.konflux-ci.dev/owner: konflux-cli
+    name: konflux-cli-configmaps-read-binding
+    namespace: konflux-cli
+    ownerReferences:
+    - apiVersion: konflux.konflux-ci.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: KonfluxCLI
+      name: konflux-cli
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: konflux-cli-configmaps-read
+  subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: system:authenticated
+kind: List
+metadata:

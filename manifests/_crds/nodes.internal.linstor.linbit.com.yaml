@@ -1,0 +1,22 @@
+apiVersion: v1
+items:
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Nodes
+  metadata:
+    name: 7f4e3ae185bdfb59c34a548e19be496afb4ed93934ac5cbf4754779c52f7339d
+  spec:
+    node_dsp_name: aiot-worker-01
+    node_flags: 0
+    node_name: AIOT-WORKER-01
+    node_type: 2
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Nodes
+  metadata:
+    name: deaecb646237e9b99febdd92e5de94e99e9def5815d67e88324de9bf649c2969
+  spec:
+    node_dsp_name: aiot-worker-02
+    node_flags: 0
+    node_name: AIOT-WORKER-02
+    node_type: 2
+kind: List
+metadata:

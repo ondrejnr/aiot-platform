@@ -1,0 +1,228 @@
+apiVersion: v1
+items:
+- apiVersion: konflux.konflux-ci.dev/v1alpha1
+  kind: Konflux
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"konflux.konflux-ci.dev/v1alpha1","kind":"Konflux","metadata":{"annotations":{},"name":"konflux"},"spec":{"buildService":{"spec":{"buildControllerManager":{"manager":{"resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"30m","memory":"128Mi"}}},"replicas":1}}},"certManager":{"createClusterIssuer":true},"defaultTenant":{"enabled":true},"info":{"spec":{"banner":{"items":[{"summary":"AIoT Konflux dev instance - default demo creds, change in production","type":"warning"}]},"publicInfo":{"environment":"development","visibility":"public"}}},"integrationService":{"spec":{"integrationControllerManager":{"manager":{"resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"30m","memory":"128Mi"}}},"replicas":1}}},"internalRegistry":{"enabled":false},"namespaceLister":{"spec":{"namespaceLister":{"namespaceLister":{"resources":{"limits":{"cpu":"500m","memory":"256Mi"},"requests":{"cpu":"100m","memory":"128Mi"}}},"replicas":1}}},"releaseService":{"spec":{"releaseControllerManager":{"manager":{"resources":{"limits":{"cpu":"200m","memory":"256Mi"},"requests":{"cpu":"30m","memory":"128Mi"}}},"replicas":1}}},"ui":{"spec":{"dex":{"config":{"enablePasswordDB":true,"passwordConnector":"local","staticPasswords":[{"email":"user1@konflux.dev","hash":"$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W","userID":"7138d2fe-724e-4e86-af8a-db7c4b080e20","username":"user1"}]}},"ingress":{"nodePortService":{"httpsPort":30011}},"proxy":{"nginx":{"resources":{"limits":{"cpu":"100m","memory":"256Mi"},"requests":{"cpu":"30m","memory":"128Mi"}}},"replicas":1}}}}}
+    name: konflux
+  spec:
+    buildService:
+      spec:
+        buildControllerManager:
+          manager:
+            resources:
+              limits:
+                cpu: 200m
+                memory: 256Mi
+              requests:
+                cpu: 30m
+                memory: 128Mi
+          replicas: 1
+    certManager:
+      createClusterIssuer: true
+    defaultTenant:
+      enabled: true
+    info:
+      spec:
+        banner:
+          items:
+          - summary: AIoT Konflux dev instance - default demo creds, change in production
+            type: warning
+        publicInfo:
+          environment: development
+          visibility: public
+    integrationService:
+      spec:
+        integrationControllerManager:
+          manager:
+            resources:
+              limits:
+                cpu: 200m
+                memory: 256Mi
+              requests:
+                cpu: 30m
+                memory: 128Mi
+          replicas: 1
+    internalRegistry:
+      enabled: false
+    namespaceLister:
+      spec:
+        namespaceLister:
+          namespaceLister:
+            resources:
+              limits:
+                cpu: 500m
+                memory: 256Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+          replicas: 1
+    releaseService:
+      spec:
+        releaseControllerManager:
+          manager:
+            resources:
+              limits:
+                cpu: 200m
+                memory: 256Mi
+              requests:
+                cpu: 30m
+                memory: 128Mi
+          replicas: 1
+    ui:
+      spec:
+        dex:
+          config:
+            enablePasswordDB: true
+            passwordConnector: local
+            staticPasswords:
+            - email: user@example.com
+              hash: $2a$10$ANfRnLuV0mBjBPujXG9qp.qcCr3uGOmw.YgvdVVR/GlexzczyvvaG
+              userID: 11111111-2222-3333-4444-555555555555
+              username: user
+          replicas: 1
+        ingress:
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+            nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+          enabled: true
+          host: konflux.35.241.255.137.nip.io
+          ingressClassName: nginx
+          tlsSecretName: konflux-ingress-tls
+        proxy:
+          nginx:
+            resources:
+              limits:
+                cpu: 100m
+                memory: 256Mi
+              requests:
+                cpu: 30m
+                memory: 128Mi
+          replicas: 1
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-22T17:56:59Z"
+      message: All 12 components are ready
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-04-22T12:02:15Z"
+      message: cert-manager CRDs are installed
+      observedGeneration: 4
+      reason: CertManagerInstalled
+      status: "True"
+      type: CertManagerAvailable
+    - lastTransitionTime: "2026-04-22T17:56:59Z"
+      message: Deployment has 1/1 replicas ready
+      observedGeneration: 4
+      reason: DeploymentReady
+      status: "True"
+      type: build-service.build-service.build-service-controller-manager
+    - lastTransitionTime: "2026-04-22T17:56:59Z"
+      message: All 1 deployments are ready
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: build-service.Ready
+    - lastTransitionTime: "2026-04-22T12:20:04Z"
+      message: Deployment has 1/1 replicas ready
+      observedGeneration: 4
+      reason: DeploymentReady
+      status: "True"
+      type: ui.konflux-ui.dex
+    - lastTransitionTime: "2026-04-22T12:16:54Z"
+      message: Deployment has 1/1 replicas ready
+      observedGeneration: 4
+      reason: DeploymentReady
+      status: "True"
+      type: ui.konflux-ui.proxy
+    - lastTransitionTime: "2026-04-22T14:19:50Z"
+      message: All 2 deployments are ready
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: ui.Ready
+    - lastTransitionTime: "2026-04-22T12:02:18Z"
+      message: Component ready (no deployments to track)
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: rbac.Ready
+    - lastTransitionTime: "2026-04-22T13:35:44Z"
+      message: Component ready (no deployments to track)
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: info.Ready
+    - lastTransitionTime: "2026-04-22T12:02:29Z"
+      message: Deployment has 1/1 replicas ready
+      observedGeneration: 4
+      reason: DeploymentReady
+      status: "True"
+      type: namespace-lister.namespace-lister.namespace-lister
+    - lastTransitionTime: "2026-04-22T14:20:03Z"
+      message: All 1 deployments are ready
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: namespace-lister.Ready
+    - lastTransitionTime: "2026-04-22T13:35:44Z"
+      message: Component ready (no deployments to track)
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: enterprise-contract.Ready
+    - lastTransitionTime: "2026-04-22T12:02:18Z"
+      message: Component ready (no deployments to track)
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: application-api.Ready
+    - lastTransitionTime: "2026-04-22T13:35:44Z"
+      message: Component ready (no deployments to track)
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: cli.Ready
+    - lastTransitionTime: "2026-04-22T14:20:02Z"
+      message: Component ready (no deployments to track)
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: cert-manager.Ready
+    - lastTransitionTime: "2026-04-22T13:35:45Z"
+      message: Component ready (no deployments to track)
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: default-tenant.Ready
+    - lastTransitionTime: "2026-04-22T12:15:14Z"
+      message: Deployment has 1/1 replicas ready
+      observedGeneration: 4
+      reason: DeploymentReady
+      status: "True"
+      type: integration-service.integration-service.integration-service-controller-manager
+    - lastTransitionTime: "2026-04-22T14:20:26Z"
+      message: All 1 deployments are ready
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: integration-service.Ready
+    - lastTransitionTime: "2026-04-22T14:20:28Z"
+      message: Deployment has 1/1 replicas ready
+      observedGeneration: 4
+      reason: DeploymentReady
+      status: "True"
+      type: release-service.release-service.release-service-controller-manager
+    - lastTransitionTime: "2026-04-22T14:20:28Z"
+      message: All 1 deployments are ready
+      observedGeneration: 4
+      reason: AllComponentsReady
+      status: "True"
+      type: release-service.Ready
+    uiURL: https://konflux.35.241.255.137.nip.io
+kind: List
+metadata:

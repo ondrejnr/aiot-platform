@@ -103,7 +103,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "2"
+      deployment.kubernetes.io/revision: "4"
       field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:cloudbeaver","ingressName":"aiot:cloudbeaver","hostname":"cloudbeaver.35.241.255.137.nip.io","path":"/","allNodes":false}]'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"field.cattle.io/publicEndpoints":"[{\"addresses\":[\"35.241.255.137\"],\"port\":443,\"protocol\":\"HTTPS\",\"serviceName\":\"aiot:cloudbeaver\",\"ingressName\":\"aiot:cloudbeaver\",\"hostname\":\"cloudbeaver.35.241.255.137.nip.io\",\"path\":\"/\",\"allNodes\":false}]"},"name":"cloudbeaver","namespace":"aiot"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"cloudbeaver"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-17T15:38:46Z"},"labels":{"app":"cloudbeaver"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"In","values":["aiot-worker-02"]}]}]}}},"containers":[{"env":[{"name":"CLOUDBEAVER_APP_GRANT_CONNECTIONS_ACCESS_TO_ANONYMOUS_TEAM","value":"true"},{"name":"CB_SERVER_NAME","value":"CloudBeaver AIoT"},{"name":"CB_ADMIN_NAME","value":"cbadmin"},{"name":"CB_ADMIN_PASSWORD","value":"Cb@dmin2026"}],"image":"dbeaver/cloudbeaver:24.3.1","imagePullPolicy":"IfNotPresent","livenessProbe":{"exec":{"command":["stat","/opt/cloudbeaver/workspace"]},"failureThreshold":3,"initialDelaySeconds":30,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":5},"name":"cloudbeaver","ports":[{"containerPort":8978,"protocol":"TCP"}],"resources":{"requests":{"cpu":"100m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/opt/cloudbeaver/workspace","name":"data"},{"mountPath":"/opt/cloudbeaver/conf/initial-data.conf","name":"cb-conf","subPath":"initial-data.conf"},{"mountPath":"/opt/cloudbeaver/conf/initial-data-sources.conf","name":"cb-conf","subPath":"initial-data-sources.conf"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"node-role.kubernetes.io/worker":""},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"cloudbeaver-data-lp"}},{"configMap":{"defaultMode":420,"name":"cloudbeaver-conf"},"name":"cb-conf"}]}}}}
@@ -178,6 +178,7 @@ items:
         dnsPolicy: ClusterFirst
         nodeSelector:
           node-role.kubernetes.io/worker: ""
+          piraeus.io/storage: "yes"
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -185,7 +186,7 @@ items:
         volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: cloudbeaver-data-lp
+            claimName: cloudbeaver-data-lp-piraeus
         - configMap:
             defaultMode: 420
             name: cloudbeaver-conf
@@ -193,19 +194,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-20T17:33:12Z"
-      lastUpdateTime: "2026-04-20T17:33:12Z"
+    - lastTransitionTime: "2026-04-19T21:41:06Z"
+      lastUpdateTime: "2026-04-22T09:21:53Z"
+      message: ReplicaSet "cloudbeaver-59c79dcbb" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T14:03:55Z"
+      lastUpdateTime: "2026-04-22T14:03:55Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-19T21:41:06Z"
-      lastUpdateTime: "2026-04-20T17:33:12Z"
-      message: ReplicaSet "cloudbeaver-575cf969c6" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    observedGeneration: 2
+    observedGeneration: 6
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -310,18 +311,21 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "5"
+      deployment.kubernetes.io/revision: "2"
+      field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":80,"protocol":"HTTP","serviceName":"aiot:hello-aiot","ingressName":"aiot:hello-aiot","hostname":"hello.35.241.255.137.nip.io","path":"/","allNodes":false}]'
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"inference-connector","namespace":"aiot"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"inference-connector"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-python":"true","kubectl.kubernetes.io/restartedAt":"2026-04-15T20:08:11Z"},"labels":{"app":"inference-connector"}},"spec":{"affinity":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"preference":{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"In","values":["aiot-worker-01","aiot-worker-02"]}]},"weight":100}]}},"containers":[{"command":["/bin/sh","-c","python /code/connector.py"],"image":"10.132.0.2:30500/aiot/aiot-python-runtime:latest","imagePullPolicy":"IfNotPresent","name":"inference-connector","ports":[{"containerPort":8000,"protocol":"TCP"}],"resources":{"requests":{"cpu":"100m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/code","name":"code"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"node-role.kubernetes.io/worker":""},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"name":"inference-connector-code"},"name":"code"}]}}}}
-    name: inference-connector
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"hello-aiot"},"name":"hello-aiot","namespace":"aiot"},"spec":{"replicas":2,"selector":{"matchLabels":{"app":"hello-aiot"}},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-22T17:00:00Z"},"labels":{"app":"hello-aiot"}},"spec":{"containers":[{"env":[{"name":"APP_VERSION","value":"0.1.0"}],"image":"internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot:latest","imagePullPolicy":"Always","livenessProbe":{"httpGet":{"path":"/healthz","port":8000},"initialDelaySeconds":10},"name":"app","ports":[{"containerPort":8000}],"readinessProbe":{"httpGet":{"path":"/healthz","port":8000},"initialDelaySeconds":3},"resources":{"limits":{"cpu":"500m","memory":"256Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}}]}}}}
+    labels:
+      app: hello-aiot
+    name: hello-aiot
     namespace: aiot
   spec:
     progressDeadlineSeconds: 600
-    replicas: 1
+    replicas: 2
     revisionHistoryLimit: 10
     selector:
       matchLabels:
-        app: inference-connector
+        app: hello-aiot
     strategy:
       rollingUpdate:
         maxSurge: 25%
@@ -330,77 +334,73 @@ items:
     template:
       metadata:
         annotations:
-          instrumentation.opentelemetry.io/inject-python: "true"
-          kubectl.kubernetes.io/restartedAt: "2026-04-20T17:33:06Z"
+          kubectl.kubernetes.io/restartedAt: "2026-04-22T17:00:00Z"
         labels:
-          app: inference-connector
+          app: hello-aiot
       spec:
-        affinity:
-          nodeAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-            - preference:
-                matchExpressions:
-                - key: kubernetes.io/hostname
-                  operator: In
-                  values:
-                  - aiot-worker-01
-                  - aiot-worker-02
-              weight: 100
         containers:
-        - command:
-          - /bin/sh
-          - -c
-          - python /code/connector.py
-          image: 10.132.0.2:30500/aiot/aiot-python-runtime:v3
-          imagePullPolicy: IfNotPresent
-          name: inference-connector
+        - env:
+          - name: APP_VERSION
+            value: 0.1.0
+          image: 10.132.0.2:30500/aiot/hello-aiot:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: app
           ports:
           - containerPort: 8000
             protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8000
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
           resources:
-            requests:
-              cpu: 100m
+            limits:
+              cpu: 500m
               memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /code
-            name: code
         dnsPolicy: ClusterFirst
-        nodeSelector:
-          kubernetes.io/hostname: aiot-master
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
-        tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
-        volumes:
-        - configMap:
-            defaultMode: 420
-            name: inference-connector-code
-          name: code
   status:
-    availableReplicas: 1
+    availableReplicas: 2
     conditions:
-    - lastTransitionTime: "2026-04-20T19:54:46Z"
-      lastUpdateTime: "2026-04-20T19:54:47Z"
-      message: ReplicaSet "inference-connector-547ddfb8d5" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    - lastTransitionTime: "2026-04-20T19:55:14Z"
-      lastUpdateTime: "2026-04-20T19:55:14Z"
+    - lastTransitionTime: "2026-04-22T17:03:36Z"
+      lastUpdateTime: "2026-04-22T17:03:36Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 5
-    readyReplicas: 1
-    replicas: 1
-    updatedReplicas: 1
+    - lastTransitionTime: "2026-04-22T17:03:19Z"
+      lastUpdateTime: "2026-04-22T17:03:36Z"
+      message: ReplicaSet "hello-aiot-6fc4c9f6b9" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 3
+    readyReplicas: 2
+    replicas: 2
+    updatedReplicas: 2
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -521,18 +521,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T21:42:04Z"
-      lastUpdateTime: "2026-04-19T21:42:04Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-20T19:54:54Z"
       lastUpdateTime: "2026-04-20T19:55:36Z"
       message: ReplicaSet "ngrok-proxy-bcc8c8b57" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T14:37:50Z"
+      lastUpdateTime: "2026-04-22T14:37:50Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 6
     readyReplicas: 1
     replicas: 1
@@ -541,7 +541,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "3"
+      deployment.kubernetes.io/revision: "5"
       field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:open-webui","ingressName":"aiot:open-webui","hostname":"chat.35.241.255.137.nip.io","path":"/","allNodes":false}]'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"field.cattle.io/publicEndpoints":"[{\"addresses\":[\"35.241.255.137\"],\"port\":443,\"protocol\":\"HTTPS\",\"serviceName\":\"aiot:open-webui\",\"ingressName\":\"aiot:open-webui\",\"hostname\":\"chat.35.241.255.137.nip.io\",\"path\":\"/\",\"allNodes\":false}]"},"name":"open-webui","namespace":"aiot"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"open-webui"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-17T04:47:46Z"},"labels":{"app":"open-webui"}},"spec":{"affinity":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"preference":{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"In","values":["aiot-worker-01","aiot-worker-02"]}]},"weight":100}]}},"containers":[{"env":[{"name":"OPENAI_API_BASE_URLS","value":"http://api-gateway.aiot.svc.cluster.local:8080/v1;http://ngrok-proxy.aiot.svc.cluster.local:8090/v1"},{"name":"OPENAI_API_KEYS","value":"sk-sambanova;sk-groq"},{"name":"WEBUI_AUTH","value":"false"},{"name":"ENABLE_SIGNUP","value":"true"},{"name":"DEFAULT_MODELS","value":"sambanova-aiot"},{"name":"WEBUI_NAME","value":"AIoT Smart Factory"},{"name":"DATABASE_URL","value":"postgresql://aiot:aiot123@postgres.aiot.svc:5432/open_webui"}],"image":"ghcr.io/open-webui/open-webui:main","imagePullPolicy":"IfNotPresent","livenessProbe":{"exec":{"command":["stat","/app/backend/data"]},"failureThreshold":3,"initialDelaySeconds":60,"periodSeconds":30,"successThreshold":1,"timeoutSeconds":5},"name":"open-webui","ports":[{"containerPort":8080,"protocol":"TCP"}],"resources":{"requests":{"cpu":"100m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/app/backend/data","name":"data"},{"mountPath":"/app/backend/data/cache","name":"cache"}]}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"open-webui-data-lp"}},{"emptyDir":{"sizeLimit":"2Gi"},"name":"cache"}]}}}}
@@ -621,6 +621,8 @@ items:
           - mountPath: /app/backend/data/cache
             name: cache
         dnsPolicy: ClusterFirst
+        nodeSelector:
+          piraeus.io/storage: "yes"
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -628,26 +630,26 @@ items:
         volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: open-webui-data-lp
+            claimName: open-webui-data-lp-piraeus
         - emptyDir:
             sizeLimit: 2Gi
           name: cache
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-20T17:44:56Z"
-      lastUpdateTime: "2026-04-20T17:44:56Z"
+    - lastTransitionTime: "2026-04-19T21:41:06Z"
+      lastUpdateTime: "2026-04-22T09:22:40Z"
+      message: ReplicaSet "open-webui-cb875f77d" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T14:48:38Z"
+      lastUpdateTime: "2026-04-22T14:48:38Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-19T21:41:06Z"
-      lastUpdateTime: "2026-04-20T17:44:56Z"
-      message: ReplicaSet "open-webui-6fddb9f557" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    observedGeneration: 3
+    observedGeneration: 7
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -725,18 +727,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-20T17:43:28Z"
-      lastUpdateTime: "2026-04-20T17:43:28Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:41:06Z"
       lastUpdateTime: "2026-04-20T17:43:28Z"
       message: ReplicaSet "pg-sink-59c7dbd894" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T14:17:33Z"
+      lastUpdateTime: "2026-04-22T14:17:33Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 3
     readyReplicas: 1
     replicas: 1
@@ -745,7 +747,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "2"
+      deployment.kubernetes.io/revision: "4"
       field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:pgadmin","ingressName":"aiot:pgadmin","hostname":"pgadmin.35.241.255.137.nip.io","path":"/","allNodes":false}]'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"field.cattle.io/publicEndpoints":"[{\"addresses\":[\"35.241.255.137\"],\"port\":443,\"protocol\":\"HTTPS\",\"serviceName\":\"aiot:pgadmin\",\"ingressName\":\"aiot:pgadmin\",\"hostname\":\"pgadmin.35.241.255.137.nip.io\",\"path\":\"/\",\"allNodes\":false}]"},"name":"pgadmin","namespace":"aiot"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"pgadmin"}},"strategy":{"type":"Recreate"},"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt":"2026-04-17T21:41:40Z"},"labels":{"app":"pgadmin"}},"spec":{"affinity":{"nodeAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"preference":{"matchExpressions":[{"key":"kubernetes.io/hostname","operator":"In","values":["aiot-worker-02"]}]},"weight":100}]}},"containers":[{"env":[{"name":"PGADMIN_DEFAULT_EMAIL","value":"admin@admin.com"},{"name":"PGADMIN_DEFAULT_PASSWORD","value":"admin123"},{"name":"PGADMIN_SERVER_JSON_FILE","value":"/pgadmin4/servers.json"},{"name":"PGADMIN_CONFIG_SERVER_MODE","value":"False"},{"name":"PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED","value":"False"},{"name":"PGADMIN_CONFIG_DESKTOP_USER","value":"'admin@admin.com'"},{"name":"PGADMIN_CONFIG_WTF_CSRF_ENABLED","value":"False"},{"name":"PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION","value":"False"},{"name":"PGPASSFILE","value":"/var/lib/pgadmin/pgpass"}],"image":"dpage/pgadmin4:latest","imagePullPolicy":"Always","name":"pgadmin","ports":[{"containerPort":80,"protocol":"TCP"}],"resources":{"requests":{"cpu":"50m","memory":"128Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/pgadmin4/servers.json","name":"servers-config","readOnly":true,"subPath":"servers.json"},{"mountPath":"/var/lib/pgadmin","name":"pgadmin-data"}]}],"dnsPolicy":"ClusterFirst","initContainers":[{"command":["sh","-c","chown -R 5050:0 /var/lib/pgadmin ;\ncp /tmp/pgpass-src/pgpass /var/lib/pgadmin/pgpass ;\nchmod 600 /var/lib/pgadmin/pgpass ;\nchown 5050:0 /var/lib/pgadmin/pgpass ;\nls -la /var/lib/pgadmin/\n"],"env":[{"name":"PGADMIN_CONFIG_SESSION_COOKIE_SAMESITE","value":"\\ Lax\\"},{"name":"PGADMIN_CONFIG_SERVER_MODE","value":"False"},{"name":"PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED","value":"False"},{"name":"PGADMIN_CONFIG_DESKTOP_USER","value":"$ ' admin@admin.com ' "}],"image":"busybox:1.36","imagePullPolicy":"IfNotPresent","name":"fix-perms","resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/tmp/pgpass-src","name":"pgpass-src"},{"mountPath":"/var/lib/pgadmin","name":"pgadmin-data"}]}],"nodeSelector":{"node-role.kubernetes.io/worker":""},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"name":"pgadmin-data","persistentVolumeClaim":{"claimName":"pgadmin-data"}},{"configMap":{"defaultMode":420,"name":"pgadmin-servers"},"name":"servers-config"},{"configMap":{"defaultMode":292,"name":"pgadmin-pgpass"},"name":"pgpass-src"}]}}}}
@@ -849,6 +851,7 @@ items:
             name: pgadmin-data
         nodeSelector:
           node-role.kubernetes.io/worker: ""
+          piraeus.io/storage: "yes"
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -856,7 +859,7 @@ items:
         volumes:
         - name: pgadmin-data
           persistentVolumeClaim:
-            claimName: pgadmin-data
+            claimName: pgadmin-data-piraeus
         - configMap:
             defaultMode: 420
             name: pgadmin-servers
@@ -868,19 +871,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-20T17:33:23Z"
-      lastUpdateTime: "2026-04-20T17:33:23Z"
+    - lastTransitionTime: "2026-04-19T21:41:06Z"
+      lastUpdateTime: "2026-04-22T09:21:15Z"
+      message: ReplicaSet "pgadmin-566597bcdc" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T14:48:41Z"
+      lastUpdateTime: "2026-04-22T14:48:41Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-19T21:41:06Z"
-      lastUpdateTime: "2026-04-20T17:33:23Z"
-      message: ReplicaSet "pgadmin-6f5966bd49" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    observedGeneration: 2
+    observedGeneration: 6
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -888,7 +891,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "2"
+      deployment.kubernetes.io/revision: "4"
       field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"aiot:qdrant","ingressName":"aiot:qdrant","hostname":"qdrant.35.241.255.137.nip.io","path":"/","allNodes":false}]'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"field.cattle.io/publicEndpoints":"[{\"addresses\":[\"35.241.255.137\"],\"port\":443,\"protocol\":\"HTTPS\",\"serviceName\":\"aiot:qdrant\",\"ingressName\":\"aiot:qdrant\",\"hostname\":\"qdrant.35.241.255.137.nip.io\",\"path\":\"/\",\"allNodes\":false}]"},"name":"qdrant","namespace":"aiot"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"qdrant"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"labels":{"app":"qdrant"}},"spec":{"containers":[{"image":"qdrant/qdrant:v1.13.2","imagePullPolicy":"IfNotPresent","name":"qdrant","ports":[{"containerPort":6333,"protocol":"TCP"},{"containerPort":6334,"protocol":"TCP"}],"resources":{"requests":{"cpu":"100m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/qdrant/storage","name":"data"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"node-role.kubernetes.io/worker":""},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"qdrant-pvc"}}]}}}}
@@ -934,6 +937,7 @@ items:
         dnsPolicy: ClusterFirst
         nodeSelector:
           node-role.kubernetes.io/worker: ""
+          piraeus.io/storage: "yes"
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -941,23 +945,23 @@ items:
         volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: qdrant-pvc
+            claimName: qdrant-pvc-piraeus
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-20T16:37:01Z"
-      lastUpdateTime: "2026-04-20T16:37:01Z"
+    - lastTransitionTime: "2026-04-19T21:41:06Z"
+      lastUpdateTime: "2026-04-22T09:23:13Z"
+      message: ReplicaSet "qdrant-698ffcd755" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-22T14:48:38Z"
+      lastUpdateTime: "2026-04-22T14:48:38Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-19T21:41:06Z"
-      lastUpdateTime: "2026-04-20T17:33:07Z"
-      message: ReplicaSet "qdrant-7cb86668c5" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    observedGeneration: 2
+    observedGeneration: 6
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -965,7 +969,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "6"
+      deployment.kubernetes.io/revision: "8"
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"qdrant-indexer","namespace":"aiot"},"spec":{"progressDeadlineSeconds":600,"replicas":1,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"qdrant-indexer"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-python":"true","kubectl.kubernetes.io/restartedAt":"2026-04-15T20:08:12Z"},"labels":{"app":"qdrant-indexer"}},"spec":{"containers":[{"command":["/bin/sh","-c","pip install --no-cache-dir --quiet paho-mqtt qdrant-client \u0026\u0026 python /code/indexer.py"],"image":"10.132.0.2:30500/aiot/aiot-python-runtime:latest","imagePullPolicy":"IfNotPresent","name":"qdrant-indexer","ports":[{"containerPort":8000,"protocol":"TCP"}],"resources":{"requests":{"cpu":"100m","memory":"256Mi"}},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","volumeMounts":[{"mountPath":"/code","name":"code"}]}],"dnsPolicy":"ClusterFirst","nodeSelector":{"node-role.kubernetes.io/worker":""},"restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30,"volumes":[{"configMap":{"defaultMode":420,"name":"qdrant-indexer-code"},"name":"code"}]}}}}
     name: qdrant-indexer
@@ -1021,6 +1025,18 @@ items:
           - mountPath: /code
             name: code
         dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - sh
+          - -c
+          - until wget -q -O- http://qdrant:6333/readyz 2>/dev/null | grep -qi ready;
+            do echo waiting for qdrant; sleep 3; done; echo qdrant ready
+          image: busybox:1.36
+          imagePullPolicy: IfNotPresent
+          name: wait-qdrant
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
         nodeSelector:
           node-role.kubernetes.io/worker: ""
         restartPolicy: Always
@@ -1035,19 +1051,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-20T16:41:12Z"
-      lastUpdateTime: "2026-04-20T16:41:12Z"
+    - lastTransitionTime: "2026-04-22T14:51:34Z"
+      lastUpdateTime: "2026-04-22T14:51:34Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
     - lastTransitionTime: "2026-04-19T21:41:06Z"
-      lastUpdateTime: "2026-04-20T17:43:29Z"
-      message: ReplicaSet "qdrant-indexer-6d9d6dcb76" has successfully progressed.
+      lastUpdateTime: "2026-04-22T17:25:22Z"
+      message: ReplicaSet "qdrant-indexer-858b4c785f" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    observedGeneration: 6
+    observedGeneration: 8
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1223,18 +1239,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-20T16:19:20Z"
-      lastUpdateTime: "2026-04-20T16:19:20Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:41:07Z"
       lastUpdateTime: "2026-04-20T17:43:29Z"
       message: ReplicaSet "sensor-simulator-6f9869bbbc" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-22T14:29:18Z"
+      lastUpdateTime: "2026-04-22T14:29:18Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 6
     readyReplicas: 1
     replicas: 1

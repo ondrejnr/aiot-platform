@@ -1,0 +1,134 @@
+apiVersion: v1
+items:
+- apiVersion: triggers.tekton.dev/v1alpha1
+  kind: ClusterInterceptor
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 015694c5ef159050307bdf3234b9d4fc6472cc02998458ac2d40d8b5367d85a8
+    labels:
+      operator.tekton.dev/operand-name: tektoncd-triggers
+      server/type: https
+    name: bitbucket
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+  spec:
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMrRENDQXAyZ0F3SUJBZ0lSQU9WNi9ic0ZDa1FHT0lKMWFJMFcwaEl3Q2dZSUtvWkl6ajBFQXdJd1Z6RVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeFB6QTlCZ05WQkFNVE5uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxagpiM0psTFdsdWRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZekFnRncweU5qQTBNakl4Ck1UUXhNRFphR0E4eU1USTJNRE15T1RFeE5ERXdObG93VnpFVU1CSUdBMVVFQ2hNTGEyNWhkR2wyWlM1a1pYWXgKUHpBOUJnTlZCQU1UTm5SbGEzUnZiaTEwY21sbloyVnljeTFqYjNKbExXbHVkR1Z5WTJWd2RHOXljeTUwWld0MApiMjR0Y0dsd1pXeHBibVZ6TG5OMll6QlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJIeEhHUjl3CmhuYldNS3VBNnZsR1Y1VC8zc0hNeHZtd3VpMFJDZlZGTkI2a0paakpxWkZOZythcndCdWlzeXZvZ0kyOENFMXgKTkt5M2JrRkJpc2lSR1ppamdnRkdNSUlCUWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3SFFZRFZSMGxCQll3RkFZSQpLd1lCQlFVSEF3RUdDQ3NHQVFVRkJ3TUNNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGTk5mCjlhb3gyU3JCZXp4Unk2MVYzL1pXamU0WU1JSGdCZ05WSFJFRWdkZ3dnZFdDSVhSbGEzUnZiaTEwY21sbloyVnkKY3kxamIzSmxMV2x1ZEdWeVkyVndkRzl5YzRJeWRHVnJkRzl1TFhSeWFXZG5aWEp6TFdOdmNtVXRhVzUwWlhKagpaWEIwYjNKekxuUmxhM1J2Ymkxd2FYQmxiR2x1WlhPQ05uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxamIzSmxMV2x1CmRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZNEpFZEdWcmRHOXVMWFJ5YVdkblpYSnoKTFdOdmNtVXRhVzUwWlhKalpYQjBiM0p6TG5SbGEzUnZiaTF3YVhCbGJHbHVaWE11YzNaakxtTnNkWE4wWlhJdQpiRzlqWVd3d0NnWUlLb1pJemowRUF3SURTUUF3UmdJaEFQckdGckI3eDZ4TWVXbExlV0FuVGdsODVvckYzL2RtCmMwRElJK1NrWjh0M0FpRUFxbE1ER01iOEs4Vmc3UGZKL25RcDBYUE1lWnhOdXhHeTh4NnhnNldNa29zPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      service:
+        name: tekton-triggers-core-interceptors
+        namespace: tekton-pipelines
+        path: bitbucket
+        port: 8443
+  status:
+    address:
+      url: https://tekton-triggers-core-interceptors.tekton-pipelines.svc:8443/bitbucket
+- apiVersion: triggers.tekton.dev/v1alpha1
+  kind: ClusterInterceptor
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 487b247fa8c4401a5b2c653212e8cbcaab298f8dba3fafe52fce3d500c3cbf63
+    labels:
+      operator.tekton.dev/operand-name: tektoncd-triggers
+      server/type: https
+    name: cel
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+  spec:
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMrRENDQXAyZ0F3SUJBZ0lSQU9WNi9ic0ZDa1FHT0lKMWFJMFcwaEl3Q2dZSUtvWkl6ajBFQXdJd1Z6RVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeFB6QTlCZ05WQkFNVE5uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxagpiM0psTFdsdWRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZekFnRncweU5qQTBNakl4Ck1UUXhNRFphR0E4eU1USTJNRE15T1RFeE5ERXdObG93VnpFVU1CSUdBMVVFQ2hNTGEyNWhkR2wyWlM1a1pYWXgKUHpBOUJnTlZCQU1UTm5SbGEzUnZiaTEwY21sbloyVnljeTFqYjNKbExXbHVkR1Z5WTJWd2RHOXljeTUwWld0MApiMjR0Y0dsd1pXeHBibVZ6TG5OMll6QlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJIeEhHUjl3CmhuYldNS3VBNnZsR1Y1VC8zc0hNeHZtd3VpMFJDZlZGTkI2a0paakpxWkZOZythcndCdWlzeXZvZ0kyOENFMXgKTkt5M2JrRkJpc2lSR1ppamdnRkdNSUlCUWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3SFFZRFZSMGxCQll3RkFZSQpLd1lCQlFVSEF3RUdDQ3NHQVFVRkJ3TUNNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGTk5mCjlhb3gyU3JCZXp4Unk2MVYzL1pXamU0WU1JSGdCZ05WSFJFRWdkZ3dnZFdDSVhSbGEzUnZiaTEwY21sbloyVnkKY3kxamIzSmxMV2x1ZEdWeVkyVndkRzl5YzRJeWRHVnJkRzl1TFhSeWFXZG5aWEp6TFdOdmNtVXRhVzUwWlhKagpaWEIwYjNKekxuUmxhM1J2Ymkxd2FYQmxiR2x1WlhPQ05uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxamIzSmxMV2x1CmRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZNEpFZEdWcmRHOXVMWFJ5YVdkblpYSnoKTFdOdmNtVXRhVzUwWlhKalpYQjBiM0p6TG5SbGEzUnZiaTF3YVhCbGJHbHVaWE11YzNaakxtTnNkWE4wWlhJdQpiRzlqWVd3d0NnWUlLb1pJemowRUF3SURTUUF3UmdJaEFQckdGckI3eDZ4TWVXbExlV0FuVGdsODVvckYzL2RtCmMwRElJK1NrWjh0M0FpRUFxbE1ER01iOEs4Vmc3UGZKL25RcDBYUE1lWnhOdXhHeTh4NnhnNldNa29zPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      service:
+        name: tekton-triggers-core-interceptors
+        namespace: tekton-pipelines
+        path: cel
+        port: 8443
+  status:
+    address:
+      url: https://tekton-triggers-core-interceptors.tekton-pipelines.svc:8443/cel
+- apiVersion: triggers.tekton.dev/v1alpha1
+  kind: ClusterInterceptor
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 75d9509c30571af6cc486445401a32909e1bae2ad1bbaf187a339b6f4dfafb56
+    labels:
+      operator.tekton.dev/operand-name: tektoncd-triggers
+      server/type: https
+    name: github
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+  spec:
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMrRENDQXAyZ0F3SUJBZ0lSQU9WNi9ic0ZDa1FHT0lKMWFJMFcwaEl3Q2dZSUtvWkl6ajBFQXdJd1Z6RVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeFB6QTlCZ05WQkFNVE5uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxagpiM0psTFdsdWRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZekFnRncweU5qQTBNakl4Ck1UUXhNRFphR0E4eU1USTJNRE15T1RFeE5ERXdObG93VnpFVU1CSUdBMVVFQ2hNTGEyNWhkR2wyWlM1a1pYWXgKUHpBOUJnTlZCQU1UTm5SbGEzUnZiaTEwY21sbloyVnljeTFqYjNKbExXbHVkR1Z5WTJWd2RHOXljeTUwWld0MApiMjR0Y0dsd1pXeHBibVZ6TG5OMll6QlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJIeEhHUjl3CmhuYldNS3VBNnZsR1Y1VC8zc0hNeHZtd3VpMFJDZlZGTkI2a0paakpxWkZOZythcndCdWlzeXZvZ0kyOENFMXgKTkt5M2JrRkJpc2lSR1ppamdnRkdNSUlCUWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3SFFZRFZSMGxCQll3RkFZSQpLd1lCQlFVSEF3RUdDQ3NHQVFVRkJ3TUNNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGTk5mCjlhb3gyU3JCZXp4Unk2MVYzL1pXamU0WU1JSGdCZ05WSFJFRWdkZ3dnZFdDSVhSbGEzUnZiaTEwY21sbloyVnkKY3kxamIzSmxMV2x1ZEdWeVkyVndkRzl5YzRJeWRHVnJkRzl1TFhSeWFXZG5aWEp6TFdOdmNtVXRhVzUwWlhKagpaWEIwYjNKekxuUmxhM1J2Ymkxd2FYQmxiR2x1WlhPQ05uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxamIzSmxMV2x1CmRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZNEpFZEdWcmRHOXVMWFJ5YVdkblpYSnoKTFdOdmNtVXRhVzUwWlhKalpYQjBiM0p6TG5SbGEzUnZiaTF3YVhCbGJHbHVaWE11YzNaakxtTnNkWE4wWlhJdQpiRzlqWVd3d0NnWUlLb1pJemowRUF3SURTUUF3UmdJaEFQckdGckI3eDZ4TWVXbExlV0FuVGdsODVvckYzL2RtCmMwRElJK1NrWjh0M0FpRUFxbE1ER01iOEs4Vmc3UGZKL25RcDBYUE1lWnhOdXhHeTh4NnhnNldNa29zPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      service:
+        name: tekton-triggers-core-interceptors
+        namespace: tekton-pipelines
+        path: github
+        port: 8443
+  status:
+    address:
+      url: https://tekton-triggers-core-interceptors.tekton-pipelines.svc:8443/github
+- apiVersion: triggers.tekton.dev/v1alpha1
+  kind: ClusterInterceptor
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: c55456f510c13539c0b0cbd1050f9e502442c8e3876f5a97e79273a07567ed02
+    labels:
+      operator.tekton.dev/operand-name: tektoncd-triggers
+      server/type: https
+    name: gitlab
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+  spec:
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMrRENDQXAyZ0F3SUJBZ0lSQU9WNi9ic0ZDa1FHT0lKMWFJMFcwaEl3Q2dZSUtvWkl6ajBFQXdJd1Z6RVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeFB6QTlCZ05WQkFNVE5uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxagpiM0psTFdsdWRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZekFnRncweU5qQTBNakl4Ck1UUXhNRFphR0E4eU1USTJNRE15T1RFeE5ERXdObG93VnpFVU1CSUdBMVVFQ2hNTGEyNWhkR2wyWlM1a1pYWXgKUHpBOUJnTlZCQU1UTm5SbGEzUnZiaTEwY21sbloyVnljeTFqYjNKbExXbHVkR1Z5WTJWd2RHOXljeTUwWld0MApiMjR0Y0dsd1pXeHBibVZ6TG5OMll6QlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJIeEhHUjl3CmhuYldNS3VBNnZsR1Y1VC8zc0hNeHZtd3VpMFJDZlZGTkI2a0paakpxWkZOZythcndCdWlzeXZvZ0kyOENFMXgKTkt5M2JrRkJpc2lSR1ppamdnRkdNSUlCUWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3SFFZRFZSMGxCQll3RkFZSQpLd1lCQlFVSEF3RUdDQ3NHQVFVRkJ3TUNNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGTk5mCjlhb3gyU3JCZXp4Unk2MVYzL1pXamU0WU1JSGdCZ05WSFJFRWdkZ3dnZFdDSVhSbGEzUnZiaTEwY21sbloyVnkKY3kxamIzSmxMV2x1ZEdWeVkyVndkRzl5YzRJeWRHVnJkRzl1TFhSeWFXZG5aWEp6TFdOdmNtVXRhVzUwWlhKagpaWEIwYjNKekxuUmxhM1J2Ymkxd2FYQmxiR2x1WlhPQ05uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxamIzSmxMV2x1CmRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZNEpFZEdWcmRHOXVMWFJ5YVdkblpYSnoKTFdOdmNtVXRhVzUwWlhKalpYQjBiM0p6TG5SbGEzUnZiaTF3YVhCbGJHbHVaWE11YzNaakxtTnNkWE4wWlhJdQpiRzlqWVd3d0NnWUlLb1pJemowRUF3SURTUUF3UmdJaEFQckdGckI3eDZ4TWVXbExlV0FuVGdsODVvckYzL2RtCmMwRElJK1NrWjh0M0FpRUFxbE1ER01iOEs4Vmc3UGZKL25RcDBYUE1lWnhOdXhHeTh4NnhnNldNa29zPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      service:
+        name: tekton-triggers-core-interceptors
+        namespace: tekton-pipelines
+        path: gitlab
+        port: 8443
+  status:
+    address:
+      url: https://tekton-triggers-core-interceptors.tekton-pipelines.svc:8443/gitlab
+- apiVersion: triggers.tekton.dev/v1alpha1
+  kind: ClusterInterceptor
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 123d28a7c77f11c7664f6a41671ab96d973880d8020fe2b60296f901fbb5485c
+    labels:
+      operator.tekton.dev/operand-name: tektoncd-triggers
+      server/type: https
+    name: slack
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+  spec:
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMrRENDQXAyZ0F3SUJBZ0lSQU9WNi9ic0ZDa1FHT0lKMWFJMFcwaEl3Q2dZSUtvWkl6ajBFQXdJd1Z6RVUKTUJJR0ExVUVDaE1MYTI1aGRHbDJaUzVrWlhZeFB6QTlCZ05WQkFNVE5uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxagpiM0psTFdsdWRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZekFnRncweU5qQTBNakl4Ck1UUXhNRFphR0E4eU1USTJNRE15T1RFeE5ERXdObG93VnpFVU1CSUdBMVVFQ2hNTGEyNWhkR2wyWlM1a1pYWXgKUHpBOUJnTlZCQU1UTm5SbGEzUnZiaTEwY21sbloyVnljeTFqYjNKbExXbHVkR1Z5WTJWd2RHOXljeTUwWld0MApiMjR0Y0dsd1pXeHBibVZ6TG5OMll6QlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJIeEhHUjl3CmhuYldNS3VBNnZsR1Y1VC8zc0hNeHZtd3VpMFJDZlZGTkI2a0paakpxWkZOZythcndCdWlzeXZvZ0kyOENFMXgKTkt5M2JrRkJpc2lSR1ppamdnRkdNSUlCUWpBT0JnTlZIUThCQWY4RUJBTUNBb1F3SFFZRFZSMGxCQll3RkFZSQpLd1lCQlFVSEF3RUdDQ3NHQVFVRkJ3TUNNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGTk5mCjlhb3gyU3JCZXp4Unk2MVYzL1pXamU0WU1JSGdCZ05WSFJFRWdkZ3dnZFdDSVhSbGEzUnZiaTEwY21sbloyVnkKY3kxamIzSmxMV2x1ZEdWeVkyVndkRzl5YzRJeWRHVnJkRzl1TFhSeWFXZG5aWEp6TFdOdmNtVXRhVzUwWlhKagpaWEIwYjNKekxuUmxhM1J2Ymkxd2FYQmxiR2x1WlhPQ05uUmxhM1J2YmkxMGNtbG5aMlZ5Y3kxamIzSmxMV2x1CmRHVnlZMlZ3ZEc5eWN5NTBaV3QwYjI0dGNHbHdaV3hwYm1WekxuTjJZNEpFZEdWcmRHOXVMWFJ5YVdkblpYSnoKTFdOdmNtVXRhVzUwWlhKalpYQjBiM0p6TG5SbGEzUnZiaTF3YVhCbGJHbHVaWE11YzNaakxtTnNkWE4wWlhJdQpiRzlqWVd3d0NnWUlLb1pJemowRUF3SURTUUF3UmdJaEFQckdGckI3eDZ4TWVXbExlV0FuVGdsODVvckYzL2RtCmMwRElJK1NrWjh0M0FpRUFxbE1ER01iOEs4Vmc3UGZKL25RcDBYUE1lWnhOdXhHeTh4NnhnNldNa29zPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+      service:
+        name: tekton-triggers-core-interceptors
+        namespace: tekton-pipelines
+        path: slack
+        port: 8443
+  status:
+    address:
+      url: https://tekton-triggers-core-interceptors.tekton-pipelines.svc:8443/slack
+kind: List
+metadata:

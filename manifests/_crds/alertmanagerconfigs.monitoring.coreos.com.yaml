@@ -1,0 +1,30 @@
+apiVersion: v1
+items:
+- apiVersion: monitoring.coreos.com/v1alpha1
+  kind: AlertmanagerConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"monitoring.coreos.com/v1alpha1","kind":"AlertmanagerConfig","metadata":{"annotations":{},"labels":{"release":"prometheus"},"name":"robusta-route","namespace":"monitoring"},"spec":{"receivers":[{"name":"robusta","webhookConfigs":[{"sendResolved":true,"url":"http://robusta-runner.robusta.svc.cluster.local/api/alerts"}]}],"route":{"continue":false,"groupBy":["alertname","namespace","severity"],"groupInterval":"5m","groupWait":"30s","receiver":"robusta","repeatInterval":"4h"}}}
+    labels:
+      release: prometheus
+    name: robusta-route
+    namespace: monitoring
+  spec:
+    receivers:
+    - name: robusta
+      webhookConfigs:
+      - sendResolved: true
+        url: http://robusta-runner.robusta.svc.cluster.local/api/alerts
+    route:
+      continue: false
+      groupBy:
+      - alertname
+      - namespace
+      - severity
+      groupInterval: 5m
+      groupWait: 30s
+      receiver: robusta
+      repeatInterval: 4h
+kind: List
+metadata:

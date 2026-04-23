@@ -4,7 +4,7 @@ items:
   kind: DaemonSet
   metadata:
     annotations:
-      field.cattle.io/publicEndpoints: '[{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-hpvfk","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-gkk8z","allNodes":false},{"nodeName":":aiot-master","addresses":["10.132.0.2"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-6b86p","allNodes":false},{"nodeName":":oci-test-node1","addresses":["172.16.200.12"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-nq4qm","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-pl4v2","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-5lg77","allNodes":false}]'
+      field.cattle.io/publicEndpoints: '[{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-q6md9","allNodes":false},{"nodeName":":aiot-master","addresses":["10.132.0.2"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-6b86p","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-xcxv2","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-5lg77","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":10050,"protocol":"TCP","podName":"zabbix:zabbix-agent2-hpvfk","allNodes":false}]'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"annotations":{},"labels":{"app":"zabbix-agent2"},"name":"zabbix-agent2","namespace":"zabbix"},"spec":{"selector":{"matchLabels":{"app":"zabbix-agent2"}},"template":{"metadata":{"labels":{"app":"zabbix-agent2"}},"spec":{"containers":[{"env":[{"name":"ZBX_SERVER_HOST","value":"zabbix-zabbix-server.zabbix.svc.cluster.local"},{"name":"ZBX_SERVER_ACTIVE","value":"zabbix-zabbix-server.zabbix.svc.cluster.local"},{"name":"ZBX_PASSIVE_ALLOW","value":"true"},{"name":"ZBX_ACTIVE_ALLOW","value":"true"},{"name":"ZBX_HOSTNAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"ZBX_HOSTMETADATA","value":"aiot-cluster-node"},{"name":"ZBX_TLSCONNECT","value":"unencrypted"},{"name":"ZBX_TLSACCEPT","value":"unencrypted"}],"image":"zabbix/zabbix-agent2:ubuntu-7.0.16","imagePullPolicy":"IfNotPresent","name":"agent","ports":[{"containerPort":10050,"name":"agent","protocol":"TCP"}],"resources":{"limits":{"memory":"128Mi"},"requests":{"cpu":"20m","memory":"32Mi"}},"securityContext":{"privileged":true},"volumeMounts":[{"mountPath":"/host/proc","name":"proc","readOnly":true},{"mountPath":"/host/sys","name":"sys","readOnly":true},{"mountPath":"/rootfs","name":"rootfs","readOnly":true}]}],"dnsPolicy":"ClusterFirstWithHostNet","hostNetwork":true,"hostPID":true,"tolerations":[{"effect":"NoSchedule","operator":"Exists"},{"effect":"NoExecute","operator":"Exists"}],"volumes":[{"hostPath":{"path":"/proc"},"name":"proc"},{"hostPath":{"path":"/sys"},"name":"sys"},{"hostPath":{"path":"/"},"name":"rootfs"}]}}}}
     labels:
@@ -100,12 +100,12 @@ items:
         maxUnavailable: 1
       type: RollingUpdate
   status:
-    currentNumberScheduled: 6
-    desiredNumberScheduled: 6
-    numberAvailable: 6
+    currentNumberScheduled: 5
+    desiredNumberScheduled: 5
+    numberAvailable: 5
     numberMisscheduled: 0
-    numberReady: 6
+    numberReady: 5
     observedGeneration: 5
-    updatedNumberScheduled: 6
+    updatedNumberScheduled: 5
 kind: List
 metadata:

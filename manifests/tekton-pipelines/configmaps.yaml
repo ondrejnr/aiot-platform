@@ -1,0 +1,1683 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    default-kind: task
+    default-service-account: default
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: b0b105541dd61d1aae531431902989dc79ccd1cbf00e155abc3b84cdc84ab115
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: bundleresolver-config
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    artifacts.oci.format: simplesigning
+    artifacts.oci.storage: oci
+    artifacts.pipelinerun.enable-deep-inspection: "true"
+    artifacts.pipelinerun.format: in-toto
+    artifacts.pipelinerun.storage: oci
+    artifacts.taskrun.format: in-toto
+    artifacts.taskrun.storage: ""
+    performance: |
+      disable-ha: false
+    transparency.enabled: "false"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: ffcfb1cd8abff3baab6c2597ac0ea3159c8f9eb1dc4b5d12f46cb5fe0582fd77
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-chains
+      operator.tekton.dev/operand-name: tektoncd-chains
+    name: chains-config
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: chain-config-npgsg
+- apiVersion: v1
+  data:
+    version: v0.26.2
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 604392539796a653caf7cb44abb601f83aabae52273a7bbff83f1786eb1af9d7
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-chains
+      operator.tekton.dev/operand-name: tektoncd-chains
+    name: chains-info
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: chain-hjlhx
+- apiVersion: v1
+  data:
+    allowed-namespaces: ""
+    blocked-namespaces: ""
+    default-kind: task
+    default-namespace: ""
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: caad32e57910a124e849113efa486cd23f6430d6a4711c047513f38ed9b6643e
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: cluster-resolver-config
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+
+      # default-timeout-minutes contains the default number of
+      # minutes to use for TaskRun and PipelineRun, if none is specified.
+      default-timeout-minutes: "60"  # 60 minutes
+
+      # default-service-account contains the default service account name
+      # to use for TaskRun and PipelineRun, if none is specified.
+      default-service-account: "default"
+
+      # default-managed-by-label-value contains the default value given to the
+      # "app.kubernetes.io/managed-by" label applied to all Pods created for
+      # TaskRuns. If a user's requested TaskRun specifies another value for this
+      # label, the user's request supercedes.
+      default-managed-by-label-value: "tekton-pipelines"
+
+      # default-pod-template contains the default pod template to use for
+      # TaskRun and PipelineRun. If a pod template is specified on the
+      # PipelineRun, the default-pod-template is merged with that one.
+      # default-pod-template:
+
+      # default-affinity-assistant-pod-template contains the default pod template
+      # to use for affinity assistant pods. If a pod template is specified on the
+      # PipelineRun, the default-affinity-assistant-pod-template is merged with
+      # that one.
+      # default-affinity-assistant-pod-template:
+
+      # default-cloud-events-sink contains the default CloudEvents sink to be
+      # used for TaskRun and PipelineRun, when no sink is specified.
+      # Note that right now it is still not possible to set a PipelineRun or
+      # TaskRun specific sink, so the default is the only option available.
+      # If no sink is specified, no CloudEvent is generated
+      # default-cloud-events-sink:
+
+      # default-task-run-workspace-binding contains the default workspace
+      # configuration provided for any Workspaces that a Task declares
+      # but that a TaskRun does not explicitly provide.
+      # default-task-run-workspace-binding: |
+      #   emptyDir: {}
+
+      # default-max-matrix-combinations-count contains the default maximum number
+      # of combinations from a Matrix, if none is specified.
+      default-max-matrix-combinations-count: "256"
+
+      # default-forbidden-env contains comma seperated environment variables that cannot be
+      # overridden by podTemplate.
+      default-forbidden-env:
+
+      # default-resolver-type contains the default resolver type to be used in the cluster,
+      # no default-resolver-type is specified by default
+      default-resolver-type:
+
+      # default-imagepullbackoff-timeout contains the default duration to wait
+      # before requeuing the TaskRun to retry, specifying 0 here is equivalent to fail fast
+      # possible values could be 1m, 5m, 10s, 1h, etc
+      # default-imagepullbackoff-timeout: "5m"
+
+      # default-maximum-resolution-timeout specifies the default duration used by the
+      # resolution controller before timing out when exceeded.
+      # Possible values include "1m", "5m", "10s", "1h", etc.
+      # Example: default-maximum-resolution-timeout: "1m"
+
+      # default-container-resource-requirements allow users to update default resource requirements
+      # to a init-containers and containers of a pods create by the controller
+      # Onet: All the resource requirements are applied to init-containers and containers
+      # only if the existing resource requirements are empty.
+      # default-container-resource-requirements: |
+      #   place-scripts: # updates resource requirements of a 'place-scripts' container
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #
+      #   prepare: # updates resource requirements of a 'prepare' container
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "256Mi"
+      #       cpu: "500m"
+      #
+      #   working-dir-initializer: # updates resource requirements of a 'working-dir-initializer' container
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "512Mi"
+      #       cpu: "500m"
+      #
+      #   prefix-scripts: # updates resource requirements of containers which starts with 'scripts-'
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #
+      #   prefix-sidecar-scripts: # updates resource requirements of containers which starts with 'sidecar-scripts-'
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #
+      #   default: # updates resource requirements of init-containers and containers which has empty resource requirements
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "256Mi"
+      #       cpu: "500m"
+
+      # default-sidecar-log-polling-interval specifies the polling interval for the Tekton sidecar log results container.
+      # This controls how frequently the sidecar checks for step completion files written by steps in a TaskRun.
+      # Lower values (e.g., "10ms") make the sidecar more responsive but may increase CPU usage; higher values (e.g., "1s")
+      # reduce resource usage but may delay result collection.
+      # This value is used by the sidecar-tekton-log-results container and can be tuned for performance or test scenarios.
+      # Example values: "100ms", "500ms", "1s"
+      default-sidecar-log-polling-interval: "100ms"
+
+      # default-step-ref-concurrency-limit specifies the concurrency limit for resolving step references.
+      # This setting controls the maximum number of concurrent goroutines used to resolve
+      # step references (`step.ref` fields) simultaneously. This limit acts as a throttle
+      # to prevent overwhelming remote servers (e.g., git providers, OCI registries) or
+      # the Kubernetes API server, especially when a TaskRun contains many steps that
+      # reference StepActions.
+      default-step-ref-concurrency-limit: "5"
+    default-service-account: default
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"_example":"################################\n#                              #\n#    EXAMPLE CONFIGURATION     #\n#                              #\n################################\n\n# This block is not actually functional configuration,\n# but serves to illustrate the available configuration\n# options and document them in a way that is accessible\n# to users that `kubectl edit` this config map.\n#\n# These sample configuration options may be copied out of\n# this example block and unindented to be in the data block\n# to actually change the configuration.\n\n# default-timeout-minutes contains the default number of\n# minutes to use for TaskRun and PipelineRun, if none is specified.\ndefault-timeout-minutes: \"60\"  # 60 minutes\n\n# default-service-account contains the default service account name\n# to use for TaskRun and PipelineRun, if none is specified.\ndefault-service-account: \"default\"\n\n# default-managed-by-label-value contains the default value given to the\n# \"app.kubernetes.io/managed-by\" label applied to all Pods created for\n# TaskRuns. If a user's requested TaskRun specifies another value for this\n# label, the user's request supercedes.\ndefault-managed-by-label-value: \"tekton-pipelines\"\n\n# default-pod-template contains the default pod template to use for\n# TaskRun and PipelineRun. If a pod template is specified on the\n# PipelineRun, the default-pod-template is merged with that one.\n# default-pod-template:\n\n# default-affinity-assistant-pod-template contains the default pod template\n# to use for affinity assistant pods. If a pod template is specified on the\n# PipelineRun, the default-affinity-assistant-pod-template is merged with\n# that one.\n# default-affinity-assistant-pod-template:\n\n# default-cloud-events-sink contains the default CloudEvents sink to be\n# used for TaskRun and PipelineRun, when no sink is specified.\n# Note that right now it is still not possible to set a PipelineRun or\n# TaskRun specific sink, so the default is the only option available.\n# If no sink is specified, no CloudEvent is generated\n# default-cloud-events-sink:\n\n# default-task-run-workspace-binding contains the default workspace\n# configuration provided for any Workspaces that a Task declares\n# but that a TaskRun does not explicitly provide.\n# default-task-run-workspace-binding: |\n#   emptyDir: {}\n\n# default-max-matrix-combinations-count contains the default maximum number\n# of combinations from a Matrix, if none is specified.\ndefault-max-matrix-combinations-count: \"256\"\n\n# default-forbidden-env contains comma seperated environment variables that cannot be\n# overridden by podTemplate.\ndefault-forbidden-env:\n\n# default-resolver-type contains the default resolver type to be used in the cluster,\n# no default-resolver-type is specified by default\ndefault-resolver-type:\n\n# default-imagepullbackoff-timeout contains the default duration to wait\n# before requeuing the TaskRun to retry, specifying 0 here is equivalent to fail fast\n# possible values could be 1m, 5m, 10s, 1h, etc\n# default-imagepullbackoff-timeout: \"5m\"\n\n# default-maximum-resolution-timeout specifies the default duration used by the\n# resolution controller before timing out when exceeded.\n# Possible values include \"1m\", \"5m\", \"10s\", \"1h\", etc.\n# Example: default-maximum-resolution-timeout: \"1m\"\n\n# default-container-resource-requirements allow users to update default resource requirements\n# to a init-containers and containers of a pods create by the controller\n# Onet: All the resource requirements are applied to init-containers and containers\n# only if the existing resource requirements are empty.\n# default-container-resource-requirements: |\n#   place-scripts: # updates resource requirements of a 'place-scripts' container\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"128Mi\"\n#       cpu: \"500m\"\n#\n#   prepare: # updates resource requirements of a 'prepare' container\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"256Mi\"\n#       cpu: \"500m\"\n#\n#   working-dir-initializer: # updates resource requirements of a 'working-dir-initializer' container\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"512Mi\"\n#       cpu: \"500m\"\n#\n#   prefix-scripts: # updates resource requirements of containers which starts with 'scripts-'\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"128Mi\"\n#       cpu: \"500m\"\n#\n#   prefix-sidecar-scripts: # updates resource requirements of containers which starts with 'sidecar-scripts-'\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"128Mi\"\n#       cpu: \"500m\"\n#\n#   default: # updates resource requirements of init-containers and containers which has empty resource requirements\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"256Mi\"\n#       cpu: \"500m\"\n\n# default-sidecar-log-polling-interval specifies the polling interval for the Tekton sidecar log results container.\n# This controls how frequently the sidecar checks for step completion files written by steps in a TaskRun.\n# Lower values (e.g., \"10ms\") make the sidecar more responsive but may increase CPU usage; higher values (e.g., \"1s\")\n# reduce resource usage but may delay result collection.\n# This value is used by the sidecar-tekton-log-results container and can be tuned for performance or test scenarios.\n# Example values: \"100ms\", \"500ms\", \"1s\"\ndefault-sidecar-log-polling-interval: \"100ms\"\n\n# default-step-ref-concurrency-limit specifies the concurrency limit for resolving step references.\n# This setting controls the maximum number of concurrent goroutines used to resolve\n# step references (`step.ref` fields) simultaneously. This limit acts as a throttle\n# to prevent overwhelming remote servers (e.g., git providers, OCI registries) or\n# the Kubernetes API server, especially when a TaskRun contains many steps that\n# reference StepActions.\ndefault-step-ref-concurrency-limit: \"5\"\n","default-service-account":"default"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"6e1712d00353630f243813366f6740ce0310870d06c37c186988986040ed1406"},"creationTimestamp":null,"labels":{"app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-pipelines","operator.tekton.dev/operand-name":"tektoncd-pipelines"},"name":"config-defaults","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"pipeline-main-static-4h464","uid":"108c3d6b-0365-43b4-b40a-f3acea03765f"}]}}
+      operator.tekton.dev/last-applied-hash: 6e1712d00353630f243813366f6740ce0310870d06c37c186988986040ed1406
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-defaults
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+
+      # default-service-account contains the default service account name
+      # to use for TaskRun and PipelineRun, if none is specified.
+      default-service-account: "default"
+      default-run-as-user: "65532"
+      default-run-as-group: "65532"
+      default-fs-group: "65532"
+      default-run-as-non-root: "true" # allowed values are true and false
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: b1508c323bd1a6a73b1456cd34df328c486c4ec079676e4ba0d84cff6240d3eb
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-triggers
+      operator.tekton.dev/operand-name: tektoncd-triggers
+    name: config-defaults-triggers
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+
+      # formats contains a comma seperated list of event formats to be used
+      # the only format supported today is "tektonv1". An empty string is not
+      # a valid configuration. To disable events, do not specify the sink.
+      formats: "tektonv1"
+
+      # sink contains the event sink to be used for TaskRun, PipelineRun and
+      # CustomRun. If no sink is specified, no CloudEvent is generated.
+      # This setting supercedes the "default-cloud-events-sink" from the
+      # "config-defaults" config map
+      sink: "https://events.sink/cdevents"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: f2f0b7128bfc9e678a38821fb194f2fc08b55b484c4a3ce9ba120f2c0762b90a
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-events
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: e7c832f5a423bfe55b28980cbf2e5b96b343c0885ffd0880bcbca84195e2bcd7
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-leader-election-controller
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 858e27844bee3a871672c03a83fd81df97e47824afb6a2a286a0386de8f8270f
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-leader-election-events
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 8c281fc721d72e1d76a1a95aade24eb3da711abed55636db9d64b75276505ecf
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-leader-election-resolvers
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 15d039df7fa98324aa37b8d89e9be51261b2167915a2abc8ede5e36971e2fc0c
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-triggers
+      operator.tekton.dev/operand-name: tektoncd-triggers
+    name: config-leader-election-triggers-controller
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: dfe7cd6f40e1b5372db5907fe5034fb261e362d3f76c5cc80e99bc628668d240
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-triggers
+      operator.tekton.dev/operand-name: tektoncd-triggers
+    name: config-leader-election-triggers-webhook
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: e85f9a77f2d2a96dcfe713315478b796899a27d99e3a4a0fe3f2e5dbcbacb312
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-leader-election-webhook
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    loglevel.controller: info
+    loglevel.webhook: info
+    zap-logger-config: |
+      {
+        "level": "info",
+        "development": false,
+        "sampling": {
+          "initial": 100,
+          "thereafter": 100
+        },
+        "outputPaths": ["stdout"],
+        "errorOutputPaths": ["stderr"],
+        "encoding": "json",
+        "encoderConfig": {
+          "timeKey": "ts",
+          "levelKey": "level",
+          "nameKey": "logger",
+          "callerKey": "caller",
+          "messageKey": "msg",
+          "stacktraceKey": "stacktrace",
+          "lineEnding": "",
+          "levelEncoder": "",
+          "timeEncoder": "iso8601",
+          "durationEncoder": "",
+          "callerEncoder": ""
+        }
+      }
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"loglevel.controller":"info","loglevel.webhook":"info","zap-logger-config":"{\n  \"level\": \"info\",\n  \"development\": false,\n  \"sampling\": {\n    \"initial\": 100,\n    \"thereafter\": 100\n  },\n  \"outputPaths\": [\"stdout\"],\n  \"errorOutputPaths\": [\"stderr\"],\n  \"encoding\": \"json\",\n  \"encoderConfig\": {\n    \"timeKey\": \"ts\",\n    \"levelKey\": \"level\",\n    \"nameKey\": \"logger\",\n    \"callerKey\": \"caller\",\n    \"messageKey\": \"msg\",\n    \"stacktraceKey\": \"stacktrace\",\n    \"lineEnding\": \"\",\n    \"levelEncoder\": \"\",\n    \"timeEncoder\": \"iso8601\",\n    \"durationEncoder\": \"\",\n    \"callerEncoder\": \"\"\n  }\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"5add5fee031ce46b2772898d853841701414daa842e767fee65a962426d191f3"},"labels":{"app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-chains","operator.tekton.dev/operand-name":"tektoncd-chains"},"name":"config-logging","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"chain-hjlhx","uid":"cbbd8078-c69e-419d-a29f-2acde07b6f1c"}]}}
+      operator.tekton.dev/last-applied-hash: 5add5fee031ce46b2772898d853841701414daa842e767fee65a962426d191f3
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-chains
+      operator.tekton.dev/operand-name: tektoncd-chains
+    name: config-logging
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: chain-hjlhx
+- apiVersion: v1
+  data:
+    loglevel.controller: info
+    loglevel.eventlistener: info
+    loglevel.webhook: info
+    zap-logger-config: |
+      {
+        "level": "info",
+        "development": false,
+        "disableStacktrace": true,
+        "sampling": {
+          "initial": 100,
+          "thereafter": 100
+        },
+        "outputPaths": ["stdout"],
+        "errorOutputPaths": ["stderr"],
+        "encoding": "json",
+        "encoderConfig": {
+          "timeKey": "timestamp",
+          "levelKey": "severity",
+          "nameKey": "logger",
+          "callerKey": "caller",
+          "messageKey": "message",
+          "stacktraceKey": "stacktrace",
+          "lineEnding": "",
+          "levelEncoder": "",
+          "timeEncoder": "iso8601",
+          "durationEncoder": "",
+          "callerEncoder": ""
+        }
+      }
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: f7d85a2893a5eaa8ec6071667dd0b5b9cb3761b3fd1328de43dbae9dec5e5527
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-triggers
+      operator.tekton.dev/operand-name: tektoncd-triggers
+    name: config-logging-triggers
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+
+      # OpenTelemetry Metrics Configuration
+      # Protocol for metrics export (prometheus, grpc, http/protobuf, none)
+      # Default if not specified: "none"
+      metrics-protocol: prometheus
+
+      # Metrics endpoint (for grpc/http protocols)
+      # Default: empty (uses default OTLP endpoint)
+      metrics-endpoint: ""
+
+      # Metrics export interval (e.g., "30s", "1m")
+      # Default: empty (uses default interval)
+      metrics-export-interval: ""
+
+      # OpenTelemetry Tracing Configuration
+      # Protocol for tracing export (grpc, http/protobuf, none, stdout)
+      # Default: none
+      tracing-protocol: none
+
+      # Tracing endpoint (for grpc/http protocols)
+      # Default: empty
+      tracing-endpoint: ""
+
+      # Tracing sampling rate (0.0 to 1.0)
+      # Default: 1.0 (100% sampling)
+      tracing-sampling-rate: "1.0"
+
+      # Runtime Configuration
+      # Enable profiling (enabled, disabled)
+      # Default: disabled
+      runtime-profiling: disabled
+
+      # Runtime export interval (e.g., "15s")
+      # Default: 15s
+      runtime-export-interval: "15s"
+
+      # Note: Legacy OpenCensus configuration (metrics.backend-destination, etc.) has been
+      # removed as OpenCensus support is no longer provided by the underlying infrastructure.
+      # Please use the OpenTelemetry configuration options above.
+    metrics-protocol: prometheus
+    metrics.count.enable-reason: "false"
+    metrics.pipelinerun.duration-type: histogram
+    metrics.pipelinerun.level: pipeline
+    metrics.taskrun.duration-type: histogram
+    metrics.taskrun.level: task
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"_example":"################################\n#                              #\n#    EXAMPLE CONFIGURATION     #\n#                              #\n################################\n\n# This block is not actually functional configuration,\n# but serves to illustrate the available configuration\n# options and document them in a way that is accessible\n# to users that `kubectl edit` this config map.\n#\n# These sample configuration options may be copied out of\n# this example block and unindented to be in the data block\n# to actually change the configuration.\n\n# OpenTelemetry Metrics Configuration\n# Protocol for metrics export (prometheus, grpc, http/protobuf, none)\n# Default if not specified: \"none\"\nmetrics-protocol: prometheus\n\n# Metrics endpoint (for grpc/http protocols)\n# Default: empty (uses default OTLP endpoint)\nmetrics-endpoint: \"\"\n\n# Metrics export interval (e.g., \"30s\", \"1m\")\n# Default: empty (uses default interval)\nmetrics-export-interval: \"\"\n\n# OpenTelemetry Tracing Configuration\n# Protocol for tracing export (grpc, http/protobuf, none, stdout)\n# Default: none\ntracing-protocol: none\n\n# Tracing endpoint (for grpc/http protocols)\n# Default: empty\ntracing-endpoint: \"\"\n\n# Tracing sampling rate (0.0 to 1.0)\n# Default: 1.0 (100% sampling)\ntracing-sampling-rate: \"1.0\"\n\n# Runtime Configuration\n# Enable profiling (enabled, disabled)\n# Default: disabled\nruntime-profiling: disabled\n\n# Runtime export interval (e.g., \"15s\")\n# Default: 15s\nruntime-export-interval: \"15s\"\n\n# Note: Legacy OpenCensus configuration (metrics.backend-destination, etc.) has been\n# removed as OpenCensus support is no longer provided by the underlying infrastructure.\n# Please use the OpenTelemetry configuration options above.\n","metrics-protocol":"prometheus","metrics.count.enable-reason":"false","metrics.pipelinerun.duration-type":"histogram","metrics.pipelinerun.level":"pipeline","metrics.taskrun.duration-type":"histogram","metrics.taskrun.level":"task"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"f794e15ced4f456b3bc61ed5536831496561e44fe087867cd1c4ab4b4a74d477"},"creationTimestamp":null,"labels":{"app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-pipelines","operator.tekton.dev/operand-name":"tektoncd-pipelines"},"name":"config-observability","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"pipeline-main-static-4h464","uid":"108c3d6b-0365-43b4-b40a-f3acea03765f"}]}}
+      operator.tekton.dev/last-applied-hash: f794e15ced4f456b3bc61ed5536831496561e44fe087867cd1c4ab4b4a74d477
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-observability
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+
+      # metrics.backend-destination field specifies the system metrics destination.
+      # It supports either prometheus (the default) or stackdriver.
+      # Note: Using stackdriver will incur additional charges
+      metrics.backend-destination: prometheus
+
+      # metrics.stackdriver-project-id field specifies the stackdriver project ID. This
+      # field is optional. When running on GCE, application default credentials will be
+      # used if this field is not provided.
+      metrics.stackdriver-project-id: "<your stackdriver project id>"
+
+      # metrics.allow-stackdriver-custom-metrics indicates whether it is allowed to send metrics to
+      # Stackdriver using "global" resource type and custom metric type if the
+      # metrics are not supported by "knative_revision" resource type. Setting this
+      # flag to "true" could cause extra Stackdriver charge.
+      # If metrics.backend-destination is not Stackdriver, this is ignored.
+      metrics.allow-stackdriver-custom-metrics: "false"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 9102a5b080afb66ca5979938a9c97e080ee632a976d7929359b74173d0090f9d
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-triggers
+      operator.tekton.dev/operand-name: tektoncd-triggers
+    name: config-observability-triggers
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 131a311ac0dfacd769781f980d29b1e8761b6b97fb6d47a036eaad8f1f3eb196
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-registry-cert
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      #
+      # spire-trust-domain specifies the SPIRE trust domain to use.
+      # spire-trust-domain: "example.org"
+      #
+      # spire-socket-path specifies the SPIRE agent socket for SPIFFE workload API.
+      # spire-socket-path: "unix:///spiffe-workload-api/spire-agent.sock"
+      #
+      # spire-server-addr specifies the SPIRE server address for workload/node registration.
+      # spire-server-addr: "spire-server.spire.svc.cluster.local:8081"
+      #
+      # spire-node-alias-prefix specifies the SPIRE node alias prefix to use.
+      # spire-node-alias-prefix: "/tekton-node/"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 61c07b23be13f8f98ed6ae2c739be6f5f9219205089f3f6dec3e9963f1f518e0
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-spire
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      #
+      # Enable sending traces to defined endpoint by setting this to true
+      enabled: "true"
+      #
+      # API endpoint to send the traces to
+      # (optional): The default value is given below
+      endpoint: "http://jaeger-collector.jaeger.svc.cluster.local:14268/api/traces"
+      # (optional) Name of the k8s secret which contains basic auth credentials
+      credentialsSecret: "jaeger-creds"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 51022763f637341eb83c75d4395171901088fd201501a986d40cb1db6b54f28e
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-tracing
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    cap: 60s
+    duration: 10s
+    factor: "2.0"
+    jitter: "0.0"
+    steps: "5"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: fb93766641ed85356e91944ab1b4219fe6520ae8a6f1d9b470802edcb81f527c
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: config-wait-exponential-backoff
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    await-sidecar-readiness: "true"
+    coschedule: workspaces
+    disable-creds-init: "false"
+    disable-inline-spec: ""
+    enable-api-fields: beta
+    enable-artifacts: "false"
+    enable-cel-in-whenexpression: "false"
+    enable-concise-resolver-syntax: "false"
+    enable-custom-tasks: "true"
+    enable-kubernetes-sidecar: "false"
+    enable-param-enum: "false"
+    enable-provenance-in-status: "true"
+    enable-step-actions: "true"
+    enable-tekton-oci-bundles: "false"
+    enable-wait-exponential-backoff: "false"
+    enforce-nonfalsifiability: none
+    keep-pod-on-cancel: "false"
+    max-result-size: "4096"
+    performance: |
+      disable-ha: false
+    require-git-ssh-secret-known-hosts: "false"
+    results-from: termination-message
+    running-in-environment-with-injected-sidecars: "true"
+    send-cloudevents-for-runs: "false"
+    set-security-context: "false"
+    set-security-context-read-only-root-filesystem: "false"
+    trusted-resources-verification-no-match-policy: ignore
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: bb178fb9b33df3e17c04e20004d6b96188f88bf25b18e1a46a393c0dccd0662d
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: feature-flags
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    enable-api-fields: stable
+    labels-exclusion-pattern: ""
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: e5132dc9712cfd19dc5cee8212d2ab823257656b346c66491594d28d11a89ee8
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-triggers
+    name: feature-flags-triggers
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+- apiVersion: v1
+  data:
+    api-token-secret-key: ""
+    api-token-secret-name: ""
+    api-token-secret-namespace: default
+    default-org: ""
+    default-revision: main
+    default-url: https://github.com/tektoncd/catalog.git
+    fetch-timeout: 1m
+    scm-type: github
+    server-url: ""
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 7f14d5a3c476f7014fe1430a191463d12d8fd2edf2fc998df07a00334addb697
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: git-resolver-config
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    fetch-timeout: 1m
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 7037e66ca65a6da9460846a4986b9dcbefdca7e2218af91f400f62cc88650536
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: http-resolver-config
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    default-artifact-hub-pipeline-catalog: tekton-catalog-pipelines
+    default-artifact-hub-task-catalog: tekton-catalog-tasks
+    default-kind: task
+    default-tekton-hub-catalog: Tekton
+    default-type: artifact
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: fb18c7aeb06f6015ba10d3a932bad305fa73dcbfd3e60dafceec66a1d28d60be
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: hubresolver-config
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    root-cert.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+      MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+      MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+      AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+      j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+      H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+      v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+      UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+      ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+      VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+      XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+      y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+      nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+      P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+      y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+      H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    labels:
+      istio.io/config: "true"
+    name: istio-ca-root-cert
+    namespace: tekton-pipelines
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+      HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+      0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+      CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+      k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+      1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+      4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+      46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+      qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+      fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+      PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+      szTc1uZpUffa
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    name: kube-root-ca.crt
+    namespace: tekton-pipelines
+- apiVersion: v1
+  data:
+    version: v1.10.0
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: f14984ceb0a2176a09b28f08378a796f2a208a8d057816be8efcd5aa258fe97e
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: pipelines-info
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    max-size: "1000"
+    ttl: 5m
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 0fdd1c73eb4a5f0a08ef7a63ce7709e243919cbfb061acc9300630d46e3b7c8c
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: resolver-cache-config
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    enable-bundles-resolver: "true"
+    enable-cluster-resolver: "true"
+    enable-git-resolver: "true"
+    enable-http-resolver: "true"
+    enable-hub-resolver: "true"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 6d3a20c4cef7a45464c45425d190bff15f296ed8fac1d12120eda2959bb301b4
+    labels:
+      app.kubernetes.io/component: resolvers
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+    name: resolvers-feature-flags
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 8dfcfb97ee8b97c2036812d78b73642c546f9e99c687f86d28bd833c2e2afded
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-chains
+      operator.tekton.dev/operand-name: tektoncd-chains
+    name: tekton-chains-config-leader-election
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: chain-hjlhx
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      #
+      # metrics.backend-destination field specifies the system metrics destination.
+      # It supports either prometheus (the default) or stackdriver.
+      # Note: Using Stackdriver will incur additional charges.
+      #
+      metrics.backend-destination: prometheus
+      #
+      # metrics.stackdriver-project-id field specifies the Stackdriver project ID. This
+      # field is optional. When running on GCE, application default credentials will be
+      # used and metrics will be sent to the cluster's project if this field is
+      # not provided.
+      #
+      metrics.stackdriver-project-id: "<your stackdriver project id>"
+      #
+      # metrics.allow-stackdriver-custom-metrics indicates whether it is allowed
+      # to send metrics to Stackdriver using "global" resource type and custom
+      # metric type. Setting this flag to "true" could cause extra Stackdriver
+      # charge.  If metrics.backend-destination is not Stackdriver, this is
+      # ignored.
+      #
+      metrics.allow-stackdriver-custom-metrics: "false"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: bd8dfca946425fd52bb18519c21b4ad15b6e7e3092e3baf8837cb2b2d4d45329
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-chains
+      operator.tekton.dev/operand-name: tektoncd-chains
+    name: tekton-chains-config-observability
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: chain-hjlhx
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: b9aa791d50d28fbee249a24b0eb88b8f0a976f3f14a62587a4846060e1010a70
+    labels:
+      app.kubernetes.io/instance: default
+      operator.tekton.dev/operand-name: tektoncd-pipelines
+      operator.tekton.dev/release: devel
+    name: tekton-operator-proxy-webhook-config-leader-election
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: pipeline-main-static-4h464
+- apiVersion: v1
+  data:
+    config: |
+      DB_USER=
+      DB_PASSWORD=
+      DB_HOST=tekton-results-postgres-service.tekton-pipelines.svc.cluster.local
+      DB_PORT=5432
+      DB_NAME=tekton-results
+      DB_SSLMODE=disable
+      DB_SSLROOTCERT=
+      DB_ENABLE_AUTO_MIGRATION=true
+      DB_MAX_IDLE_CONNECTIONS=10
+      DB_MAX_OPEN_CONNECTIONS=10
+      GRPC_WORKER_POOL=2
+      K8S_QPS=5
+      K8S_BURST=10
+      PROFILING=false
+      PROFILING_PORT=6060
+      FEATURE_GATES='PartialResponse=true'
+      SERVER_PORT=8080
+      PROMETHEUS_PORT=9090
+      PROMETHEUS_HISTOGRAM=false
+      TLS_PATH=/etc/tls
+      TLS_MIN_VERSION=
+      TLS_CIPHER_SUITES=
+      TLS_CURVE_PREFERENCES=
+      AUTH_DISABLE=false
+      AUTH_IMPERSONATE=true
+      LOG_LEVEL=info
+      SQL_LOG_LEVEL=warn
+      LOGS_API=false
+      LOGS_TYPE=File
+      LOGS_BUFFER_SIZE=32768
+      LOGS_PATH=/logs
+      LOGS_TIMESTAMPS=false
+      S3_BUCKET_NAME=
+      S3_ENDPOINT=
+      S3_HOSTNAME_IMMUTABLE=false
+      S3_REGION=
+      S3_ACCESS_KEY_ID=
+      S3_SECRET_ACCESS_KEY=
+      S3_MULTI_PART_SIZE=5242880
+      GCS_BUCKET_NAME=
+      STORAGE_EMULATOR_HOST=
+      CONVERTER_ENABLE=false
+      CONVERTER_DB_LIMIT=50
+      MAX_RETENTION=
+      LOGGING_PLUGIN_PROXY_PATH=/api/logs/v1/application
+      LOGGING_PLUGIN_API_URL=
+      LOGGING_PLUGIN_TOKEN_PATH=/var/run/secrets/kubernetes.io/serviceaccount/token
+      LOGGING_PLUGIN_NAMESPACE_KEY=kubernetes_namespace_name
+      LOGGING_PLUGIN_CONTAINER_KEY=kubernetes.container_name
+      LOGGING_PLUGIN_STATIC_LABELS='log_type=application'
+      LOGGING_PLUGIN_CA_CERT=
+      LOGGING_PLUGIN_QUERY_LIMIT=1700
+      LOGGING_PLUGIN_TLS_VERIFICATION_DISABLE=false
+      LOGGING_PLUGIN_FORWARDER_DELAY_DURATION=10
+      LOGGING_PLUGIN_QUERY_PARAMS='direction=forward'
+      LOGGING_PLUGIN_MULTIPART_REGEX=
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 4adb0cbcba16f04b23f99667d5e06b69e2a7d6fc05cc7e57de0b7109271c808c
+    labels:
+      app.kubernetes.io/part-of: tekton-results
+      app.kubernetes.io/version: v0.18.0
+      operator.tekton.dev/operand-name: tektoncd-results
+    name: tekton-results-api-config
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: result-4d4wx
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: "60s"
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: "40s"
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: "10s"
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: "1"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 747baa8971d45ccce7d3a6c90de9d190802e334d5639f9bd4854556a63a54a50
+    labels:
+      app.kubernetes.io/name: tekton-results-leader-election
+      app.kubernetes.io/part-of: tekton-results
+      app.kubernetes.io/version: v0.18.0
+      operator.tekton.dev/operand-name: tektoncd-results
+    name: tekton-results-config-leader-election
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: result-4d4wx
+- apiVersion: v1
+  data:
+    loglevel.watcher: info
+    zap-logger-config: |
+      {
+        "level": "info",
+        "development": false,
+        "outputPaths": ["stdout"],
+        "errorOutputPaths": ["stderr"],
+        "encoding": "json",
+        "encoderConfig": {
+          "timeKey": "time",
+          "levelKey": "level",
+          "nameKey": "logger",
+          "callerKey": "caller",
+          "messageKey": "msg",
+          "stacktraceKey": "stacktrace",
+          "lineEnding": "",
+          "levelEncoder": "",
+          "timeEncoder": "iso8601",
+          "durationEncoder": "string",
+          "callerEncoder": ""
+        }
+      }
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 5e3e1c7c80b38ec25212d200324db9a729d45118d9f51ddfdbdcb1fd40711bda
+    labels:
+      app.kubernetes.io/name: tekton-results-logging
+      app.kubernetes.io/part-of: tekton-results
+      app.kubernetes.io/version: v0.18.0
+      operator.tekton.dev/operand-name: tektoncd-results
+    name: tekton-results-config-logging
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: result-4d4wx
+- apiVersion: v1
+  data:
+    _example: |
+      ################################
+      #                              #
+      #    EXAMPLE CONFIGURATION     #
+      #                              #
+      ################################
+
+      # This block is not actually functional configuration,
+      # but serves to illustrate the available configuration
+      # options and document them in a way that is accessible
+      # to users that `kubectl edit` this config map.
+      #
+      # These sample configuration options may be copied out of
+      # this example block and unindented to be in the data block
+      # to actually change the configuration.
+
+      # metrics.backend-destination field specifies the system metrics destination.
+      # It supports either prometheus (the default) or stackdriver.
+      # Note: Using Stackdriver will incur additional charges.
+      metrics.backend-destination: prometheus
+
+      # metrics.stackdriver-project-id field specifies the Stackdriver project ID. This
+      # field is optional. When running on GCE, application default credentials will be
+      # used and metrics will be sent to the cluster's project if this field is
+      # not provided.
+      metrics.stackdriver-project-id: "<your stackdriver project id>"
+
+      # metrics.allow-stackdriver-custom-metrics indicates whether it is allowed
+      # to send metrics to Stackdriver using "global" resource type and custom
+      # metric type. Setting this flag to "true" could cause extra Stackdriver
+      # charge.  If metrics.backend-destination is not Stackdriver, this is
+      # ignored.
+      metrics.allow-stackdriver-custom-metrics: "false"
+      metrics.taskrun.level: "task"
+      metrics.taskrun.duration-type: "histogram"
+      metrics.pipelinerun.level: "pipeline"
+      metrics.pipelinerun.duration-type: "histogram"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 24a0dfd3453f30e4fceef628442e8857822e5f89bffcd5fcf579519c3f69ed28
+    labels:
+      app.kubernetes.io/name: tekton-results-observability
+      app.kubernetes.io/part-of: tekton-results
+      app.kubernetes.io/version: v0.18.0
+      operator.tekton.dev/operand-name: tektoncd-results
+    name: tekton-results-config-observability
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: result-4d4wx
+- apiVersion: v1
+  data:
+    defaultRetention: "30"
+    runAt: 5 5 * * 0
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 5d6aa5f8da79730b42174eb89d7c9a94f4bee97c97f6001bd108a40d3b4d3f16
+    labels:
+      app.kubernetes.io/name: tekton-results-retention-policy
+      app.kubernetes.io/part-of: tekton-results
+      app.kubernetes.io/version: v0.18.0
+      operator.tekton.dev/operand-name: tektoncd-results
+    name: tekton-results-config-results-retention-policy
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: result-4d4wx
+- apiVersion: v1
+  data:
+    version: v0.18.0
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: d335b54e5281a745699849879bae1d3923f6a9dfe5e522d5740a503c70cefb31
+    labels:
+      app.kubernetes.io/name: tekton-results-info
+      app.kubernetes.io/part-of: tekton-results
+      app.kubernetes.io/version: v0.18.0
+      operator.tekton.dev/operand-name: tektoncd-results
+    name: tekton-results-info
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: result-4d4wx
+- apiVersion: v1
+  data:
+    POSTGRES_DB: tekton-results
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: 1bc40931a0312c9cee07577a5e350b423d1970fee9a8aa2b02b6520a380aa13e
+    labels:
+      app.kubernetes.io/name: tekton-results-postgres
+      app.kubernetes.io/part-of: tekton-results
+      app.kubernetes.io/version: devel
+      operator.tekton.dev/operand-name: tektoncd-results
+    name: tekton-results-postgres
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: result-4d4wx
+- apiVersion: v1
+  data:
+    version: v0.35.0
+  kind: ConfigMap
+  metadata:
+    annotations:
+      operator.tekton.dev/last-applied-hash: d5a68bd781d55ae059001bf473694533cae157f1883b3050e8ef678351d085dc
+    labels:
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: tekton-triggers
+      operator.tekton.dev/operand-name: tektoncd-triggers
+    name: triggers-info
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: operator.tekton.dev/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: TektonInstallerSet
+      name: trigger-main-static-65hpn
+kind: List
+metadata:

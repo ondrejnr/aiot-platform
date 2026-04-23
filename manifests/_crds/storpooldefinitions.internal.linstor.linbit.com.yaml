@@ -1,0 +1,25 @@
+apiVersion: v1
+items:
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: StorPoolDefinitions
+  metadata:
+    name: 013b7e83657712110696458cddcd0ccd1f748bbcd1bbdbfdbe0b89836038b492
+  spec:
+    pool_dsp_name: lvm-thin
+    pool_name: LVM-THIN
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: StorPoolDefinitions
+  metadata:
+    name: 018f289155b47416679dd18d9bfafad480b139a93a643f79c2e305bc6f5618b0
+  spec:
+    pool_dsp_name: DfltDisklessStorPool
+    pool_name: DFLTDISKLESSSTORPOOL
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: StorPoolDefinitions
+  metadata:
+    name: c2b5778ccd555d92172a6e89e33594f34421b7fe8034c612123bf3d0c4f9697f
+  spec:
+    pool_dsp_name: DfltStorPool
+    pool_name: DFLTSTORPOOL
+kind: List
+metadata:

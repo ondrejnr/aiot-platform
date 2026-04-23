@@ -3039,6 +3039,119 @@ items:
   kind: App
   metadata:
     annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/7xWTW/bRhD9K8ScSZr6pEygh7QBWiAICrhpD21yGO4OpY2Wu4vZpQzV4H8vlpTtyLYcNYl9k6jH9968nZnVDbQUUGJAqG4AjbEBg7LGx6+2/kwieAo5K5sLDEFTruyFklDBhnSboXOQnsTZa0OcrXdbqOBiN0mTd8rIn/4gwRS++prBlqACv8mjUs6kCT3lu0nOtu58wHy3OIvEOxSR6fAa9ClorEk/W+IG/QYqkPOGZlhLWS6oaJbFslxNJwusL4uiLorZsr6k1eKyKCPpwfCtzPjgoXgKg7EraojJCPJQ/XMD6NRfxF5ZAxXsJpBCra3Y/h6hb0lTGH5pUHtKQVgT2GpNDFXgjlLYKhNP5C7YM6PrhnOcrJZiPpF1NisFZnOclxnOpMwKWYoCy9mqFiX0n/oUvCMRMxMb5BA/HLXOUQlTSAGdu39S5LNFXkAKkrxg5caK4Gr0k/xGuk0G3qSxnLzramJDgTw8kWvYu/gAndNKDN0KKeweSvV9OvTonYdZCso0Npo9NvGnWzNKSoRtnaZAkEKj2Ie35LTdUwxpWkyXWTHPptMPk2U1Lapi8TfEPjqJKiNqvoooY2MhFXzYoNkme9sNNSrjA2qtzDq5TWF0/tF8NG98giaxjkzibceCEsf2c3TmA4Yusslb3fNbj2kkO9V0d33EOyXojRC2M+HRCWSN5WtkSZz5EZnhEfTxwH2HGHfG/Cil4/G4VXAa97W1W58Jaxq1zvyXwB8icVfEtxL/Mjh7j+4x97ar6RqD2Bzsn0vPNYocu7CxrP4dpijfrnzcfUfCuvOB+Mpqeq4RxAjL+B73GgYOub6K+s/KSGXW56aQ1Qf8Cyo/Uf5p2SeG7plavmOUT/k8lxKd80dRjBu2pWd30Yuw/z/jrTUqWFZmnQvLZH0ubHvxRELvR+A5m7U9gr6ChQf79iv6n764eBf9/e0U/1hFCpK/kiEeL+mqSMF3bYu8h+qm7/v/AgAA///D1mocfQoAAA
+      objectset.rio.cattle.io/id: helm-app
+      objectset.rio.cattle.io/owner-gvk: /v1, Kind=Secret
+      objectset.rio.cattle.io/owner-name: sh.helm.release.v1.robusta.v5
+      objectset.rio.cattle.io/owner-namespace: robusta
+    labels:
+      objectset.rio.cattle.io/hash: d4fe3abdd75e0f60678215ab900b0036b9e85907
+    name: robusta
+    namespace: robusta
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: false
+      controller: true
+      kind: Secret
+      name: sh.helm.release.v1.robusta.v5
+  spec:
+    chart:
+      metadata:
+        apiVersion: v2
+        appVersion: 0.35.0
+        description: Robusta Helm chart for Kubernetes
+        name: robusta
+        type: application
+        version: 0.35.0
+    helmVersion: 3
+    info:
+      description: Upgrade complete
+      firstDeployed: "2026-04-22T16:20:05Z"
+      lastDeployed: "2026-04-22T17:20:48Z"
+      notes: |+
+        Thank you for installing Robusta 0.35.0
+
+        As an open source project, we collect general usage statistics.
+        This data is extremely limited and contains only general metadata to help us understand usage patterns.
+        If you are willing to share additional data, please do so! It really help us improve Robusta.
+
+        You can set sendAdditionalTelemetry: true as a Helm value to send exception reports and additional data.
+        This is disabled by default.
+
+        To opt-out of telemetry entirely, set a ENABLE_TELEMETRY=false environment variable on the robusta-runner deployment.
+        Note that if the Robusta UI is enabled, telemetry cannot be disabled even if ENABLE_TELEMETRY=false is set.
+
+      status: deployed
+    name: robusta
+    namespace: robusta
+    resources:
+    - apiVersion: v1
+      kind: ServiceAccount
+      name: robusta-forwarder-service-account
+      namespace: robusta
+    - apiVersion: v1
+      kind: ServiceAccount
+      name: robusta-runner-service-account
+      namespace: robusta
+    - apiVersion: v1
+      kind: Secret
+      name: robusta-playbooks-config-secret
+      namespace: robusta
+    - apiVersion: v1
+      kind: Secret
+      name: robusta-runner-secret
+      namespace: robusta
+    - apiVersion: v1
+      kind: ConfigMap
+      name: robusta-kubewatch-config
+      namespace: robusta
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      name: robusta-forwarder-cluster-role
+      namespace: robusta
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      name: robusta-runner-cluster-role
+      namespace: robusta
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      name: robusta-forwarder-cluster-role-binding
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      name: robusta-runner-cluster-role-binding
+    - apiVersion: v1
+      kind: Service
+      name: robusta-forwarder
+      namespace: robusta
+    - apiVersion: v1
+      kind: Service
+      name: robusta-runner
+      namespace: robusta
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: robusta-forwarder
+      namespace: robusta
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: robusta-runner
+      namespace: robusta
+    - apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      name: robusta-forwarder-service-monitor
+      namespace: robusta
+    - apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      name: robusta-runner-service-monitor
+      namespace: robusta
+    version: 5
+  status:
+    observedGeneration: 10
+    summary:
+      state: deployed
+- apiVersion: catalog.cattle.io/v1
+  kind: App
+  metadata:
+    annotations:
       objectset.rio.cattle.io/applied: H4sIAAAAAAAA/8RW227cNhN+Ff3zX7QXlPZoyyugQA8G2iBtA8SBgTb2xYgaSYwpkiApBbahdy8o7WrteBs7rtPerURy5jtxtLfQkMcCPUJ2C6iU9uiFVi486vwDce/IJ1bohKP3khKhZ6KADGqSTYzGAPvbffqjIhtX3RVkMOsWLHotVPHdGXFL/tFjChuCDFydhE6JJUnoKOkWydWJi4UqLSbd4kllnEE+1BKV0jfQM5CYk/wsxxpdDRnka77ZnPD1nBdpnq+WR5TyfLFcYcnTdFOu0zRNC8xXoegW8QQPxlefdGcwAHtLJVlSnBxk728BjTgn64RWkMFAK5eaX70JW09Jkh9WSpSOGHCtvNVSkoXM25YYXAkVPJmkfbJ47eDlIiVcFuUy3qyPV/E6Rx7nJ5syPirz+fGGivRoXUJ/2TNwhniQjddoffhxLz73SCyBARqzfzNPFqtNMgcGBTluhRlJwS8km2goGJXaRjww416oKmrIW8FdhKqIpK5cJFT0+sQBg1oPBGvvjctms1HbRGhgIPhQ9cHSTDTV7ExUv+ubX3WlY21RVZS4rgIGV3T9UdsimAHjHmDwxpB6R5ICjOuBTQMMGq2E11aocC6ggksGDQrlUSiyo5/UoJDjLZH6+7vwttZMTVorDxLp2b6KsehqVP5Qod1a7GqsxYOCu+VhNSmog/7yYFSdbu2YxulsJXzd5gnXzRbXbHBp0P/hFm1IxX4n1/A4PcVbU7WNh/CKPIjmr01AgcZIwYexAwy6u3k5SubQ92wYNlOQVgyEKnVI3P0gvVLOo5QR142R5AkYlMI6f0pG6msKSV/Ol8fxfB0v1u/my2w1z45WfwYb8Sm7lPZBIPhDt1GNHUUfWuejYnsumtQcw5xdqAsVR9qTjLEi5aMttSz6BhhYwmIw4UL9P4Q6fhWOhjP/e3++2zhKcPntTm7RVImrBcnChUTnWFQ0Ow9EnUffBnA7OF8ykSzt3T80i6bxYjvB6QfOdavujJmpfrwne7hVCPU/LT8SbJ7X4yetSlH9hubF0T9e+YuB2xx5gq2vtRU3w/0I4zsYf6+xbJ0n+1ZL+jypePL7322+5/2VEfwoVDGO5f9OhccwPFeMAxfla13AlwswGuPuCXWK1Gh1Ri8zPB6W/xTgMzhc3vkELfr9YA1/FR3ZjoqfSZEdP1fZnIFrmwbtNWS3fd//FQAA//+8oSXqUAsAAA
       objectset.rio.cattle.io/id: helm-app
       objectset.rio.cattle.io/owner-gvk: /v1, Kind=Secret
@@ -5050,13 +5163,13 @@ items:
   kind: App
   metadata:
     annotations:
-      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/7RWXY/bNhD8K+z2pQ+SrA9/CiiQNAFatAUapGmB5nIIVtTKYo8iVZKy4xz03wtKvrNdX+7cK/pkURzO7s4O17qFhhyW6BDyW0CltEMntLJ+qYs/iTtLLjJCRxydkxQJPREl5FCTbEJsWwi+iNNbRSZcb24gh8kmCdhPQpXf/krckHvymMKGIAdbRz5SZEgSWoo2SfQZi0J8ijZJfBGJbZF7pvEY9AFILEg+WmGNtoYc0mlMs+ksq+bVMpuvVmVZLdMVzlfZklcJ8moWp8vlCj3pPt99lHH9j9ABDFm9pYoMKU4W8qtbwFb8TsYKrSCHTQIBFFLzm1889DVJcsNOhdJSAFwrZ7SUZCB3pqMAboTy7bhX9ULduqGJCz7lOONFmFbpIpwWi2mIiywLk3S2iFfJjK/mM+iv+wBsS9wrxms0zj+c+OakhBQCwLY9vFlEcZTMIYCSLDeiHSuC90M+TFiGrEHXGWKoSkZVpY2TZC0j5ci0RlgKuURrmW5JMas7w4k1EECth2Jr51qbTybb7fauSq79vuBDpLt9tJacPYJMRLOeSL3Wk/HdR//8cRbHn5IsiVq1hgBuaLfVpvTNOjSy0Uo4bcSAaMgZwa3HdgUZRY78wusP1wE0KJRDociMDacGhYQckLjQrTBkX+yw1tonFBXm0MOXHsDeeITvmJFHpayFq7tiqOHAA31woOe1EdYJVBEqp9ULof4qSEclHQK8uoOwlx5yFuRwpL8+d/jYh0GXB7IaYSHXTdMp4XaTYWDsD18HsDm1Rwp9P0p275ssAKEq7Q12apzf2rXBkhjXTSvJ+YIqYax7Ta3UO/LGTuN0HsbTMI3fxfN8luZZ+h78zX8YlbyLk3ya5XHmUUr7BubwZrg6AduicKzShrmaWKtLy5xmBTFuCB2VEftDd4yjYntXMFcLy7YCAjCE5aDa1+wHkg0brs/ANbr/g/qgrr66+llwUpauv7lXvllHthYkS+vnUYGlN5p16DqfWXlXw6WDx9ChWw+NnPspYjaC00vOdaeOpslj5N5zjxCejqW9K8oiRM7J2gspTYE8ws7V2ojPwx9UdLMclDkO9kp21pF5qyWdpf7fKb8Tqhzv+xPMDwh6JsD+x5LZkHmWro/ybqn4X0jtCeIpbmxbe6LmePUaOrfWswR5Bv/lwjyP/N8JVKDj9anfjFY/6uIsgtJ+BEpC9QXq44maxP1hVviPnEHV8ntSZHCcoXEAtmsaNDvIb/u+/zsAAP//aTD/GAgKAAA
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/7RW72/bNhD9V7jbl32QZP1wFEfAgHYtsGEbsKLrBqxpUJzIs8WFIjWSspsG+t8HSk5sz2niZdgni+Lju7t3j2fdQkseBXqE6hZQa+PRS6NdWJr6T+LekU+sNAlH7xUl0sykgAoaUm2MXQfRF3Fmo8nGq/U1VDBbZxH7SWrx7a/ELfknj2lsCSpwTRIiJZYUoaNknSWfsa7lp2SdZSeRuA55YJqOwRCBwprUoxU26BqoIMeiXJTEzzMq0rosy4s8L5AWxM8KTmdpzfNzUZIIpNt8t1Gm9T9CRzBm9ZaWZElzclBd3gJ28neyThoNFaxDTbUy/PqXAH1Nivy4s0TlKAJutLdGKbJQedtTBNdSh3bcq3qibv3YxPP5crmYpzymYl7G82xex1iLPF4UFxd4kZdUFByGqyEC1xEPivEGrQ8PB745KCGHCLDrdm/OkzTJSohAkONWdlNF8H7Mh0nHkLXoe0sMtWC0XBrrFTnHSHuynZWOYq7QOWY60syZ3nJiLUTQmLHYxvvOVbPZZrO5q5KbsC/5GOluH50j7/YgM9muZsqszGx69zE8fzxL009ZkSWdXkEE13SzMVaEZu0a2RotvbFyRLTkreQuYPuarCZPYRH0h6sIWpTao9Rkp4ZTi1JBBUhcmk5aci9usDEmJJTUdtfDlwHA3gRE6JhVe6WspG/6eqxhxwNDtKPnjZXOS9QJam/0C6n/qskkgnYBXt1B2MsAOQqyOzJcHTt86sOoywNZTbCYm7bttfQ3s3FgbA9fRbA+tEcOwzBJdu+bIgKplyYY7NA4v3Uri4IYN22nyIeCltI6/5o6ZW4oGDtP8zJO53GevkvL6iyvivw9hJv/MCp/l51V87JKFwGlTWhgBW/GqxOxDUrPlsYy3xDrjHDMG1YT45bQk0jYH6ZnHDXbuoL5Rjq2kRCBJRSjal+zH0i1bLw+I9fk/g/6g7786vJnyUk7uvrmXvl2lbhGkhIuzKMaRTCa8+j7kJm4q+HUwWNp162HRs79FLFryekl56bXe9PkMfLguUcID8fS1hWijpFzcu5ESlsjT7D3jbHy8/gHlVwvRmX2g71SvfNk3xpFR6n/d8rvpBbTfX+C+QFBjwTY/jiya7LP0vVR3g3V/wupO0A8xY1d5w7UnK5eS8fWepYgz+A/XZjnkf87gWr0vDn0mzX6R1MfRdAmjEBFqL9AvT9Rs2zYzYrwkTOqKr4nTRanGZpG4Pq2RXsD1e0wDH8HAAD//4kMt78ICgAA
       objectset.rio.cattle.io/id: helm-app
       objectset.rio.cattle.io/owner-gvk: /v1, Kind=Secret
-      objectset.rio.cattle.io/owner-name: sh.helm.release.v1.zabbix.v10
+      objectset.rio.cattle.io/owner-name: sh.helm.release.v1.zabbix.v11
       objectset.rio.cattle.io/owner-namespace: zabbix
     labels:
-      objectset.rio.cattle.io/hash: 240e5453f6f83699ddf829a6938cf1acf502889a
+      objectset.rio.cattle.io/hash: 2a3686ec71e30b6669223ae8ec53ce50bc27d6ed
     name: zabbix
     namespace: zabbix
     ownerReferences:
@@ -5064,7 +5177,7 @@ items:
       blockOwnerDeletion: false
       controller: true
       kind: Secret
-      name: sh.helm.release.v1.zabbix.v10
+      name: sh.helm.release.v1.zabbix.v11
   spec:
     chart:
       metadata:
@@ -5096,7 +5209,7 @@ items:
     info:
       description: Upgrade complete
       firstDeployed: "2026-04-20T06:52:32Z"
-      lastDeployed: "2026-04-21T01:43:03Z"
+      lastDeployed: "2026-04-22T15:46:08Z"
       notes: |
         Please, wait for the pods to be created. You can monitor this with the command:
           kubectl get pods -n zabbix --watch --output-watch-events=true
@@ -6037,9 +6150,9 @@ items:
       kind: CronJob
       name: zabbix-nodesclean
       namespace: zabbix
-    version: 10
+    version: 11
   status:
-    observedGeneration: 20
+    observedGeneration: 22
     summary:
       state: deployed
 kind: List

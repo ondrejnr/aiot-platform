@@ -1,0 +1,44 @@
+apiVersion: v1
+items:
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecTypes
+  metadata:
+    name: 0e1d1edc14ed3bf8189fba45c65a3775f9add9f5cffb0ea795bcb2c8f7ad4348
+  spec:
+    type_dsp_name: SHARED
+    type_enabled: true
+    type_name: SHARED
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecTypes
+  metadata:
+    name: 92b7b421992ef490f3b75898ec0e511f1a5c02422819d89719b20362b023ee4f
+  spec:
+    type_dsp_name: User
+    type_enabled: true
+    type_name: USER
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecTypes
+  metadata:
+    name: d621c1a7169f2ca51bc8674da52e9572178a66a1dde88da24da78fe4951703f9
+  spec:
+    type_dsp_name: SYSTEM
+    type_enabled: true
+    type_name: SYSTEM
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecTypes
+  metadata:
+    name: d9262e7fb868c502061473089e5212378ac3935e2f96294266da6d7eec7d44e0
+  spec:
+    type_dsp_name: PUBLIC
+    type_enabled: true
+    type_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecTypes
+  metadata:
+    name: dc6190c8b399e043b9dfbacbb0d37f2a2645e33f9938491d24b24e0298d9cd17
+  spec:
+    type_dsp_name: SysAdm
+    type_enabled: true
+    type_name: SYSADM
+kind: List
+metadata:
