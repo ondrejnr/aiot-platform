@@ -5,6 +5,63 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"tekton.dev/v1","kind":"Pipeline","metadata":{"annotations":{},"name":"integration-smoke-test","namespace":"default-tenant"},"spec":{"params":[{"description":"AppStudio snapshot JSON (auto-injected by integration-service)","name":"SNAPSHOT","type":"string"}],"tasks":[{"name":"inspect-images","params":[{"name":"SNAPSHOT","value":"$(params.SNAPSHOT)"}],"taskSpec":{"params":[{"name":"SNAPSHOT","type":"string"}],"results":[{"description":"Test result in Konflux TEST_OUTPUT format","name":"TEST_OUTPUT"}],"steps":[{"image":"quay.io/skopeo/stable:latest","name":"inspect","script":"#!/bin/bash\nset -uo pipefail\ncommand -v jq \u003e/dev/null 2\u003e\u00261 || (microdnf install -y jq \u003e/dev/null 2\u003e\u00261 || dnf install -y jq -q \u003e/dev/null 2\u003e\u00261 || true)\necho '=== Snapshot received ==='\necho '$(params.SNAPSHOT)' | jq .\necho '=== Inspecting images ==='\nFAIL=0\nSUCC=0\nfor img in $(echo '$(params.SNAPSHOT)' | jq -r '.components[].containerImage'); do\n  norm=$(echo \"$img\" | sed -E 's|^internal-registry\\.registry\\.svc\\.cluster\\.local(@\\|/)|internal-registry.registry.svc.cluster.local:5000\\1|')\n  echo \"--- $norm ---\"\n  if skopeo inspect --tls-verify=false \"docker://${norm}\" \u003e/dev/null 2\u003e\u00261; then\n    echo \"OK: $norm\"\n    SUCC=$((SUCC+1))\n  else\n    echo \"FAIL inspect (ignored in PoC): $norm\"\n    FAIL=$((FAIL+1))\n  fi\ndone\nTS=$(date -u +%Y-%m-%dT%H:%M:%SZ)\ncat \u003e \"$(results.TEST_OUTPUT.path)\" \u003c\u003cJSON\n{\"result\":\"SUCCESS\",\"timestamp\":\"$TS\",\"successes\":$SUCC,\"failures\":$FAIL,\"warnings\":0,\"note\":\"smoke test PoC: image inspect attempts, never fails build\"}\nJSON\necho 'Done'\n"}]}}]}}
+    name: integration-smoke-test
+    namespace: default-tenant
+  spec:
+    params:
+    - description: AppStudio snapshot JSON (auto-injected by integration-service)
+      name: SNAPSHOT
+      type: string
+    tasks:
+    - name: inspect-images
+      params:
+      - name: SNAPSHOT
+        value: $(params.SNAPSHOT)
+      taskSpec:
+        metadata: {}
+        params:
+        - name: SNAPSHOT
+          type: string
+        results:
+        - description: Test result in Konflux TEST_OUTPUT format
+          name: TEST_OUTPUT
+          type: string
+        spec: null
+        steps:
+        - computeResources: {}
+          image: quay.io/skopeo/stable:latest
+          name: inspect
+          script: |
+            #!/bin/bash
+            set -uo pipefail
+            command -v jq >/dev/null 2>&1 || (microdnf install -y jq >/dev/null 2>&1 || dnf install -y jq -q >/dev/null 2>&1 || true)
+            echo '=== Snapshot received ==='
+            echo '$(params.SNAPSHOT)' | jq .
+            echo '=== Inspecting images ==='
+            FAIL=0
+            SUCC=0
+            for img in $(echo '$(params.SNAPSHOT)' | jq -r '.components[].containerImage'); do
+              norm=$(echo "$img" | sed -E 's|^internal-registry\.registry\.svc\.cluster\.local(@\|/)|internal-registry.registry.svc.cluster.local:5000\1|')
+              echo "--- $norm ---"
+              if skopeo inspect --tls-verify=false "docker://${norm}" >/dev/null 2>&1; then
+                echo "OK: $norm"
+                SUCC=$((SUCC+1))
+              else
+                echo "FAIL inspect (ignored in PoC): $norm"
+                FAIL=$((FAIL+1))
+              fi
+            done
+            TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+            cat > "$(results.TEST_OUTPUT.path)" <<JSON
+            {"result":"SUCCESS","timestamp":"$TS","successes":$SUCC,"failures":$FAIL,"warnings":0,"note":"smoke test PoC: image inspect attempts, never fails build"}
+            JSON
+            echo 'Done'
+- apiVersion: tekton.dev/v1
+  kind: Pipeline
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"tekton.dev/v1","kind":"Pipeline","metadata":{"annotations":{},"name":"release-noop","namespace":"default-tenant"},"spec":{"params":[{"default":"","description":"Snapshot spec as JSON string","name":"snapshot","type":"string"},{"default":"","name":"release","type":"string"},{"default":"","name":"releasePlan","type":"string"},{"default":"","name":"releasePlanAdmission","type":"string"},{"default":"","name":"enterpriseContractPolicy","type":"string"},{"default":"","name":"enterpriseContractExtraRuleData","type":"string"},{"default":"","name":"taskGitUrl","type":"string"},{"default":"","name":"taskGitRevision","type":"string"}],"tasks":[{"name":"log-snapshot","params":[{"name":"snapshot","value":"$(params.snapshot)"}],"taskSpec":{"params":[{"name":"snapshot","type":"string"}],"steps":[{"image":"registry.access.redhat.com/ubi9/ubi-minimal:latest","name":"log","script":"#!/bin/sh\necho \"release-noop invoked\"\necho \"snapshot param:\"\necho \"$(params.snapshot)\"\necho \"Release OK\"\n"}]}}]}}
     name: release-noop
     namespace: default-tenant
@@ -56,5 +113,165 @@ items:
             echo "snapshot param:"
             echo "$(params.snapshot)"
             echo "Release OK"
+- apiVersion: tekton.dev/v1
+  kind: Pipeline
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"tekton.dev/v1","kind":"Pipeline","metadata":{"annotations":{},"name":"release-with-ec","namespace":"default-tenant"},"spec":{"params":[{"default":"","description":"Snapshot spec as JSON string","name":"snapshot","type":"string"},{"default":"","name":"release","type":"string"},{"default":"","name":"releasePlan","type":"string"},{"default":"","name":"releasePlanAdmission","type":"string"},{"default":"","name":"enterpriseContractPolicy","type":"string"},{"default":"","name":"enterpriseContractExtraRuleData","type":"string"},{"default":"","name":"taskGitUrl","type":"string"},{"default":"","name":"taskGitRevision","type":"string"}],"tasks":[{"name":"extract-images","params":[{"name":"snapshot","value":"$(params.snapshot)"}],"taskSpec":{"params":[{"name":"snapshot","type":"string"}],"results":[{"description":"Newline-separated list of pullspecs","name":"IMAGES"}],"steps":[{"image":"bitnami/kubectl:latest","name":"extract","script":"#!/bin/sh\nset -e\necho 'snapshot param: $(params.snapshot)'\nSNAP_REF='$(params.snapshot)'\nif echo \"$SNAP_REF\" | grep -q '^{'; then\n  echo \"$SNAP_REF\" \u003e /tmp/snap.json\nelse\n  NS=$(echo \"$SNAP_REF\" | cut -d/ -f1)\n  NAME=$(echo \"$SNAP_REF\" | cut -d/ -f2)\n  kubectl -n \"$NS\" get snapshot \"$NAME\" -o jsonpath='{.spec}' \u003e /tmp/snap.json\nfi\necho '--- snapshot spec ---'\nhead -c 800 /tmp/snap.json; echo\n# Use kubectl jsonpath on the same snapshot to extract images (no python/jq needed)\nif echo \"$SNAP_REF\" | grep -q '^{'; then\n  # JSON inline — fall back to grep\n  grep -oE '\"containerImage\":\"[^\"]+\"' /tmp/snap.json | sed 's/\"containerImage\":\"//;s/\"$//' \u003e $(results.IMAGES.path)\nelse\n  NS=$(echo \"$SNAP_REF\" | cut -d/ -f1)\n  NAME=$(echo \"$SNAP_REF\" | cut -d/ -f2)\n  kubectl -n \"$NS\" get snapshot \"$NAME\" -o jsonpath='{range .spec.components[*]}{.containerImage}{\"\\n\"}{end}' \u003e $(results.IMAGES.path)\nfi\necho '--- IMAGES ---'\ncat $(results.IMAGES.path)\n"}]}},{"name":"verify-enterprise-contract","params":[{"name":"POLICY_CONFIGURATION","value":"$(params.enterpriseContractPolicy)"},{"name":"IMAGES_FILE","value":"$(tasks.extract-images.results.IMAGES)"},{"name":"SNAPSHOT","value":"$(params.snapshot)"}],"runAfter":["extract-images"],"taskSpec":{"params":[{"name":"POLICY_CONFIGURATION","type":"string"},{"name":"IMAGES_FILE","type":"string"},{"name":"SNAPSHOT","type":"string"}],"results":[{"description":"EC verification result","name":"TEST_OUTPUT"}],"steps":[{"env":[{"name":"HOME","value":"/tmp"}],"image":"quay.io/conforma/cli:latest","name":"verify","script":"#!/bin/bash\nset -uo pipefail\nPOL='$(params.POLICY_CONFIGURATION)'\necho \"Policy: $POL\"\nSNAP_REF='$(params.SNAPSHOT)'\necho \"snapshot ref: $SNAP_REF\"\n# Build images.json that ec accepts: {\"components\":[{\"containerImage\":\"...\", \"name\":\"...\", \"source\":{...}}]}\n# Pull snapshot spec from cluster\nif echo \"$SNAP_REF\" | grep -q '^{'; then\n  echo \"$SNAP_REF\" \u003e /tmp/snap.json\nelse\n  NS=$(echo \"$SNAP_REF\" | cut -d/ -f1)\n  NAME=$(echo \"$SNAP_REF\" | cut -d/ -f2)\n  # ec image has curl; use the kube API via in-cluster SA\n  TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\n  CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n  curl -s --cacert $CACERT -H \"Authorization: Bearer $TOKEN\" \\\n    \"https://kubernetes.default.svc/apis/appstudio.redhat.com/v1alpha1/namespaces/$NS/snapshots/$NAME\" \\\n    | (jq -r '.spec' 2\u003e/dev/null || sed -n 's/.*\"spec\":\\({.*}\\),\"status\".*/\\1/p') \u003e /tmp/snap.json\nfi\necho '--- snapshot spec ---'\nhead -c 800 /tmp/snap.json; echo\nec validate image \\\n  --images /tmp/snap.json \\\n  --policy=\"$POL\" \\\n  --public-key=k8s://tekton-pipelines/public-key \\\n  --ignore-rekor \\\n  --strict=false \\\n  --output=appstudio=$(results.TEST_OUTPUT.path) \\\n  --output=text || RC=$?\necho \"ec exit: ${RC:-0}\"\nif [ ! -s $(results.TEST_OUTPUT.path) ]; then\n  echo \"{\\\"result\\\":\\\"WARNING\\\",\\\"timestamp\\\":\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\",\\\"successes\\\":0,\\\"failures\\\":0,\\\"warnings\\\":1,\\\"note\\\":\\\"ec produced no output\\\"}\" \u003e $(results.TEST_OUTPUT.path)\nfi\necho '--- TEST_OUTPUT ---'\ncat $(results.TEST_OUTPUT.path)\n"}]}},{"name":"log-success","runAfter":["verify-enterprise-contract"],"taskSpec":{"steps":[{"image":"registry.access.redhat.com/ubi9/ubi-minimal:latest","name":"log","script":"#!/bin/sh\necho \"Release with EC validation completed\"\n"}]}}]}}
+    name: release-with-ec
+    namespace: default-tenant
+  spec:
+    params:
+    - default: ""
+      description: Snapshot spec as JSON string
+      name: snapshot
+      type: string
+    - default: ""
+      name: release
+      type: string
+    - default: ""
+      name: releasePlan
+      type: string
+    - default: ""
+      name: releasePlanAdmission
+      type: string
+    - default: ""
+      name: enterpriseContractPolicy
+      type: string
+    - default: ""
+      name: enterpriseContractExtraRuleData
+      type: string
+    - default: ""
+      name: taskGitUrl
+      type: string
+    - default: ""
+      name: taskGitRevision
+      type: string
+    tasks:
+    - name: extract-images
+      params:
+      - name: snapshot
+        value: $(params.snapshot)
+      taskSpec:
+        metadata: {}
+        params:
+        - name: snapshot
+          type: string
+        results:
+        - description: Newline-separated list of pullspecs
+          name: IMAGES
+          type: string
+        spec: null
+        steps:
+        - computeResources: {}
+          image: bitnami/kubectl:latest
+          name: extract
+          script: |
+            #!/bin/sh
+            set -e
+            echo 'snapshot param: $(params.snapshot)'
+            SNAP_REF='$(params.snapshot)'
+            if echo "$SNAP_REF" | grep -q '^{'; then
+              echo "$SNAP_REF" > /tmp/snap.json
+            else
+              NS=$(echo "$SNAP_REF" | cut -d/ -f1)
+              NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
+              kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{.spec}' > /tmp/snap.json
+            fi
+            echo '--- snapshot spec ---'
+            head -c 800 /tmp/snap.json; echo
+            # Use kubectl jsonpath on the same snapshot to extract images (no python/jq needed)
+            if echo "$SNAP_REF" | grep -q '^{'; then
+              # JSON inline — fall back to grep
+              grep -oE '"containerImage":"[^"]+"' /tmp/snap.json | sed 's/"containerImage":"//;s/"$//' > $(results.IMAGES.path)
+            else
+              NS=$(echo "$SNAP_REF" | cut -d/ -f1)
+              NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
+              kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{range .spec.components[*]}{.containerImage}{"\n"}{end}' > $(results.IMAGES.path)
+            fi
+            echo '--- IMAGES ---'
+            cat $(results.IMAGES.path)
+    - name: verify-enterprise-contract
+      params:
+      - name: POLICY_CONFIGURATION
+        value: $(params.enterpriseContractPolicy)
+      - name: IMAGES_FILE
+        value: $(tasks.extract-images.results.IMAGES)
+      - name: SNAPSHOT
+        value: $(params.snapshot)
+      runAfter:
+      - extract-images
+      taskSpec:
+        metadata: {}
+        params:
+        - name: POLICY_CONFIGURATION
+          type: string
+        - name: IMAGES_FILE
+          type: string
+        - name: SNAPSHOT
+          type: string
+        results:
+        - description: EC verification result
+          name: TEST_OUTPUT
+          type: string
+        spec: null
+        steps:
+        - computeResources: {}
+          env:
+          - name: HOME
+            value: /tmp
+          image: quay.io/conforma/cli:latest
+          name: verify
+          script: |
+            #!/bin/bash
+            set -uo pipefail
+            POL='$(params.POLICY_CONFIGURATION)'
+            echo "Policy: $POL"
+            SNAP_REF='$(params.SNAPSHOT)'
+            echo "snapshot ref: $SNAP_REF"
+            # Build images.json that ec accepts: {"components":[{"containerImage":"...", "name":"...", "source":{...}}]}
+            # Pull snapshot spec from cluster
+            if echo "$SNAP_REF" | grep -q '^{'; then
+              echo "$SNAP_REF" > /tmp/snap.json
+            else
+              NS=$(echo "$SNAP_REF" | cut -d/ -f1)
+              NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
+              # ec image has curl; use the kube API via in-cluster SA
+              TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+              CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              curl -s --cacert $CACERT -H "Authorization: Bearer $TOKEN" \
+                "https://kubernetes.default.svc/apis/appstudio.redhat.com/v1alpha1/namespaces/$NS/snapshots/$NAME" \
+                | (jq -r '.spec' 2>/dev/null || sed -n 's/.*"spec":\({.*}\),"status".*/\1/p') > /tmp/snap.json
+            fi
+            echo '--- snapshot spec ---'
+            head -c 800 /tmp/snap.json; echo
+            ec validate image \
+              --images /tmp/snap.json \
+              --policy="$POL" \
+              --public-key=k8s://tekton-pipelines/public-key \
+              --ignore-rekor \
+              --strict=false \
+              --output=appstudio=$(results.TEST_OUTPUT.path) \
+              --output=text || RC=$?
+            echo "ec exit: ${RC:-0}"
+            if [ ! -s $(results.TEST_OUTPUT.path) ]; then
+              echo "{\"result\":\"WARNING\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"successes\":0,\"failures\":0,\"warnings\":1,\"note\":\"ec produced no output\"}" > $(results.TEST_OUTPUT.path)
+            fi
+            echo '--- TEST_OUTPUT ---'
+            cat $(results.TEST_OUTPUT.path)
+    - name: log-success
+      runAfter:
+      - verify-enterprise-contract
+      taskSpec:
+        metadata: {}
+        spec: null
+        steps:
+        - computeResources: {}
+          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          name: log
+          script: |
+            #!/bin/sh
+            echo "Release with EC validation completed"
 kind: List
 metadata:

@@ -20,7 +20,9 @@ items:
       artifacts.pipelinerun.format: in-toto
       artifacts.pipelinerun.storage: oci
       artifacts.taskrun.format: in-toto
+      artifacts.taskrun.signer: x509
       artifacts.taskrun.storage: ""
+      builddefinition.buildtype: https://tekton.dev/chains/v2/slsa
       disabled: false
       options:
         deployments:
@@ -33,12 +35,11 @@ items:
                 metadata:
                 spec:
                   containers:
-                  - name: tekton-chains-controller
+                  - args:
+                    - --namespace=default-tenant
+                    - -threads-per-controller=1
+                    name: tekton-chains-controller
                     resources: {}
-                    volumeMounts:
-                    - mountPath: /etc/ssl/certs
-                      name: trusted-ca
-                      readOnly: true
                   volumes:
                   - configMap:
                       items:
@@ -63,6 +64,12 @@ items:
     pipeline:
       await-sidecar-readiness: true
       coschedule: workspaces
+      default-affinity-assistant-pod-template: |
+        nodeSelector:
+          workload-zone: build
+      default-pod-template: |
+        nodeSelector:
+          workload-zone: build
       default-service-account: default
       disable-creds-init: false
       enable-api-fields: beta
@@ -84,6 +91,20 @@ items:
       metrics.taskrun.duration-type: histogram
       metrics.taskrun.level: task
       options:
+        configMaps:
+          bundleresolver-config:
+            data:
+              fetch-timeout: 2m
+            metadata:
+          git-resolver-config:
+            data:
+              default-revision: main
+              fetch-timeout: 3m
+            metadata:
+          hubresolver-config:
+            data:
+              fetch-timeout: 2m
+            metadata:
         deployments:
           tekton-pipelines-remote-resolvers:
             metadata:
@@ -126,15 +147,43 @@ items:
     profile: basic
     pruner:
       disabled: false
-      keep: 100
+      keep: 20
       resources:
       - pipelinerun
       - taskrun
-      schedule: 0 8 * * *
+      schedule: 0 */6 * * *
     result:
       disabled: false
       is_external_db: false
-      options: {}
+      options:
+        configMaps:
+          tekton-results-config-results-retention-policy:
+            data:
+              defaultRetention: "14"
+              runAt: 0 3 * * *
+            metadata:
+        deployments:
+          tekton-results-watcher:
+            metadata:
+            spec:
+              selector: null
+              strategy: {}
+              template:
+                metadata:
+                spec:
+                  containers:
+                  - args:
+                    - -api_addr
+                    - $(TEKTON_RESULTS_API_SERVICE)
+                    - -auth_mode
+                    - $(AUTH_MODE)
+                    - -disable_storing_incomplete_runs=true
+                    - -store_deadline=2m
+                    - -namespace=default-tenant
+                    - -threadiness=1
+                    name: watcher
+                    resources: {}
+            status: {}
       performance:
         disable-ha: false
       route_enabled: false
@@ -163,7 +212,7 @@ items:
       operator.tekton.dev/post-upgrade-version: v0.79.0
       operator.tekton.dev/pre-upgrade-version: v0.79.0
     conditions:
-    - lastTransitionTime: "2026-04-22T15:17:40Z"
+    - lastTransitionTime: "2026-04-23T19:56:24Z"
       status: "True"
       type: ComponentsReady
     - lastTransitionTime: "2026-04-22T11:42:18Z"
@@ -178,7 +227,7 @@ items:
     - lastTransitionTime: "2026-04-22T11:39:56Z"
       status: "True"
       type: PreUpgrade
-    - lastTransitionTime: "2026-04-22T15:17:40Z"
+    - lastTransitionTime: "2026-04-23T19:56:24Z"
       status: "True"
       type: Ready
     version: v0.79.0

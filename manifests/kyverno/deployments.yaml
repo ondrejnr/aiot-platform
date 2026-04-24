@@ -370,8 +370,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T15:00:34Z"
-      lastUpdateTime: "2026-04-22T15:00:34Z"
+    - lastTransitionTime: "2026-04-23T05:01:39Z"
+      lastUpdateTime: "2026-04-23T05:01:39Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -535,12 +535,6 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T13:52:29Z"
-      lastUpdateTime: "2026-04-22T13:52:29Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-22T11:42:53Z"
       lastUpdateTime: "2026-04-22T14:57:39Z"
       message: ReplicaSet "kyverno-cleanup-controller-78855c6668" has successfully
@@ -548,6 +542,12 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-23T09:17:19Z"
+      lastUpdateTime: "2026-04-23T09:17:19Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 3
     readyReplicas: 1
     replicas: 1

@@ -5,19 +5,37 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"appstudio.redhat.com/v1alpha1","kind":"EnterpriseContractPolicy","metadata":{"annotations":{},"name":"hello-aiot-policy","namespace":"default-tenant"},"spec":{"configuration":{"exclude":["*"],"include":[]},"description":"Minimal policy (no checks) for hello-aiot dev releases","sources":[{"name":"empty","policy":["github.com/enterprise-contract/ec-policies//policy/release?ref=main"]}]}}
+        {"apiVersion":"appstudio.redhat.com/v1alpha1","kind":"EnterpriseContractPolicy","metadata":{"annotations":{},"name":"hello-aiot-policy","namespace":"default-tenant"},"spec":{"description":"Dev policy for hello-aiot. Enforces presence of SLSA provenance attestation\nand a valid Tekton task bundle, but excludes hermetic-build, source-image\nand rpm checks (not applicable to internal-registry builds).\n","publicKey":"k8s://tekton-pipelines/public-key","sources":[{"config":{"exclude":["hermetic_build_task","hermetic_task","source_image","rpm_repos","cve","sbom_cyclonedx","sbom_spdx","labels","trusted_task.trusted"],"include":["@slsa3","attestation_type","attestation_task_bundle","test"]},"data":["oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096"],"name":"Default","policy":["oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f"]}]}}
     name: hello-aiot-policy
     namespace: default-tenant
   spec:
-    configuration:
-      exclude:
-      - '*'
-      include: []
-    description: Minimal policy (no checks) for hello-aiot dev releases
+    description: |
+      Dev policy for hello-aiot. Enforces presence of SLSA provenance attestation
+      and a valid Tekton task bundle, but excludes hermetic-build, source-image
+      and rpm checks (not applicable to internal-registry builds).
+    publicKey: k8s://tekton-pipelines/public-key
     sources:
-    - name: empty
+    - config:
+        exclude:
+        - hermetic_build_task
+        - hermetic_task
+        - source_image
+        - rpm_repos
+        - cve
+        - sbom_cyclonedx
+        - sbom_spdx
+        - labels
+        - trusted_task.trusted
+        include:
+        - '@slsa3'
+        - attestation_type
+        - attestation_task_bundle
+        - test
+      data:
+      - oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096
+      name: Default
       policy:
-      - github.com/enterprise-contract/ec-policies//policy/release?ref=main
+      - oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f
 - apiVersion: appstudio.redhat.com/v1alpha1
   kind: EnterpriseContractPolicy
   metadata:

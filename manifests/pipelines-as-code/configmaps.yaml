@@ -189,14 +189,15 @@ items:
     bitbucket-cloud-additional-source-ip: ""
     bitbucket-cloud-check-source-ip: "true"
     custom-console-name: Local Konflux
-    custom-console-url: https://localhost:9443
-    custom-console-url-namespace: https://localhost:9443/ns/{{ namespace }}
-    custom-console-url-pr-details: https://localhost:9443/ns/{{ namespace }}/pipelinerun/{{
-      pr }}
-    custom-console-url-pr-tasklog: https://localhost:9443/ns/{{ namespace }}/pipelinerun/{{
-      pr }}/logs/{{ task }}
-    default-max-keep-runs: ""
-    enable-cancel-in-progress-on-pull-requests: "false"
+    custom-console-url: https://konflux.35.241.255.137.nip.io
+    custom-console-url-namespace: https://konflux.35.241.255.137.nip.io/ns/{{ namespace
+      }}
+    custom-console-url-pr-details: https://konflux.35.241.255.137.nip.io/ns/{{ namespace
+      }}/applications/hello-aiot/pipelineruns/{{ pr }}
+    custom-console-url-pr-tasklog: https://konflux.35.241.255.137.nip.io/ns/{{ namespace
+      }}/applications/hello-aiot/pipelineruns/{{ pr }}/logs/{{ task }}
+    default-max-keep-runs: "5"
+    enable-cancel-in-progress-on-pull-requests: "true"
     enable-cancel-in-progress-on-push: "false"
     error-detection-from-container-logs: "true"
     error-detection-max-number-of-lines: "50"
@@ -206,7 +207,7 @@ items:
     error-log-snippet-number-of-lines: "3"
     hub-catalog-type: artifacthub
     hub-url: https://artifacthub.io
-    max-keep-run-upper-limit: ""
+    max-keep-run-upper-limit: "20"
     remember-ok-to-test: "false"
     remote-tasks: "true"
     require-ok-to-test-sha: "false"

@@ -366,6 +366,22 @@ items:
   kind: Namespace
   metadata:
     annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-23T04:59:54Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-23T04:59:54Z"}]}'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"descheduler"}}
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: descheduler
+    name: descheduler
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-22T08:19:20Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-22T08:19:20Z"}]}'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"dr-ops"},"spec":{},"status":{}}

@@ -9,91 +9,88 @@ items:
     name: hello-aiot
     namespace: default-tenant
   pipelinerun_status:
-  - completionTime: "2026-04-22T16:49:50Z"
+  - completionTime: "2026-04-23T05:36:07Z"
     conditions:
-    - lastTransitionTime: "2026-04-22T16:49:50Z"
-      message: 'Pipeline default-tenant/hello-aiot-push-w8xpc can''t be Run; it contains
-        Tasks that don''t exist: Couldn''t retrieve Task "resolver type hub\nname
-        = git-clone\n": error requesting remote resource: error getting "Hub" "default-tenant/hub-a7d6c694c35281099920bcb9af6c5b87":
-        fail to fetch Artifact Hub resource: requesting resource from Hub: Get "https://artifacthub.io/api/v1/packages/tekton-task/tekton/git-clone":
-        tls: failed to verify certificate: x509: certificate signed by unknown authority'
-      reason: CouldntGetTask
-      status: "False"
-      type: Succeeded
-    event_type: push
-    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-w8xpc
-    pipelineRunName: hello-aiot-push-w8xpc
-    sha: b593ce9f92ab9d36184e506104213172aa57ebbc
-    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/b593ce9f92ab9d36184e506104213172aa57ebbc
-    startTime: "2026-04-22T16:49:49Z"
-    target_branch: main
-    title: |
-      chore: retrigger
-  - completionTime: "2026-04-22T16:52:14Z"
-    conditions:
-    - lastTransitionTime: "2026-04-22T16:52:14Z"
+    - lastTransitionTime: "2026-04-23T05:36:07Z"
       message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
       reason: Succeeded
       status: "True"
       type: Succeeded
     event_type: push
-    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-hwhj9
-    pipelineRunName: hello-aiot-push-hwhj9
-    sha: 617772d980bf1c0647fe594d0f9bcce2309ee425
-    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/617772d980bf1c0647fe594d0f9bcce2309ee425
-    startTime: "2026-04-22T16:51:02Z"
+    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-zvktv
+    pipelineRunName: hello-aiot-push-zvktv
+    sha: 5d1a035608ea5e6fe10f1d00ca62cf0caaabb3f7
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/5d1a035608ea5e6fe10f1d00ca62cf0caaabb3f7
+    startTime: "2026-04-23T05:34:38Z"
     target_branch: main
     title: |
-      fix: inline pipeline (no hub resolver)
-  - completionTime: "2026-04-22T17:46:21Z"
+      chore: e2e auto-release test 1776922475
+  - completionTime: "2026-04-23T05:44:05Z"
     conditions:
-    - lastTransitionTime: "2026-04-22T17:46:21Z"
+    - lastTransitionTime: "2026-04-23T05:44:05Z"
       message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
       reason: Succeeded
       status: "True"
       type: Succeeded
     event_type: push
-    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-89p8g
-    pipelineRunName: hello-aiot-push-89p8g
-    sha: cef878c1f7eedb16fa9f57991cbd39dbb608865f
-    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cef878c1f7eedb16fa9f57991cbd39dbb608865f
-    startTime: "2026-04-22T17:45:37Z"
+    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-d9kld
+    pipelineRunName: hello-aiot-push-d9kld
+    sha: aa97baa3ee4a29c8fff8dbb3d91e526bf93696b3
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/aa97baa3ee4a29c8fff8dbb3d91e526bf93696b3
+    startTime: "2026-04-23T05:42:34Z"
     target_branch: main
     title: |
-      add konflux build labels
-  - completionTime: "2026-04-22T17:46:21Z"
+      chore: cleanup trigger files
+  - completionTime: "2026-04-23T05:52:18Z"
     conditions:
-    - lastTransitionTime: "2026-04-22T17:46:21Z"
+    - lastTransitionTime: "2026-04-23T05:52:18Z"
       message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
       reason: Succeeded
       status: "True"
       type: Succeeded
     event_type: push
-    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-89p8g
-    pipelineRunName: hello-aiot-push-89p8g
-    sha: cef878c1f7eedb16fa9f57991cbd39dbb608865f
-    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cef878c1f7eedb16fa9f57991cbd39dbb608865f
-    startTime: "2026-04-22T17:45:37Z"
+    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-pfs4p
+    pipelineRunName: hello-aiot-push-pfs4p
+    sha: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+    startTime: "2026-04-23T05:50:51Z"
     target_branch: main
     title: |
-      add konflux build labels
-  - completionTime: "2026-04-22T17:50:30Z"
+      chore: e2e auto-release test 1776923447
+  - completionTime: "2026-04-23T07:21:21Z"
     conditions:
-    - lastTransitionTime: "2026-04-22T17:50:30Z"
+    - lastTransitionTime: "2026-04-23T07:21:21Z"
       message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
       reason: Succeeded
       status: "True"
       type: Succeeded
     event_type: push
-    logurl: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-9pjx9
-    pipelineRunName: hello-aiot-push-9pjx9
-    sha: 5e8056762053ed1f311d1e9fa479ca03b2280645
-    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/5e8056762053ed1f311d1e9fa479ca03b2280645
-    startTime: "2026-04-22T17:49:48Z"
+    logurl: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-push-w9b6d
+    pipelineRunName: hello-aiot-push-w9b6d
+    sha: 2ff6059f7196209f85d3232be2cb07b5acaee11d
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/2ff6059f7196209f85d3232be2cb07b5acaee11d
+    startTime: "2026-04-23T07:19:53Z"
     target_branch: main
     title: |
-      feat: add pipeline results (IMAGE_URL, IMAGE_DIGEST) for Konflux snapshot
+      chore: e2e auto-release test 1776928787
+  - completionTime: "2026-04-23T07:29:33Z"
+    conditions:
+    - lastTransitionTime: "2026-04-23T07:29:33Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    event_type: push
+    logurl: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-push-fxzbt
+    pipelineRunName: hello-aiot-push-fxzbt
+    sha: ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
+    startTime: "2026-04-23T07:28:04Z"
+    target_branch: main
+    title: |
+      chore: e2e auto-release test 1776929279
   spec:
+    concurrency_limit: 2
     git_provider:
       secret:
         key: provider.token
@@ -104,5 +101,111 @@ items:
         key: webhook.secret
         name: hello-aiot-git-provider
     url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+- apiVersion: pipelinesascode.tekton.dev/v1alpha1
+  kind: Repository
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"pipelinesascode.tekton.dev/v1alpha1","kind":"Repository","metadata":{"annotations":{},"name":"hello-aiot-backend","namespace":"default-tenant"},"spec":{"concurrency_limit":2,"git_provider":{"secret":{"key":"provider.token","name":"hello-aiot-backend-git-provider"},"type":"gitea","url":"https://gitea.35.241.255.137.nip.io","webhook_secret":{"key":"webhook.secret","name":"hello-aiot-backend-git-provider"}},"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend"}}
+    name: hello-aiot-backend
+    namespace: default-tenant
+  pipelinerun_status:
+  - completionTime: "2026-04-23T09:44:17Z"
+    conditions:
+    - lastTransitionTime: "2026-04-23T09:44:17Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    event_type: push
+    logurl: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-backend-push-xtmbr
+    pipelineRunName: hello-aiot-backend-push-xtmbr
+    sha: 1b379d5682904b065dce66fcac339a5d7601683b
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend/commit/1b379d5682904b065dce66fcac339a5d7601683b
+    startTime: "2026-04-23T09:42:23Z"
+    target_branch: main
+    title: |
+      chore: first build trigger 1776937340
+  spec:
+    concurrency_limit: 2
+    git_provider:
+      secret:
+        key: provider.token
+        name: hello-aiot-backend-git-provider
+      type: gitea
+      url: https://gitea.35.241.255.137.nip.io
+      webhook_secret:
+        key: webhook.secret
+        name: hello-aiot-backend-git-provider
+    url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend
+- apiVersion: pipelinesascode.tekton.dev/v1alpha1
+  kind: Repository
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"pipelinesascode.tekton.dev/v1alpha1","kind":"Repository","metadata":{"annotations":{},"name":"hello-aiot-frontend","namespace":"default-tenant"},"spec":{"concurrency_limit":2,"git_provider":{"secret":{"key":"provider.token","name":"hello-aiot-frontend-git-provider"},"type":"gitea","url":"https://gitea.35.241.255.137.nip.io","webhook_secret":{"key":"webhook.secret","name":"hello-aiot-frontend-git-provider"}},"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend"}}
+    name: hello-aiot-frontend
+    namespace: default-tenant
+  pipelinerun_status:
+  - completionTime: "2026-04-23T09:42:33Z"
+    conditions:
+    - lastTransitionTime: "2026-04-23T09:42:33Z"
+      message: 'Tasks Completed: 1 (Failed: 1, Cancelled 0), Skipped: 0'
+      reason: Failed
+      status: "False"
+      type: Succeeded
+    event_type: push
+    logurl: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-frontend-push-b7swr
+    pipelineRunName: hello-aiot-frontend-push-b7swr
+    sha: 99d52464ec791b4f984ea0c34a84cdc2ba863648
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend/commit/99d52464ec791b4f984ea0c34a84cdc2ba863648
+    startTime: "2026-04-23T09:42:20Z"
+    target_branch: main
+    title: |
+      chore: first build trigger 1776937338
+  - completionTime: "2026-04-23T09:45:21Z"
+    conditions:
+    - lastTransitionTime: "2026-04-23T09:45:21Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    event_type: push
+    logurl: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-frontend-push-jwfgk
+    pipelineRunName: hello-aiot-frontend-push-jwfgk
+    sha: 6a60509a2ce71a66930ef8870eb704a5a829b99a
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend/commit/6a60509a2ce71a66930ef8870eb704a5a829b99a
+    startTime: "2026-04-23T09:44:02Z"
+    target_branch: main
+    title: |
+      fix: qualify nginx image FQN
+  - completionTime: "2026-04-23T10:00:20Z"
+    conditions:
+    - lastTransitionTime: "2026-04-23T10:00:20Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    event_type: push
+    logurl: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-frontend-push-gqwgr
+    pipelineRunName: hello-aiot-frontend-push-gqwgr
+    sha: 546a482358e22e13a6857ae02f670c14103d1aea
+    sha_url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend/commit/546a482358e22e13a6857ae02f670c14103d1aea
+    startTime: "2026-04-23T09:59:02Z"
+    target_branch: main
+    title: |
+      test finalizer fix
+  spec:
+    concurrency_limit: 2
+    git_provider:
+      secret:
+        key: provider.token
+        name: hello-aiot-frontend-git-provider
+      type: gitea
+      url: https://gitea.35.241.255.137.nip.io
+      webhook_secret:
+        key: webhook.secret
+        name: hello-aiot-frontend-git-provider
+    url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
 kind: List
 metadata:

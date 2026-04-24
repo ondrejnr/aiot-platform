@@ -4,7 +4,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "5"
+      deployment.kubernetes.io/revision: "6"
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"otel-deployment","app.kubernetes.io/instance":"k8s-infra","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"k8s-infra","app.kubernetes.io/version":"0.139.0","helm.sh/chart":"k8s-infra-0.15.0"},"name":"k8s-infra-otel-deployment","namespace":"signoz"},"spec":{"minReadySeconds":5,"progressDeadlineSeconds":120,"replicas":null,"selector":{"matchLabels":{"app.kubernetes.io/component":"otel-deployment","app.kubernetes.io/instance":"k8s-infra","app.kubernetes.io/name":"k8s-infra"}},"template":{"metadata":{"annotations":{"checksum/config":"37a9c0a773111d3ceacab6c26290d0bf0e34871a1de43f8364162c993c80b4f4"},"labels":{"app.kubernetes.io/component":"otel-deployment","app.kubernetes.io/instance":"k8s-infra","app.kubernetes.io/name":"k8s-infra"}},"spec":{"containers":[{"args":["--config=/conf/otel-deployment-config.yaml"],"command":["/otelcol-contrib"],"env":[{"name":"OTEL_EXPORTER_OTLP_ENDPOINT","value":null},{"name":"OTEL_SECRETS_PATH","value":"/secrets"},{"name":"K8S_CLUSTER_NAME","value":"aiot-cluster"},{"name":"K8S_NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"K8S_POD_IP","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"status.podIP"}}},{"name":"K8S_HOST_IP","valueFrom":{"fieldRef":{"fieldPath":"status.hostIP"}}},{"name":"K8S_POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"K8S_POD_UID","valueFrom":{"fieldRef":{"fieldPath":"metadata.uid"}}},{"name":"K8S_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"SIGNOZ_COMPONENT","value":"otel-deployment"},{"name":"OTEL_RESOURCE_ATTRIBUTES","value":"signoz.component=$(SIGNOZ_COMPONENT),k8s.cluster.name=$(K8S_CLUSTER_NAME)"}],"image":"docker.io/otel/opentelemetry-collector-contrib:0.139.0","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":6,"httpGet":{"path":"/","port":13133},"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"name":"k8s-infra-otel-deployment","ports":[{"containerPort":13133,"name":"health-check","protocol":"TCP"}],"readinessProbe":{"failureThreshold":6,"httpGet":{"path":"/","port":13133},"initialDelaySeconds":10,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{"requests":{"cpu":"100m","memory":"100Mi"}},"securityContext":{},"volumeMounts":[{"mountPath":"/conf","name":"otel-deployment-config-vol"}]}],"priorityClassName":"","securityContext":{},"serviceAccountName":"k8s-infra-otel-deployment","volumes":[{"configMap":{"name":"k8s-infra-otel-deployment"},"name":"otel-deployment-config-vol"}]}}}}
     labels:
@@ -125,6 +125,8 @@ items:
           - mountPath: /conf
             name: otel-deployment-config-vol
         dnsPolicy: ClusterFirst
+        nodeSelector:
+          workload-zone: build
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -139,20 +141,20 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-21T03:12:07Z"
-      lastUpdateTime: "2026-04-21T03:12:24Z"
-      message: ReplicaSet "k8s-infra-otel-deployment-6955655f8b" has successfully
-        progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    - lastTransitionTime: "2026-04-22T14:17:55Z"
-      lastUpdateTime: "2026-04-22T14:17:55Z"
+    - lastTransitionTime: "2026-04-23T05:01:55Z"
+      lastUpdateTime: "2026-04-23T05:01:55Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 5
+    - lastTransitionTime: "2026-04-21T03:12:07Z"
+      lastUpdateTime: "2026-04-23T05:04:03Z"
+      message: ReplicaSet "k8s-infra-otel-deployment-599fb89485" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 6
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -384,8 +386,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:17:57Z"
-      lastUpdateTime: "2026-04-22T14:17:57Z"
+    - lastTransitionTime: "2026-04-23T05:02:47Z"
+      lastUpdateTime: "2026-04-23T05:02:47Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -398,7 +400,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "3"
+      deployment.kubernetes.io/revision: "4"
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"otel-collector","app.kubernetes.io/instance":"signoz","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"signoz","app.kubernetes.io/version":"v0.117.1","helm.sh/chart":"signoz-0.117.1"},"name":"signoz-otel-collector","namespace":"signoz"},"spec":{"minReadySeconds":5,"progressDeadlineSeconds":600,"replicas":1,"selector":{"matchLabels":{"app.kubernetes.io/component":"otel-collector","app.kubernetes.io/instance":"signoz","app.kubernetes.io/name":"signoz"}},"strategy":{"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"checksum/config":"843b4c663a4eb1058edf4f9d4c44d6ed5930212154e6110163127ae76f6f2f88","signoz.io/port":"8888","signoz.io/scrape":"true"},"labels":{"app.kubernetes.io/component":"otel-collector","app.kubernetes.io/instance":"signoz","app.kubernetes.io/name":"signoz"}},"spec":{"containers":[{"args":["--config=/conf/otel-collector-config.yaml","--manager-config=/conf/otel-collector-opamp-config.yaml","--copy-path=/var/tmp/collector-config.yaml"],"command":["/signoz-otel-collector"],"env":[{"name":"CLICKHOUSE_HOST","value":"signoz-clickhouse"},{"name":"CLICKHOUSE_PORT","value":"9000"},{"name":"CLICKHOUSE_HTTP_PORT","value":"8123"},{"name":"CLICKHOUSE_CLUSTER","value":"cluster"},{"name":"CLICKHOUSE_USER","value":"admin"},{"name":"CLICKHOUSE_PASSWORD","value":"27ff0399-0d3a-4bd8-919d-17c2181e6fb9"},{"name":"CLICKHOUSE_SECURE","value":"false"},{"name":"CLICKHOUSE_DATABASE","value":"signoz_metrics"},{"name":"CLICKHOUSE_TRACE_DATABASE","value":"signoz_traces"},{"name":"CLICKHOUSE_LOG_DATABASE","value":"signoz_logs"},{"name":"CLICKHOUSE_METER_DATABASE","value":"signoz_meter"},{"name":"CLICKHOUSE_VERIFY","value":"false"},{"name":"K8S_NODE_NAME","valueFrom":{"fieldRef":{"fieldPath":"spec.nodeName"}}},{"name":"K8S_POD_IP","valueFrom":{"fieldRef":{"apiVersion":"v1","fieldPath":"status.podIP"}}},{"name":"K8S_HOST_IP","valueFrom":{"fieldRef":{"fieldPath":"status.hostIP"}}},{"name":"K8S_POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"K8S_POD_UID","valueFrom":{"fieldRef":{"fieldPath":"metadata.uid"}}},{"name":"K8S_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"LOW_CARDINAL_EXCEPTION_GROUPING","value":"false"}],"image":"docker.io/signoz/signoz-otel-collector:v0.144.2","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":6,"httpGet":{"path":"/","port":13133},"initialDelaySeconds":5,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"name":"collector","ports":[{"containerPort":14250,"name":"jaeger-grpc","protocol":"TCP"},{"containerPort":14268,"name":"jaeger-thrift","protocol":"TCP"},{"containerPort":8081,"name":"logsheroku","protocol":"TCP"},{"containerPort":8082,"name":"logsjson","protocol":"TCP"},{"containerPort":8888,"name":"metrics","protocol":"TCP"},{"containerPort":4317,"name":"otlp","protocol":"TCP"},{"containerPort":4318,"name":"otlp-http","protocol":"TCP"}],"readinessProbe":{"failureThreshold":6,"httpGet":{"path":"/","port":13133},"initialDelaySeconds":5,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5},"resources":{"requests":{"cpu":"100m","memory":"200Mi"}},"volumeMounts":[{"mountPath":"/conf","name":"otel-collector-config-vol"}]}],"initContainers":[{"args":["migrate","sync","check"],"command":["/signoz-otel-collector"],"env":[{"name":"CLICKHOUSE_HOST","value":"signoz-clickhouse"},{"name":"CLICKHOUSE_PORT","value":"9000"},{"name":"CLICKHOUSE_HTTP_PORT","value":"8123"},{"name":"CLICKHOUSE_CLUSTER","value":"cluster"},{"name":"CLICKHOUSE_USER","value":"admin"},{"name":"CLICKHOUSE_PASSWORD","value":"27ff0399-0d3a-4bd8-919d-17c2181e6fb9"},{"name":"CLICKHOUSE_SECURE","value":"false"},{"name":"SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN","value":"tcp://$(CLICKHOUSE_USER):$(CLICKHOUSE_PASSWORD)@$(CLICKHOUSE_HOST):$(CLICKHOUSE_PORT)"},{"name":"SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER","value":"$(CLICKHOUSE_CLUSTER)"},{"name":"SIGNOZ_OTEL_COLLECTOR_TIMEOUT","value":"10m"},{"name":"SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION","value":"true"}],"image":"docker.io/signoz/signoz-otel-collector:v0.144.2","imagePullPolicy":"IfNotPresent","name":"check"}],"priorityClassName":"","securityContext":{},"serviceAccountName":"signoz-otel-collector","topologySpreadConstraints":[{"labelSelector":{"matchLabels":{"app.kubernetes.io/component":"otel-collector"}},"maxSkew":1,"topologyKey":"kubernetes.io/hostname","whenUnsatisfiable":"ScheduleAnyway"}],"volumes":[{"configMap":{"name":"signoz-otel-collector"},"name":"otel-collector-config-vol"}]}}}}
       meta.helm.sh/release-name: signoz
@@ -594,6 +596,8 @@ items:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+        nodeSelector:
+          workload-zone: build
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -615,19 +619,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T21:43:31Z"
-      lastUpdateTime: "2026-04-21T06:40:04Z"
-      message: ReplicaSet "signoz-otel-collector-7b5978d7f7" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
     - lastTransitionTime: "2026-04-22T10:53:08Z"
       lastUpdateTime: "2026-04-22T10:53:08Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 3
+    - lastTransitionTime: "2026-04-19T21:43:31Z"
+      lastUpdateTime: "2026-04-23T05:05:54Z"
+      message: ReplicaSet "signoz-otel-collector-5c4864968" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 4
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1

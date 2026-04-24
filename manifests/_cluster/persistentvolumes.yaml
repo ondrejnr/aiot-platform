@@ -152,42 +152,6 @@ items:
   kind: PersistentVolume
   metadata:
     annotations:
-      local.path.provisioner/selected-node: aiot-worker-01
-      pv.kubernetes.io/provisioned-by: rancher.io/local-path
-    finalizers:
-    - kubernetes.io/pv-protection
-    name: pvc-21459b32-6e0d-43de-9015-7897059f36ad
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    capacity:
-      storage: 1Gi
-    claimRef:
-      apiVersion: v1
-      kind: PersistentVolumeClaim
-      name: pvc-275d26e5c4
-      namespace: default-tenant
-    hostPath:
-      path: /opt/local-path-provisioner/pvc-21459b32-6e0d-43de-9015-7897059f36ad_default-tenant_pvc-275d26e5c4
-      type: DirectoryOrCreate
-    nodeAffinity:
-      required:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: kubernetes.io/hostname
-            operator: In
-            values:
-            - aiot-worker-01
-    persistentVolumeReclaimPolicy: Delete
-    storageClassName: local-path
-    volumeMode: Filesystem
-  status:
-    lastPhaseTransitionTime: "2026-04-22T18:05:12Z"
-    phase: Bound
-- apiVersion: v1
-  kind: PersistentVolume
-  metadata:
-    annotations:
       pv.kubernetes.io/provisioned-by: linstor.csi.linbit.com
       volume.kubernetes.io/provisioner-deletion-secret-name: ""
       volume.kubernetes.io/provisioner-deletion-secret-namespace: ""
@@ -220,6 +184,42 @@ items:
     volumeMode: Filesystem
   status:
     lastPhaseTransitionTime: "2026-04-22T09:19:28Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-2fd187bf-205f-4b10-81ae-fdeb15ba3a83
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-d5f4ef46f7
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-2fd187bf-205f-4b10-81ae-fdeb15ba3a83_default-tenant_pvc-d5f4ef46f7
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T09:46:36Z"
     phase: Bound
 - apiVersion: v1
   kind: PersistentVolume
@@ -300,6 +300,150 @@ items:
   kind: PersistentVolume
   metadata:
     annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-473ba6f9-c2c4-4911-9bad-f81c22b8fac8
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 2Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-4c5547734e
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-473ba6f9-c2c4-4911-9bad-f81c22b8fac8_default-tenant_pvc-4c5547734e
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T09:44:05Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-4a609dfd-f563-429f-a52b-cb09c833443f
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 2Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-53588f3165
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-4a609dfd-f563-429f-a52b-cb09c833443f_default-tenant_pvc-53588f3165
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T09:59:04Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      local.path.provisioner/selected-node: oci-e5-node2
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-4d63cb6c-72df-46e7-9ca7-94a898aac5f9
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 2Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-64f8bd87ab
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-4d63cb6c-72df-46e7-9ca7-94a898aac5f9_default-tenant_pvc-64f8bd87ab
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node2
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T09:42:28Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-588f213a-629a-4466-801a-051b7d35f7b5
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 2Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-be1b58b3fa
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-588f213a-629a-4466-801a-051b7d35f7b5_default-tenant_pvc-be1b58b3fa
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T09:42:24Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
       pv.kubernetes.io/provisioned-by: linstor.csi.linbit.com
       volume.kubernetes.io/provisioner-deletion-secret-name: ""
       volume.kubernetes.io/provisioner-deletion-secret-namespace: ""
@@ -337,6 +481,78 @@ items:
   kind: PersistentVolume
   metadata:
     annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-63d2b839-032a-404e-888d-20dcc6b271ad
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-d3848b25bd
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-63d2b839-032a-404e-888d-20dcc6b271ad_default-tenant_pvc-d3848b25bd
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T05:45:25Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-64a227a5-0177-4fff-bb88-7de96f461f8a
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 2Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-7b127f963b
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-64a227a5-0177-4fff-bb88-7de96f461f8a_default-tenant_pvc-7b127f963b
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T07:19:56Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
       local.path.provisioner/selected-node: aiot-worker-01
       pv.kubernetes.io/provisioned-by: rancher.io/local-path
     finalizers:
@@ -368,6 +584,42 @@ items:
     volumeMode: Filesystem
   status:
     lastPhaseTransitionTime: "2026-04-19T05:12:19Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-7282b713-c32d-4985-b7b3-b1ea26945252
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-5fa950c4e3
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-7282b713-c32d-4985-b7b3-b1ea26945252_default-tenant_pvc-5fa950c4e3
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T10:03:43Z"
     phase: Bound
 - apiVersion: v1
   kind: PersistentVolume
@@ -520,23 +772,23 @@ items:
   kind: PersistentVolume
   metadata:
     annotations:
-      local.path.provisioner/selected-node: aiot-worker-01
+      local.path.provisioner/selected-node: oci-e5-node1
       pv.kubernetes.io/provisioned-by: rancher.io/local-path
     finalizers:
     - kubernetes.io/pv-protection
-    name: pvc-986499cf-754b-4f25-800d-81cbad0e5054
+    name: pvc-88e91519-5e82-4de7-8ea4-cef21e83360a
   spec:
     accessModes:
     - ReadWriteOnce
     capacity:
-      storage: 2Gi
+      storage: 1Gi
     claimRef:
       apiVersion: v1
       kind: PersistentVolumeClaim
-      name: pvc-9ee138c511
+      name: pvc-0a5aa70f06
       namespace: default-tenant
     hostPath:
-      path: /opt/local-path-provisioner/pvc-986499cf-754b-4f25-800d-81cbad0e5054_default-tenant_pvc-9ee138c511
+      path: /opt/local-path-provisioner/pvc-88e91519-5e82-4de7-8ea4-cef21e83360a_default-tenant_pvc-0a5aa70f06
       type: DirectoryOrCreate
     nodeAffinity:
       required:
@@ -545,12 +797,12 @@ items:
           - key: kubernetes.io/hostname
             operator: In
             values:
-            - aiot-worker-01
+            - oci-e5-node1
     persistentVolumeReclaimPolicy: Delete
     storageClassName: local-path
     volumeMode: Filesystem
   status:
-    lastPhaseTransitionTime: "2026-04-22T17:49:51Z"
+    lastPhaseTransitionTime: "2026-04-23T09:48:42Z"
     phase: Bound
 - apiVersion: v1
   kind: PersistentVolume
@@ -592,23 +844,23 @@ items:
   kind: PersistentVolume
   metadata:
     annotations:
-      local.path.provisioner/selected-node: aiot-worker-01
+      local.path.provisioner/selected-node: oci-e5-node1
       pv.kubernetes.io/provisioned-by: rancher.io/local-path
     finalizers:
     - kubernetes.io/pv-protection
-    name: pvc-b339cf1e-172a-4155-9a6e-c480d25ac231
+    name: pvc-b70cf1e2-61f5-4c65-8171-1b9a1352ea88
   spec:
     accessModes:
     - ReadWriteOnce
     capacity:
-      storage: 2Gi
+      storage: 1Gi
     claimRef:
       apiVersion: v1
       kind: PersistentVolumeClaim
-      name: pvc-c72cf3b137
+      name: pvc-cdb3ea13e0
       namespace: default-tenant
     hostPath:
-      path: /opt/local-path-provisioner/pvc-b339cf1e-172a-4155-9a6e-c480d25ac231_default-tenant_pvc-c72cf3b137
+      path: /opt/local-path-provisioner/pvc-b70cf1e2-61f5-4c65-8171-1b9a1352ea88_default-tenant_pvc-cdb3ea13e0
       type: DirectoryOrCreate
     nodeAffinity:
       required:
@@ -617,12 +869,12 @@ items:
           - key: kubernetes.io/hostname
             operator: In
             values:
-            - aiot-worker-01
+            - oci-e5-node1
     persistentVolumeReclaimPolicy: Delete
     storageClassName: local-path
     volumeMode: Filesystem
   status:
-    lastPhaseTransitionTime: "2026-04-22T16:51:08Z"
+    lastPhaseTransitionTime: "2026-04-23T05:53:38Z"
     phase: Bound
 - apiVersion: v1
   kind: PersistentVolume
@@ -700,6 +952,42 @@ items:
   kind: PersistentVolume
   metadata:
     annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-c6ac5a07-cf66-47a4-8612-b17c97912799
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 2Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-47831c8db5
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-c6ac5a07-cf66-47a4-8612-b17c97912799_default-tenant_pvc-47831c8db5
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T05:50:54Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
       local.path.provisioner/selected-node: oci-e5-node2
       pv.kubernetes.io/provisioned-by: rancher.io/local-path
     finalizers:
@@ -736,11 +1024,11 @@ items:
   kind: PersistentVolume
   metadata:
     annotations:
-      local.path.provisioner/selected-node: aiot-worker-01
+      local.path.provisioner/selected-node: oci-e5-node1
       pv.kubernetes.io/provisioned-by: rancher.io/local-path
     finalizers:
     - kubernetes.io/pv-protection
-    name: pvc-e47201cd-59a4-4e92-b120-014d15063974
+    name: pvc-cd5409ec-c349-4d61-a233-c6de3fc972cc
   spec:
     accessModes:
     - ReadWriteOnce
@@ -749,10 +1037,10 @@ items:
     claimRef:
       apiVersion: v1
       kind: PersistentVolumeClaim
-      name: pvc-5ecbab098c
+      name: pvc-35376c0cb0
       namespace: default-tenant
     hostPath:
-      path: /opt/local-path-provisioner/pvc-e47201cd-59a4-4e92-b120-014d15063974_default-tenant_pvc-5ecbab098c
+      path: /opt/local-path-provisioner/pvc-cd5409ec-c349-4d61-a233-c6de3fc972cc_default-tenant_pvc-35376c0cb0
       type: DirectoryOrCreate
     nodeAffinity:
       required:
@@ -761,12 +1049,84 @@ items:
           - key: kubernetes.io/hostname
             operator: In
             values:
-            - aiot-worker-01
+            - oci-e5-node1
     persistentVolumeReclaimPolicy: Delete
     storageClassName: local-path
     volumeMode: Filesystem
   status:
-    lastPhaseTransitionTime: "2026-04-22T17:45:40Z"
+    lastPhaseTransitionTime: "2026-04-23T07:28:07Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-d3a93834-31e4-4474-9a35-b297df7fb773
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-c87bb82deb
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-d3a93834-31e4-4474-9a35-b297df7fb773_default-tenant_pvc-c87bb82deb
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T07:30:55Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      local.path.provisioner/selected-node: oci-e5-node1
+      pv.kubernetes.io/provisioned-by: rancher.io/local-path
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: pvc-f482bc53-9ba7-4cdb-a738-cc104d95ca50
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: pvc-51dc950af2
+      namespace: default-tenant
+    hostPath:
+      path: /opt/local-path-provisioner/pvc-f482bc53-9ba7-4cdb-a738-cc104d95ca50_default-tenant_pvc-51dc950af2
+      type: DirectoryOrCreate
+    nodeAffinity:
+      required:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - oci-e5-node1
+    persistentVolumeReclaimPolicy: Delete
+    storageClassName: local-path
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-23T07:22:44Z"
     phase: Bound
 - apiVersion: v1
   kind: PersistentVolume

@@ -4,7 +4,7 @@ items:
   kind: TektonInstallerSet
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: c337d3d6201cfdf3d11b6c2efe103fd148314d03800ea16ccdfd36a5a9bd0fd1
+      operator.tekton.dev/last-applied-hash: 6cc2648f6ec430ef831bc6805e7ae8f0bd03e0ee05158f84e5c14bbc6a4e0342
       operator.tekton.dev/target-namespace: tekton-pipelines
     finalizers:
     - tektoninstallersets.operator.tekton.dev
@@ -13,7 +13,7 @@ items:
       operator.tekton.dev/created-by: TektonChain
       operator.tekton.dev/release-version: v0.79.0
       operator.tekton.dev/type: chain-config
-    name: chain-config-npgsg
+    name: chain-config-qgg98
     ownerReferences:
     - apiVersion: operator.tekton.dev/v1alpha1
       blockOwnerDeletion: true
@@ -30,7 +30,9 @@ items:
         artifacts.pipelinerun.format: in-toto
         artifacts.pipelinerun.storage: oci
         artifacts.taskrun.format: in-toto
+        artifacts.taskrun.signer: x509
         artifacts.taskrun.storage: ""
+        builddefinition.buildtype: https://tekton.dev/chains/v2/slsa
         performance: |
           disable-ha: false
         transparency.enabled: "false"
@@ -50,41 +52,41 @@ items:
           name: chain
   status:
     conditions:
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: AllDeploymentsReady
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: ClusterScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: ControllersReady
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: CrdsInstalled
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: DeploymentsAvailable
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: JobsInstalled
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: NamespaceScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: Ready
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: StatefulSetReady
-    - lastTransitionTime: "2026-04-22T11:42:27Z"
+    - lastTransitionTime: "2026-04-23T09:55:04Z"
       status: "True"
       type: WebhooksReady
 - apiVersion: operator.tekton.dev/v1alpha1
   kind: TektonInstallerSet
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: c337d3d6201cfdf3d11b6c2efe103fd148314d03800ea16ccdfd36a5a9bd0fd1
+      operator.tekton.dev/last-applied-hash: 6cc2648f6ec430ef831bc6805e7ae8f0bd03e0ee05158f84e5c14bbc6a4e0342
       operator.tekton.dev/target-namespace: tekton-pipelines
     finalizers:
     - tektoninstallersets.operator.tekton.dev
@@ -142,7 +144,7 @@ items:
               app.kubernetes.io/name: controller
               app.kubernetes.io/part-of: tekton-chains
               deployment.spec.replicas: "1"
-              operator.tekton.dev/deployment-spec-applied-hash: c928362b399530cb75d6f56d119ccac8
+              operator.tekton.dev/deployment-spec-applied-hash: 66c63c5a3f4df92ebd9e30077aa03a35
               pipeline.tekton.dev/release: v0.26.2
               version: v0.26.2
           spec:
@@ -167,7 +169,10 @@ items:
                     topologyKey: kubernetes.io/hostname
                   weight: 100
             containers:
-            - env:
+            - args:
+              - --namespace=default-tenant
+              - -threads-per-controller=1
+              env:
               - name: SYSTEM_NAMESPACE
                 valueFrom:
                   fieldRef:
@@ -199,9 +204,6 @@ items:
                 name: signing-secrets
               - mountPath: /var/run/sigstore/cosign
                 name: oidc-info
-              - mountPath: /etc/ssl/certs
-                name: trusted-ca
-                readOnly: true
             securityContext:
               runAsNonRoot: true
               seccompProfile:
@@ -704,13 +706,13 @@ items:
     - lastTransitionTime: "2026-04-22T11:41:19Z"
       status: "True"
       type: ClusterScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T13:43:14Z"
+    - lastTransitionTime: "2026-04-23T05:02:21Z"
       status: "True"
       type: ControllersReady
     - lastTransitionTime: "2026-04-22T11:41:19Z"
       status: "True"
       type: CrdsInstalled
-    - lastTransitionTime: "2026-04-22T11:41:19Z"
+    - lastTransitionTime: "2026-04-23T07:14:35Z"
       status: "True"
       type: DeploymentsAvailable
     - lastTransitionTime: "2026-04-22T11:41:19Z"
@@ -719,7 +721,7 @@ items:
     - lastTransitionTime: "2026-04-22T11:41:19Z"
       status: "True"
       type: NamespaceScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T13:43:14Z"
+    - lastTransitionTime: "2026-04-23T07:14:35Z"
       status: "True"
       type: Ready
     - lastTransitionTime: "2026-04-22T11:41:19Z"
@@ -800,7 +802,7 @@ items:
   kind: TektonInstallerSet
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: 738f20e7177d09c3b55eb341ad0d65a0a1f03ecfc342a4e9be63187bc84676f1
+      operator.tekton.dev/last-applied-hash: 4de25d2ad733b52688355f571321f993419e9063ca109c0ca51a309482f53302
       operator.tekton.dev/target-namespace: tekton-pipelines
     finalizers:
     - tektoninstallersets.operator.tekton.dev
@@ -1462,7 +1464,7 @@ items:
     - lastTransitionTime: "2026-04-22T11:40:15Z"
       status: "True"
       type: ClusterScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T14:21:46Z"
+    - lastTransitionTime: "2026-04-23T05:02:35Z"
       status: "True"
       type: ControllersReady
     - lastTransitionTime: "2026-04-22T11:40:15Z"
@@ -1477,20 +1479,20 @@ items:
     - lastTransitionTime: "2026-04-22T11:40:16Z"
       status: "True"
       type: NamespaceScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T14:21:46Z"
+    - lastTransitionTime: "2026-04-23T09:42:56Z"
       status: "True"
       type: Ready
     - lastTransitionTime: "2026-04-22T11:40:17Z"
       status: "True"
       type: StatefulSetReady
-    - lastTransitionTime: "2026-04-22T14:21:46Z"
+    - lastTransitionTime: "2026-04-23T09:42:56Z"
       status: "True"
       type: WebhooksReady
 - apiVersion: operator.tekton.dev/v1alpha1
   kind: TektonInstallerSet
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: 738f20e7177d09c3b55eb341ad0d65a0a1f03ecfc342a4e9be63187bc84676f1
+      operator.tekton.dev/last-applied-hash: 4de25d2ad733b52688355f571321f993419e9063ca109c0ca51a309482f53302
       operator.tekton.dev/target-namespace: tekton-pipelines
     finalizers:
     - tektoninstallersets.operator.tekton.dev
@@ -27486,6 +27488,12 @@ items:
           # the Kubernetes API server, especially when a TaskRun contains many steps that
           # reference StepActions.
           default-step-ref-concurrency-limit: "5"
+        default-affinity-assistant-pod-template: |
+          nodeSelector:
+            workload-zone: build
+        default-pod-template: |
+          nodeSelector:
+            workload-zone: build
         default-service-account: default
       kind: ConfigMap
       metadata:
@@ -28183,6 +28191,7 @@ items:
       data:
         default-kind: task
         default-service-account: default
+        fetch-timeout: 2m
       kind: ConfigMap
       metadata:
         labels:
@@ -28415,7 +28424,7 @@ items:
         default-org: ""
         default-revision: main
         default-url: https://github.com/tektoncd/catalog.git
-        fetch-timeout: 1m
+        fetch-timeout: 3m
         scm-type: github
         server-url: ""
       kind: ConfigMap
@@ -28458,6 +28467,7 @@ items:
         default-kind: task
         default-tekton-hub-catalog: Tekton
         default-type: artifact
+        fetch-timeout: 2m
       kind: ConfigMap
       metadata:
         labels:
@@ -29083,10 +29093,10 @@ items:
     - lastTransitionTime: "2026-04-22T11:40:12Z"
       status: "True"
       type: JobsInstalled
-    - lastTransitionTime: "2026-04-22T14:21:44Z"
+    - lastTransitionTime: "2026-04-23T19:56:20Z"
       status: "True"
       type: NamespaceScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T14:21:44Z"
+    - lastTransitionTime: "2026-04-23T19:56:20Z"
       status: "True"
       type: Ready
     - lastTransitionTime: "2026-04-22T11:40:12Z"
@@ -29099,7 +29109,7 @@ items:
   kind: TektonInstallerSet
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: 85854a98761be044ba346b1a43cd1fcb13a971b5f0ded25e1271c92850c1fa5c
+      operator.tekton.dev/last-applied-hash: 4fbccd5255e8cf7365f1231d55725f9180555109e5f1ed21ccf4265cca39c7e6
       operator.tekton.dev/target-namespace: tekton-pipelines
     finalizers:
     - tektoninstallersets.operator.tekton.dev
@@ -29623,8 +29633,8 @@ items:
           name: result
     - apiVersion: v1
       data:
-        defaultRetention: "30"
-        runAt: 5 5 * * 0
+        defaultRetention: "14"
+        runAt: 0 3 * * *
       kind: ConfigMap
       metadata:
         labels:
@@ -29747,7 +29757,7 @@ items:
               app: tekton-results-api
               app.kubernetes.io/name: tekton-results-api
               app.kubernetes.io/version: v0.18.0
-              operator.tekton.dev/deployment-spec-applied-hash: 10cd0ac72a245c0487bada5455bd0cb3
+              operator.tekton.dev/deployment-spec-applied-hash: c101ce699888551a9f63389dbc944ee2
           spec:
             affinity:
               nodeAffinity:
@@ -29779,16 +29789,16 @@ items:
                   secretKeyRef:
                     key: POSTGRES_USER
                     name: tekton-results-postgres
+              - name: ROUTE_ENABLED
+                value: "false"
+              - name: ROUTE_TLS_TERMINATION
+                value: edge
               - name: DB_HOST
                 value: tekton-results-postgres-service.tekton-pipelines.svc.cluster.local
               - name: IS_EXTERNAL_DB
                 value: "false"
               - name: LOGGING_PLUGIN_TLS_VERIFICATION_DISABLE
                 value: "false"
-              - name: ROUTE_ENABLED
-                value: "false"
-              - name: ROUTE_TLS_TERMINATION
-                value: edge
               - name: KUBERNETES_MIN_VERSION
                 value: v1.0.0
               image: ghcr.io/tektoncd/results/api-b1b7ffa9ba32f7c3020c3b68830b30a8:v0.18.0@sha256:72833d31749615fe45d4f7b7a3d4964e5da1cc2966e983fd31f67720d5c22720
@@ -29962,7 +29972,7 @@ items:
               app.kubernetes.io/name: tekton-results-watcher
               app.kubernetes.io/version: v0.18.0
               deployment.spec.replicas: "1"
-              operator.tekton.dev/deployment-spec-applied-hash: 6badf139127c1027d0f6adba536b2e59
+              operator.tekton.dev/deployment-spec-applied-hash: 01f7cf2e5c74eff644d86db7cbe1e10c
           spec:
             affinity:
               nodeAffinity:
@@ -29988,6 +29998,10 @@ items:
               - $(TEKTON_RESULTS_API_SERVICE)
               - -auth_mode
               - $(AUTH_MODE)
+              - -disable_storing_incomplete_runs=true
+              - -store_deadline=2m
+              - -namespace=default-tenant
+              - -threadiness=1
               env:
               - name: AUTH_MODE
                 value: token
@@ -30192,7 +30206,7 @@ items:
         name: system:authenticated
   status:
     conditions:
-    - lastTransitionTime: "2026-04-22T14:43:51Z"
+    - lastTransitionTime: "2026-04-23T05:02:28Z"
       status: "True"
       type: AllDeploymentsReady
     - lastTransitionTime: "2026-04-22T11:41:28Z"
@@ -30213,7 +30227,7 @@ items:
     - lastTransitionTime: "2026-04-22T11:41:29Z"
       status: "True"
       type: NamespaceScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T15:17:40Z"
+    - lastTransitionTime: "2026-04-23T05:02:28Z"
       status: "True"
       type: Ready
     - lastTransitionTime: "2026-04-22T15:17:40Z"
@@ -30779,7 +30793,7 @@ items:
     - lastTransitionTime: "2026-04-22T11:40:53Z"
       status: "True"
       type: ClusterScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T11:41:03Z"
+    - lastTransitionTime: "2026-04-23T05:01:59Z"
       status: "True"
       type: ControllersReady
     - lastTransitionTime: "2026-04-22T11:40:53Z"
@@ -30794,13 +30808,13 @@ items:
     - lastTransitionTime: "2026-04-22T11:40:53Z"
       status: "True"
       type: NamespaceScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T13:43:20Z"
+    - lastTransitionTime: "2026-04-23T05:01:59Z"
       status: "True"
       type: Ready
     - lastTransitionTime: "2026-04-22T11:40:54Z"
       status: "True"
       type: StatefulSetReady
-    - lastTransitionTime: "2026-04-22T13:43:20Z"
+    - lastTransitionTime: "2026-04-23T05:01:55Z"
       status: "True"
       type: WebhooksReady
 - apiVersion: operator.tekton.dev/v1alpha1

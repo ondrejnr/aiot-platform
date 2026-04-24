@@ -18,6 +18,12 @@ items:
     await-sidecar-readiness: true
     config: {}
     coschedule: workspaces
+    default-affinity-assistant-pod-template: |
+      nodeSelector:
+        workload-zone: build
+    default-pod-template: |
+      nodeSelector:
+        workload-zone: build
     default-service-account: default
     disable-creds-init: false
     enable-api-fields: beta
@@ -39,6 +45,20 @@ items:
     metrics.taskrun.duration-type: histogram
     metrics.taskrun.level: task
     options:
+      configMaps:
+        bundleresolver-config:
+          data:
+            fetch-timeout: 2m
+          metadata:
+        git-resolver-config:
+          data:
+            default-revision: main
+            fetch-timeout: 3m
+          metadata:
+        hubresolver-config:
+          data:
+            fetch-timeout: 2m
+          metadata:
       deployments:
         tekton-pipelines-remote-resolvers:
           metadata:
@@ -82,7 +102,7 @@ items:
     - lastTransitionTime: "2026-04-22T11:40:10Z"
       status: "True"
       type: InstallerSetAvailable
-    - lastTransitionTime: "2026-04-22T14:21:48Z"
+    - lastTransitionTime: "2026-04-23T19:56:23Z"
       status: "True"
       type: InstallerSetReady
     - lastTransitionTime: "2026-04-22T11:40:47Z"
@@ -91,7 +111,7 @@ items:
     - lastTransitionTime: "2026-04-22T11:39:57Z"
       status: "True"
       type: PreReconciler
-    - lastTransitionTime: "2026-04-22T14:21:48Z"
+    - lastTransitionTime: "2026-04-23T19:56:23Z"
       status: "True"
       type: Ready
     version: v1.10.0

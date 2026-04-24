@@ -21,7 +21,9 @@ items:
     artifacts.pipelinerun.format: in-toto
     artifacts.pipelinerun.storage: oci
     artifacts.taskrun.format: in-toto
+    artifacts.taskrun.signer: x509
     artifacts.taskrun.storage: ""
+    builddefinition.buildtype: https://tekton.dev/chains/v2/slsa
     config: {}
     disabled: false
     options:
@@ -35,12 +37,11 @@ items:
               metadata:
               spec:
                 containers:
-                - name: tekton-chains-controller
+                - args:
+                  - --namespace=default-tenant
+                  - -threads-per-controller=1
+                  name: tekton-chains-controller
                   resources: {}
-                  volumeMounts:
-                  - mountPath: /etc/ssl/certs
-                    name: trusted-ca
-                    readOnly: true
                 volumes:
                 - configMap:
                     items:
@@ -57,13 +58,13 @@ items:
     transparency.enabled: "false"
   status:
     conditions:
-    - lastTransitionTime: "2026-04-22T14:21:51Z"
+    - lastTransitionTime: "2026-04-23T05:03:59Z"
       status: "True"
       type: DependenciesInstalled
-    - lastTransitionTime: "2026-04-22T11:42:29Z"
+    - lastTransitionTime: "2026-04-23T09:55:06Z"
       status: "True"
       type: InstallerSetAvailable
-    - lastTransitionTime: "2026-04-22T13:20:38Z"
+    - lastTransitionTime: "2026-04-23T07:14:36Z"
       status: "True"
       type: InstallerSetReady
     - lastTransitionTime: "2026-04-22T11:41:27Z"
@@ -72,11 +73,11 @@ items:
     - lastTransitionTime: "2026-04-22T11:41:18Z"
       status: "True"
       type: PreReconciler
-    - lastTransitionTime: "2026-04-22T14:21:51Z"
+    - lastTransitionTime: "2026-04-23T09:55:06Z"
       status: "True"
       type: Ready
-    observedGeneration: 2
-    tektonInstallerSet: chain-config-npgsg
+    observedGeneration: 7
+    tektonInstallerSet: chain-config-qgg98
     version: v0.26.2
 kind: List
 metadata:

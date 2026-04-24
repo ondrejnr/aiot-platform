@@ -23,15 +23,15 @@ items:
       Solution: 1. Check labels, 2. Add cnpg.io/cluster & cnpg.io/instanceRole labels.
     error:
     - sensitive:
-      - masked: X2wlJW9XMmolaXY9aDNr
+      - masked: YU07diw1NzlPV3hkTjE3
         unmasked: cnpg.io/cluster
-      - masked: VzxhJ1E=
+      - masked: TjVvc0M=
         unmasked: pg-ha
       text: Service has no endpoints, expected label cnpg.io/cluster=pg-ha
     - sensitive:
-      - masked: Smw3InMxJ2dQYU0tJD9hWHAxXTE=
+      - masked: ciY0UFk4Tl81Q3QhOEVsK3ZNKXw=
         unmasked: cnpg.io/instanceRole
-      - masked: M0x2KVszQA==
+      - masked: QDE6SG4jYw==
         unmasked: replica
       text: Service has no endpoints, expected label cnpg.io/instanceRole=replica
     kind: Service
@@ -97,15 +97,15 @@ items:
       Solution: 1. Check labels. 2. Add app.kubernetes.io/name=konflux-operator and control-plane=controller-manager.
     error:
     - sensitive:
-      - masked: SigmeCJJdVZyLTZtZSYteD1GMTRwLw==
+      - masked: REVyIl5uZDFlL0RkN3R4NDNSQDZpUQ==
         unmasked: app.kubernetes.io/name
-      - masked: e1h1WU1fcUM2KUpHNWwiNA==
+      - masked: NklrUjstMDR8Tl5pZCV2TQ==
         unmasked: konflux-operator
       text: Service has no endpoints, expected label app.kubernetes.io/name=konflux-operator
     - sensitive:
-      - masked: N2cjazR5cVg2OXUoag==
+      - masked: QjUjck0ka2VOWn1sbQ==
         unmasked: control-plane
-      - masked: V3M1enoyUGN1aUFXdFk7XSJk
+      - masked: Pnw4V017XkFQOzteZVd4amJK
         unmasked: controller-manager
       text: Service has no endpoints, expected label control-plane=controller-manager
     kind: Service
@@ -113,7 +113,7 @@ items:
     parentObject: ""
   status:
     contentHash: 637cecbd1c46f56e43f58e0273ed41d99c538e811fd99d4781ffe47956090879
-    lifecycle: historical
+    lifecycle: updated
 - apiVersion: core.k8sgpt.ai/v1alpha1
   kind: Result
   metadata:

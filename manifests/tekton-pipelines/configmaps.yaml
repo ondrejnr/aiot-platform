@@ -4,10 +4,13 @@ items:
   data:
     default-kind: task
     default-service-account: default
+    fetch-timeout: 2m
   kind: ConfigMap
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: b0b105541dd61d1aae531431902989dc79ccd1cbf00e155abc3b84cdc84ab115
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"default-kind":"task","default-service-account":"default","fetch-timeout":"2m"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"e591a340b785417c3489c032b19233b0d40cdc3b1768a51a66a07dbabc554d90"},"creationTimestamp":null,"labels":{"app.kubernetes.io/component":"resolvers","app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-pipelines","operator.tekton.dev/operand-name":"tektoncd-pipelines"},"name":"bundleresolver-config","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"pipeline-main-static-4h464","uid":"108c3d6b-0365-43b4-b40a-f3acea03765f"}]}}
+      operator.tekton.dev/last-applied-hash: e591a340b785417c3489c032b19233b0d40cdc3b1768a51a66a07dbabc554d90
     labels:
       app.kubernetes.io/component: resolvers
       app.kubernetes.io/instance: default
@@ -29,14 +32,16 @@ items:
     artifacts.pipelinerun.format: in-toto
     artifacts.pipelinerun.storage: oci
     artifacts.taskrun.format: in-toto
+    artifacts.taskrun.signer: x509
     artifacts.taskrun.storage: ""
+    builddefinition.buildtype: https://tekton.dev/chains/v2/slsa
     performance: |
       disable-ha: false
     transparency.enabled: "false"
   kind: ConfigMap
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: ffcfb1cd8abff3baab6c2597ac0ea3159c8f9eb1dc4b5d12f46cb5fe0582fd77
+      operator.tekton.dev/last-applied-hash: 9001f0b03392299b71d98d4ce9868e1752a67cad1f713f5961f58fd1f57d641b
     labels:
       app.kubernetes.io/instance: default
       app.kubernetes.io/part-of: tekton-chains
@@ -48,7 +53,7 @@ items:
       blockOwnerDeletion: true
       controller: true
       kind: TektonInstallerSet
-      name: chain-config-npgsg
+      name: chain-config-qgg98
 - apiVersion: v1
   data:
     version: v0.26.2
@@ -237,13 +242,19 @@ items:
       # the Kubernetes API server, especially when a TaskRun contains many steps that
       # reference StepActions.
       default-step-ref-concurrency-limit: "5"
+    default-affinity-assistant-pod-template: |
+      nodeSelector:
+        workload-zone: build
+    default-pod-template: |
+      nodeSelector:
+        workload-zone: build
     default-service-account: default
   kind: ConfigMap
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","data":{"_example":"################################\n#                              #\n#    EXAMPLE CONFIGURATION     #\n#                              #\n################################\n\n# This block is not actually functional configuration,\n# but serves to illustrate the available configuration\n# options and document them in a way that is accessible\n# to users that `kubectl edit` this config map.\n#\n# These sample configuration options may be copied out of\n# this example block and unindented to be in the data block\n# to actually change the configuration.\n\n# default-timeout-minutes contains the default number of\n# minutes to use for TaskRun and PipelineRun, if none is specified.\ndefault-timeout-minutes: \"60\"  # 60 minutes\n\n# default-service-account contains the default service account name\n# to use for TaskRun and PipelineRun, if none is specified.\ndefault-service-account: \"default\"\n\n# default-managed-by-label-value contains the default value given to the\n# \"app.kubernetes.io/managed-by\" label applied to all Pods created for\n# TaskRuns. If a user's requested TaskRun specifies another value for this\n# label, the user's request supercedes.\ndefault-managed-by-label-value: \"tekton-pipelines\"\n\n# default-pod-template contains the default pod template to use for\n# TaskRun and PipelineRun. If a pod template is specified on the\n# PipelineRun, the default-pod-template is merged with that one.\n# default-pod-template:\n\n# default-affinity-assistant-pod-template contains the default pod template\n# to use for affinity assistant pods. If a pod template is specified on the\n# PipelineRun, the default-affinity-assistant-pod-template is merged with\n# that one.\n# default-affinity-assistant-pod-template:\n\n# default-cloud-events-sink contains the default CloudEvents sink to be\n# used for TaskRun and PipelineRun, when no sink is specified.\n# Note that right now it is still not possible to set a PipelineRun or\n# TaskRun specific sink, so the default is the only option available.\n# If no sink is specified, no CloudEvent is generated\n# default-cloud-events-sink:\n\n# default-task-run-workspace-binding contains the default workspace\n# configuration provided for any Workspaces that a Task declares\n# but that a TaskRun does not explicitly provide.\n# default-task-run-workspace-binding: |\n#   emptyDir: {}\n\n# default-max-matrix-combinations-count contains the default maximum number\n# of combinations from a Matrix, if none is specified.\ndefault-max-matrix-combinations-count: \"256\"\n\n# default-forbidden-env contains comma seperated environment variables that cannot be\n# overridden by podTemplate.\ndefault-forbidden-env:\n\n# default-resolver-type contains the default resolver type to be used in the cluster,\n# no default-resolver-type is specified by default\ndefault-resolver-type:\n\n# default-imagepullbackoff-timeout contains the default duration to wait\n# before requeuing the TaskRun to retry, specifying 0 here is equivalent to fail fast\n# possible values could be 1m, 5m, 10s, 1h, etc\n# default-imagepullbackoff-timeout: \"5m\"\n\n# default-maximum-resolution-timeout specifies the default duration used by the\n# resolution controller before timing out when exceeded.\n# Possible values include \"1m\", \"5m\", \"10s\", \"1h\", etc.\n# Example: default-maximum-resolution-timeout: \"1m\"\n\n# default-container-resource-requirements allow users to update default resource requirements\n# to a init-containers and containers of a pods create by the controller\n# Onet: All the resource requirements are applied to init-containers and containers\n# only if the existing resource requirements are empty.\n# default-container-resource-requirements: |\n#   place-scripts: # updates resource requirements of a 'place-scripts' container\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"128Mi\"\n#       cpu: \"500m\"\n#\n#   prepare: # updates resource requirements of a 'prepare' container\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"256Mi\"\n#       cpu: \"500m\"\n#\n#   working-dir-initializer: # updates resource requirements of a 'working-dir-initializer' container\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"512Mi\"\n#       cpu: \"500m\"\n#\n#   prefix-scripts: # updates resource requirements of containers which starts with 'scripts-'\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"128Mi\"\n#       cpu: \"500m\"\n#\n#   prefix-sidecar-scripts: # updates resource requirements of containers which starts with 'sidecar-scripts-'\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"128Mi\"\n#       cpu: \"500m\"\n#\n#   default: # updates resource requirements of init-containers and containers which has empty resource requirements\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"256Mi\"\n#       cpu: \"500m\"\n\n# default-sidecar-log-polling-interval specifies the polling interval for the Tekton sidecar log results container.\n# This controls how frequently the sidecar checks for step completion files written by steps in a TaskRun.\n# Lower values (e.g., \"10ms\") make the sidecar more responsive but may increase CPU usage; higher values (e.g., \"1s\")\n# reduce resource usage but may delay result collection.\n# This value is used by the sidecar-tekton-log-results container and can be tuned for performance or test scenarios.\n# Example values: \"100ms\", \"500ms\", \"1s\"\ndefault-sidecar-log-polling-interval: \"100ms\"\n\n# default-step-ref-concurrency-limit specifies the concurrency limit for resolving step references.\n# This setting controls the maximum number of concurrent goroutines used to resolve\n# step references (`step.ref` fields) simultaneously. This limit acts as a throttle\n# to prevent overwhelming remote servers (e.g., git providers, OCI registries) or\n# the Kubernetes API server, especially when a TaskRun contains many steps that\n# reference StepActions.\ndefault-step-ref-concurrency-limit: \"5\"\n","default-service-account":"default"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"6e1712d00353630f243813366f6740ce0310870d06c37c186988986040ed1406"},"creationTimestamp":null,"labels":{"app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-pipelines","operator.tekton.dev/operand-name":"tektoncd-pipelines"},"name":"config-defaults","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"pipeline-main-static-4h464","uid":"108c3d6b-0365-43b4-b40a-f3acea03765f"}]}}
-      operator.tekton.dev/last-applied-hash: 6e1712d00353630f243813366f6740ce0310870d06c37c186988986040ed1406
+        {"apiVersion":"v1","data":{"_example":"################################\n#                              #\n#    EXAMPLE CONFIGURATION     #\n#                              #\n################################\n\n# This block is not actually functional configuration,\n# but serves to illustrate the available configuration\n# options and document them in a way that is accessible\n# to users that `kubectl edit` this config map.\n#\n# These sample configuration options may be copied out of\n# this example block and unindented to be in the data block\n# to actually change the configuration.\n\n# default-timeout-minutes contains the default number of\n# minutes to use for TaskRun and PipelineRun, if none is specified.\ndefault-timeout-minutes: \"60\"  # 60 minutes\n\n# default-service-account contains the default service account name\n# to use for TaskRun and PipelineRun, if none is specified.\ndefault-service-account: \"default\"\n\n# default-managed-by-label-value contains the default value given to the\n# \"app.kubernetes.io/managed-by\" label applied to all Pods created for\n# TaskRuns. If a user's requested TaskRun specifies another value for this\n# label, the user's request supercedes.\ndefault-managed-by-label-value: \"tekton-pipelines\"\n\n# default-pod-template contains the default pod template to use for\n# TaskRun and PipelineRun. If a pod template is specified on the\n# PipelineRun, the default-pod-template is merged with that one.\n# default-pod-template:\n\n# default-affinity-assistant-pod-template contains the default pod template\n# to use for affinity assistant pods. If a pod template is specified on the\n# PipelineRun, the default-affinity-assistant-pod-template is merged with\n# that one.\n# default-affinity-assistant-pod-template:\n\n# default-cloud-events-sink contains the default CloudEvents sink to be\n# used for TaskRun and PipelineRun, when no sink is specified.\n# Note that right now it is still not possible to set a PipelineRun or\n# TaskRun specific sink, so the default is the only option available.\n# If no sink is specified, no CloudEvent is generated\n# default-cloud-events-sink:\n\n# default-task-run-workspace-binding contains the default workspace\n# configuration provided for any Workspaces that a Task declares\n# but that a TaskRun does not explicitly provide.\n# default-task-run-workspace-binding: |\n#   emptyDir: {}\n\n# default-max-matrix-combinations-count contains the default maximum number\n# of combinations from a Matrix, if none is specified.\ndefault-max-matrix-combinations-count: \"256\"\n\n# default-forbidden-env contains comma seperated environment variables that cannot be\n# overridden by podTemplate.\ndefault-forbidden-env:\n\n# default-resolver-type contains the default resolver type to be used in the cluster,\n# no default-resolver-type is specified by default\ndefault-resolver-type:\n\n# default-imagepullbackoff-timeout contains the default duration to wait\n# before requeuing the TaskRun to retry, specifying 0 here is equivalent to fail fast\n# possible values could be 1m, 5m, 10s, 1h, etc\n# default-imagepullbackoff-timeout: \"5m\"\n\n# default-maximum-resolution-timeout specifies the default duration used by the\n# resolution controller before timing out when exceeded.\n# Possible values include \"1m\", \"5m\", \"10s\", \"1h\", etc.\n# Example: default-maximum-resolution-timeout: \"1m\"\n\n# default-container-resource-requirements allow users to update default resource requirements\n# to a init-containers and containers of a pods create by the controller\n# Onet: All the resource requirements are applied to init-containers and containers\n# only if the existing resource requirements are empty.\n# default-container-resource-requirements: |\n#   place-scripts: # updates resource requirements of a 'place-scripts' container\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"128Mi\"\n#       cpu: \"500m\"\n#\n#   prepare: # updates resource requirements of a 'prepare' container\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"256Mi\"\n#       cpu: \"500m\"\n#\n#   working-dir-initializer: # updates resource requirements of a 'working-dir-initializer' container\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"512Mi\"\n#       cpu: \"500m\"\n#\n#   prefix-scripts: # updates resource requirements of containers which starts with 'scripts-'\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"128Mi\"\n#       cpu: \"500m\"\n#\n#   prefix-sidecar-scripts: # updates resource requirements of containers which starts with 'sidecar-scripts-'\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"128Mi\"\n#       cpu: \"500m\"\n#\n#   default: # updates resource requirements of init-containers and containers which has empty resource requirements\n#     requests:\n#       memory: \"64Mi\"\n#       cpu: \"250m\"\n#     limits:\n#       memory: \"256Mi\"\n#       cpu: \"500m\"\n\n# default-sidecar-log-polling-interval specifies the polling interval for the Tekton sidecar log results container.\n# This controls how frequently the sidecar checks for step completion files written by steps in a TaskRun.\n# Lower values (e.g., \"10ms\") make the sidecar more responsive but may increase CPU usage; higher values (e.g., \"1s\")\n# reduce resource usage but may delay result collection.\n# This value is used by the sidecar-tekton-log-results container and can be tuned for performance or test scenarios.\n# Example values: \"100ms\", \"500ms\", \"1s\"\ndefault-sidecar-log-polling-interval: \"100ms\"\n\n# default-step-ref-concurrency-limit specifies the concurrency limit for resolving step references.\n# This setting controls the maximum number of concurrent goroutines used to resolve\n# step references (`step.ref` fields) simultaneously. This limit acts as a throttle\n# to prevent overwhelming remote servers (e.g., git providers, OCI registries) or\n# the Kubernetes API server, especially when a TaskRun contains many steps that\n# reference StepActions.\ndefault-step-ref-concurrency-limit: \"5\"\n","default-affinity-assistant-pod-template":"nodeSelector:\n  workload-zone: build\n","default-pod-template":"nodeSelector:\n  workload-zone: build\n","default-service-account":"default"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"de139c3a73c4a45d9e33906efe8262b817cf4bde116b326b419ff3b984d02697"},"creationTimestamp":null,"labels":{"app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-pipelines","operator.tekton.dev/operand-name":"tektoncd-pipelines"},"name":"config-defaults","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"pipeline-main-static-4h464","uid":"108c3d6b-0365-43b4-b40a-f3acea03765f"}]}}
+      operator.tekton.dev/last-applied-hash: de139c3a73c4a45d9e33906efe8262b817cf4bde116b326b419ff3b984d02697
     labels:
       app.kubernetes.io/instance: default
       app.kubernetes.io/part-of: tekton-pipelines
@@ -640,11 +651,11 @@ items:
         "errorOutputPaths": ["stderr"],
         "encoding": "json",
         "encoderConfig": {
-          "timeKey": "ts",
-          "levelKey": "level",
+          "timeKey": "timestamp",
+          "levelKey": "severity",
           "nameKey": "logger",
           "callerKey": "caller",
-          "messageKey": "msg",
+          "messageKey": "message",
           "stacktraceKey": "stacktrace",
           "lineEnding": "",
           "levelEncoder": "",
@@ -657,12 +668,13 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","data":{"loglevel.controller":"info","loglevel.webhook":"info","zap-logger-config":"{\n  \"level\": \"info\",\n  \"development\": false,\n  \"sampling\": {\n    \"initial\": 100,\n    \"thereafter\": 100\n  },\n  \"outputPaths\": [\"stdout\"],\n  \"errorOutputPaths\": [\"stderr\"],\n  \"encoding\": \"json\",\n  \"encoderConfig\": {\n    \"timeKey\": \"ts\",\n    \"levelKey\": \"level\",\n    \"nameKey\": \"logger\",\n    \"callerKey\": \"caller\",\n    \"messageKey\": \"msg\",\n    \"stacktraceKey\": \"stacktrace\",\n    \"lineEnding\": \"\",\n    \"levelEncoder\": \"\",\n    \"timeEncoder\": \"iso8601\",\n    \"durationEncoder\": \"\",\n    \"callerEncoder\": \"\"\n  }\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"5add5fee031ce46b2772898d853841701414daa842e767fee65a962426d191f3"},"labels":{"app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-chains","operator.tekton.dev/operand-name":"tektoncd-chains"},"name":"config-logging","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"chain-hjlhx","uid":"cbbd8078-c69e-419d-a29f-2acde07b6f1c"}]}}
-      operator.tekton.dev/last-applied-hash: 5add5fee031ce46b2772898d853841701414daa842e767fee65a962426d191f3
+        {"apiVersion":"v1","data":{"loglevel.controller":"info","loglevel.webhook":"info","zap-logger-config":"{\n  \"level\": \"info\",\n  \"development\": false,\n  \"sampling\": {\n    \"initial\": 100,\n    \"thereafter\": 100\n  },\n  \"outputPaths\": [\"stdout\"],\n  \"errorOutputPaths\": [\"stderr\"],\n  \"encoding\": \"json\",\n  \"encoderConfig\": {\n    \"timeKey\": \"timestamp\",\n    \"levelKey\": \"severity\",\n    \"nameKey\": \"logger\",\n    \"callerKey\": \"caller\",\n    \"messageKey\": \"message\",\n    \"stacktraceKey\": \"stacktrace\",\n    \"lineEnding\": \"\",\n    \"levelEncoder\": \"\",\n    \"timeEncoder\": \"iso8601\",\n    \"durationEncoder\": \"\",\n    \"callerEncoder\": \"\"\n  }\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"d256da23d117a5db58e40c804f04ba1e03ea6c07f31d1cea5bac227774806c66"},"labels":{"app.kubernetes.io/component":"resolvers","app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-pipelines","operator.tekton.dev/operand-name":"tektoncd-pipelines"},"name":"config-logging","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"pipeline-main-static-4h464","uid":"108c3d6b-0365-43b4-b40a-f3acea03765f"}]}}
+      operator.tekton.dev/last-applied-hash: d256da23d117a5db58e40c804f04ba1e03ea6c07f31d1cea5bac227774806c66
     labels:
+      app.kubernetes.io/component: resolvers
       app.kubernetes.io/instance: default
-      app.kubernetes.io/part-of: tekton-chains
-      operator.tekton.dev/operand-name: tektoncd-chains
+      app.kubernetes.io/part-of: tekton-pipelines
+      operator.tekton.dev/operand-name: tektoncd-pipelines
     name: config-logging
     namespace: tekton-pipelines
     ownerReferences:
@@ -670,7 +682,7 @@ items:
       blockOwnerDeletion: true
       controller: true
       kind: TektonInstallerSet
-      name: chain-hjlhx
+      name: pipeline-main-static-4h464
 - apiVersion: v1
   data:
     loglevel.controller: info
@@ -1046,13 +1058,15 @@ items:
     default-org: ""
     default-revision: main
     default-url: https://github.com/tektoncd/catalog.git
-    fetch-timeout: 1m
+    fetch-timeout: 3m
     scm-type: github
     server-url: ""
   kind: ConfigMap
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: 7f14d5a3c476f7014fe1430a191463d12d8fd2edf2fc998df07a00334addb697
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"api-token-secret-key":"","api-token-secret-name":"","api-token-secret-namespace":"default","default-org":"","default-revision":"main","default-url":"https://github.com/tektoncd/catalog.git","fetch-timeout":"3m","scm-type":"github","server-url":""},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"976939134ad1e69020dca4622396beb00afdd7663072c67601e5a49eafdb163a"},"creationTimestamp":null,"labels":{"app.kubernetes.io/component":"resolvers","app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-pipelines","operator.tekton.dev/operand-name":"tektoncd-pipelines"},"name":"git-resolver-config","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"pipeline-main-static-4h464","uid":"108c3d6b-0365-43b4-b40a-f3acea03765f"}]}}
+      operator.tekton.dev/last-applied-hash: 976939134ad1e69020dca4622396beb00afdd7663072c67601e5a49eafdb163a
     labels:
       app.kubernetes.io/component: resolvers
       app.kubernetes.io/instance: default
@@ -1093,10 +1107,13 @@ items:
     default-kind: task
     default-tekton-hub-catalog: Tekton
     default-type: artifact
+    fetch-timeout: 2m
   kind: ConfigMap
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: fb18c7aeb06f6015ba10d3a932bad305fa73dcbfd3e60dafceec66a1d28d60be
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"default-artifact-hub-pipeline-catalog":"tekton-catalog-pipelines","default-artifact-hub-task-catalog":"tekton-catalog-tasks","default-kind":"task","default-tekton-hub-catalog":"Tekton","default-type":"artifact","fetch-timeout":"2m"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"8914b1cfc730d13a5938d128742e56ccbfad1d5ff72bf12d1701eb7b95fc82b8"},"creationTimestamp":null,"labels":{"app.kubernetes.io/component":"resolvers","app.kubernetes.io/instance":"default","app.kubernetes.io/part-of":"tekton-pipelines","operator.tekton.dev/operand-name":"tektoncd-pipelines"},"name":"hubresolver-config","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"pipeline-main-static-4h464","uid":"108c3d6b-0365-43b4-b40a-f3acea03765f"}]}}
+      operator.tekton.dev/last-applied-hash: 8914b1cfc730d13a5938d128742e56ccbfad1d5ff72bf12d1701eb7b95fc82b8
     labels:
       app.kubernetes.io/component: resolvers
       app.kubernetes.io/instance: default
@@ -1601,12 +1618,14 @@ items:
       name: result-4d4wx
 - apiVersion: v1
   data:
-    defaultRetention: "30"
-    runAt: 5 5 * * 0
+    defaultRetention: "14"
+    runAt: 0 3 * * *
   kind: ConfigMap
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: 5d6aa5f8da79730b42174eb89d7c9a94f4bee97c97f6001bd108a40d3b4d3f16
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"defaultRetention":"14","runAt":"0 3 * * *"},"kind":"ConfigMap","metadata":{"annotations":{"operator.tekton.dev/last-applied-hash":"bf1d313ba657e9451fb80b1245c73f9f0caf56d70542fd92b52c535cc9329d32"},"creationTimestamp":null,"labels":{"app.kubernetes.io/name":"tekton-results-retention-policy","app.kubernetes.io/part-of":"tekton-results","app.kubernetes.io/version":"v0.18.0","operator.tekton.dev/operand-name":"tektoncd-results"},"name":"tekton-results-config-results-retention-policy","namespace":"tekton-pipelines","ownerReferences":[{"apiVersion":"operator.tekton.dev/v1alpha1","blockOwnerDeletion":true,"controller":true,"kind":"TektonInstallerSet","name":"result-4d4wx","uid":"1978b571-1741-44fd-9381-bed4e14a1ed1"}]}}
+      operator.tekton.dev/last-applied-hash: bf1d313ba657e9451fb80b1245c73f9f0caf56d70542fd92b52c535cc9329d32
     labels:
       app.kubernetes.io/name: tekton-results-retention-policy
       app.kubernetes.io/part-of: tekton-results

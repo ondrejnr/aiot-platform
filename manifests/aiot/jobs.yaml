@@ -405,12 +405,132 @@ items:
 - apiVersion: batch/v1
   kind: Job
   metadata:
-    annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T23:05:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-partition-mgr-29614985
-      job-name: pg-partition-mgr-29614985
-    name: pg-partition-mgr-29614985
+      k8up.io/owned-by: backup_aiot-backup-g9jbf
+      k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+      k8up.io/type: backup
+      k8upjob: "true"
+    name: backup-aiot-backup-g9jbf-prebackup
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Backup
+      name: aiot-backup-g9jbf
+  spec:
+    backoffLimit: 6
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: backup-aiot-backup-g9jbf-prebackup
+          job-name: backup-aiot-backup-g9jbf-prebackup
+          k8upjob: "true"
+      spec:
+        containers:
+        - args:
+          - -varDir
+          - /k8up
+          command:
+          - /usr/local/bin/k8up
+          - restic
+          env:
+          - name: CLUSTER_NAME
+            value: default
+          - name: FILEEXTENSION_ANNOTATION
+            value: k8up.io/file-extension
+          - name: HOSTNAME
+            value: aiot
+          - name: RESTIC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: k8up-repo
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                key: access_key
+                name: r2-creds
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                key: secret_key
+                name: r2-creds
+          - name: PROM_URL
+            value: http://127.0.0.1/
+          - name: BACKUPCOMMAND_ANNOTATION
+            value: k8up.io/backupcommand
+          - name: STATS_URL
+          - name: RESTIC_REPOSITORY
+            value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+          - name: TARGET_PODS
+            value: pg-ha-dump-6c58f586fc-cwkt9
+          - name: SLEEP_DURATION
+            value: 0s
+          image: ghcr.io/k8up-io/k8up:v2.15.0
+          imagePullPolicy: IfNotPresent
+          name: backup
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /k8up
+            name: k8up-dir
+          - mountPath: /tmp
+            name: restic-tmp-dir
+          - mountPath: /.cache
+            name: restic-cache-dir
+        dnsPolicy: ClusterFirst
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: pod-executor
+        serviceAccountName: pod-executor
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: k8up-dir
+        - emptyDir: {}
+          name: restic-tmp-dir
+        - emptyDir: {}
+          name: restic-cache-dir
+  status:
+    completionTime: "2026-04-23T03:11:26Z"
+    conditions:
+    - lastProbeTime: "2026-04-23T03:11:26Z"
+      lastTransitionTime: "2026-04-23T03:11:26Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-23T03:11:26Z"
+      lastTransitionTime: "2026-04-23T03:11:26Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-23T03:10:30Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T23:05:00Z"
+    labels:
+      batch.kubernetes.io/job-name: pg-partition-mgr-29616425
+      job-name: pg-partition-mgr-29616425
+    name: pg-partition-mgr-29616425
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -432,8 +552,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-partition-mgr-29614985
-          job-name: pg-partition-mgr-29614985
+          batch.kubernetes.io/job-name: pg-partition-mgr-29616425
+          job-name: pg-partition-mgr-29616425
       spec:
         containers:
         - command:
@@ -492,22 +612,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-22T23:05:03Z"
+    completionTime: "2026-04-23T23:05:03Z"
     conditions:
-    - lastProbeTime: "2026-04-22T23:05:03Z"
-      lastTransitionTime: "2026-04-22T23:05:03Z"
+    - lastProbeTime: "2026-04-23T23:05:03Z"
+      lastTransitionTime: "2026-04-23T23:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T23:05:03Z"
-      lastTransitionTime: "2026-04-22T23:05:03Z"
+    - lastProbeTime: "2026-04-23T23:05:03Z"
+      lastTransitionTime: "2026-04-23T23:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T23:05:00Z"
+    startTime: "2026-04-23T23:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -515,11 +635,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T00:05:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T00:05:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-partition-mgr-29615045
-      job-name: pg-partition-mgr-29615045
-    name: pg-partition-mgr-29615045
+      batch.kubernetes.io/job-name: pg-partition-mgr-29616485
+      job-name: pg-partition-mgr-29616485
+    name: pg-partition-mgr-29616485
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -541,8 +661,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-partition-mgr-29615045
-          job-name: pg-partition-mgr-29615045
+          batch.kubernetes.io/job-name: pg-partition-mgr-29616485
+          job-name: pg-partition-mgr-29616485
       spec:
         containers:
         - command:
@@ -601,22 +721,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-23T00:05:03Z"
+    completionTime: "2026-04-24T00:05:09Z"
     conditions:
-    - lastProbeTime: "2026-04-23T00:05:03Z"
-      lastTransitionTime: "2026-04-23T00:05:03Z"
+    - lastProbeTime: "2026-04-24T00:05:09Z"
+      lastTransitionTime: "2026-04-24T00:05:09Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-23T00:05:03Z"
-      lastTransitionTime: "2026-04-23T00:05:03Z"
+    - lastProbeTime: "2026-04-24T00:05:09Z"
+      lastTransitionTime: "2026-04-24T00:05:09Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-23T00:05:00Z"
+    startTime: "2026-04-24T00:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -624,11 +744,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T01:05:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T01:05:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-partition-mgr-29615105
-      job-name: pg-partition-mgr-29615105
-    name: pg-partition-mgr-29615105
+      batch.kubernetes.io/job-name: pg-partition-mgr-29616545
+      job-name: pg-partition-mgr-29616545
+    name: pg-partition-mgr-29616545
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -650,8 +770,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-partition-mgr-29615105
-          job-name: pg-partition-mgr-29615105
+          batch.kubernetes.io/job-name: pg-partition-mgr-29616545
+          job-name: pg-partition-mgr-29616545
       spec:
         containers:
         - command:
@@ -710,22 +830,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-23T01:05:03Z"
+    completionTime: "2026-04-24T01:05:03Z"
     conditions:
-    - lastProbeTime: "2026-04-23T01:05:03Z"
-      lastTransitionTime: "2026-04-23T01:05:03Z"
+    - lastProbeTime: "2026-04-24T01:05:03Z"
+      lastTransitionTime: "2026-04-24T01:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-23T01:05:03Z"
-      lastTransitionTime: "2026-04-23T01:05:03Z"
+    - lastProbeTime: "2026-04-24T01:05:03Z"
+      lastTransitionTime: "2026-04-24T01:05:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-23T01:05:00Z"
+    startTime: "2026-04-24T01:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -733,11 +853,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T20:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T20:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-sensor-cleanup-29614800
-      job-name: pg-sensor-cleanup-29614800
-    name: pg-sensor-cleanup-29614800
+      batch.kubernetes.io/job-name: pg-sensor-cleanup-29616240
+      job-name: pg-sensor-cleanup-29616240
+    name: pg-sensor-cleanup-29616240
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -759,8 +879,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-sensor-cleanup-29614800
-          job-name: pg-sensor-cleanup-29614800
+          batch.kubernetes.io/job-name: pg-sensor-cleanup-29616240
+          job-name: pg-sensor-cleanup-29616240
       spec:
         containers:
         - command:
@@ -794,22 +914,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-22T20:00:03Z"
+    completionTime: "2026-04-23T20:00:03Z"
     conditions:
-    - lastProbeTime: "2026-04-22T20:00:03Z"
-      lastTransitionTime: "2026-04-22T20:00:03Z"
+    - lastProbeTime: "2026-04-23T20:00:03Z"
+      lastTransitionTime: "2026-04-23T20:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T20:00:03Z"
-      lastTransitionTime: "2026-04-22T20:00:03Z"
+    - lastProbeTime: "2026-04-23T20:00:03Z"
+      lastTransitionTime: "2026-04-23T20:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T20:00:00Z"
+    startTime: "2026-04-23T20:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -817,11 +937,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T00:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T00:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: pg-sensor-cleanup-29615040
-      job-name: pg-sensor-cleanup-29615040
-    name: pg-sensor-cleanup-29615040
+      batch.kubernetes.io/job-name: pg-sensor-cleanup-29616480
+      job-name: pg-sensor-cleanup-29616480
+    name: pg-sensor-cleanup-29616480
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -843,8 +963,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: pg-sensor-cleanup-29615040
-          job-name: pg-sensor-cleanup-29615040
+          batch.kubernetes.io/job-name: pg-sensor-cleanup-29616480
+          job-name: pg-sensor-cleanup-29616480
       spec:
         containers:
         - command:
@@ -878,22 +998,22 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-23T00:00:04Z"
+    completionTime: "2026-04-24T00:00:04Z"
     conditions:
-    - lastProbeTime: "2026-04-23T00:00:04Z"
-      lastTransitionTime: "2026-04-23T00:00:04Z"
+    - lastProbeTime: "2026-04-24T00:00:04Z"
+      lastTransitionTime: "2026-04-24T00:00:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-23T00:00:04Z"
-      lastTransitionTime: "2026-04-23T00:00:04Z"
+    - lastProbeTime: "2026-04-24T00:00:04Z"
+      lastTransitionTime: "2026-04-24T00:00:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-23T00:00:00Z"
+    startTime: "2026-04-24T00:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -1127,20 +1247,20 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T18:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T03:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: sensor-data-retention-29614680
-      job-name: sensor-data-retention-29614680
-    name: sensor-data-retention-29614680
+      batch.kubernetes.io/job-name: postgres-backup-29615220
+      job-name: postgres-backup-29615220
+    name: postgres-backup-29615220
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
       blockOwnerDeletion: true
       controller: true
       kind: CronJob
-      name: sensor-data-retention
+      name: postgres-backup
   spec:
-    activeDeadlineSeconds: 1800
+    activeDeadlineSeconds: 3600
     backoffLimit: 1
     completionMode: NonIndexed
     completions: 1
@@ -1153,60 +1273,202 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: sensor-data-retention-29614680
-          job-name: sensor-data-retention-29614680
+          batch.kubernetes.io/job-name: postgres-backup-29615220
+          job-name: postgres-backup-29615220
       spec:
         containers:
         - command:
-          - python3
+          - /bin/bash
           - -c
           - |
-            import psycopg2, os
-            conn = psycopg2.connect(host=os.environ['PG_HOST'], user=os.environ['PG_USER'],
-                                     password=os.environ['PG_PASS'], dbname='aiot')
-            conn.autocommit = True
-            cur = conn.cursor()
-            cur.execute("DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '14 days'")
-            print(f"Cleaned sensor_data: {cur.rowcount} rows")
-            cur.close(); conn.close()
+            set -e
+            TS=$(date -u +%Y-%m-%d-%H%M%S)
+            DBS="aiot mlflow n8n open_webui grafana mattermost"
+            for DB in $DBS; do
+              mkdir -p "$BACKUP_DIR/$DB"
+              echo "==> Dumping $DB"
+              pg_dump -Fc -Z6 -d "postgresql://$PGUSER:$PGPASSWORD@$PGHOST:5432/$DB" -f "$BACKUP_DIR/$DB/$DB-$TS.dump"
+              ls -lh "$BACKUP_DIR/$DB/$DB-$TS.dump"
+            done
+            echo "==> Pruning >${RETENTION_DAYS}d"
+            find "$BACKUP_DIR" -type f -name '*.dump' -mtime +${RETENTION_DAYS} -print -delete
+            echo "==> Disk usage:"
+            du -sh "$BACKUP_DIR"/*
+            echo "==> Backup complete"
           env:
-          - name: PG_HOST
+          - name: PGHOST
             value: postgres.aiot.svc.cluster.local
-          - name: PG_USER
-            value: aiot_admin
-          - name: PG_PASS
+          - name: PGUSER
             valueFrom:
               secretKeyRef:
-                key: PG_PASS
-                name: pg-credentials
-          image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
-          imagePullPolicy: Always
-          name: retention
-          resources: {}
+                key: username
+                name: pg-ha-superuser
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: pg-ha-superuser
+          - name: RETENTION_DAYS
+            value: "30"
+          - name: BACKUP_DIR
+            value: /backups
+          image: postgres:16
+          imagePullPolicy: IfNotPresent
+          name: backup
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /backups
+            name: backups
         dnsPolicy: ClusterFirst
-        restartPolicy: Never
+        nodeSelector:
+          piraeus.io/storage: "yes"
+        restartPolicy: OnFailure
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
+        volumes:
+        - name: backups
+          persistentVolumeClaim:
+            claimName: postgres-backup-data-piraeus
   status:
-    completionTime: "2026-04-22T18:00:03Z"
+    completionTime: "2026-04-23T03:01:04Z"
     conditions:
-    - lastProbeTime: "2026-04-22T18:00:03Z"
-      lastTransitionTime: "2026-04-22T18:00:03Z"
+    - lastProbeTime: "2026-04-23T03:01:04Z"
+      lastTransitionTime: "2026-04-23T03:01:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T18:00:03Z"
-      lastTransitionTime: "2026-04-22T18:00:03Z"
+    - lastProbeTime: "2026-04-23T03:01:04Z"
+      lastTransitionTime: "2026-04-23T03:01:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T18:00:00Z"
+    startTime: "2026-04-23T03:00:00Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    labels:
+      k8up.io/owned-by: prune_aiot-prune-fbwq4
+      k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+      k8up.io/type: prune
+      k8upjob: "true"
+      k8upjob/exclusive: "true"
+    name: prune-aiot-prune-fbwq4
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Prune
+      name: aiot-prune-fbwq4
+  spec:
+    backoffLimit: 6
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: prune-aiot-prune-fbwq4
+          job-name: prune-aiot-prune-fbwq4
+          k8upjob: "true"
+      spec:
+        containers:
+        - args:
+          - -varDir
+          - /k8up
+          - -prune
+          command:
+          - /usr/local/bin/k8up
+          - restic
+          env:
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                key: secret_key
+                name: r2-creds
+          - name: PROM_URL
+            value: http://127.0.0.1/
+          - name: HOSTNAME
+            value: aiot
+          - name: STATS_URL
+          - name: KEEP_DAILY
+            value: "2"
+          - name: RESTIC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: k8up-repo
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                key: access_key
+                name: r2-creds
+          - name: RESTIC_REPOSITORY
+            value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+          image: ghcr.io/k8up-io/k8up:v2.15.0
+          imagePullPolicy: IfNotPresent
+          name: prune
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /k8up
+            name: k8up-dir
+          - mountPath: /tmp
+            name: restic-tmp-dir
+          - mountPath: /.cache
+            name: restic-cache-dir
+        dnsPolicy: ClusterFirst
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: pod-executor
+        serviceAccountName: pod-executor
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: k8up-dir
+        - emptyDir: {}
+          name: restic-tmp-dir
+        - emptyDir: {}
+          name: restic-cache-dir
+  status:
+    completionTime: "2026-04-23T04:10:08Z"
+    conditions:
+    - lastProbeTime: "2026-04-23T04:10:08Z"
+      lastTransitionTime: "2026-04-23T04:10:08Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-23T04:10:08Z"
+      lastTransitionTime: "2026-04-23T04:10:08Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-23T04:10:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -1214,11 +1476,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T00:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T18:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: sensor-data-retention-29615040
-      job-name: sensor-data-retention-29615040
-    name: sensor-data-retention-29615040
+      batch.kubernetes.io/job-name: sensor-data-retention-29616120
+      job-name: sensor-data-retention-29616120
+    name: sensor-data-retention-29616120
     namespace: aiot
     ownerReferences:
     - apiVersion: batch/v1
@@ -1240,8 +1502,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: sensor-data-retention-29615040
-          job-name: sensor-data-retention-29615040
+          batch.kubernetes.io/job-name: sensor-data-retention-29616120
+          job-name: sensor-data-retention-29616120
       spec:
         containers:
         - command:
@@ -1278,22 +1540,109 @@ items:
         securityContext: {}
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-23T00:00:03Z"
+    completionTime: "2026-04-23T18:00:04Z"
     conditions:
-    - lastProbeTime: "2026-04-23T00:00:03Z"
-      lastTransitionTime: "2026-04-23T00:00:03Z"
+    - lastProbeTime: "2026-04-23T18:00:04Z"
+      lastTransitionTime: "2026-04-23T18:00:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-23T00:00:03Z"
-      lastTransitionTime: "2026-04-23T00:00:03Z"
+    - lastProbeTime: "2026-04-23T18:00:04Z"
+      lastTransitionTime: "2026-04-23T18:00:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-23T00:00:00Z"
+    startTime: "2026-04-23T18:00:00Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T00:00:00Z"
+    labels:
+      batch.kubernetes.io/job-name: sensor-data-retention-29616480
+      job-name: sensor-data-retention-29616480
+    name: sensor-data-retention-29616480
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: sensor-data-retention
+  spec:
+    activeDeadlineSeconds: 1800
+    backoffLimit: 1
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: sensor-data-retention-29616480
+          job-name: sensor-data-retention-29616480
+      spec:
+        containers:
+        - command:
+          - python3
+          - -c
+          - |
+            import psycopg2, os
+            conn = psycopg2.connect(host=os.environ['PG_HOST'], user=os.environ['PG_USER'],
+                                     password=os.environ['PG_PASS'], dbname='aiot')
+            conn.autocommit = True
+            cur = conn.cursor()
+            cur.execute("DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '14 days'")
+            print(f"Cleaned sensor_data: {cur.rowcount} rows")
+            cur.close(); conn.close()
+          env:
+          - name: PG_HOST
+            value: postgres.aiot.svc.cluster.local
+          - name: PG_USER
+            value: aiot_admin
+          - name: PG_PASS
+            valueFrom:
+              secretKeyRef:
+                key: PG_PASS
+                name: pg-credentials
+          image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+          imagePullPolicy: Always
+          name: retention
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Never
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    completionTime: "2026-04-24T00:00:04Z"
+    conditions:
+    - lastProbeTime: "2026-04-24T00:00:04Z"
+      lastTransitionTime: "2026-04-24T00:00:04Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-24T00:00:04Z"
+      lastTransitionTime: "2026-04-24T00:00:04Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-24T00:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

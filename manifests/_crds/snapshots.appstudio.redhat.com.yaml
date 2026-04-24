@@ -29,9 +29,12 @@ items:
       pac.test.appstudio.openshift.io/url-org: aiot
       pac.test.appstudio.openshift.io/url-repository: hello-aiot
       test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-22T17:50:33Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260422-174948-000":{"lastUpdateTime":"2026-04-23T04:01:27.22228519Z"}}}'
       test.appstudio.openshift.io/integration-workflow: push
       test.appstudio.openshift.io/pipelinerunstarttime: "1776880188000"
       test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T04:01:27.22228519Z","details":"Integration
+        test passed","startTime":"2026-04-23T04:01:12.894493898Z","completionTime":"2026-04-23T04:01:27.22228519Z","testPipelineRunName":"hello-aiot-smoke-99njj"}]'
     labels:
       appstudio.openshift.io/application: hello-aiot
       appstudio.openshift.io/build-pipelinerun: hello-aiot-push-9pjx9
@@ -67,12 +70,1099 @@ items:
       version: ""
   status:
     conditions:
-    - lastTransitionTime: "2026-04-22T17:50:33Z"
-      message: No required IntegrationTestScenarios found, skipped testing
+    - lastTransitionTime: "2026-04-23T04:01:27Z"
+      message: All Integration Pipeline tests passed
       reason: Passed
       status: "True"
       type: AppStudioTestSucceeded
     - lastTransitionTime: "2026-04-22T17:50:33Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+    - lastTransitionTime: "2026-04-23T04:01:27Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-wmtwrd
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-gdb26
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 4d5363cd7114a5cfe623efdc731bd4284f9bf258
+      pac.test.appstudio.openshift.io/sha-title: |
+        fix: use port-less registry hostname so snapshot.containerImage parser is not confused by host:port
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/4d5363cd7114a5cfe623efdc731bd4284f9bf258
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T04:17:48Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-041559-000":{"lastUpdateTime":"2026-04-23T04:19:02.536849732Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776917759000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T04:19:02.536849732Z","details":"Integration
+        test passed","startTime":"2026-04-23T04:17:48.640640245Z","completionTime":"2026-04-23T04:19:02.536849732Z","testPipelineRunName":"hello-aiot-smoke-hlsmm"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-gdb26
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: 4d5363cd7114a5cfe623efdc731bd4284f9bf258
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776917864"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-041559-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:41d352ea54292592eb668d93bca182e667e57705a7904f436dca0bf8953fd827
+      name: hello-aiot
+      source:
+        git:
+          revision: 4d5363cd7114a5cfe623efdc731bd4284f9bf258
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T04:19:02Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T04:19:02Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T04:19:03Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      force-reconcile: ""
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-wpovoz
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-f2f4l
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 7134c170e6bf2e8a2101e290c87ec3a329369d66
+      pac.test.appstudio.openshift.io/sha-title: |
+        chore: e2e auto-release test 1776921617
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/7134c170e6bf2e8a2101e290c87ec3a329369d66
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T05:22:15Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-052021-000":{"lastUpdateTime":"2026-04-23T05:23:38.445887754Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776921621000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T05:23:38.445887754Z","details":"Integration
+        test passed","startTime":"2026-04-23T05:22:15.712157767Z","completionTime":"2026-04-23T05:23:38.445887754Z","testPipelineRunName":"hello-aiot-smoke-96smd"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-f2f4l
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: 7134c170e6bf2e8a2101e290c87ec3a329369d66
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776921732"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-052021-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:5941f26bc03766c9e7deb67bf673b61573ae48ffb7ff0698ffbe8460a3fd2fd2
+      name: hello-aiot
+      source:
+        git:
+          revision: 7134c170e6bf2e8a2101e290c87ec3a329369d66
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T05:23:38Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T05:23:38Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T05:23:38Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-zqamvy
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-kxwrh
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: f53ce521d32f884af0b81a3747e049723d7d2952
+      pac.test.appstudio.openshift.io/sha-title: |
+        chore: e2e auto-release test 1776921885
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/f53ce521d32f884af0b81a3747e049723d7d2952
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T05:26:20Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-052450-000":{"lastUpdateTime":"2026-04-23T05:27:33.949722054Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776921890000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T05:27:33.949722054Z","details":"Integration
+        test passed","startTime":"2026-04-23T05:26:20.83308458Z","completionTime":"2026-04-23T05:27:33.949722054Z","testPipelineRunName":"hello-aiot-smoke-l67dp"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-kxwrh
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: f53ce521d32f884af0b81a3747e049723d7d2952
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776921977"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-052450-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:29654e5bfc549016e010c4a182ee6b09d6cb79ad49dae2d07d9bacec14a64719
+      name: hello-aiot
+      source:
+        git:
+          revision: f53ce521d32f884af0b81a3747e049723d7d2952
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T05:27:33Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T05:27:34Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T05:27:34Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-fgbbeb
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-8g5xg
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: fa3e410aaff563885d3d6551368fa518da02a15e
+      pac.test.appstudio.openshift.io/sha-title: |
+        chore: e2e auto-release test 1776922166
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/fa3e410aaff563885d3d6551368fa518da02a15e
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T05:31:12Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-052931-000":{"lastUpdateTime":"2026-04-23T05:32:27.730904785Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776922171000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T05:32:27.730904785Z","details":"Integration
+        test passed","startTime":"2026-04-23T05:31:12.736997878Z","completionTime":"2026-04-23T05:32:27.730904785Z","testPipelineRunName":"hello-aiot-smoke-6j7sr"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-8g5xg
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: fa3e410aaff563885d3d6551368fa518da02a15e
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776922269"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-052931-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:5ff424d7aa2a7df448e1c4e43b88dae2f079b6da89866d8e868244d1f35dc6ad
+      name: hello-aiot
+      source:
+        git:
+          revision: fa3e410aaff563885d3d6551368fa518da02a15e
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T05:32:27Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T05:32:27Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T05:32:27Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-epnhzq
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-zvktv
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 5d1a035608ea5e6fe10f1d00ca62cf0caaabb3f7
+      pac.test.appstudio.openshift.io/sha-title: |
+        chore: e2e auto-release test 1776922475
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/5d1a035608ea5e6fe10f1d00ca62cf0caaabb3f7
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T05:36:10Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-053438-000":{"lastUpdateTime":"2026-04-23T05:37:25.58687733Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776922478000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T05:37:25.58687733Z","details":"Integration
+        test passed","startTime":"2026-04-23T05:36:10.551231152Z","completionTime":"2026-04-23T05:37:25.58687733Z","testPipelineRunName":"hello-aiot-smoke-h84fc"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-zvktv
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: 5d1a035608ea5e6fe10f1d00ca62cf0caaabb3f7
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776922567"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-053438-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:5e52030c33e711294733686b28f885efdbb530c8ecf285fc39d12d93e6fe7521
+      name: hello-aiot
+      source:
+        git:
+          revision: 5d1a035608ea5e6fe10f1d00ca62cf0caaabb3f7
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T05:37:25Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T05:37:25Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T05:37:25Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-bvzoce
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-d9kld
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: aa97baa3ee4a29c8fff8dbb3d91e526bf93696b3
+      pac.test.appstudio.openshift.io/sha-title: |
+        chore: cleanup trigger files
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/aa97baa3ee4a29c8fff8dbb3d91e526bf93696b3
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T05:44:09Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-054234-000":{"lastUpdateTime":"2026-04-23T05:45:22.052847146Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776922954000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T05:45:22.052847146Z","details":"Integration
+        test passed","startTime":"2026-04-23T05:44:09.306877605Z","completionTime":"2026-04-23T05:45:22.052847146Z","testPipelineRunName":"hello-aiot-smoke-r96fz"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-d9kld
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: aa97baa3ee4a29c8fff8dbb3d91e526bf93696b3
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776923045"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-054234-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2fc9668bcc120fc955eef009ec0ece7f96a91d5504fec2384fe90d6942b94153
+      name: hello-aiot
+      source:
+        git:
+          revision: aa97baa3ee4a29c8fff8dbb3d91e526bf93696b3
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T05:45:22Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T05:45:22Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T05:45:22Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-nhvaam
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-pfs4p
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      pac.test.appstudio.openshift.io/sha-title: |
+        chore: e2e auto-release test 1776923447
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T05:52:21Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-055051-000":{"lastUpdateTime":"2026-04-23T05:53:35.707737334Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776923451000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T05:53:35.707737334Z","details":"Integration
+        test passed","startTime":"2026-04-23T05:52:21.673737693Z","completionTime":"2026-04-23T05:53:35.707737334Z","testPipelineRunName":"hello-aiot-smoke-mgnpc"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-pfs4p
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776923538"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-055051-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:bdaee90a46ea1c78dff75cb6dcd361cd1d8c6fd1db4e8114f4910fd4ed4aad97
+      name: hello-aiot
+      source:
+        git:
+          revision: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T05:53:35Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T05:53:35Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T05:53:35Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-push-w9b6d
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-egxkuy
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-push-w9b6d
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 2ff6059f7196209f85d3232be2cb07b5acaee11d
+      pac.test.appstudio.openshift.io/sha-title: |
+        chore: e2e auto-release test 1776928787
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/2ff6059f7196209f85d3232be2cb07b5acaee11d
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T07:21:26Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-071953-000":{"lastUpdateTime":"2026-04-23T07:22:40.900202305Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776928793000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T07:22:40.900202305Z","details":"Integration
+        test passed","startTime":"2026-04-23T07:21:26.674028674Z","completionTime":"2026-04-23T07:22:40.900202305Z","testPipelineRunName":"hello-aiot-smoke-2z25m"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-w9b6d
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: 2ff6059f7196209f85d3232be2cb07b5acaee11d
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776928881"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-071953-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:cc4a696f3c9bf35394c48fcb87c06245f0ba3cacdaa6fecd6387505eb6a9183f
+      name: hello-aiot
+      source:
+        git:
+          revision: 2ff6059f7196209f85d3232be2cb07b5acaee11d
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T07:22:40Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T07:22:40Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T07:22:41Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-push-fxzbt
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-igqhba
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-push-fxzbt
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
+      pac.test.appstudio.openshift.io/sha-title: |
+        chore: e2e auto-release test 1776929279
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T07:29:36Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-072804-000":{"lastUpdateTime":"2026-04-23T07:30:51.761564574Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776929284000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T07:30:51.761564574Z","details":"Integration
+        test passed","startTime":"2026-04-23T07:29:36.896250578Z","completionTime":"2026-04-23T07:30:51.761564574Z","testPipelineRunName":"hello-aiot-smoke-545fm"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-push-fxzbt
+      appstudio.openshift.io/component: hello-aiot
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/sha: ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776929373"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-072804-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2b3233806369b99f4cd68f4b2aa82123a6d264874c4563064b4dca701f00e836
+      name: hello-aiot
+      source:
+        git:
+          revision: ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T07:30:51Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T07:30:51Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T07:30:51Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-backend-push-xtmbr
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-sfvkxx
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-backend-push-xtmbr
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-backend-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend
+      pac.test.appstudio.openshift.io/repository: hello-aiot-backend
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 1b379d5682904b065dce66fcac339a5d7601683b
+      pac.test.appstudio.openshift.io/sha-title: |
+        chore: first build trigger 1776937340
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend/commit/1b379d5682904b065dce66fcac339a5d7601683b
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot-backend
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T09:44:20Z"}'
+      test.appstudio.openshift.io/create-snapshot-status: Component(s) 'hello-aiot-frontend'
+        is(are) not included in snapshot due to missing valid containerImage or git
+        source
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-094223-000":{"lastUpdateTime":"2026-04-23T09:46:32.807458784Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776937343000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T09:46:32.807458784Z","details":"Integration
+        test passed","startTime":"2026-04-23T09:44:20.433918457Z","completionTime":"2026-04-23T09:46:32.807458784Z","testPipelineRunName":"hello-aiot-smoke-758gg"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-backend-push-xtmbr
+      appstudio.openshift.io/component: hello-aiot-backend
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-backend-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot-backend
+      pac.test.appstudio.openshift.io/sha: 1b379d5682904b065dce66fcac339a5d7601683b
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot-backend
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776937457"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-094223-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2b3233806369b99f4cd68f4b2aa82123a6d264874c4563064b4dca701f00e836
+      name: hello-aiot
+      source:
+        git:
+          dockerfileUrl: Dockerfile
+          revision: ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc
+      name: hello-aiot-backend
+      source:
+        git:
+          revision: 1b379d5682904b065dce66fcac339a5d7601683b
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T09:46:32Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T09:46:32Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T09:46:33Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-frontend-push-jwfgk
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-cstgtc
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-frontend-push-jwfgk
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-frontend-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pac.test.appstudio.openshift.io/repository: hello-aiot-frontend
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 6a60509a2ce71a66930ef8870eb704a5a829b99a
+      pac.test.appstudio.openshift.io/sha-title: |
+        fix: qualify nginx image FQN
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend/commit/6a60509a2ce71a66930ef8870eb704a5a829b99a
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot-frontend
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T09:45:24Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-094402-000":{"lastUpdateTime":"2026-04-23T09:48:38.31595451Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776937442000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T09:48:38.31595451Z","details":"Integration
+        test passed","startTime":"2026-04-23T09:45:24.596711245Z","completionTime":"2026-04-23T09:48:38.31595451Z","testPipelineRunName":"hello-aiot-smoke-6vpcx"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-frontend-push-jwfgk
+      appstudio.openshift.io/component: hello-aiot-frontend
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-frontend-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot-frontend
+      pac.test.appstudio.openshift.io/sha: 6a60509a2ce71a66930ef8870eb704a5a829b99a
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot-frontend
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776937521"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-094402-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2b3233806369b99f4cd68f4b2aa82123a6d264874c4563064b4dca701f00e836
+      name: hello-aiot
+      source:
+        git:
+          dockerfileUrl: Dockerfile
+          revision: ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:c5e59acc90f0f87651c74b648888b1c6f8054fce7e3be518aa5f52367939e8df
+      name: hello-aiot-frontend
+      source:
+        git:
+          revision: 6a60509a2ce71a66930ef8870eb704a5a829b99a
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      version: ""
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc
+      name: hello-aiot-backend
+      source:
+        git:
+          dockerfileUrl: Dockerfile
+          revision: 1b379d5682904b065dce66fcac339a5d7601683b
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T09:48:38Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T09:48:38Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T09:48:38Z"
+      message: The Snapshot was auto-released
+      reason: AutoReleased
+      status: "True"
+      type: AutoReleased
+- apiVersion: appstudio.redhat.com/v1alpha1
+  kind: Snapshot
+  metadata:
+    annotations:
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-frontend-push-gqwgr
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-jqcyji
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-frontend-push-gqwgr
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-frontend-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pac.test.appstudio.openshift.io/repository: hello-aiot-frontend
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 546a482358e22e13a6857ae02f670c14103d1aea
+      pac.test.appstudio.openshift.io/sha-title: |
+        test finalizer fix
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend/commit/546a482358e22e13a6857ae02f670c14103d1aea
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot-frontend
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T10:00:24Z"}'
+      test.appstudio.openshift.io/git-reporter-status: '{"scenarios":{"hello-aiot-smoke-hello-aiot-20260423-095902-000":{"lastUpdateTime":"2026-04-23T10:03:38.354437125Z"}}}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1776938342000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"TestPassed","lastUpdateTime":"2026-04-23T10:03:38.354437125Z","details":"Integration
+        test passed","startTime":"2026-04-23T10:00:24.39972513Z","completionTime":"2026-04-23T10:03:38.354437125Z","testPipelineRunName":"hello-aiot-smoke-6b5lx"}]'
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/build-pipelinerun: hello-aiot-frontend-push-gqwgr
+      appstudio.openshift.io/component: hello-aiot-frontend
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-frontend-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot-frontend
+      pac.test.appstudio.openshift.io/sha: 546a482358e22e13a6857ae02f670c14103d1aea
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot-frontend
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1776938420"
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-20260423-095902-000
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Application
+      name: hello-aiot
+  spec:
+    application: hello-aiot
+    artifacts: {}
+    componentGroup: ""
+    components:
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2b3233806369b99f4cd68f4b2aa82123a6d264874c4563064b4dca701f00e836
+      name: hello-aiot
+      source:
+        git:
+          dockerfileUrl: Dockerfile
+          revision: ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      version: ""
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:7e9c6ea915e6b20b8b9bf5a4329198ad6c869c2aef46fb357d4d3a81f3bdf2be
+      name: hello-aiot-frontend
+      source:
+        git:
+          revision: 546a482358e22e13a6857ae02f670c14103d1aea
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      version: ""
+    - containerImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc
+      name: hello-aiot-backend
+      source:
+        git:
+          dockerfileUrl: Dockerfile
+          revision: 1b379d5682904b065dce66fcac339a5d7601683b
+          url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend
+      version: ""
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T10:03:38Z"
+      message: Snapshot integration status condition is finished since all testing
+        pipelines completed
+      reason: Finished
+      status: "True"
+      type: AppStudioIntegrationStatus
+    - lastTransitionTime: "2026-04-23T10:03:38Z"
+      message: All Integration Pipeline tests passed
+      reason: Passed
+      status: "True"
+      type: AppStudioTestSucceeded
+    - lastTransitionTime: "2026-04-23T10:03:38Z"
       message: The Snapshot was auto-released
       reason: AutoReleased
       status: "True"

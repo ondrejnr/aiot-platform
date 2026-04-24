@@ -3911,6 +3911,94 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRole","metadata":{"annotations":{},"name":"descheduler"},"rules":[{"apiGroups":["events.k8s.io"],"resources":["events"],"verbs":["create","update"]},{"apiGroups":[""],"resources":["events"],"verbs":["create","update"]},{"apiGroups":[""],"resources":["nodes"],"verbs":["get","watch","list"]},{"apiGroups":[""],"resources":["pods"],"verbs":["get","watch","list","delete"]},{"apiGroups":[""],"resources":["pods/eviction"],"verbs":["create"]},{"apiGroups":["scheduling.k8s.io"],"resources":["priorityclasses"],"verbs":["get","watch","list"]},{"apiGroups":[""],"resources":["namespaces"],"verbs":["get","watch","list"]},{"apiGroups":["apps"],"resources":["replicasets","deployments","statefulsets","daemonsets"],"verbs":["get","watch","list"]},{"apiGroups":["coordination.k8s.io"],"resources":["leases"],"verbs":["create","get","update"]},{"apiGroups":["policy"],"resources":["poddisruptionbudgets"],"verbs":["get","watch","list"]}]}
+    name: descheduler
+  rules:
+  - apiGroups:
+    - events.k8s.io
+    resources:
+    - events
+    verbs:
+    - create
+    - update
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+    - update
+  - apiGroups:
+    - ""
+    resources:
+    - nodes
+    verbs:
+    - get
+    - watch
+    - list
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - get
+    - watch
+    - list
+    - delete
+  - apiGroups:
+    - ""
+    resources:
+    - pods/eviction
+    verbs:
+    - create
+  - apiGroups:
+    - scheduling.k8s.io
+    resources:
+    - priorityclasses
+    verbs:
+    - get
+    - watch
+    - list
+  - apiGroups:
+    - ""
+    resources:
+    - namespaces
+    verbs:
+    - get
+    - watch
+    - list
+  - apiGroups:
+    - apps
+    resources:
+    - replicasets
+    - deployments
+    - statefulsets
+    - daemonsets
+    verbs:
+    - get
+    - watch
+    - list
+  - apiGroups:
+    - coordination.k8s.io
+    resources:
+    - leases
+    verbs:
+    - create
+    - get
+    - update
+  - apiGroups:
+    - policy
+    resources:
+    - poddisruptionbudgets
+    verbs:
+    - get
+    - watch
+    - list
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRole","metadata":{"annotations":{},"name":"dex"},"rules":[{"apiGroups":["dex.coreos.com"],"resources":["*"],"verbs":["*"]},{"apiGroups":["apiextensions.k8s.io"],"resources":["customresourcedefinitions"],"verbs":["create"]}]}
     labels:
       konflux.konflux-ci.dev/component: ui

@@ -385,18 +385,18 @@ items:
   status:
     availableReplicas: 2
     conditions:
-    - lastTransitionTime: "2026-04-22T17:03:36Z"
-      lastUpdateTime: "2026-04-22T17:03:36Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-22T17:03:19Z"
       lastUpdateTime: "2026-04-22T17:03:36Z"
       message: ReplicaSet "hello-aiot-6fc4c9f6b9" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-23T05:15:27Z"
+      lastUpdateTime: "2026-04-23T05:15:27Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 3
     readyReplicas: 2
     replicas: 2
@@ -733,8 +733,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:17:33Z"
-      lastUpdateTime: "2026-04-22T14:17:33Z"
+    - lastTransitionTime: "2026-04-23T05:02:01Z"
+      lastUpdateTime: "2026-04-23T05:02:01Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"

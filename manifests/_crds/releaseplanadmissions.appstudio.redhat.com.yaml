@@ -5,7 +5,7 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"appstudio.redhat.com/v1alpha1","kind":"ReleasePlanAdmission","metadata":{"annotations":{},"labels":{"release.appstudio.openshift.io/auto-release":"true"},"name":"hello-aiot-dev-rpa","namespace":"default-tenant"},"spec":{"applications":["hello-aiot"],"origin":"default-tenant","pipeline":{"pipelineRef":{"params":[{"name":"kind","value":"pipeline"},{"name":"name","value":"release-noop"},{"name":"namespace","value":"default-tenant"}],"resolver":"cluster"},"serviceAccountName":"release-service-account"},"policy":"hello-aiot-policy"}}
+        {"apiVersion":"appstudio.redhat.com/v1alpha1","kind":"ReleasePlanAdmission","metadata":{"annotations":{},"labels":{"release.appstudio.openshift.io/auto-release":"true"},"name":"hello-aiot-dev-rpa","namespace":"default-tenant"},"spec":{"applications":["hello-aiot"],"origin":"default-tenant","pipeline":{"pipelineRef":{"params":[{"name":"kind","value":"pipeline"},{"name":"name","value":"release-with-ec"},{"name":"namespace","value":"default-tenant"}],"resolver":"cluster"},"serviceAccountName":"release-service-account"},"policy":"hello-aiot-policy"}}
     labels:
       release.appstudio.openshift.io/auto-release: "true"
       release.appstudio.openshift.io/block-releases: "false"
@@ -21,7 +21,7 @@ items:
         - name: kind
           value: pipeline
         - name: name
-          value: release-noop
+          value: release-with-ec
         - name: namespace
           value: default-tenant
         resolver: cluster

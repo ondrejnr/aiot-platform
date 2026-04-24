@@ -4,7 +4,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "2"
+      deployment.kubernetes.io/revision: "12"
     labels:
       app.kubernetes.io/component: controller
       app.kubernetes.io/instance: default
@@ -47,7 +47,7 @@ items:
           app.kubernetes.io/name: controller
           app.kubernetes.io/part-of: tekton-chains
           deployment.spec.replicas: "1"
-          operator.tekton.dev/deployment-spec-applied-hash: c928362b399530cb75d6f56d119ccac8
+          operator.tekton.dev/deployment-spec-applied-hash: 66c63c5a3f4df92ebd9e30077aa03a35
           pipeline.tekton.dev/release: v0.26.2
           version: v0.26.2
       spec:
@@ -72,7 +72,10 @@ items:
                 topologyKey: kubernetes.io/hostname
               weight: 100
         containers:
-        - env:
+        - args:
+          - --namespace=default-tenant
+          - -threads-per-controller=1
+          env:
           - name: CONFIG_LEADERELECTION_NAME
             value: tekton-chains-config-leader-election
           - name: CONFIG_OBSERVABILITY_NAME
@@ -109,9 +112,6 @@ items:
             name: signing-secrets
           - mountPath: /var/run/sigstore/cosign
             name: oidc-info
-          - mountPath: /etc/ssl/certs
-            name: trusted-ca
-            readOnly: true
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -146,19 +146,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T11:41:19Z"
-      lastUpdateTime: "2026-04-22T11:42:42Z"
-      message: ReplicaSet "tekton-chains-controller-d989c4cc6" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    - lastTransitionTime: "2026-04-22T14:17:34Z"
-      lastUpdateTime: "2026-04-22T14:17:34Z"
+    - lastTransitionTime: "2026-04-23T05:02:21Z"
+      lastUpdateTime: "2026-04-23T05:02:21Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 2
+    - lastTransitionTime: "2026-04-22T11:41:19Z"
+      lastUpdateTime: "2026-04-23T09:55:08Z"
+      message: ReplicaSet "tekton-chains-controller-666b9684ff" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 12
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -322,8 +322,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:19:38Z"
-      lastUpdateTime: "2026-04-22T14:19:38Z"
+    - lastTransitionTime: "2026-04-23T05:02:18Z"
+      lastUpdateTime: "2026-04-23T05:02:18Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -430,8 +430,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:20:05Z"
-      lastUpdateTime: "2026-04-22T14:20:05Z"
+    - lastTransitionTime: "2026-04-23T05:02:34Z"
+      lastUpdateTime: "2026-04-23T05:02:34Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -633,8 +633,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:18:55Z"
-      lastUpdateTime: "2026-04-22T14:18:55Z"
+    - lastTransitionTime: "2026-04-23T05:02:16Z"
+      lastUpdateTime: "2026-04-23T05:02:16Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -998,13 +998,13 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:20:51Z"
-      lastUpdateTime: "2026-04-22T14:20:51Z"
+    - lastTransitionTime: "2026-04-23T09:42:55Z"
+      lastUpdateTime: "2026-04-23T09:42:55Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    observedGeneration: 3
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1012,7 +1012,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "8"
     labels:
       app.kubernetes.io/name: tekton-results-api
       app.kubernetes.io/part-of: tekton-results
@@ -1047,7 +1047,7 @@ items:
           app: tekton-results-api
           app.kubernetes.io/name: tekton-results-api
           app.kubernetes.io/version: v0.18.0
-          operator.tekton.dev/deployment-spec-applied-hash: 10cd0ac72a245c0487bada5455bd0cb3
+          operator.tekton.dev/deployment-spec-applied-hash: c101ce699888551a9f63389dbc944ee2
       spec:
         affinity:
           nodeAffinity:
@@ -1165,19 +1165,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T11:41:29Z"
-      lastUpdateTime: "2026-04-22T11:42:10Z"
-      message: ReplicaSet "tekton-results-api-5d849b788b" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    - lastTransitionTime: "2026-04-22T14:39:21Z"
-      lastUpdateTime: "2026-04-22T14:39:21Z"
+    - lastTransitionTime: "2026-04-23T05:01:54Z"
+      lastUpdateTime: "2026-04-23T05:01:54Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    - lastTransitionTime: "2026-04-22T11:41:29Z"
+      lastUpdateTime: "2026-04-23T09:55:16Z"
+      message: ReplicaSet "tekton-results-api-76f77d6cdf" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 8
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1185,7 +1185,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "3"
     labels:
       app.kubernetes.io/name: tekton-results-retention-policy-agent
       app.kubernetes.io/part-of: tekton-results
@@ -1287,20 +1287,20 @@ items:
   status:
     availableReplicas: 1
     conditions:
+    - lastTransitionTime: "2026-04-23T05:02:10Z"
+      lastUpdateTime: "2026-04-23T05:02:10Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     - lastTransitionTime: "2026-04-22T11:41:29Z"
-      lastUpdateTime: "2026-04-22T11:41:41Z"
+      lastUpdateTime: "2026-04-23T07:15:38Z"
       message: ReplicaSet "tekton-results-retention-policy-agent-58d6f7bfd5" has successfully
         progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:36:06Z"
-      lastUpdateTime: "2026-04-22T14:36:06Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
-    observedGeneration: 1
+    observedGeneration: 3
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1308,7 +1308,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "6"
     labels:
       app.kubernetes.io/name: tekton-results-watcher
       app.kubernetes.io/part-of: tekton-results
@@ -1344,7 +1344,7 @@ items:
           app.kubernetes.io/name: tekton-results-watcher
           app.kubernetes.io/version: v0.18.0
           deployment.spec.replicas: "1"
-          operator.tekton.dev/deployment-spec-applied-hash: 6badf139127c1027d0f6adba536b2e59
+          operator.tekton.dev/deployment-spec-applied-hash: 01f7cf2e5c74eff644d86db7cbe1e10c
       spec:
         affinity:
           nodeAffinity:
@@ -1370,6 +1370,10 @@ items:
           - $(TEKTON_RESULTS_API_SERVICE)
           - -auth_mode
           - $(AUTH_MODE)
+          - -disable_storing_incomplete_runs=true
+          - -store_deadline=2m
+          - -namespace=default-tenant
+          - -threadiness=1
           env:
           - name: AUTH_MODE
             value: token
@@ -1434,19 +1438,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T11:41:29Z"
-      lastUpdateTime: "2026-04-22T11:41:45Z"
-      message: ReplicaSet "tekton-results-watcher-79bd888d7b" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    - lastTransitionTime: "2026-04-22T14:43:50Z"
-      lastUpdateTime: "2026-04-22T14:43:50Z"
+    - lastTransitionTime: "2026-04-23T05:02:27Z"
+      lastUpdateTime: "2026-04-23T05:02:27Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    - lastTransitionTime: "2026-04-22T11:41:29Z"
+      lastUpdateTime: "2026-04-23T09:55:08Z"
+      message: ReplicaSet "tekton-results-watcher-7f7c98d7ff" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 6
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1611,8 +1615,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:20:44Z"
-      lastUpdateTime: "2026-04-22T14:20:44Z"
+    - lastTransitionTime: "2026-04-23T05:01:59Z"
+      lastUpdateTime: "2026-04-23T05:01:59Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -1743,8 +1747,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:20:21Z"
-      lastUpdateTime: "2026-04-22T14:20:21Z"
+    - lastTransitionTime: "2026-04-23T05:01:58Z"
+      lastUpdateTime: "2026-04-23T05:01:58Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -1867,8 +1871,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:19:04Z"
-      lastUpdateTime: "2026-04-22T14:19:04Z"
+    - lastTransitionTime: "2026-04-23T05:01:55Z"
+      lastUpdateTime: "2026-04-23T05:01:55Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"

@@ -5,9 +5,13 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"appstudio.redhat.com/v1alpha1","kind":"ReleasePlan","metadata":{"annotations":{},"labels":{"release.appstudio.openshift.io/auto-release":"true"},"name":"hello-aiot-dev","namespace":"default-tenant"},"spec":{"application":"hello-aiot","target":"default-tenant"}}
+        {"apiVersion":"appstudio.redhat.com/v1alpha1","kind":"ReleasePlan","metadata":{"annotations":{"release.appstudio.openshift.io/author":"kubernetes-admin","release.appstudio.openshift.io/standing-attribution":"true"},"labels":{"release.appstudio.openshift.io/auto-release":"true"},"name":"hello-aiot-dev","namespace":"default-tenant"},"spec":{"application":"hello-aiot","target":"default-tenant"}}
+      release.appstudio.openshift.io/author: admin
+      release.appstudio.openshift.io/standing-attribution: "true"
     labels:
+      release.appstudio.openshift.io/author: kubernetes-admin
       release.appstudio.openshift.io/auto-release: "true"
+      release.appstudio.openshift.io/standing-attribution: "true"
     name: hello-aiot-dev
     namespace: default-tenant
   spec:

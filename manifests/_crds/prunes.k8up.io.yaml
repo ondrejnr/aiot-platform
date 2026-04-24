@@ -1,0 +1,326 @@
+apiVersion: v1
+items:
+- apiVersion: k8up.io/v1
+  kind: Prune
+  metadata:
+    name: aiot-prune-fbwq4
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    resources: {}
+    retention:
+      keepDaily: 2
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T04:10:10Z"
+      message: job 'prune-aiot-prune-fbwq4' completed successfully
+      reason: Finished
+      status: "False"
+      type: Progressing
+    - lastTransitionTime: "2026-04-23T04:10:10Z"
+      message: job 'prune-aiot-prune-fbwq4' has 0 active, 1 succeeded and 0 failed
+        pods
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-23T04:10:10Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+    finished: true
+    started: true
+- apiVersion: k8up.io/v1
+  kind: Prune
+  metadata:
+    name: aiot-prune-6pmd5
+    namespace: backrest
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    resources: {}
+    retention:
+      keepDaily: 2
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T04:20:15Z"
+      message: job 'prune-aiot-prune-6pmd5' completed successfully
+      reason: Finished
+      status: "False"
+      type: Progressing
+    - lastTransitionTime: "2026-04-23T04:20:15Z"
+      message: job 'prune-aiot-prune-6pmd5' has 0 active, 1 succeeded and 0 failed
+        pods
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-23T04:20:15Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+    finished: true
+    started: true
+- apiVersion: k8up.io/v1
+  kind: Prune
+  metadata:
+    name: aiot-prune-bmnv8
+    namespace: gitea
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    resources: {}
+    retention:
+      keepDaily: 2
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T04:20:10Z"
+      message: job 'prune-aiot-prune-bmnv8' completed successfully
+      reason: Finished
+      status: "False"
+      type: Progressing
+    - lastTransitionTime: "2026-04-23T04:20:10Z"
+      message: job 'prune-aiot-prune-bmnv8' has 0 active, 1 succeeded and 0 failed
+        pods
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-23T04:20:10Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+    finished: true
+    started: true
+- apiVersion: k8up.io/v1
+  kind: Prune
+  metadata:
+    name: aiot-prune-rp5rm
+    namespace: jenkins
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    resources: {}
+    retention:
+      keepDaily: 2
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T04:00:10Z"
+      message: job 'prune-aiot-prune-rp5rm' completed successfully
+      reason: Finished
+      status: "False"
+      type: Progressing
+    - lastTransitionTime: "2026-04-23T04:00:10Z"
+      message: job 'prune-aiot-prune-rp5rm' has 0 active, 1 succeeded and 0 failed
+        pods
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-23T04:00:10Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+    finished: true
+    started: true
+- apiVersion: k8up.io/v1
+  kind: Prune
+  metadata:
+    name: aiot-prune-zkkzs
+    namespace: semaphore
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    resources: {}
+    retention:
+      keepDaily: 2
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T04:05:15Z"
+      message: job 'prune-aiot-prune-zkkzs' completed successfully
+      reason: Finished
+      status: "False"
+      type: Progressing
+    - lastTransitionTime: "2026-04-23T04:05:15Z"
+      message: job 'prune-aiot-prune-zkkzs' has 0 active, 1 succeeded and 0 failed
+        pods
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-23T04:05:15Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+    finished: true
+    started: true
+- apiVersion: k8up.io/v1
+  kind: Prune
+  metadata:
+    name: aiot-prune-m2f4d
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    resources: {}
+    retention:
+      keepDaily: 2
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T04:20:50Z"
+      message: job 'prune-aiot-prune-m2f4d' completed successfully
+      reason: Finished
+      status: "False"
+      type: Progressing
+    - lastTransitionTime: "2026-04-23T04:20:50Z"
+      message: job 'prune-aiot-prune-m2f4d' has 0 active, 1 succeeded and 0 failed
+        pods
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-23T04:20:50Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+    finished: true
+    started: true
+- apiVersion: k8up.io/v1
+  kind: Prune
+  metadata:
+    name: aiot-prune-7zdbm
+    namespace: victoriametrics
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    resources: {}
+    retention:
+      keepDaily: 2
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-23T04:20:30Z"
+      message: job 'prune-aiot-prune-7zdbm' completed successfully
+      reason: Finished
+      status: "False"
+      type: Progressing
+    - lastTransitionTime: "2026-04-23T04:20:30Z"
+      message: job 'prune-aiot-prune-7zdbm' has 0 active, 1 succeeded and 0 failed
+        pods
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-23T04:20:30Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+    finished: true
+    started: true
+kind: List
+metadata:

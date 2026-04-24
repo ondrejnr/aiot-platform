@@ -4,6 +4,102 @@ items:
   kind: Job
   metadata:
     annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T01:30:00Z"
+    labels:
+      batch.kubernetes.io/job-name: dns-backup-29615130
+      job-name: dns-backup-29615130
+    name: dns-backup-29615130
+    namespace: dr-ops
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: dns-backup
+  spec:
+    backoffLimit: 1
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: dns-backup-29615130
+          job-name: dns-backup-29615130
+      spec:
+        containers:
+        - command:
+          - /bin/sh
+          - /scripts/backup.sh
+          env:
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: token
+                name: github-pat
+          - name: GITHUB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: github-pat
+          - name: GITHUB_EMAIL
+            valueFrom:
+              secretKeyRef:
+                key: email
+                name: github-pat
+          - name: CF_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: token
+                name: cloudflare-api-token
+          image: alpine/k8s:1.32.3
+          imagePullPolicy: IfNotPresent
+          name: backup
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /scripts
+            name: scripts
+        dnsPolicy: ClusterFirst
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 493
+            name: dns-backup-script
+          name: scripts
+  status:
+    completionTime: "2026-04-23T01:30:31Z"
+    conditions:
+    - lastProbeTime: "2026-04-23T01:30:31Z"
+      lastTransitionTime: "2026-04-23T01:30:31Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-23T01:30:31Z"
+      lastTransitionTime: "2026-04-23T01:30:31Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-23T01:30:00Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
       cronjob.kubernetes.io/instantiate: manual
     labels:
       batch.kubernetes.io/job-name: dns-backup-test1
@@ -169,9 +265,102 @@ items:
             name: manifest-backup-script
           name: scripts
   status:
+    completionTime: "2026-04-23T01:18:28Z"
+    conditions:
+    - lastProbeTime: "2026-04-23T01:18:28Z"
+      lastTransitionTime: "2026-04-23T01:18:28Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-23T01:18:28Z"
+      lastTransitionTime: "2026-04-23T01:18:28Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-23T01:15:00Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T01:15:00Z"
+    labels:
+      batch.kubernetes.io/job-name: manifest-backup-29616555
+      job-name: manifest-backup-29616555
+    name: manifest-backup-29616555
+    namespace: dr-ops
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: manifest-backup
+  spec:
+    backoffLimit: 1
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: manifest-backup-29616555
+          job-name: manifest-backup-29616555
+      spec:
+        containers:
+        - command:
+          - /bin/sh
+          - /scripts/backup.sh
+          env:
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: token
+                name: github-pat
+          - name: GITHUB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: github-pat
+          - name: GITHUB_EMAIL
+            valueFrom:
+              secretKeyRef:
+                key: email
+                name: github-pat
+          image: alpine/k8s:1.32.3
+          imagePullPolicy: IfNotPresent
+          name: backup
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /scripts
+            name: scripts
+        dnsPolicy: ClusterFirst
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: manifest-backup
+        serviceAccountName: manifest-backup
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 493
+            name: manifest-backup-script
+          name: scripts
+  status:
     active: 1
     ready: 1
-    startTime: "2026-04-23T01:15:00Z"
+    startTime: "2026-04-24T01:15:00Z"
     terminating: 0
     uncountedTerminatedPods: {}
 - apiVersion: batch/v1

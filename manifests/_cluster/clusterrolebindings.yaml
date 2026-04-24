@@ -610,6 +610,21 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRoleBinding","metadata":{"annotations":{},"name":"descheduler"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"descheduler"},"subjects":[{"kind":"ServiceAccount","name":"descheduler","namespace":"descheduler"}]}
+    name: descheduler
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: descheduler
+  subjects:
+  - kind: ServiceAccount
+    name: descheduler
+    namespace: descheduler
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRoleBinding","metadata":{"annotations":{},"name":"dex"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"dex"},"subjects":[{"kind":"ServiceAccount","name":"dex","namespace":"dex"}]}
     labels:
       konflux.konflux-ci.dev/component: ui

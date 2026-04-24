@@ -4,7 +4,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"fleet-controller","namespace":"cattle-fleet-system"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"fleet-controller"}},"template":{"metadata":{"labels":{"app":"fleet-controller","fleet.cattle.io/shard-default":"true","fleet.cattle.io/shard-id":""}},"spec":{"containers":[{"command":["fleetcontroller"],"env":[{"name":"NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"CATTLE_ELECTION_LEASE_DURATION","value":"30s"},{"name":"CATTLE_ELECTION_RETRY_PERIOD","value":"10s"},{"name":"CATTLE_ELECTION_RENEW_DEADLINE","value":"25s"},{"name":"BUNDLE_RECONCILER_WORKERS","value":"50"},{"name":"BUNDLEDEPLOYMENT_RECONCILER_WORKERS","value":"50"},{"name":"CLUSTER_RECONCILER_WORKERS","value":"50"},{"name":"CLUSTERGROUP_RECONCILER_WORKERS","value":"50"},{"name":"IMAGESCAN_RECONCILER_WORKERS","value":"50"},{"name":"SCHEDULE_RECONCILER_WORKERS","value":"50"},{"name":"CONTENT_RECONCILER_WORKERS","value":"50"}],"image":"rancher/fleet:v0.14.3","imagePullPolicy":"IfNotPresent","name":"fleet-controller","ports":[{"containerPort":8080,"name":"metrics"}],"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/tmp","name":"tmp"}]},{"command":["fleetcontroller","cleanup"],"env":[{"name":"NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"CATTLE_ELECTION_LEASE_DURATION","value":"30s"},{"name":"CATTLE_ELECTION_RETRY_PERIOD","value":"10s"},{"name":"CATTLE_ELECTION_RENEW_DEADLINE","value":"25s"}],"image":"rancher/fleet:v0.14.3","imagePullPolicy":"IfNotPresent","name":"fleet-cleanup","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true}},{"command":["fleetcontroller","agentmanagement","--disable-bootstrap"],"env":[{"name":"NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"FLEET_PROPAGATE_DEBUG_SETTINGS_TO_AGENTS","value":"true"},{"name":"FLEET_DEBUG_DISABLE_SECURITY_CONTEXT","value":"false"},{"name":"CATTLE_ELECTION_LEASE_DURATION","value":"30s"},{"name":"CATTLE_ELECTION_RETRY_PERIOD","value":"10s"},{"name":"CATTLE_ELECTION_RENEW_DEADLINE","value":"25s"},{"name":"FLEET_AGENT_REPLICA_COUNT","value":"1"},{"name":"FLEET_AGENT_ELECTION_LEASE_DURATION","value":"30s"},{"name":"FLEET_AGENT_ELECTION_RETRY_PERIOD","value":"10s"},{"name":"FLEET_AGENT_ELECTION_RENEW_DEADLINE","value":"25s"}],"image":"rancher/fleet:v0.14.3","imagePullPolicy":"IfNotPresent","name":"fleet-agentmanagement","securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true}}],"nodeSelector":{"kubernetes.io/os":"linux"},"priorityClassName":"rancher-critical","securityContext":{"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000},"serviceAccountName":"fleet-controller","tolerations":[{"effect":"NoSchedule","key":"cattle.io/os","operator":"Equal","value":"linux"}],"volumes":[{"emptyDir":{},"name":"tmp"}]}}}}
     name: fleet-controller
@@ -149,6 +149,7 @@ items:
         dnsPolicy: ClusterFirst
         nodeSelector:
           kubernetes.io/os: linux
+          workload-zone: build
         priorityClassName: rancher-critical
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -170,19 +171,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T21:43:04Z"
-      lastUpdateTime: "2026-04-19T21:43:15Z"
-      message: ReplicaSet "fleet-controller-7dc955f86" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
     - lastTransitionTime: "2026-04-22T14:18:09Z"
       lastUpdateTime: "2026-04-22T14:18:09Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    - lastTransitionTime: "2026-04-19T21:43:04Z"
+      lastUpdateTime: "2026-04-23T05:03:20Z"
+      message: ReplicaSet "fleet-controller-5c7f858c9d" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -190,7 +191,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"gitjob","namespace":"cattle-fleet-system"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"gitjob"}},"template":{"metadata":{"labels":{"app":"gitjob","fleet.cattle.io/shard-default":"true","fleet.cattle.io/shard-id":""}},"spec":{"containers":[{"args":["fleetcontroller","gitjob","--gitjob-image","rancher/fleet:v0.14.3"],"env":[{"name":"NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"CATTLE_ELECTION_LEASE_DURATION","value":"30s"},{"name":"CATTLE_ELECTION_RETRY_PERIOD","value":"10s"},{"name":"CATTLE_ELECTION_RENEW_DEADLINE","value":"25s"},{"name":"GITREPO_SYNC_PERIOD","value":"2h"},{"name":"GITREPO_RECONCILER_WORKERS","value":"50"}],"image":"rancher/fleet:v0.14.3","name":"gitjob","ports":[{"containerPort":8081,"name":"metrics"}],"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/tmp","name":"tmp"}]}],"nodeSelector":{"kubernetes.io/os":"linux"},"priorityClassName":"rancher-critical","securityContext":{"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000},"serviceAccountName":"gitjob","tolerations":[{"effect":"NoSchedule","key":"cattle.io/os","operator":"Equal","value":"linux"}],"volumes":[{"emptyDir":{},"name":"tmp"}]}}}}
     name: gitjob
@@ -259,6 +260,7 @@ items:
         dnsPolicy: ClusterFirst
         nodeSelector:
           kubernetes.io/os: linux
+          workload-zone: build
         priorityClassName: rancher-critical
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -280,19 +282,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T21:43:04Z"
-      lastUpdateTime: "2026-04-19T21:43:11Z"
-      message: ReplicaSet "gitjob-b878b59b7" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
     - lastTransitionTime: "2026-04-22T17:18:34Z"
       lastUpdateTime: "2026-04-22T17:18:34Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    - lastTransitionTime: "2026-04-19T21:43:04Z"
+      lastUpdateTime: "2026-04-23T05:03:20Z"
+      message: ReplicaSet "gitjob-674fb45d55" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -300,7 +302,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"helmops","namespace":"cattle-fleet-system"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"helmops"}},"template":{"metadata":{"labels":{"app":"helmops","fleet.cattle.io/shard-default":"true","fleet.cattle.io/shard-id":""}},"spec":{"containers":[{"args":["fleetcontroller","helmops"],"env":[{"name":"NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"CATTLE_ELECTION_LEASE_DURATION","value":"30s"},{"name":"CATTLE_ELECTION_RETRY_PERIOD","value":"10s"},{"name":"CATTLE_ELECTION_RENEW_DEADLINE","value":"25s"},{"name":"HELMOPS_RECONCILER_WORKERS","value":"50"}],"image":"rancher/fleet:v0.14.3","name":"helmops","ports":[{"containerPort":8081,"name":"metrics"}],"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/tmp","name":"tmp"}]}],"nodeSelector":{"kubernetes.io/os":"linux"},"priorityClassName":"rancher-critical","securityContext":{"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000},"serviceAccountName":"helmops","tolerations":[{"effect":"NoSchedule","key":"cattle.io/os","operator":"Equal","value":"linux"}],"volumes":[{"emptyDir":{},"name":"tmp"}]}}}}
     name: helmops
@@ -365,6 +367,7 @@ items:
         dnsPolicy: ClusterFirst
         nodeSelector:
           kubernetes.io/os: linux
+          workload-zone: build
         priorityClassName: rancher-critical
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -386,19 +389,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T21:43:04Z"
-      lastUpdateTime: "2026-04-19T21:43:10Z"
-      message: ReplicaSet "helmops-7bcb7cdd88" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
     - lastTransitionTime: "2026-04-22T14:17:54Z"
       lastUpdateTime: "2026-04-22T14:17:54Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    - lastTransitionTime: "2026-04-19T21:43:04Z"
+      lastUpdateTime: "2026-04-23T05:05:04Z"
+      message: ReplicaSet "helmops-6f5bd58f9b" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1

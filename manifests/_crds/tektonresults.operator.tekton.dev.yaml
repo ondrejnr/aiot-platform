@@ -18,7 +18,35 @@ items:
     config: {}
     disabled: false
     is_external_db: false
-    options: {}
+    options:
+      configMaps:
+        tekton-results-config-results-retention-policy:
+          data:
+            defaultRetention: "14"
+            runAt: 0 3 * * *
+          metadata:
+      deployments:
+        tekton-results-watcher:
+          metadata:
+          spec:
+            selector: null
+            strategy: {}
+            template:
+              metadata:
+              spec:
+                containers:
+                - args:
+                  - -api_addr
+                  - $(TEKTON_RESULTS_API_SERVICE)
+                  - -auth_mode
+                  - $(AUTH_MODE)
+                  - -disable_storing_incomplete_runs=true
+                  - -store_deadline=2m
+                  - -namespace=default-tenant
+                  - -threadiness=1
+                  name: watcher
+                  resources: {}
+          status: {}
     performance:
       disable-ha: false
     route_enabled: false
@@ -26,13 +54,13 @@ items:
     targetNamespace: tekton-pipelines
   status:
     conditions:
-    - lastTransitionTime: "2026-04-22T14:21:52Z"
+    - lastTransitionTime: "2026-04-23T05:04:05Z"
       status: "True"
       type: DependenciesInstalled
     - lastTransitionTime: "2026-04-22T11:41:28Z"
       status: "True"
       type: InstallerSetAvailable
-    - lastTransitionTime: "2026-04-22T15:17:40Z"
+    - lastTransitionTime: "2026-04-23T05:04:05Z"
       status: "True"
       type: InstallerSetReady
     - lastTransitionTime: "2026-04-22T11:42:10Z"
@@ -41,10 +69,10 @@ items:
     - lastTransitionTime: "2026-04-22T11:41:28Z"
       status: "True"
       type: PreReconciler
-    - lastTransitionTime: "2026-04-22T15:17:40Z"
+    - lastTransitionTime: "2026-04-23T05:04:05Z"
       status: "True"
       type: Ready
-    observedGeneration: 1
+    observedGeneration: 7
     tektonInstallerSet: result-4d4wx
     version: v0.18.0
 kind: List

@@ -5,6 +5,22 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{},"name":"release-pipeline-snapshot-reader","namespace":"default-tenant"},"rules":[{"apiGroups":["appstudio.redhat.com"],"resources":["snapshots"],"verbs":["get","list"]}]}
+    name: release-pipeline-snapshot-reader
+    namespace: default-tenant
+  rules:
+  - apiGroups:
+    - appstudio.redhat.com
+    resources:
+    - snapshots
+    verbs:
+    - get
+    - list
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":{"annotations":{},"name":"release-service-account","namespace":"default-tenant"},"rules":[{"apiGroups":["appstudio.redhat.com"],"resources":["*"],"verbs":["get","list","watch","patch","update"]},{"apiGroups":["tekton.dev"],"resources":["pipelineruns","taskruns"],"verbs":["get","list","watch","create","update","patch","delete"]},{"apiGroups":[""],"resources":["secrets","configmaps","serviceaccounts"],"verbs":["get","list","watch"]}]}
     name: release-service-account
     namespace: default-tenant

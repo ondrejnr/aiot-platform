@@ -84,6 +84,22 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"name":"release-pipeline-snapshot-reader","namespace":"default-tenant"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"release-pipeline-snapshot-reader"},"subjects":[{"kind":"ServiceAccount","name":"release-service-account","namespace":"default-tenant"}]}
+    name: release-pipeline-snapshot-reader
+    namespace: default-tenant
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: release-pipeline-snapshot-reader
+  subjects:
+  - kind: ServiceAccount
+    name: release-service-account
+    namespace: default-tenant
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":{"annotations":{},"name":"release-service-account","namespace":"default-tenant"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"Role","name":"release-service-account"},"subjects":[{"kind":"ServiceAccount","name":"release-service-account","namespace":"default-tenant"}]}
     name: release-service-account
     namespace: default-tenant

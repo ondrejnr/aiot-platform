@@ -15,6 +15,12 @@ items:
 - apiVersion: management.cattle.io/v3
   kind: Preference
   metadata:
+    name: hide-desc
+    namespace: user-b2zsr
+  value: '["node"]'
+- apiVersion: management.cattle.io/v3
+  kind: Preference
+  metadata:
     name: locale
     namespace: user-b2zsr
   value: en-us

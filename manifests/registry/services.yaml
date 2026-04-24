@@ -29,5 +29,32 @@ items:
     type: NodePort
   status:
     loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"internal-registry-http","namespace":"registry"},"spec":{"ports":[{"name":"http","port":80,"targetPort":5000}],"selector":{"app":"registry"}}}
+    name: internal-registry-http
+    namespace: registry
+  spec:
+    clusterIP: 10.105.21.16
+    clusterIPs:
+    - 10.105.21.16
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 5000
+    selector:
+      app: registry
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
 kind: List
 metadata:
