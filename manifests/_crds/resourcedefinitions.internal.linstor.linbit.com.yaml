@@ -51,6 +51,18 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: ResourceDefinitions
   metadata:
+    name: 0d5f95cf53f1a49b6e5a5dfb1a3052142a21e0d4809dc9291c4827a310e04fba
+  spec:
+    layer_stack: '["DRBD","STORAGE"]'
+    resource_dsp_name: pvc-72715972-98c4-4f7c-b8eb-79d33f741d9f
+    resource_flags: 0
+    resource_group_name: SC-3BA5B71F-7C6D-50FB-AB0A-19062E56B1A8
+    resource_name: PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+    snapshot_dsp_name: ""
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: ResourceDefinitions
+  metadata:
     name: 15ab13c3a75472a5f4bb9997c5b401dc759be493d4bb74905564a3799242217a
   spec:
     layer_stack: '["DRBD","STORAGE"]'
@@ -58,6 +70,18 @@ items:
     resource_flags: 0
     resource_group_name: SC-3BA5B71F-7C6D-50FB-AB0A-19062E56B1A8
     resource_name: PVC-33099827-4B54-4D13-8588-122F969DEA72
+    snapshot_dsp_name: ""
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: ResourceDefinitions
+  metadata:
+    name: 3ef030802b39552f858976e3d334bdea63e9b2eb268a59d1ea090452eba6b6c8
+  spec:
+    layer_stack: '["DRBD","STORAGE"]'
+    resource_dsp_name: pvc-0c6ad1c4-ea10-4b24-95c5-12f0f48ef8ab
+    resource_flags: 0
+    resource_group_name: SC-3BA5B71F-7C6D-50FB-AB0A-19062E56B1A8
+    resource_name: PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
     snapshot_dsp_name: ""
     snapshot_name: ""
 - apiVersion: internal.linstor.linbit.com/v1-15-0

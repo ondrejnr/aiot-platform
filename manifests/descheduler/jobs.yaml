@@ -4,11 +4,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T01:15:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-25T01:15:00Z"
     labels:
-      batch.kubernetes.io/job-name: descheduler-29616555
-      job-name: descheduler-29616555
-    name: descheduler-29616555
+      batch.kubernetes.io/job-name: descheduler-29617995
+      job-name: descheduler-29617995
+    name: descheduler-29617995
     namespace: descheduler
     ownerReferences:
     - apiVersion: batch/v1
@@ -29,8 +29,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: descheduler-29616555
-          job-name: descheduler-29616555
+          batch.kubernetes.io/job-name: descheduler-29617995
+          job-name: descheduler-29617995
       spec:
         containers:
         - args:
@@ -73,22 +73,22 @@ items:
             name: descheduler-policy
           name: policy
   status:
-    completionTime: "2026-04-24T01:15:05Z"
+    completionTime: "2026-04-25T01:15:06Z"
     conditions:
-    - lastProbeTime: "2026-04-24T01:15:05Z"
-      lastTransitionTime: "2026-04-24T01:15:05Z"
+    - lastProbeTime: "2026-04-25T01:15:06Z"
+      lastTransitionTime: "2026-04-25T01:15:06Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-24T01:15:05Z"
-      lastTransitionTime: "2026-04-24T01:15:05Z"
+    - lastProbeTime: "2026-04-25T01:15:06Z"
+      lastTransitionTime: "2026-04-25T01:15:06Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-24T01:15:00Z"
+    startTime: "2026-04-25T01:15:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

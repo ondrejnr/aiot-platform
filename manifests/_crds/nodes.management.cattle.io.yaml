@@ -35,7 +35,7 @@ items:
   status:
     conditions:
     - lastTransitionTime: 2026-04-14 01:18:12 +0000 UTC
-      lastUpdateTime: 2026-04-24 01:14:39 +0000 UTC
+      lastUpdateTime: 2026-04-25 01:13:13 +0000 UTC
       message: kubelet is posting ready status
       reason: KubeletReady
       status: "True"
@@ -65,7 +65,7 @@ items:
         memory: 16107400Ki
         pods: "110"
       conditions:
-      - lastHeartbeatTime: "2026-04-24T01:14:39Z"
+      - lastHeartbeatTime: "2026-04-25T01:13:13Z"
         lastTransitionTime: "2026-04-14T01:18:12Z"
         message: kubelet is posting ready status
         reason: KubeletReady
@@ -150,8 +150,8 @@ items:
     worker: true
   status:
     conditions:
-    - lastTransitionTime: 2026-04-18 04:56:21 +0000 UTC
-      lastUpdateTime: 2026-04-24 01:15:43 +0000 UTC
+    - lastTransitionTime: 2026-04-24 06:03:37 +0000 UTC
+      lastUpdateTime: 2026-04-25 01:15:35 +0000 UTC
       message: kubelet is posting ready status
       reason: KubeletReady
       status: "True"
@@ -181,8 +181,8 @@ items:
         memory: 11769116Ki
         pods: "110"
       conditions:
-      - lastHeartbeatTime: "2026-04-24T01:15:43Z"
-        lastTransitionTime: "2026-04-18T04:56:21Z"
+      - lastHeartbeatTime: "2026-04-25T01:15:35Z"
+        lastTransitionTime: "2026-04-24T06:03:37Z"
         message: kubelet is posting ready status
         reason: KubeletReady
         status: "True"
@@ -212,7 +212,7 @@ items:
         name: runc
     limits:
       cpu: 6400m
-      memory: 15348Mi
+      memory: 13300Mi
     nodeAnnotations:
       flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"16:54:0e:22:4b:41"}'
       flannel.alpha.coreos.com/backend-type: vxlan
@@ -234,9 +234,9 @@ items:
       workload-zone: build
     nodeName: oci-e5-node2
     requested:
-      cpu: 2135m
-      memory: 3786Mi
-      pods: "24"
+      cpu: 2035m
+      memory: 3074Mi
+      pods: "23"
 - apiVersion: management.cattle.io/v3
   kind: Node
   metadata:
@@ -268,8 +268,8 @@ items:
     worker: true
   status:
     conditions:
-    - lastTransitionTime: 2026-04-22 15:12:38 +0000 UTC
-      lastUpdateTime: 2026-04-24 01:15:01 +0000 UTC
+    - lastTransitionTime: 2026-04-24 10:19:16 +0000 UTC
+      lastUpdateTime: 2026-04-25 01:13:50 +0000 UTC
       message: kubelet is posting ready status
       reason: KubeletReady
       status: "True"
@@ -299,8 +299,8 @@ items:
         memory: 16107388Ki
         pods: "110"
       conditions:
-      - lastHeartbeatTime: "2026-04-24T01:15:01Z"
-        lastTransitionTime: "2026-04-22T15:12:38Z"
+      - lastHeartbeatTime: "2026-04-25T01:13:50Z"
+        lastTransitionTime: "2026-04-24T10:19:16Z"
         message: kubelet is posting ready status
         reason: KubeletReady
         status: "True"
@@ -329,8 +329,8 @@ items:
           userNamespaces: true
         name: runc
     limits:
-      cpu: 7560m
-      memory: 8274Mi
+      cpu: 8360m
+      memory: 9850Mi
     nodeAnnotations:
       csi.volume.kubernetes.io/nodeid: '{"linstor.csi.linbit.com":"aiot-worker-01"}'
       flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"c2:d5:10:6d:8d:c7"}'
@@ -352,9 +352,9 @@ items:
       workload-zone: data
     nodeName: aiot-worker-01
     requested:
-      cpu: 1521m
-      memory: 3115Mi
-      pods: "45"
+      cpu: 2031m
+      memory: 3931Mi
+      pods: "50"
 - apiVersion: management.cattle.io/v3
   kind: Node
   metadata:
@@ -387,7 +387,7 @@ items:
   status:
     conditions:
     - lastTransitionTime: 2026-04-20 12:00:18 +0000 UTC
-      lastUpdateTime: 2026-04-24 01:17:14 +0000 UTC
+      lastUpdateTime: 2026-04-25 01:17:41 +0000 UTC
       message: kubelet is posting ready status
       reason: KubeletReady
       status: "True"
@@ -417,7 +417,7 @@ items:
         memory: 11769108Ki
         pods: "110"
       conditions:
-      - lastHeartbeatTime: "2026-04-24T01:17:14Z"
+      - lastHeartbeatTime: "2026-04-25T01:17:41Z"
         lastTransitionTime: "2026-04-20T12:00:18Z"
         message: kubelet is posting ready status
         reason: KubeletReady
@@ -470,8 +470,8 @@ items:
       workload-zone: build
     nodeName: oci-e5-node1
     requested:
-      cpu: 785m
-      memory: 1250Mi
+      cpu: 885m
+      memory: 1450Mi
       pods: "20"
 - apiVersion: management.cattle.io/v3
   kind: Node
@@ -505,7 +505,7 @@ items:
   status:
     conditions:
     - lastTransitionTime: 2026-04-22 13:49:53 +0000 UTC
-      lastUpdateTime: 2026-04-24 01:16:34 +0000 UTC
+      lastUpdateTime: 2026-04-25 01:17:57 +0000 UTC
       message: kubelet is posting ready status
       reason: KubeletReady
       status: "True"
@@ -535,7 +535,7 @@ items:
         memory: 16107400Ki
         pods: "110"
       conditions:
-      - lastHeartbeatTime: "2026-04-24T01:16:34Z"
+      - lastHeartbeatTime: "2026-04-25T01:17:57Z"
         lastTransitionTime: "2026-04-22T13:49:53Z"
         message: kubelet is posting ready status
         reason: KubeletReady
@@ -565,8 +565,8 @@ items:
           userNamespaces: true
         name: runc
     limits:
-      cpu: 16200m
-      memory: 18946Mi
+      cpu: 17200m
+      memory: 20994Mi
     nodeAnnotations:
       csi.volume.kubernetes.io/nodeid: '{"linstor.csi.linbit.com":"aiot-worker-02"}'
       flannel.alpha.coreos.com/backend-data: '{"VNI":1,"VtepMAC":"86:3b:9d:76:60:f8"}'
@@ -588,8 +588,8 @@ items:
       workload-zone: data
     nodeName: aiot-worker-02
     requested:
-      cpu: 2500m
-      memory: 4890Mi
-      pods: "43"
+      cpu: 2550m
+      memory: 5102Mi
+      pods: "42"
 kind: List
 metadata:

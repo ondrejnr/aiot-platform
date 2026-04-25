@@ -3,11 +3,12 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"k8up.io/v1","kind":"Backup","metadata":{"annotations":{},"name":"adhoc-20260422-070041","namespace":"aiot"},"spec":{"backend":{"repoPasswordSecretRef":{"key":"password","name":"k8up-repo"},"s3":{"accessKeyIDSecretRef":{"key":"access_key","name":"r2-creds"},"bucket":"aiot-velero","endpoint":"https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com","secretAccessKeySecretRef":{"key":"secret_key","name":"r2-creds"}}},"failedJobsHistoryLimit":2,"successfulJobsHistoryLimit":2}}
-    name: adhoc-20260422-070041
+    name: aiot-backup-fk7hm
     namespace: aiot
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
   spec:
     backend:
       repoPasswordSecretRef:
@@ -22,28 +23,28 @@ items:
         secretAccessKeySecretRef:
           key: secret_key
           name: r2-creds
-    failedJobsHistoryLimit: 2
-    successfulJobsHistoryLimit: 2
+    keepJobs: 2
+    resources: {}
   status:
     conditions:
-    - lastTransitionTime: "2026-04-22T07:01:11Z"
+    - lastTransitionTime: "2026-04-24T03:10:30Z"
       message: The resource is ready
       reason: Finished
       status: "True"
       type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-22T07:03:11Z"
-      message: job 'backup_adhoc-20260422-070041' completed successfully
+    - lastTransitionTime: "2026-04-24T03:11:40Z"
+      message: job 'backup_aiot-backup-fk7hm' completed successfully
       reason: Finished
       status: "False"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T07:03:11Z"
-      message: '"backup_adhoc-20260422-070041" has 3 succeeded, 0 failed, and 0 started
+    - lastTransitionTime: "2026-04-24T03:11:40Z"
+      message: '"backup_aiot-backup-fk7hm" has 1 succeeded, 0 failed, and 0 started
         jobs'
       reason: Succeeded
       status: "True"
       type: Completed
-    - lastTransitionTime: "2026-04-22T07:03:11Z"
-      message: Deleted 0 resources
+    - lastTransitionTime: "2026-04-24T03:11:40Z"
+      message: Deleted 1 resources
       reason: Succeeded
       status: "True"
       type: Scrubbed
@@ -144,6 +145,90 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
+    name: aiot-backup-jg5p4
+    namespace: backrest
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    keepJobs: 2
+    resources: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-24T03:20:00Z"
+      message: no container definitions found
+      reason: NoPreBackupPodsFound
+      status: "True"
+      type: PreBackupPodReady
+    - lastTransitionTime: "2026-04-24T03:20:00Z"
+      message: nothing to backup
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-24T03:20:30Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+- apiVersion: k8up.io/v1
+  kind: Backup
+  metadata:
+    name: aiot-backup-rmrc6
+    namespace: gitea
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    keepJobs: 2
+    resources: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-24T03:20:00Z"
+      message: no container definitions found
+      reason: NoPreBackupPodsFound
+      status: "True"
+      type: PreBackupPodReady
+    - lastTransitionTime: "2026-04-24T03:20:00Z"
+      message: nothing to backup
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-24T03:20:30Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+- apiVersion: k8up.io/v1
+  kind: Backup
+  metadata:
     name: aiot-backup-x5svz
     namespace: gitea
     ownerReferences:
@@ -183,55 +268,6 @@ items:
       reason: Succeeded
       status: "True"
       type: Scrubbed
-- apiVersion: k8up.io/v1
-  kind: Backup
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"k8up.io/v1","kind":"Backup","metadata":{"annotations":{},"name":"adhoc-20260422-070041","namespace":"jenkins"},"spec":{"backend":{"repoPasswordSecretRef":{"key":"password","name":"k8up-repo"},"s3":{"accessKeyIDSecretRef":{"key":"access_key","name":"r2-creds"},"bucket":"aiot-velero","endpoint":"https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com","secretAccessKeySecretRef":{"key":"secret_key","name":"r2-creds"}}},"failedJobsHistoryLimit":2,"successfulJobsHistoryLimit":2}}
-    name: adhoc-20260422-070041
-    namespace: jenkins
-  spec:
-    backend:
-      repoPasswordSecretRef:
-        key: password
-        name: k8up-repo
-      s3:
-        accessKeyIDSecretRef:
-          key: access_key
-          name: r2-creds
-        bucket: aiot-velero
-        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
-        secretAccessKeySecretRef:
-          key: secret_key
-          name: r2-creds
-    failedJobsHistoryLimit: 2
-    successfulJobsHistoryLimit: 2
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-22T07:00:41Z"
-      message: no container definitions found
-      reason: NoPreBackupPodsFound
-      status: "True"
-      type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-22T07:01:16Z"
-      message: job 'backup_adhoc-20260422-070041' completed successfully
-      reason: Finished
-      status: "False"
-      type: Progressing
-    - lastTransitionTime: "2026-04-22T07:01:16Z"
-      message: '"backup_adhoc-20260422-070041" has 1 succeeded, 0 failed, and 0 started
-        jobs'
-      reason: Succeeded
-      status: "True"
-      type: Completed
-    - lastTransitionTime: "2026-04-22T07:01:16Z"
-      message: Deleted 0 resources
-      reason: Succeeded
-      status: "True"
-      type: Scrubbed
-    finished: true
-    started: true
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
@@ -277,11 +313,12 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"k8up.io/v1","kind":"Backup","metadata":{"annotations":{},"name":"adhoc-20260422-070041","namespace":"semaphore"},"spec":{"backend":{"repoPasswordSecretRef":{"key":"password","name":"k8up-repo"},"s3":{"accessKeyIDSecretRef":{"key":"access_key","name":"r2-creds"},"bucket":"aiot-velero","endpoint":"https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com","secretAccessKeySecretRef":{"key":"secret_key","name":"r2-creds"}}},"failedJobsHistoryLimit":2,"successfulJobsHistoryLimit":2}}
-    name: adhoc-20260422-070041
-    namespace: semaphore
+    name: aiot-backup-wld6x
+    namespace: jenkins
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
   spec:
     backend:
       repoPasswordSecretRef:
@@ -296,28 +333,70 @@ items:
         secretAccessKeySecretRef:
           key: secret_key
           name: r2-creds
-    failedJobsHistoryLimit: 2
-    successfulJobsHistoryLimit: 2
+    keepJobs: 2
+    resources: {}
   status:
     conditions:
-    - lastTransitionTime: "2026-04-22T07:00:42Z"
+    - lastTransitionTime: "2026-04-24T03:00:00Z"
       message: no container definitions found
       reason: NoPreBackupPodsFound
       status: "True"
       type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-22T07:01:07Z"
-      message: job 'backup_adhoc-20260422-070041' completed successfully
+    - lastTransitionTime: "2026-04-24T03:00:00Z"
+      message: nothing to backup
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-24T03:00:30Z"
+      message: Deleted 1 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+- apiVersion: k8up.io/v1
+  kind: Backup
+  metadata:
+    name: aiot-backup-4pvj2
+    namespace: semaphore
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    keepJobs: 2
+    resources: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-24T03:05:00Z"
+      message: no container definitions found
+      reason: NoPreBackupPodsFound
+      status: "True"
+      type: PreBackupPodReady
+    - lastTransitionTime: "2026-04-24T03:05:15Z"
+      message: job 'backup_aiot-backup-4pvj2' completed successfully
       reason: Finished
       status: "False"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T07:01:07Z"
-      message: '"backup_adhoc-20260422-070041" has 1 succeeded, 0 failed, and 0 started
+    - lastTransitionTime: "2026-04-24T03:05:15Z"
+      message: '"backup_aiot-backup-4pvj2" has 1 succeeded, 0 failed, and 0 started
         jobs'
       reason: Succeeded
       status: "True"
       type: Completed
-    - lastTransitionTime: "2026-04-22T07:01:07Z"
-      message: Deleted 0 resources
+    - lastTransitionTime: "2026-04-24T03:05:15Z"
+      message: Deleted 2 resources
       reason: Succeeded
       status: "True"
       type: Scrubbed
@@ -376,52 +455,6 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"k8up.io/v1","kind":"Backup","metadata":{"annotations":{},"name":"first-backup","namespace":"semaphore"},"spec":{"backend":{"repoPasswordSecretRef":{"key":"password","name":"k8up-repo"},"s3":{"accessKeyIDSecretRef":{"key":"access_key","name":"r2-creds"},"bucket":"aiot-velero","endpoint":"https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com","secretAccessKeySecretRef":{"key":"secret_key","name":"r2-creds"}}}}}
-    name: first-backup
-    namespace: semaphore
-  spec:
-    backend:
-      repoPasswordSecretRef:
-        key: password
-        name: k8up-repo
-      s3:
-        accessKeyIDSecretRef:
-          key: access_key
-          name: r2-creds
-        bucket: aiot-velero
-        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
-        secretAccessKeySecretRef:
-          key: secret_key
-          name: r2-creds
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-22T06:04:30Z"
-      message: no container definitions found
-      reason: NoPreBackupPodsFound
-      status: "True"
-      type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-22T06:04:45Z"
-      message: job 'backup_first-backup' completed successfully
-      reason: Finished
-      status: "False"
-      type: Progressing
-    - lastTransitionTime: "2026-04-22T06:04:45Z"
-      message: '"backup_first-backup" has 1 succeeded, 0 failed, and 0 started jobs'
-      reason: Succeeded
-      status: "True"
-      type: Completed
-    - lastTransitionTime: "2026-04-22T06:04:45Z"
-      message: Deleted 0 resources
-      reason: Succeeded
-      status: "True"
-      type: Scrubbed
-    finished: true
-    started: true
-- apiVersion: k8up.io/v1
-  kind: Backup
-  metadata:
     name: aiot-backup-9xpmx
     namespace: signoz
     ownerReferences:
@@ -457,6 +490,90 @@ items:
       status: "True"
       type: Completed
     - lastTransitionTime: "2026-04-23T03:20:30Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+- apiVersion: k8up.io/v1
+  kind: Backup
+  metadata:
+    name: aiot-backup-rkctx
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    keepJobs: 2
+    resources: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-24T03:20:00Z"
+      message: no container definitions found
+      reason: NoPreBackupPodsFound
+      status: "True"
+      type: PreBackupPodReady
+    - lastTransitionTime: "2026-04-24T03:20:00Z"
+      message: nothing to backup
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-24T03:20:30Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+- apiVersion: k8up.io/v1
+  kind: Backup
+  metadata:
+    name: aiot-backup-4k85m
+    namespace: victoriametrics
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    keepJobs: 2
+    resources: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-24T03:20:00Z"
+      message: no container definitions found
+      reason: NoPreBackupPodsFound
+      status: "True"
+      type: PreBackupPodReady
+    - lastTransitionTime: "2026-04-24T03:20:00Z"
+      message: nothing to backup
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-24T03:20:30Z"
       message: Deleted 0 resources
       reason: Succeeded
       status: "True"

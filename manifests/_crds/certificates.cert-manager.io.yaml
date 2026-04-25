@@ -1135,40 +1135,6 @@ items:
 - apiVersion: cert-manager.io/v1
   kind: Certificate
   metadata:
-    name: holmes-tls
-    namespace: robusta
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: holmes
-  spec:
-    dnsNames:
-    - holmes.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: holmes-tls
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-22T16:21:39Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-21T15:23:06Z"
-    notBefore: "2026-04-22T15:23:07Z"
-    renewalTime: "2026-06-21T15:23:06Z"
-    revision: 1
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
     name: tls-signoz
     namespace: signoz
     ownerReferences:

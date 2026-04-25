@@ -7,6 +7,8 @@ items:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"chef:chef-automate","ingressName":"chef:chef","hostname":"chef.35.241.255.137.nip.io","path":"/","allNodes":false}]'
       nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      nginx.ingress.kubernetes.io/proxy-redirect-from: https://chef.35.241.255.137.nip.io:8443/
+      nginx.ingress.kubernetes.io/proxy-redirect-to: https://chef.35.241.255.137.nip.io/
     name: chef
     namespace: chef
   spec:

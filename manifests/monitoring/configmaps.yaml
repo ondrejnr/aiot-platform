@@ -148,45 +148,25 @@ items:
 - apiVersion: v1
   data:
     config.yaml: |
-      logLevel: warn
+      logLevel: info
       logFormat: json
+      maxEventAgeSeconds: 600
+      omitLookup: true
       route:
         match:
-          - receiver: "mm"
+          - receiver: "ai"
             type: "Warning"
       receivers:
-        - name: "mm"
+        - name: "ai"
           webhook:
-            endpoint: "https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr"
+            endpoint: "http://ai-enricher.ai-enricher.svc.cluster.local:8080/classify"
             headers:
               Content-Type: application/json
-            layout:
-              channel: "k8s"
-              username: "k8s-events"
-              icon_emoji: ":warning:"
-              text: |
-                ### :warning: {{ .Reason }} — {{ .InvolvedObject.Kind }} `{{ .Namespace }}/{{ .InvolvedObject.Name }}`
-                **Message:** {{ .Message }}
-                | Field | Value |
-                |---|---|
-                | Reason | `{{ .Reason }}` |
-                | Type | `{{ .Type }}` |
-                | Count | {{ .Count }} |
-                | First seen | {{ .FirstTimestamp }} |
-                | Last seen | {{ .LastTimestamp }} |
-                | Source host | `{{ .Source.Host }}` |
-                | Component | `{{ .Source.Component }}` |
-                | Reporting ctrl | `{{ .ReportingController }}` |
-                {{- if .InvolvedObject.Labels }}
-                **Labels:** {{ range $k,$v := .InvolvedObject.Labels }}`{{ $k }}={{ $v }}` {{ end }}
-                {{- end }}
-                ---
-                _Investigate:_ [Holmes](https://holmes.35.241.255.137.nip.io) · `kubectl -n {{ .Namespace }} describe {{ .InvolvedObject.Kind | lower }} {{ .InvolvedObject.Name }}` · `kubectl -n {{ .Namespace }} logs {{ .InvolvedObject.Name }} --tail=50`
   kind: ConfigMap
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","data":{"config.yaml":"logLevel: warn\nlogFormat: json\nroute:\n  match:\n    - receiver: \"mm\"\n      type: \"Warning\"\nreceivers:\n  - name: \"mm\"\n    webhook:\n      endpoint: \"https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr\"\n      headers:\n        Content-Type: application/json\n      layout:\n        channel: \"k8s\"\n        username: \"k8s-events\"\n        icon_emoji: \":warning:\"\n        text: |\n          ### :warning: {{ .Reason }} — {{ .InvolvedObject.Kind }} `{{ .Namespace }}/{{ .InvolvedObject.Name }}`\n          **Message:** {{ .Message }}\n          | Field | Value |\n          |---|---|\n          | Reason | `{{ .Reason }}` |\n          | Type | `{{ .Type }}` |\n          | Count | {{ .Count }} |\n          | First seen | {{ .FirstTimestamp }} |\n          | Last seen | {{ .LastTimestamp }} |\n          | Source host | `{{ .Source.Host }}` |\n          | Component | `{{ .Source.Component }}` |\n          | Reporting ctrl | `{{ .ReportingController }}` |\n          {{- if .InvolvedObject.Labels }}\n          **Labels:** {{ range $k,$v := .InvolvedObject.Labels }}`{{ $k }}={{ $v }}` {{ end }}\n          {{- end }}\n          ---\n          _Investigate:_ [Holmes](https://holmes.35.241.255.137.nip.io) · `kubectl -n {{ .Namespace }} describe {{ .InvolvedObject.Kind | lower }} {{ .InvolvedObject.Name }}` · `kubectl -n {{ .Namespace }} logs {{ .InvolvedObject.Name }} --tail=50`\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"event-exporter-cfg","namespace":"monitoring"}}
+        {"apiVersion":"v1","data":{"config.yaml":"logLevel: info\nlogFormat: json\nmaxEventAgeSeconds: 600\nomitLookup: true\nroute:\n  match:\n    - receiver: \"ai\"\n      type: \"Warning\"\nreceivers:\n  - name: \"ai\"\n    webhook:\n      endpoint: \"http://ai-enricher.ai-enricher.svc.cluster.local:8080/classify\"\n      headers:\n        Content-Type: application/json\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"event-exporter-cfg","namespace":"monitoring"}}
     name: event-exporter-cfg
     namespace: monitoring
 - apiVersion: v1
@@ -3146,6 +3126,24 @@ items:
     namespace: monitoring
 - apiVersion: v1
   data:
+    ai-enricher-ai-enricher-rules-fbeda0a0-8f9a-4324-b40e-0c3d3b640260.yaml: |
+      groups:
+      - name: ai-enricher
+        rules:
+        - alert: AIEnricherCircuitOpen
+          annotations:
+            summary: ai-enricher circuit breaker is open (LLM disabled)
+          expr: ai_enricher_circuit_breaker_open == 1
+          for: 5m
+          labels:
+            severity: warning
+        - alert: AIEnricherBudgetExhausted
+          annotations:
+            summary: ai-enricher hit LLM budget limit
+          expr: rate(ai_enricher_budget_exhausted_total[10m]) > 0
+          for: 10m
+          labels:
+            severity: warning
     event-exporter-event-exporter-warnings-caa5041f-edf4-4661-b287-ba9f5cc7451b.yaml: |
       groups:
       - name: kubernetes-warning-events

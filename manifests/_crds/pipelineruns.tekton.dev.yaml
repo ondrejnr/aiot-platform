@@ -925,6 +925,316 @@ items:
   kind: PipelineRun
   metadata:
     annotations:
+      appstudio.openshift.io/snapshot: hello-aiot-20260424-052512-000
+      appstudio.openshift.io/snapshots: hello-aiot-20260424-052512-000
+      chains.tekton.dev/signed: "true"
+      pipelinesascode.tekton.dev/branch: refs/heads/main
+      pipelinesascode.tekton.dev/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pipelinesascode.tekton.dev/event-type: push
+      pipelinesascode.tekton.dev/execution-order: default-tenant/hello-aiot-frontend-push-hsfr9
+      pipelinesascode.tekton.dev/git-auth-secret: pac-gitauth-vxwonw
+      pipelinesascode.tekton.dev/git-provider: gitea
+      pipelinesascode.tekton.dev/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-frontend-push-hsfr9
+      pipelinesascode.tekton.dev/max-keep-runs: "5"
+      pipelinesascode.tekton.dev/on-event: '[push]'
+      pipelinesascode.tekton.dev/on-target-branch: '[main]'
+      pipelinesascode.tekton.dev/original-prname: hello-aiot-frontend-push
+      pipelinesascode.tekton.dev/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pipelinesascode.tekton.dev/repository: hello-aiot-frontend
+      pipelinesascode.tekton.dev/scm-reporting-plr-started: "true"
+      pipelinesascode.tekton.dev/sender: admin
+      pipelinesascode.tekton.dev/sha: 06274a33272a899952c3597102471ad66e01729a
+      pipelinesascode.tekton.dev/sha-title: |
+        rollback demo: only frontend change
+      pipelinesascode.tekton.dev/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend/commit/06274a33272a899952c3597102471ad66e01729a
+      pipelinesascode.tekton.dev/source-branch: refs/heads/main
+      pipelinesascode.tekton.dev/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pipelinesascode.tekton.dev/state: completed
+      pipelinesascode.tekton.dev/url-org: aiot
+      pipelinesascode.tekton.dev/url-repository: hello-aiot-frontend
+      results.tekton.dev/record: default-tenant/results/345628c4-7711-46f4-86e2-15cb8e94db0a/records/345628c4-7711-46f4-86e2-15cb8e94db0a
+      results.tekton.dev/recordSummaryAnnotations: '{"repo":"hello-aiot-frontend","commit":"06274a33272a899952c3597102471ad66e01729a","eventType":"push"}'
+      results.tekton.dev/result: default-tenant/results/345628c4-7711-46f4-86e2-15cb8e94db0a
+      results.tekton.dev/stored: "true"
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-24T05:26:33Z"}'
+      test.appstudio.openshift.io/create-snapshot-status: '{"message":"Sucessfully
+        created snapshot. See annotation appstudio.openshift.io/snapshot for name","status":"success"}'
+    finalizers:
+    - pipelinesascode.tekton.dev/finalizer
+    - chains.tekton.dev/pipelinerun
+    - results.tekton.dev/pipelinerun
+    generateName: hello-aiot-frontend-push-
+    labels:
+      app.kubernetes.io/managed-by: pipelinesascode.tekton.dev
+      app.kubernetes.io/version: v0.42.0
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/component: hello-aiot-frontend
+      pipelines.appstudio.openshift.io/type: build
+      pipelinesascode.tekton.dev/event-type: push
+      pipelinesascode.tekton.dev/original-prname: hello-aiot-frontend-push
+      pipelinesascode.tekton.dev/repository: hello-aiot-frontend
+      pipelinesascode.tekton.dev/sha: 06274a33272a899952c3597102471ad66e01729a
+      pipelinesascode.tekton.dev/state: completed
+      pipelinesascode.tekton.dev/url-org: aiot
+      pipelinesascode.tekton.dev/url-repository: hello-aiot-frontend
+      tekton.dev/pipeline: hello-aiot-frontend-push-hsfr9
+    name: hello-aiot-frontend-push-hsfr9
+    namespace: default-tenant
+  spec:
+    params:
+    - name: repo-url
+      value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+    - name: revision
+      value: 06274a33272a899952c3597102471ad66e01729a
+    - name: image
+      value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend
+    - name: tag
+      value: 06274a33272a899952c3597102471ad66e01729a
+    pipelineSpec:
+      params:
+      - name: repo-url
+        type: string
+      - name: revision
+        type: string
+      - name: image
+        type: string
+      - name: tag
+        type: string
+      results:
+      - description: ""
+        name: IMAGE_URL
+        value: $(tasks.build-and-push.results.IMAGE_URL)
+      - description: ""
+        name: IMAGE_DIGEST
+        value: $(tasks.build-and-push.results.IMAGE_DIGEST)
+      - description: ""
+        name: CHAINS-GIT_URL
+        value: $(tasks.build-and-push.results.CHAINS-GIT_URL)
+      - description: ""
+        name: CHAINS-GIT_COMMIT
+        value: $(tasks.build-and-push.results.CHAINS-GIT_COMMIT)
+      tasks:
+      - name: build-and-push
+        params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: image
+          value: $(params.image)
+        - name: tag
+          value: $(params.tag)
+        taskSpec:
+          metadata: {}
+          params:
+          - name: repo-url
+            type: string
+          - name: revision
+            type: string
+          - name: image
+            type: string
+          - name: tag
+            type: string
+          results:
+          - name: IMAGE_URL
+            type: string
+          - name: IMAGE_DIGEST
+            type: string
+          - name: CHAINS-GIT_URL
+            type: string
+          - name: CHAINS-GIT_COMMIT
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: alpine/git:2.45.2
+            name: clone
+            script: |
+              #!/bin/sh
+              set -e
+              URL="$(params.repo-url)"
+              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
+              git clone "$CLUSTER_URL" src
+              cd src
+              git checkout "$(params.revision)"
+              printf '%s' "$URL" > $(results.CHAINS-GIT_URL.path)
+              printf '%s' "$(params.revision)" > $(results.CHAINS-GIT_COMMIT.path)
+            workingDir: $(workspaces.source.path)
+          - computeResources: {}
+            image: quay.io/buildah/stable:v1.38
+            name: buildah
+            script: |
+              #!/usr/bin/env bash
+              set -euo pipefail
+              IMAGE="$(params.image):$(params.tag)"
+              LATEST="$(params.image):latest"
+              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
+              buildah push --storage-driver=vfs --tls-verify=false --digestfile /tmp/digest "$IMAGE"
+              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
+              DIGEST=$(cat /tmp/digest)
+              printf '%s' "$IMAGE" > $(results.IMAGE_URL.path)
+              printf '%s' "$DIGEST" > $(results.IMAGE_DIGEST.path)
+            securityContext:
+              privileged: true
+            workingDir: $(workspaces.source.path)/src
+          workspaces:
+          - name: source
+        workspaces:
+        - name: source
+          workspace: source
+      workspaces:
+      - name: source
+    taskRunTemplate:
+      podTemplate:
+        nodeSelector:
+          workload-zone: build
+      serviceAccountName: default
+    timeouts:
+      pipeline: 1h0m0s
+    workspaces:
+    - name: source
+      volumeClaimTemplate:
+        metadata: {}
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+        status: {}
+  status:
+    childReferences:
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: hello-aiot-frontend-push-hsfr9-build-and-push
+      pipelineTaskName: build-and-push
+    completionTime: "2026-04-24T05:26:29Z"
+    conditions:
+    - lastTransitionTime: "2026-04-24T05:26:29Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    pipelineSpec:
+      params:
+      - name: repo-url
+        type: string
+      - name: revision
+        type: string
+      - name: image
+        type: string
+      - name: tag
+        type: string
+      results:
+      - description: ""
+        name: IMAGE_URL
+        value: $(tasks.build-and-push.results.IMAGE_URL)
+      - description: ""
+        name: IMAGE_DIGEST
+        value: $(tasks.build-and-push.results.IMAGE_DIGEST)
+      - description: ""
+        name: CHAINS-GIT_URL
+        value: $(tasks.build-and-push.results.CHAINS-GIT_URL)
+      - description: ""
+        name: CHAINS-GIT_COMMIT
+        value: $(tasks.build-and-push.results.CHAINS-GIT_COMMIT)
+      tasks:
+      - name: build-and-push
+        params:
+        - name: repo-url
+          value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+        - name: revision
+          value: 06274a33272a899952c3597102471ad66e01729a
+        - name: image
+          value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend
+        - name: tag
+          value: 06274a33272a899952c3597102471ad66e01729a
+        taskSpec:
+          metadata: {}
+          params:
+          - name: repo-url
+            type: string
+          - name: revision
+            type: string
+          - name: image
+            type: string
+          - name: tag
+            type: string
+          results:
+          - name: IMAGE_URL
+            type: string
+          - name: IMAGE_DIGEST
+            type: string
+          - name: CHAINS-GIT_URL
+            type: string
+          - name: CHAINS-GIT_COMMIT
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: alpine/git:2.45.2
+            name: clone
+            script: |
+              #!/bin/sh
+              set -e
+              URL="https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend"
+              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
+              git clone "$CLUSTER_URL" src
+              cd src
+              git checkout "06274a33272a899952c3597102471ad66e01729a"
+              printf '%s' "$URL" > $(results.CHAINS-GIT_URL.path)
+              printf '%s' "06274a33272a899952c3597102471ad66e01729a" > $(results.CHAINS-GIT_COMMIT.path)
+            workingDir: $(workspaces.source.path)
+          - computeResources: {}
+            image: quay.io/buildah/stable:v1.38
+            name: buildah
+            script: |
+              #!/usr/bin/env bash
+              set -euo pipefail
+              IMAGE="internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend:06274a33272a899952c3597102471ad66e01729a"
+              LATEST="internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend:latest"
+              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
+              buildah push --storage-driver=vfs --tls-verify=false --digestfile /tmp/digest "$IMAGE"
+              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
+              DIGEST=$(cat /tmp/digest)
+              printf '%s' "$IMAGE" > $(results.IMAGE_URL.path)
+              printf '%s' "$DIGEST" > $(results.IMAGE_DIGEST.path)
+            securityContext:
+              privileged: true
+            workingDir: $(workspaces.source.path)/src
+          workspaces:
+          - name: source
+        workspaces:
+        - name: source
+          workspace: source
+      workspaces:
+      - name: source
+    provenance:
+      featureFlags:
+        awaitSidecarReadiness: true
+        coschedule: workspaces
+        enableAPIFields: beta
+        enableProvenanceInStatus: true
+        enforceNonfalsifiability: none
+        maxResultSize: 4096
+        resultExtractionMethod: termination-message
+        runningInEnvWithInjectedSidecars: true
+        verificationNoMatchPolicy: ignore
+    results:
+    - name: IMAGE_URL
+      value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend:06274a33272a899952c3597102471ad66e01729a
+    - name: IMAGE_DIGEST
+      value: sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9
+    - name: CHAINS-GIT_URL
+      value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+    - name: CHAINS-GIT_COMMIT
+      value: 06274a33272a899952c3597102471ad66e01729a
+    startTime: "2026-04-24T05:25:12Z"
+- apiVersion: tekton.dev/v1
+  kind: PipelineRun
+  metadata:
+    annotations:
       appstudio.openshift.io/snapshot: hello-aiot-20260423-094402-000
       appstudio.openshift.io/snapshots: hello-aiot-20260423-094402-000
       chains.tekton.dev/signed: "true"
@@ -1551,16 +1861,17 @@ items:
   kind: PipelineRun
   metadata:
     annotations:
-      appstudio.openshift.io/snapshot: hello-aiot-20260423-055051-000
-      appstudio.openshift.io/snapshots: hello-aiot-20260423-055051-000
+      appstudio.openshift.io/snapshot: hello-aiot-20260424-140752-000
+      appstudio.openshift.io/snapshots: hello-aiot-20260424-140752-000
       chains.tekton.dev/signed: "true"
       pipelinesascode.tekton.dev/branch: refs/heads/main
       pipelinesascode.tekton.dev/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
         "gRepo": "pipelines-as-code"}'
       pipelinesascode.tekton.dev/event-type: push
-      pipelinesascode.tekton.dev/git-auth-secret: pac-gitauth-nhvaam
+      pipelinesascode.tekton.dev/execution-order: default-tenant/hello-aiot-push-vpddp
+      pipelinesascode.tekton.dev/git-auth-secret: pac-gitauth-rnjgrl
       pipelinesascode.tekton.dev/git-provider: gitea
-      pipelinesascode.tekton.dev/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-pfs4p
+      pipelinesascode.tekton.dev/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-push-vpddp
       pipelinesascode.tekton.dev/max-keep-runs: "5"
       pipelinesascode.tekton.dev/on-event: '[push]'
       pipelinesascode.tekton.dev/on-target-branch: '[main]'
@@ -1569,26 +1880,26 @@ items:
       pipelinesascode.tekton.dev/repository: hello-aiot
       pipelinesascode.tekton.dev/scm-reporting-plr-started: "true"
       pipelinesascode.tekton.dev/sender: admin
-      pipelinesascode.tekton.dev/sha: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      pipelinesascode.tekton.dev/sha: 047105e6800d5bd3ab93e913068b89ee1bb10d56
       pipelinesascode.tekton.dev/sha-title: |
-        chore: e2e auto-release test 1776923447
-      pipelinesascode.tekton.dev/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+        fix: use port-less registry hostname so snapshot.containerImage parser is not confused by host:port
+      pipelinesascode.tekton.dev/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/047105e6800d5bd3ab93e913068b89ee1bb10d56
       pipelinesascode.tekton.dev/source-branch: refs/heads/main
       pipelinesascode.tekton.dev/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
       pipelinesascode.tekton.dev/state: completed
       pipelinesascode.tekton.dev/url-org: aiot
       pipelinesascode.tekton.dev/url-repository: hello-aiot
-      results.tekton.dev/record: default-tenant/results/7d62233b-0002-4c9f-9ebd-588d6ed47f2f/records/7d62233b-0002-4c9f-9ebd-588d6ed47f2f
-      results.tekton.dev/recordSummaryAnnotations: '{"repo":"hello-aiot","commit":"cd6ee3ffd96b3542d398183fbbecd4b34b028cbc","eventType":"push"}'
-      results.tekton.dev/result: default-tenant/results/7d62233b-0002-4c9f-9ebd-588d6ed47f2f
+      results.tekton.dev/record: default-tenant/results/8455011b-3bcf-4e48-9016-4065e0c1e81e/records/8455011b-3bcf-4e48-9016-4065e0c1e81e
+      results.tekton.dev/recordSummaryAnnotations: '{"repo":"hello-aiot","commit":"047105e6800d5bd3ab93e913068b89ee1bb10d56","eventType":"push"}'
+      results.tekton.dev/result: default-tenant/results/8455011b-3bcf-4e48-9016-4065e0c1e81e
       results.tekton.dev/stored: "true"
-      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T05:52:21Z"}'
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-24T14:09:29Z"}'
       test.appstudio.openshift.io/create-snapshot-status: '{"message":"Sucessfully
         created snapshot. See annotation appstudio.openshift.io/snapshot for name","status":"success"}'
     finalizers:
+    - results.tekton.dev/pipelinerun
     - chains.tekton.dev/pipelinerun
     - pipelinesascode.tekton.dev/finalizer
-    - results.tekton.dev/pipelinerun
     generateName: hello-aiot-push-
     labels:
       app.kubernetes.io/managed-by: pipelinesascode.tekton.dev
@@ -1599,23 +1910,23 @@ items:
       pipelinesascode.tekton.dev/event-type: push
       pipelinesascode.tekton.dev/original-prname: hello-aiot-push
       pipelinesascode.tekton.dev/repository: hello-aiot
-      pipelinesascode.tekton.dev/sha: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      pipelinesascode.tekton.dev/sha: 047105e6800d5bd3ab93e913068b89ee1bb10d56
       pipelinesascode.tekton.dev/state: completed
       pipelinesascode.tekton.dev/url-org: aiot
       pipelinesascode.tekton.dev/url-repository: hello-aiot
-      tekton.dev/pipeline: hello-aiot-push-pfs4p
-    name: hello-aiot-push-pfs4p
+      tekton.dev/pipeline: hello-aiot-push-vpddp
+    name: hello-aiot-push-vpddp
     namespace: default-tenant
   spec:
     params:
     - name: repo-url
       value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
     - name: revision
-      value: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      value: 047105e6800d5bd3ab93e913068b89ee1bb10d56
     - name: image
       value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot
     - name: tag
-      value: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      value: 047105e6800d5bd3ab93e913068b89ee1bb10d56
     pipelineSpec:
       params:
       - name: repo-url
@@ -1735,11 +2046,11 @@ items:
     childReferences:
     - apiVersion: tekton.dev/v1
       kind: TaskRun
-      name: hello-aiot-push-pfs4p-build-and-push
+      name: hello-aiot-push-vpddp-build-and-push
       pipelineTaskName: build-and-push
-    completionTime: "2026-04-23T05:52:18Z"
+    completionTime: "2026-04-24T14:09:25Z"
     conditions:
-    - lastTransitionTime: "2026-04-23T05:52:18Z"
+    - lastTransitionTime: "2026-04-24T14:09:25Z"
       message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
       reason: Succeeded
       status: "True"
@@ -1773,11 +2084,11 @@ items:
         - name: repo-url
           value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
         - name: revision
-          value: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+          value: 047105e6800d5bd3ab93e913068b89ee1bb10d56
         - name: image
           value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot
         - name: tag
-          value: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+          value: 047105e6800d5bd3ab93e913068b89ee1bb10d56
         taskSpec:
           metadata: {}
           params:
@@ -1811,10 +2122,10 @@ items:
               echo "cloning $CLUSTER_URL"
               git clone "$CLUSTER_URL" src
               cd src
-              git checkout "cd6ee3ffd96b3542d398183fbbecd4b34b028cbc"
+              git checkout "047105e6800d5bd3ab93e913068b89ee1bb10d56"
               git log -1 --oneline
               printf '%s' "$URL" > $(results.CHAINS-GIT_URL.path)
-              printf '%s' "cd6ee3ffd96b3542d398183fbbecd4b34b028cbc" > $(results.CHAINS-GIT_COMMIT.path)
+              printf '%s' "047105e6800d5bd3ab93e913068b89ee1bb10d56" > $(results.CHAINS-GIT_COMMIT.path)
             workingDir: $(workspaces.source.path)
           - computeResources: {}
             image: quay.io/buildah/stable:v1.38
@@ -1822,7 +2133,7 @@ items:
             script: |
               #!/usr/bin/env bash
               set -euo pipefail
-              IMAGE="internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot:cd6ee3ffd96b3542d398183fbbecd4b34b028cbc"
+              IMAGE="internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot:047105e6800d5bd3ab93e913068b89ee1bb10d56"
               LATEST="internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot:latest"
               buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
               buildah push --storage-driver=vfs --tls-verify=false --digestfile /tmp/digest "$IMAGE"
@@ -1854,495 +2165,14 @@ items:
         verificationNoMatchPolicy: ignore
     results:
     - name: IMAGE_URL
-      value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot:cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot:047105e6800d5bd3ab93e913068b89ee1bb10d56
     - name: IMAGE_DIGEST
-      value: sha256:bdaee90a46ea1c78dff75cb6dcd361cd1d8c6fd1db4e8114f4910fd4ed4aad97
+      value: sha256:67eb960d0b37eb57f6a1e9277f703c1d963f793ff347e601dded21dbfa6e72f0
     - name: CHAINS-GIT_URL
       value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
     - name: CHAINS-GIT_COMMIT
-      value: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
-    startTime: "2026-04-23T05:50:51Z"
-- apiVersion: tekton.dev/v1
-  kind: PipelineRun
-  metadata:
-    annotations:
-      appstudio.openshift.io/snapshot: hello-aiot-20260423-071953-000
-      appstudio.openshift.io/snapshots: hello-aiot-20260423-071953-000
-      chains.tekton.dev/signed: "true"
-      pipelinesascode.tekton.dev/branch: refs/heads/main
-      pipelinesascode.tekton.dev/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
-        "gRepo": "pipelines-as-code"}'
-      pipelinesascode.tekton.dev/event-type: push
-      pipelinesascode.tekton.dev/execution-order: default-tenant/hello-aiot-push-w9b6d
-      pipelinesascode.tekton.dev/git-auth-secret: pac-gitauth-egxkuy
-      pipelinesascode.tekton.dev/git-provider: gitea
-      pipelinesascode.tekton.dev/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-push-w9b6d
-      pipelinesascode.tekton.dev/max-keep-runs: "5"
-      pipelinesascode.tekton.dev/on-event: '[push]'
-      pipelinesascode.tekton.dev/on-target-branch: '[main]'
-      pipelinesascode.tekton.dev/original-prname: hello-aiot-push
-      pipelinesascode.tekton.dev/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      pipelinesascode.tekton.dev/repository: hello-aiot
-      pipelinesascode.tekton.dev/scm-reporting-plr-started: "true"
-      pipelinesascode.tekton.dev/sender: admin
-      pipelinesascode.tekton.dev/sha: 2ff6059f7196209f85d3232be2cb07b5acaee11d
-      pipelinesascode.tekton.dev/sha-title: |
-        chore: e2e auto-release test 1776928787
-      pipelinesascode.tekton.dev/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/2ff6059f7196209f85d3232be2cb07b5acaee11d
-      pipelinesascode.tekton.dev/source-branch: refs/heads/main
-      pipelinesascode.tekton.dev/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      pipelinesascode.tekton.dev/state: completed
-      pipelinesascode.tekton.dev/url-org: aiot
-      pipelinesascode.tekton.dev/url-repository: hello-aiot
-      results.tekton.dev/record: default-tenant/results/576dfb42-3eec-4d55-bc63-4d26f0124b8f/records/576dfb42-3eec-4d55-bc63-4d26f0124b8f
-      results.tekton.dev/recordSummaryAnnotations: '{"repo":"hello-aiot","commit":"2ff6059f7196209f85d3232be2cb07b5acaee11d","eventType":"push"}'
-      results.tekton.dev/result: default-tenant/results/576dfb42-3eec-4d55-bc63-4d26f0124b8f
-      results.tekton.dev/stored: "true"
-      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T07:21:26Z"}'
-      test.appstudio.openshift.io/create-snapshot-status: '{"message":"Sucessfully
-        created snapshot. See annotation appstudio.openshift.io/snapshot for name","status":"success"}'
-    finalizers:
-    - pipelinesascode.tekton.dev/finalizer
-    - chains.tekton.dev/pipelinerun
-    - results.tekton.dev/pipelinerun
-    generateName: hello-aiot-push-
-    labels:
-      app.kubernetes.io/managed-by: pipelinesascode.tekton.dev
-      app.kubernetes.io/version: v0.42.0
-      appstudio.openshift.io/application: hello-aiot
-      appstudio.openshift.io/component: hello-aiot
-      pipelines.appstudio.openshift.io/type: build
-      pipelinesascode.tekton.dev/event-type: push
-      pipelinesascode.tekton.dev/original-prname: hello-aiot-push
-      pipelinesascode.tekton.dev/repository: hello-aiot
-      pipelinesascode.tekton.dev/sha: 2ff6059f7196209f85d3232be2cb07b5acaee11d
-      pipelinesascode.tekton.dev/state: completed
-      pipelinesascode.tekton.dev/url-org: aiot
-      pipelinesascode.tekton.dev/url-repository: hello-aiot
-      tekton.dev/pipeline: hello-aiot-push-w9b6d
-    name: hello-aiot-push-w9b6d
-    namespace: default-tenant
-  spec:
-    params:
-    - name: repo-url
-      value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-    - name: revision
-      value: 2ff6059f7196209f85d3232be2cb07b5acaee11d
-    - name: image
-      value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot
-    - name: tag
-      value: 2ff6059f7196209f85d3232be2cb07b5acaee11d
-    pipelineSpec:
-      params:
-      - name: repo-url
-        type: string
-      - name: revision
-        type: string
-      - name: image
-        type: string
-      - name: tag
-        type: string
-      results:
-      - description: ""
-        name: IMAGE_URL
-        value: $(tasks.build-and-push.results.IMAGE_URL)
-      - description: ""
-        name: IMAGE_DIGEST
-        value: $(tasks.build-and-push.results.IMAGE_DIGEST)
-      - description: ""
-        name: CHAINS-GIT_URL
-        value: $(tasks.build-and-push.results.CHAINS-GIT_URL)
-      - description: ""
-        name: CHAINS-GIT_COMMIT
-        value: $(tasks.build-and-push.results.CHAINS-GIT_COMMIT)
-      tasks:
-      - name: build-and-push
-        params:
-        - name: repo-url
-          value: $(params.repo-url)
-        - name: revision
-          value: $(params.revision)
-        - name: image
-          value: $(params.image)
-        - name: tag
-          value: $(params.tag)
-        taskSpec:
-          metadata: {}
-          params:
-          - name: repo-url
-            type: string
-          - name: revision
-            type: string
-          - name: image
-            type: string
-          - name: tag
-            type: string
-          results:
-          - name: IMAGE_URL
-            type: string
-          - name: IMAGE_DIGEST
-            type: string
-          - name: CHAINS-GIT_URL
-            type: string
-          - name: CHAINS-GIT_COMMIT
-            type: string
-          spec: null
-          steps:
-          - computeResources: {}
-            image: alpine/git:2.45.2
-            name: clone
-            script: |
-              #!/bin/sh
-              set -e
-              URL="$(params.repo-url)"
-              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
-              echo "cloning $CLUSTER_URL"
-              git clone "$CLUSTER_URL" src
-              cd src
-              git checkout "$(params.revision)"
-              git log -1 --oneline
-              printf '%s' "$URL" > $(results.CHAINS-GIT_URL.path)
-              printf '%s' "$(params.revision)" > $(results.CHAINS-GIT_COMMIT.path)
-            workingDir: $(workspaces.source.path)
-          - computeResources: {}
-            image: quay.io/buildah/stable:v1.38
-            name: buildah
-            script: |
-              #!/usr/bin/env bash
-              set -euo pipefail
-              IMAGE="$(params.image):$(params.tag)"
-              LATEST="$(params.image):latest"
-              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
-              buildah push --storage-driver=vfs --tls-verify=false --digestfile /tmp/digest "$IMAGE"
-              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
-              DIGEST=$(cat /tmp/digest)
-              echo "pushed $IMAGE@$DIGEST"
-              printf '%s' "$IMAGE" > $(results.IMAGE_URL.path)
-              printf '%s' "$DIGEST" > $(results.IMAGE_DIGEST.path)
-            securityContext:
-              privileged: true
-            workingDir: $(workspaces.source.path)/src
-          workspaces:
-          - name: source
-        workspaces:
-        - name: source
-          workspace: source
-      workspaces:
-      - name: source
-    taskRunTemplate:
-      podTemplate:
-        nodeSelector:
-          workload-zone: build
-      serviceAccountName: default
-    timeouts:
-      pipeline: 1h0m0s
-    workspaces:
-    - name: source
-      volumeClaimTemplate:
-        metadata: {}
-        spec:
-          accessModes:
-          - ReadWriteOnce
-          resources:
-            requests:
-              storage: 2Gi
-        status: {}
-  status:
-    childReferences:
-    - apiVersion: tekton.dev/v1
-      kind: TaskRun
-      name: hello-aiot-push-w9b6d-build-and-push
-      pipelineTaskName: build-and-push
-    completionTime: "2026-04-23T07:21:21Z"
-    conditions:
-    - lastTransitionTime: "2026-04-23T07:21:21Z"
-      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
-      reason: Succeeded
-      status: "True"
-      type: Succeeded
-    pipelineSpec:
-      params:
-      - name: repo-url
-        type: string
-      - name: revision
-        type: string
-      - name: image
-        type: string
-      - name: tag
-        type: string
-      results:
-      - description: ""
-        name: IMAGE_URL
-        value: $(tasks.build-and-push.results.IMAGE_URL)
-      - description: ""
-        name: IMAGE_DIGEST
-        value: $(tasks.build-and-push.results.IMAGE_DIGEST)
-      - description: ""
-        name: CHAINS-GIT_URL
-        value: $(tasks.build-and-push.results.CHAINS-GIT_URL)
-      - description: ""
-        name: CHAINS-GIT_COMMIT
-        value: $(tasks.build-and-push.results.CHAINS-GIT_COMMIT)
-      tasks:
-      - name: build-and-push
-        params:
-        - name: repo-url
-          value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-        - name: revision
-          value: 2ff6059f7196209f85d3232be2cb07b5acaee11d
-        - name: image
-          value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot
-        - name: tag
-          value: 2ff6059f7196209f85d3232be2cb07b5acaee11d
-        taskSpec:
-          metadata: {}
-          params:
-          - name: repo-url
-            type: string
-          - name: revision
-            type: string
-          - name: image
-            type: string
-          - name: tag
-            type: string
-          results:
-          - name: IMAGE_URL
-            type: string
-          - name: IMAGE_DIGEST
-            type: string
-          - name: CHAINS-GIT_URL
-            type: string
-          - name: CHAINS-GIT_COMMIT
-            type: string
-          spec: null
-          steps:
-          - computeResources: {}
-            image: alpine/git:2.45.2
-            name: clone
-            script: |
-              #!/bin/sh
-              set -e
-              URL="https://gitea.35.241.255.137.nip.io/aiot/hello-aiot"
-              CLUSTER_URL=$(echo "$URL" | sed 's|https://gitea.35.241.255.137.nip.io|http://gitea.gitea.svc.cluster.local:3000|')
-              echo "cloning $CLUSTER_URL"
-              git clone "$CLUSTER_URL" src
-              cd src
-              git checkout "2ff6059f7196209f85d3232be2cb07b5acaee11d"
-              git log -1 --oneline
-              printf '%s' "$URL" > $(results.CHAINS-GIT_URL.path)
-              printf '%s' "2ff6059f7196209f85d3232be2cb07b5acaee11d" > $(results.CHAINS-GIT_COMMIT.path)
-            workingDir: $(workspaces.source.path)
-          - computeResources: {}
-            image: quay.io/buildah/stable:v1.38
-            name: buildah
-            script: |
-              #!/usr/bin/env bash
-              set -euo pipefail
-              IMAGE="internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot:2ff6059f7196209f85d3232be2cb07b5acaee11d"
-              LATEST="internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot:latest"
-              buildah bud --isolation=chroot --storage-driver=vfs -t "$IMAGE" -t "$LATEST" .
-              buildah push --storage-driver=vfs --tls-verify=false --digestfile /tmp/digest "$IMAGE"
-              buildah push --storage-driver=vfs --tls-verify=false "$LATEST"
-              DIGEST=$(cat /tmp/digest)
-              echo "pushed $IMAGE@$DIGEST"
-              printf '%s' "$IMAGE" > $(results.IMAGE_URL.path)
-              printf '%s' "$DIGEST" > $(results.IMAGE_DIGEST.path)
-            securityContext:
-              privileged: true
-            workingDir: $(workspaces.source.path)/src
-          workspaces:
-          - name: source
-        workspaces:
-        - name: source
-          workspace: source
-      workspaces:
-      - name: source
-    provenance:
-      featureFlags:
-        awaitSidecarReadiness: true
-        coschedule: workspaces
-        enableAPIFields: beta
-        enableProvenanceInStatus: true
-        enforceNonfalsifiability: none
-        maxResultSize: 4096
-        resultExtractionMethod: termination-message
-        runningInEnvWithInjectedSidecars: true
-        verificationNoMatchPolicy: ignore
-    results:
-    - name: IMAGE_URL
-      value: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot:2ff6059f7196209f85d3232be2cb07b5acaee11d
-    - name: IMAGE_DIGEST
-      value: sha256:cc4a696f3c9bf35394c48fcb87c06245f0ba3cacdaa6fecd6387505eb6a9183f
-    - name: CHAINS-GIT_URL
-      value: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-    - name: CHAINS-GIT_COMMIT
-      value: 2ff6059f7196209f85d3232be2cb07b5acaee11d
-    startTime: "2026-04-23T07:19:53Z"
-- apiVersion: tekton.dev/v1
-  kind: PipelineRun
-  metadata:
-    annotations:
-      chains.tekton.dev/signed: "true"
-      pac.test.appstudio.openshift.io/branch: refs/heads/main
-      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
-        "gRepo": "pipelines-as-code"}'
-      pac.test.appstudio.openshift.io/event-type: push
-      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-push-w9b6d
-      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-egxkuy
-      pac.test.appstudio.openshift.io/git-provider: gitea
-      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/pipelinerun/hello-aiot-smoke-2z25m
-      pac.test.appstudio.openshift.io/max-keep-runs: "5"
-      pac.test.appstudio.openshift.io/on-event: '[push]'
-      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
-      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
-      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      pac.test.appstudio.openshift.io/repository: hello-aiot
-      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
-      pac.test.appstudio.openshift.io/sender: admin
-      pac.test.appstudio.openshift.io/sha: 2ff6059f7196209f85d3232be2cb07b5acaee11d
-      pac.test.appstudio.openshift.io/sha-title: |
-        chore: e2e auto-release test 1776928787
-      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/2ff6059f7196209f85d3232be2cb07b5acaee11d
-      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
-      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      pac.test.appstudio.openshift.io/state: completed
-      pac.test.appstudio.openshift.io/url-org: aiot
-      pac.test.appstudio.openshift.io/url-repository: hello-aiot
-      results.tekton.dev/childReadyForDeletion: "true"
-      results.tekton.dev/record: default-tenant/results/51b3ec38-f8bf-49a9-92f8-85694ea005db/records/51b3ec38-f8bf-49a9-92f8-85694ea005db
-      results.tekton.dev/result: default-tenant/results/51b3ec38-f8bf-49a9-92f8-85694ea005db
-      results.tekton.dev/stored: "true"
-      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T07:21:26Z"}'
-      test.appstudio.openshift.io/integration-workflow: push
-      test.appstudio.openshift.io/pipelinerunstarttime: "1776928793000"
-      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"Pending","lastUpdateTime":"2026-04-23T07:21:26.545205116Z","details":"Pending"}]'
-    finalizers:
-    - chains.tekton.dev/pipelinerun
-    - results.tekton.dev/pipelinerun
-    generateName: hello-aiot-smoke-
-    labels:
-      appstudio.openshift.io/application: hello-aiot
-      appstudio.openshift.io/component: hello-aiot
-      appstudio.openshift.io/snapshot: hello-aiot-20260423-071953-000
-      pac.test.appstudio.openshift.io/event-type: push
-      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
-      pac.test.appstudio.openshift.io/repository: hello-aiot
-      pac.test.appstudio.openshift.io/sha: 2ff6059f7196209f85d3232be2cb07b5acaee11d
-      pac.test.appstudio.openshift.io/state: completed
-      pac.test.appstudio.openshift.io/url-org: aiot
-      pac.test.appstudio.openshift.io/url-repository: hello-aiot
-      pipelines.appstudio.openshift.io/type: test
-      tekton.dev/pipeline: integration-smoke-test
-      test.appstudio.openshift.io/pipelinerunfinishtime: "1776928881"
-      test.appstudio.openshift.io/scenario: hello-aiot-smoke
-      test.appstudio.openshift.io/type: component
-    name: hello-aiot-smoke-2z25m
-    namespace: default-tenant
-    ownerReferences:
-    - apiVersion: appstudio.redhat.com/v1alpha1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Snapshot
-      name: hello-aiot-20260423-071953-000
-  spec:
-    params:
-    - name: SNAPSHOT
-      value: '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:cc4a696f3c9bf35394c48fcb87c06245f0ba3cacdaa6fecd6387505eb6a9183f","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"2ff6059f7196209f85d3232be2cb07b5acaee11d"}}}],"artifacts":{}}'
-    pipelineRef:
-      params:
-      - name: kind
-        value: pipeline
-      - name: name
-        value: integration-smoke-test
-      - name: namespace
-        value: default-tenant
-      resolver: cluster
-    taskRunTemplate:
-      podTemplate:
-        nodeSelector:
-          workload-zone: build
-      serviceAccountName: konflux-integration-runner
-    timeouts:
-      pipeline: 1h0m0s
-  status:
-    childReferences:
-    - apiVersion: tekton.dev/v1
-      kind: TaskRun
-      name: hello-aiot-smoke-2z25m-inspect-images
-      pipelineTaskName: inspect-images
-    completionTime: "2026-04-23T07:22:40Z"
-    conditions:
-    - lastTransitionTime: "2026-04-23T07:22:40Z"
-      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
-      reason: Succeeded
-      status: "True"
-      type: Succeeded
-    pipelineSpec:
-      params:
-      - description: AppStudio snapshot JSON (auto-injected by integration-service)
-        name: SNAPSHOT
-        type: string
-      tasks:
-      - name: inspect-images
-        params:
-        - name: SNAPSHOT
-          value: '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:cc4a696f3c9bf35394c48fcb87c06245f0ba3cacdaa6fecd6387505eb6a9183f","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"2ff6059f7196209f85d3232be2cb07b5acaee11d"}}}],"artifacts":{}}'
-        taskSpec:
-          metadata: {}
-          params:
-          - name: SNAPSHOT
-            type: string
-          results:
-          - description: Test result in Konflux TEST_OUTPUT format
-            name: TEST_OUTPUT
-            type: string
-          spec: null
-          steps:
-          - computeResources: {}
-            image: quay.io/skopeo/stable:latest
-            name: inspect
-            script: |
-              #!/bin/bash
-              set -uo pipefail
-              command -v jq >/dev/null 2>&1 || (microdnf install -y jq >/dev/null 2>&1 || dnf install -y jq -q >/dev/null 2>&1 || true)
-              echo '=== Snapshot received ==='
-              echo '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:cc4a696f3c9bf35394c48fcb87c06245f0ba3cacdaa6fecd6387505eb6a9183f","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"2ff6059f7196209f85d3232be2cb07b5acaee11d"}}}],"artifacts":{}}' | jq .
-              echo '=== Inspecting images ==='
-              FAIL=0
-              SUCC=0
-              for img in $(echo '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:cc4a696f3c9bf35394c48fcb87c06245f0ba3cacdaa6fecd6387505eb6a9183f","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"2ff6059f7196209f85d3232be2cb07b5acaee11d"}}}],"artifacts":{}}' | jq -r '.components[].containerImage'); do
-                norm=$(echo "$img" | sed -E 's|^internal-registry\.registry\.svc\.cluster\.local(@\|/)|internal-registry.registry.svc.cluster.local:5000\1|')
-                echo "--- $norm ---"
-                if skopeo inspect --tls-verify=false "docker://${norm}" >/dev/null 2>&1; then
-                  echo "OK: $norm"
-                  SUCC=$((SUCC+1))
-                else
-                  echo "FAIL inspect (ignored in PoC): $norm"
-                  FAIL=$((FAIL+1))
-                fi
-              done
-              TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-              cat > "$(results.TEST_OUTPUT.path)" <<JSON
-              {"result":"SUCCESS","timestamp":"$TS","successes":$SUCC,"failures":$FAIL,"warnings":0,"note":"smoke test PoC: image inspect attempts, never fails build"}
-              JSON
-              echo 'Done'
-    provenance:
-      featureFlags:
-        awaitSidecarReadiness: true
-        coschedule: workspaces
-        enableAPIFields: beta
-        enableProvenanceInStatus: true
-        enforceNonfalsifiability: none
-        maxResultSize: 4096
-        resultExtractionMethod: termination-message
-        runningInEnvWithInjectedSidecars: true
-        verificationNoMatchPolicy: ignore
-      refSource:
-        digest:
-          sha256: 005ae3dec3cc96fefac4fb88d9fa409308e8c13a938ce9aa00cc100dc55c9c3a
-        uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/integration-smoke-test@6ffef512-5984-4ea6-9f22-d79fd7b0847e
-    startTime: "2026-04-23T07:21:26Z"
+      value: 047105e6800d5bd3ab93e913068b89ee1bb10d56
+    startTime: "2026-04-24T14:07:52Z"
 - apiVersion: tekton.dev/v1
   kind: PipelineRun
   metadata:
@@ -3015,9 +2845,10 @@ items:
       pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
         "gRepo": "pipelines-as-code"}'
       pac.test.appstudio.openshift.io/event-type: push
-      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-nhvaam
+      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-push-vpddp
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-rnjgrl
       pac.test.appstudio.openshift.io/git-provider: gitea
-      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/pipelinerun/hello-aiot-smoke-mgnpc
+      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/pipelinerun/hello-aiot-smoke-hf9h7
       pac.test.appstudio.openshift.io/max-keep-runs: "5"
       pac.test.appstudio.openshift.io/on-event: '[push]'
       pac.test.appstudio.openshift.io/on-target-branch: '[main]'
@@ -3026,56 +2857,56 @@ items:
       pac.test.appstudio.openshift.io/repository: hello-aiot
       pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
       pac.test.appstudio.openshift.io/sender: admin
-      pac.test.appstudio.openshift.io/sha: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      pac.test.appstudio.openshift.io/sha: 047105e6800d5bd3ab93e913068b89ee1bb10d56
       pac.test.appstudio.openshift.io/sha-title: |
-        chore: e2e auto-release test 1776923447
-      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+        fix: use port-less registry hostname so snapshot.containerImage parser is not confused by host:port
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/047105e6800d5bd3ab93e913068b89ee1bb10d56
       pac.test.appstudio.openshift.io/source-branch: refs/heads/main
       pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
       pac.test.appstudio.openshift.io/state: completed
       pac.test.appstudio.openshift.io/url-org: aiot
       pac.test.appstudio.openshift.io/url-repository: hello-aiot
       results.tekton.dev/childReadyForDeletion: "true"
-      results.tekton.dev/record: default-tenant/results/a40cbb0e-3409-4304-94c2-7d50f3f18d64/records/a40cbb0e-3409-4304-94c2-7d50f3f18d64
-      results.tekton.dev/result: default-tenant/results/a40cbb0e-3409-4304-94c2-7d50f3f18d64
+      results.tekton.dev/record: default-tenant/results/c930e005-28a7-405a-b07b-74797c9c7dd8/records/c930e005-28a7-405a-b07b-74797c9c7dd8
+      results.tekton.dev/result: default-tenant/results/c930e005-28a7-405a-b07b-74797c9c7dd8
       results.tekton.dev/stored: "true"
-      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-23T05:52:21Z"}'
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-24T14:09:29Z"}'
       test.appstudio.openshift.io/integration-workflow: push
-      test.appstudio.openshift.io/pipelinerunstarttime: "1776923451000"
+      test.appstudio.openshift.io/pipelinerunstarttime: "1777039672000"
       test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"Pending","lastUpdateTime":"2026-04-23T05:52:21.553322973Z","details":"Pending"}]'
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"Pending","lastUpdateTime":"2026-04-24T14:09:30.087212989Z","details":"Pending"}]'
     finalizers:
-    - results.tekton.dev/pipelinerun
     - chains.tekton.dev/pipelinerun
+    - results.tekton.dev/pipelinerun
     generateName: hello-aiot-smoke-
     labels:
       appstudio.openshift.io/application: hello-aiot
       appstudio.openshift.io/component: hello-aiot
-      appstudio.openshift.io/snapshot: hello-aiot-20260423-055051-000
+      appstudio.openshift.io/snapshot: hello-aiot-20260424-140752-000
       pac.test.appstudio.openshift.io/event-type: push
       pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
       pac.test.appstudio.openshift.io/repository: hello-aiot
-      pac.test.appstudio.openshift.io/sha: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
+      pac.test.appstudio.openshift.io/sha: 047105e6800d5bd3ab93e913068b89ee1bb10d56
       pac.test.appstudio.openshift.io/state: completed
       pac.test.appstudio.openshift.io/url-org: aiot
       pac.test.appstudio.openshift.io/url-repository: hello-aiot
       pipelines.appstudio.openshift.io/type: test
       tekton.dev/pipeline: integration-smoke-test
-      test.appstudio.openshift.io/pipelinerunfinishtime: "1776923538"
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1777039765"
       test.appstudio.openshift.io/scenario: hello-aiot-smoke
       test.appstudio.openshift.io/type: component
-    name: hello-aiot-smoke-mgnpc
+    name: hello-aiot-smoke-hf9h7
     namespace: default-tenant
     ownerReferences:
     - apiVersion: appstudio.redhat.com/v1alpha1
       blockOwnerDeletion: true
       controller: true
       kind: Snapshot
-      name: hello-aiot-20260423-055051-000
+      name: hello-aiot-20260424-140752-000
   spec:
     params:
     - name: SNAPSHOT
-      value: '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:bdaee90a46ea1c78dff75cb6dcd361cd1d8c6fd1db4e8114f4910fd4ed4aad97","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"cd6ee3ffd96b3542d398183fbbecd4b34b028cbc"}}}],"artifacts":{}}'
+      value: '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot-backend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend","revision":"1b379d5682904b065dce66fcac339a5d7601683b","dockerfileUrl":"Dockerfile"}}},{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:67eb960d0b37eb57f6a1e9277f703c1d963f793ff347e601dded21dbfa6e72f0","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"047105e6800d5bd3ab93e913068b89ee1bb10d56"}}},{"name":"hello-aiot-frontend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend","revision":"06274a33272a899952c3597102471ad66e01729a","dockerfileUrl":"Dockerfile"}}}],"artifacts":{}}'
     pipelineRef:
       params:
       - name: kind
@@ -3096,11 +2927,11 @@ items:
     childReferences:
     - apiVersion: tekton.dev/v1
       kind: TaskRun
-      name: hello-aiot-smoke-mgnpc-inspect-images
+      name: hello-aiot-smoke-hf9h7-inspect-images
       pipelineTaskName: inspect-images
-    completionTime: "2026-04-23T05:53:35Z"
+    completionTime: "2026-04-24T14:12:58Z"
     conditions:
-    - lastTransitionTime: "2026-04-23T05:53:35Z"
+    - lastTransitionTime: "2026-04-24T14:12:58Z"
       message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
       reason: Succeeded
       status: "True"
@@ -3114,7 +2945,7 @@ items:
       - name: inspect-images
         params:
         - name: SNAPSHOT
-          value: '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:bdaee90a46ea1c78dff75cb6dcd361cd1d8c6fd1db4e8114f4910fd4ed4aad97","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"cd6ee3ffd96b3542d398183fbbecd4b34b028cbc"}}}],"artifacts":{}}'
+          value: '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot-backend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend","revision":"1b379d5682904b065dce66fcac339a5d7601683b","dockerfileUrl":"Dockerfile"}}},{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:67eb960d0b37eb57f6a1e9277f703c1d963f793ff347e601dded21dbfa6e72f0","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"047105e6800d5bd3ab93e913068b89ee1bb10d56"}}},{"name":"hello-aiot-frontend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend","revision":"06274a33272a899952c3597102471ad66e01729a","dockerfileUrl":"Dockerfile"}}}],"artifacts":{}}'
         taskSpec:
           metadata: {}
           params:
@@ -3134,11 +2965,11 @@ items:
               set -uo pipefail
               command -v jq >/dev/null 2>&1 || (microdnf install -y jq >/dev/null 2>&1 || dnf install -y jq -q >/dev/null 2>&1 || true)
               echo '=== Snapshot received ==='
-              echo '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:bdaee90a46ea1c78dff75cb6dcd361cd1d8c6fd1db4e8114f4910fd4ed4aad97","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"cd6ee3ffd96b3542d398183fbbecd4b34b028cbc"}}}],"artifacts":{}}' | jq .
+              echo '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot-backend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend","revision":"1b379d5682904b065dce66fcac339a5d7601683b","dockerfileUrl":"Dockerfile"}}},{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:67eb960d0b37eb57f6a1e9277f703c1d963f793ff347e601dded21dbfa6e72f0","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"047105e6800d5bd3ab93e913068b89ee1bb10d56"}}},{"name":"hello-aiot-frontend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend","revision":"06274a33272a899952c3597102471ad66e01729a","dockerfileUrl":"Dockerfile"}}}],"artifacts":{}}' | jq .
               echo '=== Inspecting images ==='
               FAIL=0
               SUCC=0
-              for img in $(echo '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:bdaee90a46ea1c78dff75cb6dcd361cd1d8c6fd1db4e8114f4910fd4ed4aad97","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"cd6ee3ffd96b3542d398183fbbecd4b34b028cbc"}}}],"artifacts":{}}' | jq -r '.components[].containerImage'); do
+              for img in $(echo '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot-backend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend","revision":"1b379d5682904b065dce66fcac339a5d7601683b","dockerfileUrl":"Dockerfile"}}},{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:67eb960d0b37eb57f6a1e9277f703c1d963f793ff347e601dded21dbfa6e72f0","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"047105e6800d5bd3ab93e913068b89ee1bb10d56"}}},{"name":"hello-aiot-frontend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend","revision":"06274a33272a899952c3597102471ad66e01729a","dockerfileUrl":"Dockerfile"}}}],"artifacts":{}}' | jq -r '.components[].containerImage'); do
                 norm=$(echo "$img" | sed -E 's|^internal-registry\.registry\.svc\.cluster\.local(@\|/)|internal-registry.registry.svc.cluster.local:5000\1|')
                 echo "--- $norm ---"
                 if skopeo inspect --tls-verify=false "docker://${norm}" >/dev/null 2>&1; then
@@ -3169,7 +3000,172 @@ items:
         digest:
           sha256: 005ae3dec3cc96fefac4fb88d9fa409308e8c13a938ce9aa00cc100dc55c9c3a
         uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/integration-smoke-test@6ffef512-5984-4ea6-9f22-d79fd7b0847e
-    startTime: "2026-04-23T05:52:21Z"
+    startTime: "2026-04-24T14:09:30Z"
+- apiVersion: tekton.dev/v1
+  kind: PipelineRun
+  metadata:
+    annotations:
+      chains.tekton.dev/signed: "true"
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-frontend-push-hsfr9
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-vxwonw
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/pipelinerun/hello-aiot-smoke-mxg85
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-frontend-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pac.test.appstudio.openshift.io/repository: hello-aiot-frontend
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 06274a33272a899952c3597102471ad66e01729a
+      pac.test.appstudio.openshift.io/sha-title: |
+        rollback demo: only frontend change
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend/commit/06274a33272a899952c3597102471ad66e01729a
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot-frontend
+      results.tekton.dev/childReadyForDeletion: "true"
+      results.tekton.dev/record: default-tenant/results/42f6d7fe-372e-42d9-b872-e77b0dd20625/records/42f6d7fe-372e-42d9-b872-e77b0dd20625
+      results.tekton.dev/result: default-tenant/results/42f6d7fe-372e-42d9-b872-e77b0dd20625
+      results.tekton.dev/stored: "true"
+      test.appstudio.openshift.io/added-to-global-candidate-list: '{"result":true,"reason":"Success","lastupdatedtime":"2026-04-24T05:26:33Z"}'
+      test.appstudio.openshift.io/integration-workflow: push
+      test.appstudio.openshift.io/pipelinerunstarttime: "1777008312000"
+      test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      test.appstudio.openshift.io/status: '[{"scenario":"hello-aiot-smoke","status":"Pending","lastUpdateTime":"2026-04-24T05:26:33.33589988Z","details":"Pending"}]'
+    finalizers:
+    - chains.tekton.dev/pipelinerun
+    - results.tekton.dev/pipelinerun
+    generateName: hello-aiot-smoke-
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/component: hello-aiot-frontend
+      appstudio.openshift.io/snapshot: hello-aiot-20260424-052512-000
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-frontend-push
+      pac.test.appstudio.openshift.io/repository: hello-aiot-frontend
+      pac.test.appstudio.openshift.io/sha: 06274a33272a899952c3597102471ad66e01729a
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot-frontend
+      pipelines.appstudio.openshift.io/type: test
+      tekton.dev/pipeline: integration-smoke-test
+      test.appstudio.openshift.io/pipelinerunfinishtime: "1777008389"
+      test.appstudio.openshift.io/scenario: hello-aiot-smoke
+      test.appstudio.openshift.io/type: component
+    name: hello-aiot-smoke-mxg85
+    namespace: default-tenant
+    ownerReferences:
+    - apiVersion: appstudio.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Snapshot
+      name: hello-aiot-20260424-052512-000
+  spec:
+    params:
+    - name: SNAPSHOT
+      value: '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2b3233806369b99f4cd68f4b2aa82123a6d264874c4563064b4dca701f00e836","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"ff42065c6fc9bac5e1b28e3a807da34b856c5ba3","dockerfileUrl":"Dockerfile"}}},{"name":"hello-aiot-frontend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend","revision":"06274a33272a899952c3597102471ad66e01729a"}}},{"name":"hello-aiot-backend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend","revision":"1b379d5682904b065dce66fcac339a5d7601683b","dockerfileUrl":"Dockerfile"}}}],"artifacts":{}}'
+    pipelineRef:
+      params:
+      - name: kind
+        value: pipeline
+      - name: name
+        value: integration-smoke-test
+      - name: namespace
+        value: default-tenant
+      resolver: cluster
+    taskRunTemplate:
+      podTemplate:
+        nodeSelector:
+          workload-zone: build
+      serviceAccountName: konflux-integration-runner
+    timeouts:
+      pipeline: 1h0m0s
+  status:
+    childReferences:
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: hello-aiot-smoke-mxg85-inspect-images
+      pipelineTaskName: inspect-images
+    completionTime: "2026-04-24T05:29:54Z"
+    conditions:
+    - lastTransitionTime: "2026-04-24T05:29:54Z"
+      message: 'Tasks Completed: 1 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    pipelineSpec:
+      params:
+      - description: AppStudio snapshot JSON (auto-injected by integration-service)
+        name: SNAPSHOT
+        type: string
+      tasks:
+      - name: inspect-images
+        params:
+        - name: SNAPSHOT
+          value: '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2b3233806369b99f4cd68f4b2aa82123a6d264874c4563064b4dca701f00e836","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"ff42065c6fc9bac5e1b28e3a807da34b856c5ba3","dockerfileUrl":"Dockerfile"}}},{"name":"hello-aiot-frontend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend","revision":"06274a33272a899952c3597102471ad66e01729a"}}},{"name":"hello-aiot-backend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend","revision":"1b379d5682904b065dce66fcac339a5d7601683b","dockerfileUrl":"Dockerfile"}}}],"artifacts":{}}'
+        taskSpec:
+          metadata: {}
+          params:
+          - name: SNAPSHOT
+            type: string
+          results:
+          - description: Test result in Konflux TEST_OUTPUT format
+            name: TEST_OUTPUT
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: quay.io/skopeo/stable:latest
+            name: inspect
+            script: |
+              #!/bin/bash
+              set -uo pipefail
+              command -v jq >/dev/null 2>&1 || (microdnf install -y jq >/dev/null 2>&1 || dnf install -y jq -q >/dev/null 2>&1 || true)
+              echo '=== Snapshot received ==='
+              echo '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2b3233806369b99f4cd68f4b2aa82123a6d264874c4563064b4dca701f00e836","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"ff42065c6fc9bac5e1b28e3a807da34b856c5ba3","dockerfileUrl":"Dockerfile"}}},{"name":"hello-aiot-frontend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend","revision":"06274a33272a899952c3597102471ad66e01729a"}}},{"name":"hello-aiot-backend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend","revision":"1b379d5682904b065dce66fcac339a5d7601683b","dockerfileUrl":"Dockerfile"}}}],"artifacts":{}}' | jq .
+              echo '=== Inspecting images ==='
+              FAIL=0
+              SUCC=0
+              for img in $(echo '{"application":"hello-aiot","componentGroup":"","components":[{"name":"hello-aiot","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2b3233806369b99f4cd68f4b2aa82123a6d264874c4563064b4dca701f00e836","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","revision":"ff42065c6fc9bac5e1b28e3a807da34b856c5ba3","dockerfileUrl":"Dockerfile"}}},{"name":"hello-aiot-frontend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend","revision":"06274a33272a899952c3597102471ad66e01729a"}}},{"name":"hello-aiot-backend","version":"","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-backend@sha256:8bea0c2559137621961d5f93fef69d49f4d574f165c02a0e6ba8d4ce9e6334dc","source":{"git":{"url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-backend","revision":"1b379d5682904b065dce66fcac339a5d7601683b","dockerfileUrl":"Dockerfile"}}}],"artifacts":{}}' | jq -r '.components[].containerImage'); do
+                norm=$(echo "$img" | sed -E 's|^internal-registry\.registry\.svc\.cluster\.local(@\|/)|internal-registry.registry.svc.cluster.local:5000\1|')
+                echo "--- $norm ---"
+                if skopeo inspect --tls-verify=false "docker://${norm}" >/dev/null 2>&1; then
+                  echo "OK: $norm"
+                  SUCC=$((SUCC+1))
+                else
+                  echo "FAIL inspect (ignored in PoC): $norm"
+                  FAIL=$((FAIL+1))
+                fi
+              done
+              TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+              cat > "$(results.TEST_OUTPUT.path)" <<JSON
+              {"result":"SUCCESS","timestamp":"$TS","successes":$SUCC,"failures":$FAIL,"warnings":0,"note":"smoke test PoC: image inspect attempts, never fails build"}
+              JSON
+              echo 'Done'
+    provenance:
+      featureFlags:
+        awaitSidecarReadiness: true
+        coschedule: workspaces
+        enableAPIFields: beta
+        enableProvenanceInStatus: true
+        enforceNonfalsifiability: none
+        maxResultSize: 4096
+        resultExtractionMethod: termination-message
+        runningInEnvWithInjectedSidecars: true
+        verificationNoMatchPolicy: ignore
+      refSource:
+        digest:
+          sha256: 005ae3dec3cc96fefac4fb88d9fa409308e8c13a938ce9aa00cc100dc55c9c3a
+        uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/integration-smoke-test@6ffef512-5984-4ea6-9f22-d79fd7b0847e
+    startTime: "2026-04-24T05:26:33Z"
 - apiVersion: tekton.dev/v1
   kind: PipelineRun
   metadata:
@@ -3458,580 +3454,6 @@ items:
           sha256: 02449e4e39551d2692822282e5792a3bd3c77971ad80a1cc13702e5b103d853c
         uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/release-with-ec@cb57dcc4-2d1f-499f-b1a3-31f31d4d1e72
     startTime: "2026-04-23T09:46:33Z"
-- apiVersion: tekton.dev/v1
-  kind: PipelineRun
-  metadata:
-    annotations:
-      chains.tekton.dev/signed: "true"
-      operator-sdk/primary-resource: default-tenant/hello-aiot-20260423-055051-000-cd6ee3f-vvfn8
-      operator-sdk/primary-resource-type: Release.appstudio.redhat.com
-      pac.test.appstudio.openshift.io/branch: refs/heads/main
-      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
-        "gRepo": "pipelines-as-code"}'
-      pac.test.appstudio.openshift.io/event-type: push
-      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-nhvaam
-      pac.test.appstudio.openshift.io/git-provider: gitea
-      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-pfs4p
-      pac.test.appstudio.openshift.io/max-keep-runs: "5"
-      pac.test.appstudio.openshift.io/on-event: '[push]'
-      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
-      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
-      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      pac.test.appstudio.openshift.io/repository: hello-aiot
-      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
-      pac.test.appstudio.openshift.io/sender: admin
-      pac.test.appstudio.openshift.io/sha: cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
-      pac.test.appstudio.openshift.io/sha-title: |
-        chore: e2e auto-release test 1776923447
-      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/cd6ee3ffd96b3542d398183fbbecd4b34b028cbc
-      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
-      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      pac.test.appstudio.openshift.io/state: completed
-      pac.test.appstudio.openshift.io/url-org: aiot
-      pac.test.appstudio.openshift.io/url-repository: hello-aiot
-      results.tekton.dev/record: default-tenant/results/41e6db4f-c9e3-444c-bc55-a5dd0fcaad68/records/41e6db4f-c9e3-444c-bc55-a5dd0fcaad68
-      results.tekton.dev/result: default-tenant/results/41e6db4f-c9e3-444c-bc55-a5dd0fcaad68
-      results.tekton.dev/stored: "true"
-    finalizers:
-    - results.tekton.dev/pipelinerun
-    - chains.tekton.dev/pipelinerun
-    generateName: managed-
-    labels:
-      appstudio.openshift.io/application: hello-aiot
-      appstudio.openshift.io/service: release
-      appstudio.openshift.io/snapshot: hello-aiot-20260423-055051-000
-      pipelines.appstudio.openshift.io/type: managed
-      release.appstudio.openshift.io/name: hello-aiot-20260423-055051-000-cd6ee3f-vvfn8
-      release.appstudio.openshift.io/namespace: default-tenant
-      tekton.dev/pipeline: release-with-ec
-    name: managed-8bhtz
-    namespace: default-tenant
-  spec:
-    params:
-    - name: release
-      value: default-tenant/hello-aiot-20260423-055051-000-cd6ee3f-vvfn8
-    - name: releasePlan
-      value: default-tenant/hello-aiot-dev
-    - name: releasePlanAdmission
-      value: default-tenant/hello-aiot-dev-rpa
-    - name: releaseServiceConfig
-      value: release-service/release-service-config
-    - name: snapshot
-      value: default-tenant/hello-aiot-20260423-055051-000
-    - name: enterpriseContractPolicy
-      value: '{"description":"Dev policy for hello-aiot. Enforces presence of SLSA
-        provenance attestation\nand a valid Tekton task bundle, but excludes hermetic-build,
-        source-image\nand rpm checks (not applicable to internal-registry builds).\n","sources":[{"name":"Default","policy":["oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f"],"data":["oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096"],"config":{"exclude":["hermetic_build_task","hermetic_task","source_image","rpm_repos","cve","sbom_cyclonedx","sbom_spdx","labels","trusted_task.trusted"],"include":["@slsa3","attestation_type","attestation_task_bundle","test"]}}],"publicKey":"k8s://tekton-pipelines/public-key"}'
-    - name: verify_ec_task_bundle
-      value: quay.io/enterprise-contract/ec-task-bundle@sha256:c9aef67023cec2bef31d93f2161920d4205722eda1b4876f2d46cdbb4d6db7c5
-    - name: verify_ec_task_git_revision
-      value: b1ede77ff694522a917dea2b4bde14b2cc1839f2
-    pipelineRef:
-      params:
-      - name: kind
-        value: pipeline
-      - name: name
-        value: release-with-ec
-      - name: namespace
-        value: default-tenant
-      resolver: cluster
-    taskRunTemplate:
-      podTemplate:
-        nodeSelector:
-          workload-zone: build
-      serviceAccountName: release-service-account
-    timeouts:
-      pipeline: 1h0m0s
-    workspaces:
-    - name: release-workspace
-      volumeClaimTemplate:
-        metadata: {}
-        spec:
-          accessModes:
-          - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
-        status: {}
-  status:
-    childReferences:
-    - apiVersion: tekton.dev/v1
-      kind: TaskRun
-      name: managed-8bhtz-extract-images
-      pipelineTaskName: extract-images
-    - apiVersion: tekton.dev/v1
-      kind: TaskRun
-      name: managed-8bhtz-verify-enterprise-contract
-      pipelineTaskName: verify-enterprise-contract
-    - apiVersion: tekton.dev/v1
-      kind: TaskRun
-      name: managed-8bhtz-log-success
-      pipelineTaskName: log-success
-    completionTime: "2026-04-23T05:53:56Z"
-    conditions:
-    - lastTransitionTime: "2026-04-23T05:53:56Z"
-      message: 'Tasks Completed: 3 (Failed: 0, Cancelled 0), Skipped: 0'
-      reason: Succeeded
-      status: "True"
-      type: Succeeded
-    pipelineSpec:
-      params:
-      - default: ""
-        description: Snapshot spec as JSON string
-        name: snapshot
-        type: string
-      - default: ""
-        name: release
-        type: string
-      - default: ""
-        name: releasePlan
-        type: string
-      - default: ""
-        name: releasePlanAdmission
-        type: string
-      - default: ""
-        name: enterpriseContractPolicy
-        type: string
-      - default: ""
-        name: enterpriseContractExtraRuleData
-        type: string
-      - default: ""
-        name: taskGitUrl
-        type: string
-      - default: ""
-        name: taskGitRevision
-        type: string
-      tasks:
-      - name: extract-images
-        params:
-        - name: snapshot
-          value: default-tenant/hello-aiot-20260423-055051-000
-        taskSpec:
-          metadata: {}
-          params:
-          - name: snapshot
-            type: string
-          results:
-          - description: Newline-separated list of pullspecs
-            name: IMAGES
-            type: string
-          spec: null
-          steps:
-          - computeResources: {}
-            image: bitnami/kubectl:latest
-            name: extract
-            script: |
-              #!/bin/sh
-              set -e
-              echo 'snapshot param: default-tenant/hello-aiot-20260423-055051-000'
-              SNAP_REF='default-tenant/hello-aiot-20260423-055051-000'
-              if echo "$SNAP_REF" | grep -q '^{'; then
-                echo "$SNAP_REF" > /tmp/snap.json
-              else
-                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
-                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
-                kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{.spec}' > /tmp/snap.json
-              fi
-              echo '--- snapshot spec ---'
-              head -c 800 /tmp/snap.json; echo
-              # Use kubectl jsonpath on the same snapshot to extract images (no python/jq needed)
-              if echo "$SNAP_REF" | grep -q '^{'; then
-                # JSON inline — fall back to grep
-                grep -oE '"containerImage":"[^"]+"' /tmp/snap.json | sed 's/"containerImage":"//;s/"$//' > $(results.IMAGES.path)
-              else
-                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
-                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
-                kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{range .spec.components[*]}{.containerImage}{"\n"}{end}' > $(results.IMAGES.path)
-              fi
-              echo '--- IMAGES ---'
-              cat $(results.IMAGES.path)
-      - name: verify-enterprise-contract
-        params:
-        - name: POLICY_CONFIGURATION
-          value: '{"description":"Dev policy for hello-aiot. Enforces presence of
-            SLSA provenance attestation\nand a valid Tekton task bundle, but excludes
-            hermetic-build, source-image\nand rpm checks (not applicable to internal-registry
-            builds).\n","sources":[{"name":"Default","policy":["oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f"],"data":["oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096"],"config":{"exclude":["hermetic_build_task","hermetic_task","source_image","rpm_repos","cve","sbom_cyclonedx","sbom_spdx","labels","trusted_task.trusted"],"include":["@slsa3","attestation_type","attestation_task_bundle","test"]}}],"publicKey":"k8s://tekton-pipelines/public-key"}'
-        - name: IMAGES_FILE
-          value: $(tasks.extract-images.results.IMAGES)
-        - name: SNAPSHOT
-          value: default-tenant/hello-aiot-20260423-055051-000
-        runAfter:
-        - extract-images
-        taskSpec:
-          metadata: {}
-          params:
-          - name: POLICY_CONFIGURATION
-            type: string
-          - name: IMAGES_FILE
-            type: string
-          - name: SNAPSHOT
-            type: string
-          results:
-          - description: EC verification result
-            name: TEST_OUTPUT
-            type: string
-          spec: null
-          steps:
-          - computeResources: {}
-            env:
-            - name: HOME
-              value: /tmp
-            image: quay.io/conforma/cli:latest
-            name: verify
-            script: |
-              #!/bin/bash
-              set -uo pipefail
-              POL='$(params.POLICY_CONFIGURATION)'
-              echo "Policy: $POL"
-              SNAP_REF='$(params.SNAPSHOT)'
-              echo "snapshot ref: $SNAP_REF"
-              # Build images.json that ec accepts: {"components":[{"containerImage":"...", "name":"...", "source":{...}}]}
-              # Pull snapshot spec from cluster
-              if echo "$SNAP_REF" | grep -q '^{'; then
-                echo "$SNAP_REF" > /tmp/snap.json
-              else
-                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
-                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
-                # ec image has curl; use the kube API via in-cluster SA
-                TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-                CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-                curl -s --cacert $CACERT -H "Authorization: Bearer $TOKEN" \
-                  "https://kubernetes.default.svc/apis/appstudio.redhat.com/v1alpha1/namespaces/$NS/snapshots/$NAME" \
-                  | (jq -r '.spec' 2>/dev/null || sed -n 's/.*"spec":\({.*}\),"status".*/\1/p') > /tmp/snap.json
-              fi
-              echo '--- snapshot spec ---'
-              head -c 800 /tmp/snap.json; echo
-              ec validate image \
-                --images /tmp/snap.json \
-                --policy="$POL" \
-                --public-key=k8s://tekton-pipelines/public-key \
-                --ignore-rekor \
-                --strict=false \
-                --output=appstudio=$(results.TEST_OUTPUT.path) \
-                --output=text || RC=$?
-              echo "ec exit: ${RC:-0}"
-              if [ ! -s $(results.TEST_OUTPUT.path) ]; then
-                echo "{\"result\":\"WARNING\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"successes\":0,\"failures\":0,\"warnings\":1,\"note\":\"ec produced no output\"}" > $(results.TEST_OUTPUT.path)
-              fi
-              echo '--- TEST_OUTPUT ---'
-              cat $(results.TEST_OUTPUT.path)
-      - name: log-success
-        runAfter:
-        - verify-enterprise-contract
-        taskSpec:
-          metadata: {}
-          spec: null
-          steps:
-          - computeResources: {}
-            image: registry.access.redhat.com/ubi9/ubi-minimal:latest
-            name: log
-            script: |
-              #!/bin/sh
-              echo "Release with EC validation completed"
-    provenance:
-      featureFlags:
-        awaitSidecarReadiness: true
-        coschedule: workspaces
-        enableAPIFields: beta
-        enableProvenanceInStatus: true
-        enforceNonfalsifiability: none
-        maxResultSize: 4096
-        resultExtractionMethod: termination-message
-        runningInEnvWithInjectedSidecars: true
-        verificationNoMatchPolicy: ignore
-      refSource:
-        digest:
-          sha256: 02449e4e39551d2692822282e5792a3bd3c77971ad80a1cc13702e5b103d853c
-        uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/release-with-ec@cb57dcc4-2d1f-499f-b1a3-31f31d4d1e72
-    startTime: "2026-04-23T05:53:36Z"
-- apiVersion: tekton.dev/v1
-  kind: PipelineRun
-  metadata:
-    annotations:
-      chains.tekton.dev/signed: "true"
-      operator-sdk/primary-resource: default-tenant/hello-aiot-20260423-054234-000-aa97baa-xsrs2
-      operator-sdk/primary-resource-type: Release.appstudio.redhat.com
-      pac.test.appstudio.openshift.io/branch: refs/heads/main
-      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
-        "gRepo": "pipelines-as-code"}'
-      pac.test.appstudio.openshift.io/event-type: push
-      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-bvzoce
-      pac.test.appstudio.openshift.io/git-provider: gitea
-      pac.test.appstudio.openshift.io/log-url: https://localhost:9443/ns/default-tenant/pipelinerun/hello-aiot-push-d9kld
-      pac.test.appstudio.openshift.io/max-keep-runs: "5"
-      pac.test.appstudio.openshift.io/on-event: '[push]'
-      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
-      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
-      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      pac.test.appstudio.openshift.io/repository: hello-aiot
-      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
-      pac.test.appstudio.openshift.io/sender: admin
-      pac.test.appstudio.openshift.io/sha: aa97baa3ee4a29c8fff8dbb3d91e526bf93696b3
-      pac.test.appstudio.openshift.io/sha-title: |
-        chore: cleanup trigger files
-      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/aa97baa3ee4a29c8fff8dbb3d91e526bf93696b3
-      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
-      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
-      pac.test.appstudio.openshift.io/state: completed
-      pac.test.appstudio.openshift.io/url-org: aiot
-      pac.test.appstudio.openshift.io/url-repository: hello-aiot
-      results.tekton.dev/record: default-tenant/results/10049770-7664-4bd2-836f-9a6492bcee22/records/10049770-7664-4bd2-836f-9a6492bcee22
-      results.tekton.dev/result: default-tenant/results/10049770-7664-4bd2-836f-9a6492bcee22
-      results.tekton.dev/stored: "true"
-    finalizers:
-    - chains.tekton.dev/pipelinerun
-    - results.tekton.dev/pipelinerun
-    generateName: managed-
-    labels:
-      appstudio.openshift.io/application: hello-aiot
-      appstudio.openshift.io/service: release
-      appstudio.openshift.io/snapshot: hello-aiot-20260423-054234-000
-      pipelines.appstudio.openshift.io/type: managed
-      release.appstudio.openshift.io/name: hello-aiot-20260423-054234-000-aa97baa-xsrs2
-      release.appstudio.openshift.io/namespace: default-tenant
-      tekton.dev/pipeline: release-with-ec
-    name: managed-dw4j8
-    namespace: default-tenant
-  spec:
-    params:
-    - name: release
-      value: default-tenant/hello-aiot-20260423-054234-000-aa97baa-xsrs2
-    - name: releasePlan
-      value: default-tenant/hello-aiot-dev
-    - name: releasePlanAdmission
-      value: default-tenant/hello-aiot-dev-rpa
-    - name: releaseServiceConfig
-      value: release-service/release-service-config
-    - name: snapshot
-      value: default-tenant/hello-aiot-20260423-054234-000
-    - name: enterpriseContractPolicy
-      value: '{"description":"Dev policy for hello-aiot. Enforces presence of SLSA
-        provenance attestation\nand a valid Tekton task bundle, but excludes hermetic-build,
-        source-image\nand rpm checks (not applicable to internal-registry builds).\n","sources":[{"name":"Default","policy":["oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f"],"data":["oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096"],"config":{"exclude":["hermetic_build_task","hermetic_task","source_image","rpm_repos","cve","sbom_cyclonedx","sbom_spdx","labels","trusted_task.trusted"],"include":["@slsa3","attestation_type","attestation_task_bundle","test"]}}],"publicKey":"k8s://tekton-pipelines/public-key"}'
-    - name: verify_ec_task_bundle
-      value: quay.io/enterprise-contract/ec-task-bundle@sha256:c9aef67023cec2bef31d93f2161920d4205722eda1b4876f2d46cdbb4d6db7c5
-    - name: verify_ec_task_git_revision
-      value: b1ede77ff694522a917dea2b4bde14b2cc1839f2
-    pipelineRef:
-      params:
-      - name: kind
-        value: pipeline
-      - name: name
-        value: release-with-ec
-      - name: namespace
-        value: default-tenant
-      resolver: cluster
-    taskRunTemplate:
-      podTemplate:
-        nodeSelector:
-          workload-zone: build
-      serviceAccountName: release-service-account
-    timeouts:
-      pipeline: 1h0m0s
-    workspaces:
-    - name: release-workspace
-      volumeClaimTemplate:
-        metadata: {}
-        spec:
-          accessModes:
-          - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
-        status: {}
-  status:
-    childReferences:
-    - apiVersion: tekton.dev/v1
-      kind: TaskRun
-      name: managed-dw4j8-extract-images
-      pipelineTaskName: extract-images
-    - apiVersion: tekton.dev/v1
-      kind: TaskRun
-      name: managed-dw4j8-verify-enterprise-contract
-      pipelineTaskName: verify-enterprise-contract
-    - apiVersion: tekton.dev/v1
-      kind: TaskRun
-      name: managed-dw4j8-log-success
-      pipelineTaskName: log-success
-    completionTime: "2026-04-23T05:45:43Z"
-    conditions:
-    - lastTransitionTime: "2026-04-23T05:45:43Z"
-      message: 'Tasks Completed: 3 (Failed: 0, Cancelled 0), Skipped: 0'
-      reason: Succeeded
-      status: "True"
-      type: Succeeded
-    pipelineSpec:
-      params:
-      - default: ""
-        description: Snapshot spec as JSON string
-        name: snapshot
-        type: string
-      - default: ""
-        name: release
-        type: string
-      - default: ""
-        name: releasePlan
-        type: string
-      - default: ""
-        name: releasePlanAdmission
-        type: string
-      - default: ""
-        name: enterpriseContractPolicy
-        type: string
-      - default: ""
-        name: enterpriseContractExtraRuleData
-        type: string
-      - default: ""
-        name: taskGitUrl
-        type: string
-      - default: ""
-        name: taskGitRevision
-        type: string
-      tasks:
-      - name: extract-images
-        params:
-        - name: snapshot
-          value: default-tenant/hello-aiot-20260423-054234-000
-        taskSpec:
-          metadata: {}
-          params:
-          - name: snapshot
-            type: string
-          results:
-          - description: Newline-separated list of pullspecs
-            name: IMAGES
-            type: string
-          spec: null
-          steps:
-          - computeResources: {}
-            image: bitnami/kubectl:latest
-            name: extract
-            script: |
-              #!/bin/sh
-              set -e
-              echo 'snapshot param: default-tenant/hello-aiot-20260423-054234-000'
-              SNAP_REF='default-tenant/hello-aiot-20260423-054234-000'
-              if echo "$SNAP_REF" | grep -q '^{'; then
-                echo "$SNAP_REF" > /tmp/snap.json
-              else
-                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
-                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
-                kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{.spec}' > /tmp/snap.json
-              fi
-              echo '--- snapshot spec ---'
-              head -c 800 /tmp/snap.json; echo
-              # Use kubectl jsonpath on the same snapshot to extract images (no python/jq needed)
-              if echo "$SNAP_REF" | grep -q '^{'; then
-                # JSON inline — fall back to grep
-                grep -oE '"containerImage":"[^"]+"' /tmp/snap.json | sed 's/"containerImage":"//;s/"$//' > $(results.IMAGES.path)
-              else
-                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
-                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
-                kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{range .spec.components[*]}{.containerImage}{"\n"}{end}' > $(results.IMAGES.path)
-              fi
-              echo '--- IMAGES ---'
-              cat $(results.IMAGES.path)
-      - name: verify-enterprise-contract
-        params:
-        - name: POLICY_CONFIGURATION
-          value: '{"description":"Dev policy for hello-aiot. Enforces presence of
-            SLSA provenance attestation\nand a valid Tekton task bundle, but excludes
-            hermetic-build, source-image\nand rpm checks (not applicable to internal-registry
-            builds).\n","sources":[{"name":"Default","policy":["oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f"],"data":["oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096"],"config":{"exclude":["hermetic_build_task","hermetic_task","source_image","rpm_repos","cve","sbom_cyclonedx","sbom_spdx","labels","trusted_task.trusted"],"include":["@slsa3","attestation_type","attestation_task_bundle","test"]}}],"publicKey":"k8s://tekton-pipelines/public-key"}'
-        - name: IMAGES_FILE
-          value: $(tasks.extract-images.results.IMAGES)
-        - name: SNAPSHOT
-          value: default-tenant/hello-aiot-20260423-054234-000
-        runAfter:
-        - extract-images
-        taskSpec:
-          metadata: {}
-          params:
-          - name: POLICY_CONFIGURATION
-            type: string
-          - name: IMAGES_FILE
-            type: string
-          - name: SNAPSHOT
-            type: string
-          results:
-          - description: EC verification result
-            name: TEST_OUTPUT
-            type: string
-          spec: null
-          steps:
-          - computeResources: {}
-            env:
-            - name: HOME
-              value: /tmp
-            image: quay.io/conforma/cli:latest
-            name: verify
-            script: |
-              #!/bin/bash
-              set -uo pipefail
-              POL='$(params.POLICY_CONFIGURATION)'
-              echo "Policy: $POL"
-              SNAP_REF='$(params.SNAPSHOT)'
-              echo "snapshot ref: $SNAP_REF"
-              # Build images.json that ec accepts: {"components":[{"containerImage":"...", "name":"...", "source":{...}}]}
-              # Pull snapshot spec from cluster
-              if echo "$SNAP_REF" | grep -q '^{'; then
-                echo "$SNAP_REF" > /tmp/snap.json
-              else
-                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
-                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
-                # ec image has curl; use the kube API via in-cluster SA
-                TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-                CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-                curl -s --cacert $CACERT -H "Authorization: Bearer $TOKEN" \
-                  "https://kubernetes.default.svc/apis/appstudio.redhat.com/v1alpha1/namespaces/$NS/snapshots/$NAME" \
-                  | (jq -r '.spec' 2>/dev/null || sed -n 's/.*"spec":\({.*}\),"status".*/\1/p') > /tmp/snap.json
-              fi
-              echo '--- snapshot spec ---'
-              head -c 800 /tmp/snap.json; echo
-              ec validate image \
-                --images /tmp/snap.json \
-                --policy="$POL" \
-                --public-key=k8s://tekton-pipelines/public-key \
-                --ignore-rekor \
-                --strict=false \
-                --output=appstudio=$(results.TEST_OUTPUT.path) \
-                --output=text || RC=$?
-              echo "ec exit: ${RC:-0}"
-              if [ ! -s $(results.TEST_OUTPUT.path) ]; then
-                echo "{\"result\":\"WARNING\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"successes\":0,\"failures\":0,\"warnings\":1,\"note\":\"ec produced no output\"}" > $(results.TEST_OUTPUT.path)
-              fi
-              echo '--- TEST_OUTPUT ---'
-              cat $(results.TEST_OUTPUT.path)
-      - name: log-success
-        runAfter:
-        - verify-enterprise-contract
-        taskSpec:
-          metadata: {}
-          spec: null
-          steps:
-          - computeResources: {}
-            image: registry.access.redhat.com/ubi9/ubi-minimal:latest
-            name: log
-            script: |
-              #!/bin/sh
-              echo "Release with EC validation completed"
-    provenance:
-      featureFlags:
-        awaitSidecarReadiness: true
-        coschedule: workspaces
-        enableAPIFields: beta
-        enableProvenanceInStatus: true
-        enforceNonfalsifiability: none
-        maxResultSize: 4096
-        resultExtractionMethod: termination-message
-        runningInEnvWithInjectedSidecars: true
-        verificationNoMatchPolicy: ignore
-      refSource:
-        digest:
-          sha256: 02449e4e39551d2692822282e5792a3bd3c77971ad80a1cc13702e5b103d853c
-        uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/release-with-ec@cb57dcc4-2d1f-499f-b1a3-31f31d4d1e72
-    startTime: "2026-04-23T05:45:22Z"
 - apiVersion: tekton.dev/v1
   kind: PipelineRun
   metadata:
@@ -4613,6 +4035,294 @@ items:
   metadata:
     annotations:
       chains.tekton.dev/signed: "true"
+      operator-sdk/primary-resource: default-tenant/hello-aiot-20260424-052512-000-06274a3-cm874
+      operator-sdk/primary-resource-type: Release.appstudio.redhat.com
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-frontend-push-hsfr9
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-vxwonw
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-frontend-push-hsfr9
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-frontend-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pac.test.appstudio.openshift.io/repository: hello-aiot-frontend
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 06274a33272a899952c3597102471ad66e01729a
+      pac.test.appstudio.openshift.io/sha-title: |
+        rollback demo: only frontend change
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend/commit/06274a33272a899952c3597102471ad66e01729a
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot-frontend
+      results.tekton.dev/record: default-tenant/results/a904869f-924e-4893-8882-ffa3ee13d56d/records/a904869f-924e-4893-8882-ffa3ee13d56d
+      results.tekton.dev/result: default-tenant/results/a904869f-924e-4893-8882-ffa3ee13d56d
+      results.tekton.dev/stored: "true"
+    finalizers:
+    - chains.tekton.dev/pipelinerun
+    - results.tekton.dev/pipelinerun
+    generateName: managed-
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/service: release
+      appstudio.openshift.io/snapshot: hello-aiot-20260424-052512-000
+      pipelines.appstudio.openshift.io/type: managed
+      release.appstudio.openshift.io/name: hello-aiot-20260424-052512-000-06274a3-cm874
+      release.appstudio.openshift.io/namespace: default-tenant
+      tekton.dev/pipeline: release-with-ec
+    name: managed-sw885
+    namespace: default-tenant
+  spec:
+    params:
+    - name: release
+      value: default-tenant/hello-aiot-20260424-052512-000-06274a3-cm874
+    - name: releasePlan
+      value: default-tenant/hello-aiot-dev
+    - name: releasePlanAdmission
+      value: default-tenant/hello-aiot-dev-rpa
+    - name: releaseServiceConfig
+      value: release-service/release-service-config
+    - name: snapshot
+      value: default-tenant/hello-aiot-20260424-052512-000
+    - name: enterpriseContractPolicy
+      value: '{"description":"Dev policy for hello-aiot. Enforces presence of SLSA
+        provenance attestation\nand a valid Tekton task bundle, but excludes hermetic-build,
+        source-image\nand rpm checks (not applicable to internal-registry builds).\n","sources":[{"name":"Default","policy":["oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f"],"data":["oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096"],"config":{"exclude":["hermetic_build_task","hermetic_task","source_image","rpm_repos","cve","sbom_cyclonedx","sbom_spdx","labels","trusted_task.trusted"],"include":["@slsa3","attestation_type","attestation_task_bundle","test"]}}],"publicKey":"k8s://tekton-pipelines/public-key"}'
+    - name: verify_ec_task_bundle
+      value: quay.io/enterprise-contract/ec-task-bundle@sha256:c9aef67023cec2bef31d93f2161920d4205722eda1b4876f2d46cdbb4d6db7c5
+    - name: verify_ec_task_git_revision
+      value: b1ede77ff694522a917dea2b4bde14b2cc1839f2
+    pipelineRef:
+      params:
+      - name: kind
+        value: pipeline
+      - name: name
+        value: release-with-ec
+      - name: namespace
+        value: default-tenant
+      resolver: cluster
+    taskRunTemplate:
+      podTemplate:
+        nodeSelector:
+          workload-zone: build
+      serviceAccountName: release-service-account
+    timeouts:
+      pipeline: 1h0m0s
+    workspaces:
+    - name: release-workspace
+      volumeClaimTemplate:
+        metadata: {}
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+        status: {}
+  status:
+    childReferences:
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: managed-sw885-extract-images
+      pipelineTaskName: extract-images
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: managed-sw885-verify-enterprise-contract
+      pipelineTaskName: verify-enterprise-contract
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: managed-sw885-log-success
+      pipelineTaskName: log-success
+    completionTime: "2026-04-24T05:31:01Z"
+    conditions:
+    - lastTransitionTime: "2026-04-24T05:31:01Z"
+      message: 'Tasks Completed: 3 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    pipelineSpec:
+      params:
+      - default: ""
+        description: Snapshot spec as JSON string
+        name: snapshot
+        type: string
+      - default: ""
+        name: release
+        type: string
+      - default: ""
+        name: releasePlan
+        type: string
+      - default: ""
+        name: releasePlanAdmission
+        type: string
+      - default: ""
+        name: enterpriseContractPolicy
+        type: string
+      - default: ""
+        name: enterpriseContractExtraRuleData
+        type: string
+      - default: ""
+        name: taskGitUrl
+        type: string
+      - default: ""
+        name: taskGitRevision
+        type: string
+      tasks:
+      - name: extract-images
+        params:
+        - name: snapshot
+          value: default-tenant/hello-aiot-20260424-052512-000
+        taskSpec:
+          metadata: {}
+          params:
+          - name: snapshot
+            type: string
+          results:
+          - description: Newline-separated list of pullspecs
+            name: IMAGES
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: bitnami/kubectl:latest
+            name: extract
+            script: |
+              #!/bin/sh
+              set -e
+              echo 'snapshot param: default-tenant/hello-aiot-20260424-052512-000'
+              SNAP_REF='default-tenant/hello-aiot-20260424-052512-000'
+              if echo "$SNAP_REF" | grep -q '^{'; then
+                echo "$SNAP_REF" > /tmp/snap.json
+              else
+                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
+                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
+                kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{.spec}' > /tmp/snap.json
+              fi
+              echo '--- snapshot spec ---'
+              head -c 800 /tmp/snap.json; echo
+              # Use kubectl jsonpath on the same snapshot to extract images (no python/jq needed)
+              if echo "$SNAP_REF" | grep -q '^{'; then
+                # JSON inline — fall back to grep
+                grep -oE '"containerImage":"[^"]+"' /tmp/snap.json | sed 's/"containerImage":"//;s/"$//' > $(results.IMAGES.path)
+              else
+                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
+                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
+                kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{range .spec.components[*]}{.containerImage}{"\n"}{end}' > $(results.IMAGES.path)
+              fi
+              echo '--- IMAGES ---'
+              cat $(results.IMAGES.path)
+      - name: verify-enterprise-contract
+        params:
+        - name: POLICY_CONFIGURATION
+          value: '{"description":"Dev policy for hello-aiot. Enforces presence of
+            SLSA provenance attestation\nand a valid Tekton task bundle, but excludes
+            hermetic-build, source-image\nand rpm checks (not applicable to internal-registry
+            builds).\n","sources":[{"name":"Default","policy":["oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f"],"data":["oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096"],"config":{"exclude":["hermetic_build_task","hermetic_task","source_image","rpm_repos","cve","sbom_cyclonedx","sbom_spdx","labels","trusted_task.trusted"],"include":["@slsa3","attestation_type","attestation_task_bundle","test"]}}],"publicKey":"k8s://tekton-pipelines/public-key"}'
+        - name: IMAGES_FILE
+          value: $(tasks.extract-images.results.IMAGES)
+        - name: SNAPSHOT
+          value: default-tenant/hello-aiot-20260424-052512-000
+        runAfter:
+        - extract-images
+        taskSpec:
+          metadata: {}
+          params:
+          - name: POLICY_CONFIGURATION
+            type: string
+          - name: IMAGES_FILE
+            type: string
+          - name: SNAPSHOT
+            type: string
+          results:
+          - description: EC verification result
+            name: TEST_OUTPUT
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            env:
+            - name: HOME
+              value: /tmp
+            image: quay.io/conforma/cli:latest
+            name: verify
+            script: |
+              #!/bin/bash
+              set -uo pipefail
+              POL='$(params.POLICY_CONFIGURATION)'
+              echo "Policy: $POL"
+              SNAP_REF='$(params.SNAPSHOT)'
+              echo "snapshot ref: $SNAP_REF"
+              # Build images.json that ec accepts: {"components":[{"containerImage":"...", "name":"...", "source":{...}}]}
+              # Pull snapshot spec from cluster
+              if echo "$SNAP_REF" | grep -q '^{'; then
+                echo "$SNAP_REF" > /tmp/snap.json
+              else
+                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
+                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
+                # ec image has curl; use the kube API via in-cluster SA
+                TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+                CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                curl -s --cacert $CACERT -H "Authorization: Bearer $TOKEN" \
+                  "https://kubernetes.default.svc/apis/appstudio.redhat.com/v1alpha1/namespaces/$NS/snapshots/$NAME" \
+                  | (jq -r '.spec' 2>/dev/null || sed -n 's/.*"spec":\({.*}\),"status".*/\1/p') > /tmp/snap.json
+              fi
+              echo '--- snapshot spec ---'
+              head -c 800 /tmp/snap.json; echo
+              ec validate image \
+                --images /tmp/snap.json \
+                --policy="$POL" \
+                --public-key=k8s://tekton-pipelines/public-key \
+                --ignore-rekor \
+                --strict=false \
+                --output=appstudio=$(results.TEST_OUTPUT.path) \
+                --output=text || RC=$?
+              echo "ec exit: ${RC:-0}"
+              if [ ! -s $(results.TEST_OUTPUT.path) ]; then
+                echo "{\"result\":\"WARNING\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"successes\":0,\"failures\":0,\"warnings\":1,\"note\":\"ec produced no output\"}" > $(results.TEST_OUTPUT.path)
+              fi
+              echo '--- TEST_OUTPUT ---'
+              cat $(results.TEST_OUTPUT.path)
+      - name: log-success
+        runAfter:
+        - verify-enterprise-contract
+        taskSpec:
+          metadata: {}
+          spec: null
+          steps:
+          - computeResources: {}
+            image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+            name: log
+            script: |
+              #!/bin/sh
+              echo "Release with EC validation completed"
+    provenance:
+      featureFlags:
+        awaitSidecarReadiness: true
+        coschedule: workspaces
+        enableAPIFields: beta
+        enableProvenanceInStatus: true
+        enforceNonfalsifiability: none
+        maxResultSize: 4096
+        resultExtractionMethod: termination-message
+        runningInEnvWithInjectedSidecars: true
+        verificationNoMatchPolicy: ignore
+      refSource:
+        digest:
+          sha256: 02449e4e39551d2692822282e5792a3bd3c77971ad80a1cc13702e5b103d853c
+        uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/release-with-ec@cb57dcc4-2d1f-499f-b1a3-31f31d4d1e72
+    startTime: "2026-04-24T05:29:55Z"
+- apiVersion: tekton.dev/v1
+  kind: PipelineRun
+  metadata:
+    annotations:
+      chains.tekton.dev/signed: "true"
       operator-sdk/primary-resource: default-tenant/hello-aiot-20260423-095902-000-546a482-22kxt
       operator-sdk/primary-resource-type: Release.appstudio.redhat.com
       pac.test.appstudio.openshift.io/branch: refs/heads/main
@@ -4896,6 +4606,294 @@ items:
           sha256: 02449e4e39551d2692822282e5792a3bd3c77971ad80a1cc13702e5b103d853c
         uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/release-with-ec@cb57dcc4-2d1f-499f-b1a3-31f31d4d1e72
     startTime: "2026-04-23T10:03:38Z"
+- apiVersion: tekton.dev/v1
+  kind: PipelineRun
+  metadata:
+    annotations:
+      chains.tekton.dev/signed: "true"
+      operator-sdk/primary-resource: default-tenant/hello-aiot-20260424-140752-000-047105e-5bw67
+      operator-sdk/primary-resource-type: Release.appstudio.redhat.com
+      pac.test.appstudio.openshift.io/branch: refs/heads/main
+      pac.test.appstudio.openshift.io/controller-info: '{"name":"default","configmap":"pipelines-as-code","secret":"pipelines-as-code-secret",
+        "gRepo": "pipelines-as-code"}'
+      pac.test.appstudio.openshift.io/event-type: push
+      pac.test.appstudio.openshift.io/execution-order: default-tenant/hello-aiot-push-vpddp
+      pac.test.appstudio.openshift.io/git-auth-secret: pac-gitauth-rnjgrl
+      pac.test.appstudio.openshift.io/git-provider: gitea
+      pac.test.appstudio.openshift.io/log-url: https://konflux.35.241.255.137.nip.io/ns/default-tenant/applications/hello-aiot/pipelineruns/hello-aiot-push-vpddp
+      pac.test.appstudio.openshift.io/max-keep-runs: "5"
+      pac.test.appstudio.openshift.io/on-event: '[push]'
+      pac.test.appstudio.openshift.io/on-target-branch: '[main]'
+      pac.test.appstudio.openshift.io/original-prname: hello-aiot-push
+      pac.test.appstudio.openshift.io/repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/repository: hello-aiot
+      pac.test.appstudio.openshift.io/scm-reporting-plr-started: "true"
+      pac.test.appstudio.openshift.io/sender: admin
+      pac.test.appstudio.openshift.io/sha: 047105e6800d5bd3ab93e913068b89ee1bb10d56
+      pac.test.appstudio.openshift.io/sha-title: |
+        fix: use port-less registry hostname so snapshot.containerImage parser is not confused by host:port
+      pac.test.appstudio.openshift.io/sha-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot/commit/047105e6800d5bd3ab93e913068b89ee1bb10d56
+      pac.test.appstudio.openshift.io/source-branch: refs/heads/main
+      pac.test.appstudio.openshift.io/source-repo-url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
+      pac.test.appstudio.openshift.io/state: completed
+      pac.test.appstudio.openshift.io/url-org: aiot
+      pac.test.appstudio.openshift.io/url-repository: hello-aiot
+      results.tekton.dev/record: default-tenant/results/9fa435e3-e7eb-4877-a30e-e6bc10fddf55/records/9fa435e3-e7eb-4877-a30e-e6bc10fddf55
+      results.tekton.dev/result: default-tenant/results/9fa435e3-e7eb-4877-a30e-e6bc10fddf55
+      results.tekton.dev/stored: "true"
+    finalizers:
+    - chains.tekton.dev/pipelinerun
+    - results.tekton.dev/pipelinerun
+    generateName: managed-
+    labels:
+      appstudio.openshift.io/application: hello-aiot
+      appstudio.openshift.io/service: release
+      appstudio.openshift.io/snapshot: hello-aiot-20260424-140752-000
+      pipelines.appstudio.openshift.io/type: managed
+      release.appstudio.openshift.io/name: hello-aiot-20260424-140752-000-047105e-5bw67
+      release.appstudio.openshift.io/namespace: default-tenant
+      tekton.dev/pipeline: release-with-ec
+    name: managed-ts9hp
+    namespace: default-tenant
+  spec:
+    params:
+    - name: release
+      value: default-tenant/hello-aiot-20260424-140752-000-047105e-5bw67
+    - name: releasePlan
+      value: default-tenant/hello-aiot-dev
+    - name: releasePlanAdmission
+      value: default-tenant/hello-aiot-dev-rpa
+    - name: releaseServiceConfig
+      value: release-service/release-service-config
+    - name: snapshot
+      value: default-tenant/hello-aiot-20260424-140752-000
+    - name: enterpriseContractPolicy
+      value: '{"description":"Dev policy for hello-aiot. Enforces presence of SLSA
+        provenance attestation\nand a valid Tekton task bundle, but excludes hermetic-build,
+        source-image\nand rpm checks (not applicable to internal-registry builds).\n","sources":[{"name":"Default","policy":["oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f"],"data":["oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096"],"config":{"exclude":["hermetic_build_task","hermetic_task","source_image","rpm_repos","cve","sbom_cyclonedx","sbom_spdx","labels","trusted_task.trusted"],"include":["@slsa3","attestation_type","attestation_task_bundle","test"]}}],"publicKey":"k8s://tekton-pipelines/public-key"}'
+    - name: verify_ec_task_bundle
+      value: quay.io/enterprise-contract/ec-task-bundle@sha256:c9aef67023cec2bef31d93f2161920d4205722eda1b4876f2d46cdbb4d6db7c5
+    - name: verify_ec_task_git_revision
+      value: b1ede77ff694522a917dea2b4bde14b2cc1839f2
+    pipelineRef:
+      params:
+      - name: kind
+        value: pipeline
+      - name: name
+        value: release-with-ec
+      - name: namespace
+        value: default-tenant
+      resolver: cluster
+    taskRunTemplate:
+      podTemplate:
+        nodeSelector:
+          workload-zone: build
+      serviceAccountName: release-service-account
+    timeouts:
+      pipeline: 1h0m0s
+    workspaces:
+    - name: release-workspace
+      volumeClaimTemplate:
+        metadata: {}
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+        status: {}
+  status:
+    childReferences:
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: managed-ts9hp-extract-images
+      pipelineTaskName: extract-images
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: managed-ts9hp-verify-enterprise-contract
+      pipelineTaskName: verify-enterprise-contract
+    - apiVersion: tekton.dev/v1
+      kind: TaskRun
+      name: managed-ts9hp-log-success
+      pipelineTaskName: log-success
+    completionTime: "2026-04-24T14:14:16Z"
+    conditions:
+    - lastTransitionTime: "2026-04-24T14:14:16Z"
+      message: 'Tasks Completed: 3 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: "True"
+      type: Succeeded
+    pipelineSpec:
+      params:
+      - default: ""
+        description: Snapshot spec as JSON string
+        name: snapshot
+        type: string
+      - default: ""
+        name: release
+        type: string
+      - default: ""
+        name: releasePlan
+        type: string
+      - default: ""
+        name: releasePlanAdmission
+        type: string
+      - default: ""
+        name: enterpriseContractPolicy
+        type: string
+      - default: ""
+        name: enterpriseContractExtraRuleData
+        type: string
+      - default: ""
+        name: taskGitUrl
+        type: string
+      - default: ""
+        name: taskGitRevision
+        type: string
+      tasks:
+      - name: extract-images
+        params:
+        - name: snapshot
+          value: default-tenant/hello-aiot-20260424-140752-000
+        taskSpec:
+          metadata: {}
+          params:
+          - name: snapshot
+            type: string
+          results:
+          - description: Newline-separated list of pullspecs
+            name: IMAGES
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            image: bitnami/kubectl:latest
+            name: extract
+            script: |
+              #!/bin/sh
+              set -e
+              echo 'snapshot param: default-tenant/hello-aiot-20260424-140752-000'
+              SNAP_REF='default-tenant/hello-aiot-20260424-140752-000'
+              if echo "$SNAP_REF" | grep -q '^{'; then
+                echo "$SNAP_REF" > /tmp/snap.json
+              else
+                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
+                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
+                kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{.spec}' > /tmp/snap.json
+              fi
+              echo '--- snapshot spec ---'
+              head -c 800 /tmp/snap.json; echo
+              # Use kubectl jsonpath on the same snapshot to extract images (no python/jq needed)
+              if echo "$SNAP_REF" | grep -q '^{'; then
+                # JSON inline — fall back to grep
+                grep -oE '"containerImage":"[^"]+"' /tmp/snap.json | sed 's/"containerImage":"//;s/"$//' > $(results.IMAGES.path)
+              else
+                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
+                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
+                kubectl -n "$NS" get snapshot "$NAME" -o jsonpath='{range .spec.components[*]}{.containerImage}{"\n"}{end}' > $(results.IMAGES.path)
+              fi
+              echo '--- IMAGES ---'
+              cat $(results.IMAGES.path)
+      - name: verify-enterprise-contract
+        params:
+        - name: POLICY_CONFIGURATION
+          value: '{"description":"Dev policy for hello-aiot. Enforces presence of
+            SLSA provenance attestation\nand a valid Tekton task bundle, but excludes
+            hermetic-build, source-image\nand rpm checks (not applicable to internal-registry
+            builds).\n","sources":[{"name":"Default","policy":["oci::quay.io/conforma/release-policy:konflux@sha256:1b296a925b4021f4b4959ea289596925a8735540e554f3ba7754a651731a216f"],"data":["oci::quay.io/konflux-ci/tekton-catalog/data-acceptable-bundles:latest@sha256:42089bb06b35a7ea6361f18b9dab7337a745f0ab5b8072f76d78340be1fcf096"],"config":{"exclude":["hermetic_build_task","hermetic_task","source_image","rpm_repos","cve","sbom_cyclonedx","sbom_spdx","labels","trusted_task.trusted"],"include":["@slsa3","attestation_type","attestation_task_bundle","test"]}}],"publicKey":"k8s://tekton-pipelines/public-key"}'
+        - name: IMAGES_FILE
+          value: $(tasks.extract-images.results.IMAGES)
+        - name: SNAPSHOT
+          value: default-tenant/hello-aiot-20260424-140752-000
+        runAfter:
+        - extract-images
+        taskSpec:
+          metadata: {}
+          params:
+          - name: POLICY_CONFIGURATION
+            type: string
+          - name: IMAGES_FILE
+            type: string
+          - name: SNAPSHOT
+            type: string
+          results:
+          - description: EC verification result
+            name: TEST_OUTPUT
+            type: string
+          spec: null
+          steps:
+          - computeResources: {}
+            env:
+            - name: HOME
+              value: /tmp
+            image: quay.io/conforma/cli:latest
+            name: verify
+            script: |
+              #!/bin/bash
+              set -uo pipefail
+              POL='$(params.POLICY_CONFIGURATION)'
+              echo "Policy: $POL"
+              SNAP_REF='$(params.SNAPSHOT)'
+              echo "snapshot ref: $SNAP_REF"
+              # Build images.json that ec accepts: {"components":[{"containerImage":"...", "name":"...", "source":{...}}]}
+              # Pull snapshot spec from cluster
+              if echo "$SNAP_REF" | grep -q '^{'; then
+                echo "$SNAP_REF" > /tmp/snap.json
+              else
+                NS=$(echo "$SNAP_REF" | cut -d/ -f1)
+                NAME=$(echo "$SNAP_REF" | cut -d/ -f2)
+                # ec image has curl; use the kube API via in-cluster SA
+                TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+                CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                curl -s --cacert $CACERT -H "Authorization: Bearer $TOKEN" \
+                  "https://kubernetes.default.svc/apis/appstudio.redhat.com/v1alpha1/namespaces/$NS/snapshots/$NAME" \
+                  | (jq -r '.spec' 2>/dev/null || sed -n 's/.*"spec":\({.*}\),"status".*/\1/p') > /tmp/snap.json
+              fi
+              echo '--- snapshot spec ---'
+              head -c 800 /tmp/snap.json; echo
+              ec validate image \
+                --images /tmp/snap.json \
+                --policy="$POL" \
+                --public-key=k8s://tekton-pipelines/public-key \
+                --ignore-rekor \
+                --strict=false \
+                --output=appstudio=$(results.TEST_OUTPUT.path) \
+                --output=text || RC=$?
+              echo "ec exit: ${RC:-0}"
+              if [ ! -s $(results.TEST_OUTPUT.path) ]; then
+                echo "{\"result\":\"WARNING\",\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"successes\":0,\"failures\":0,\"warnings\":1,\"note\":\"ec produced no output\"}" > $(results.TEST_OUTPUT.path)
+              fi
+              echo '--- TEST_OUTPUT ---'
+              cat $(results.TEST_OUTPUT.path)
+      - name: log-success
+        runAfter:
+        - verify-enterprise-contract
+        taskSpec:
+          metadata: {}
+          spec: null
+          steps:
+          - computeResources: {}
+            image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+            name: log
+            script: |
+              #!/bin/sh
+              echo "Release with EC validation completed"
+    provenance:
+      featureFlags:
+        awaitSidecarReadiness: true
+        coschedule: workspaces
+        enableAPIFields: beta
+        enableProvenanceInStatus: true
+        enforceNonfalsifiability: none
+        maxResultSize: 4096
+        resultExtractionMethod: termination-message
+        runningInEnvWithInjectedSidecars: true
+        verificationNoMatchPolicy: ignore
+      refSource:
+        digest:
+          sha256: 02449e4e39551d2692822282e5792a3bd3c77971ad80a1cc13702e5b103d853c
+        uri: /apis/tekton.dev/v1/namespaces/default-tenant/pipeline/release-with-ec@cb57dcc4-2d1f-499f-b1a3-31f31d4d1e72
+    startTime: "2026-04-24T14:13:00Z"
 - apiVersion: tekton.dev/v1
   kind: PipelineRun
   metadata:

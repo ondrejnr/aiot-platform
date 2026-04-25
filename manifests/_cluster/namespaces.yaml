@@ -4,6 +4,38 @@ items:
   kind: Namespace
   metadata:
     annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-24T08:55:46Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-24T08:55:46Z"}]}'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"ai-enricher"}}
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: ai-enricher
+    name: ai-enricher
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-24T08:53:00Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-24T08:53:00Z"}]}'
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"ai-enricher-build"},"spec":{},"status":{}}
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: ai-enricher-build
+    name: ai-enricher-build
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:39Z"}]}'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"aiot"},"spec":{},"status":{}}
@@ -321,6 +353,21 @@ items:
       fleet.cattle.io/managed: "true"
       kubernetes.io/metadata.name: cluster-fleet-local-local-1a3d67d0a899
     name: cluster-fleet-local-local-1a3d67d0a899
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-24T07:15:57Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-24T07:15:57Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      app.kubernetes.io/name: cloudnative-pg
+      kubernetes.io/metadata.name: cnpg-system
+    name: cnpg-system
   spec:
     finalizers:
     - kubernetes

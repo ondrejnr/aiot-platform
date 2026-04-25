@@ -4,11 +4,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T01:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-25T01:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: zabbix-nodesclean-29616540
-      job-name: zabbix-nodesclean-29616540
-    name: zabbix-nodesclean-29616540
+      batch.kubernetes.io/job-name: zabbix-nodesclean-29617980
+      job-name: zabbix-nodesclean-29617980
+    name: zabbix-nodesclean-29617980
     namespace: zabbix
     ownerReferences:
     - apiVersion: batch/v1
@@ -29,8 +29,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: zabbix-nodesclean-29616540
-          job-name: zabbix-nodesclean-29616540
+          batch.kubernetes.io/job-name: zabbix-nodesclean-29617980
+          job-name: zabbix-nodesclean-29617980
       spec:
         containers:
         - command:
@@ -77,22 +77,22 @@ items:
           operator: Exists
     ttlSecondsAfterFinished: 86400
   status:
-    completionTime: "2026-04-24T01:00:04Z"
+    completionTime: "2026-04-25T01:00:03Z"
     conditions:
-    - lastProbeTime: "2026-04-24T01:00:04Z"
-      lastTransitionTime: "2026-04-24T01:00:04Z"
+    - lastProbeTime: "2026-04-25T01:00:03Z"
+      lastTransitionTime: "2026-04-25T01:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-24T01:00:04Z"
-      lastTransitionTime: "2026-04-24T01:00:04Z"
+    - lastProbeTime: "2026-04-25T01:00:03Z"
+      lastTransitionTime: "2026-04-25T01:00:03Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-24T01:00:00Z"
+    startTime: "2026-04-25T01:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

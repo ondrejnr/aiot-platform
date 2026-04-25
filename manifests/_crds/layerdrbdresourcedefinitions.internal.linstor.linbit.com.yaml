@@ -29,6 +29,19 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: LayerDrbdResourceDefinitions
   metadata:
+    name: 31bfcae97d6610d7a8ca50384fedc59720b2e53434bfa28f03965f1010b36b3d
+  spec:
+    al_stripe_size: 32
+    al_stripes: 1
+    peer_slots: 7
+    resource_name: PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    resource_name_suffix: ""
+    secret: O6ZShkqRWYaXxTcPEov8
+    snapshot_name: ""
+    transport_type: IP
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerDrbdResourceDefinitions
+  metadata:
     name: 5e963e6f65c42d127fd901f83ddd4f486270460ae940472cc5ded5404d361555
   spec:
     al_stripe_size: 32
@@ -102,6 +115,19 @@ items:
     resource_name: PVC-7496D803-A21D-484B-9756-4327047B07BD
     resource_name_suffix: ""
     secret: UjimnYrxFOCDb26gKMgW
+    snapshot_name: ""
+    transport_type: IP
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerDrbdResourceDefinitions
+  metadata:
+    name: c8c1392d0a80617870608fbd1ebaca8b8e86eb648d8b9c07575b6e27301935e5
+  spec:
+    al_stripe_size: 32
+    al_stripes: 1
+    peer_slots: 7
+    resource_name: PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+    resource_name_suffix: ""
+    secret: yB+DhPfUjvUmCV7SAt1q
     snapshot_name: ""
     transport_type: IP
 - apiVersion: internal.linstor.linbit.com/v1-15-0

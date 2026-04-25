@@ -1,0 +1,57 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"ai-enricher","namespace":"ai-enricher"},"spec":{"ports":[{"name":"http","port":8080,"targetPort":8080}],"selector":{"app":"ai-enricher"}}}
+    name: ai-enricher
+    namespace: ai-enricher
+  spec:
+    clusterIP: 10.107.232.207
+    clusterIPs:
+    - 10.107.232.207
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: ai-enricher
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"ai-enricher-redis","namespace":"ai-enricher"},"spec":{"ports":[{"port":6379,"targetPort":6379}],"selector":{"app":"ai-enricher-redis"}}}
+    name: ai-enricher-redis
+    namespace: ai-enricher
+  spec:
+    clusterIP: 10.111.135.176
+    clusterIPs:
+    - 10.111.135.176
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 6379
+      protocol: TCP
+      targetPort: 6379
+    selector:
+      app: ai-enricher-redis
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:

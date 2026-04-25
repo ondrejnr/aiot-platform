@@ -19,7 +19,7 @@ items:
     snapshot_name: ""
     vlm_flags: 0
     vlm_nr: 0
-    vlm_size: 10485760
+    vlm_size: 31457280
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: VolumeDefinitions
   metadata:
@@ -40,6 +40,16 @@ items:
     vlm_flags: 0
     vlm_nr: 0
     vlm_size: 5242880
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: VolumeDefinitions
+  metadata:
+    name: 6b9d3ab011931b75ee449ca1411043e49bfbe1333e42b2aa195974b45d60f6cf
+  spec:
+    resource_name: PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    snapshot_name: ""
+    vlm_flags: 0
+    vlm_nr: 0
+    vlm_size: 10485760
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: VolumeDefinitions
   metadata:
@@ -66,6 +76,16 @@ items:
     name: aea05612005650de3a0f238bef656404be59a9d7a8ad79b262d0a636536de78c
   spec:
     resource_name: PVC-27976678-7D15-4989-99F4-0B94C9EC069C
+    snapshot_name: ""
+    vlm_flags: 0
+    vlm_nr: 0
+    vlm_size: 10485760
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: VolumeDefinitions
+  metadata:
+    name: b6bdc28d1a1aea11b744b7e3c49e78094abe99f62ba40158a611e3624455e7c0
+  spec:
+    resource_name: PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
     snapshot_name: ""
     vlm_flags: 0
     vlm_nr: 0

@@ -100,14 +100,15 @@ items:
   kind: Job
   metadata:
     annotations:
-      cronjob.kubernetes.io/instantiate: manual
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T01:30:00Z"
     labels:
-      batch.kubernetes.io/job-name: dns-backup-test1
-      job-name: dns-backup-test1
-    name: dns-backup-test1
+      batch.kubernetes.io/job-name: dns-backup-29616570
+      job-name: dns-backup-29616570
+    name: dns-backup-29616570
     namespace: dr-ops
     ownerReferences:
     - apiVersion: batch/v1
+      blockOwnerDeletion: true
       controller: true
       kind: CronJob
       name: dns-backup
@@ -124,8 +125,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: dns-backup-test1
-          job-name: dns-backup-test1
+          batch.kubernetes.io/job-name: dns-backup-29616570
+          job-name: dns-backup-29616570
       spec:
         containers:
         - command:
@@ -172,22 +173,22 @@ items:
             name: dns-backup-script
           name: scripts
   status:
-    completionTime: "2026-04-22T08:21:16Z"
+    completionTime: "2026-04-24T01:30:10Z"
     conditions:
-    - lastProbeTime: "2026-04-22T08:21:16Z"
-      lastTransitionTime: "2026-04-22T08:21:16Z"
+    - lastProbeTime: "2026-04-24T01:30:10Z"
+      lastTransitionTime: "2026-04-24T01:30:10Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T08:21:16Z"
-      lastTransitionTime: "2026-04-22T08:21:16Z"
+    - lastProbeTime: "2026-04-24T01:30:10Z"
+      lastTransitionTime: "2026-04-24T01:30:10Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T08:21:07Z"
+    startTime: "2026-04-24T01:30:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -358,23 +359,38 @@ items:
             name: manifest-backup-script
           name: scripts
   status:
-    active: 1
-    ready: 1
+    completionTime: "2026-04-24T01:18:04Z"
+    conditions:
+    - lastProbeTime: "2026-04-24T01:18:04Z"
+      lastTransitionTime: "2026-04-24T01:18:04Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-24T01:18:04Z"
+      lastTransitionTime: "2026-04-24T01:18:04Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
     startTime: "2026-04-24T01:15:00Z"
+    succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
 - apiVersion: batch/v1
   kind: Job
   metadata:
     annotations:
-      cronjob.kubernetes.io/instantiate: manual
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-25T01:15:00Z"
     labels:
-      batch.kubernetes.io/job-name: mb2
-      job-name: mb2
-    name: mb2
+      batch.kubernetes.io/job-name: manifest-backup-29617995
+      job-name: manifest-backup-29617995
+    name: manifest-backup-29617995
     namespace: dr-ops
     ownerReferences:
     - apiVersion: batch/v1
+      blockOwnerDeletion: true
       controller: true
       kind: CronJob
       name: manifest-backup
@@ -391,8 +407,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: mb2
-          job-name: mb2
+          batch.kubernetes.io/job-name: manifest-backup-29617995
+          job-name: manifest-backup-29617995
       spec:
         containers:
         - command:
@@ -436,23 +452,9 @@ items:
             name: manifest-backup-script
           name: scripts
   status:
-    completionTime: "2026-04-22T08:28:39Z"
-    conditions:
-    - lastProbeTime: "2026-04-22T08:28:39Z"
-      lastTransitionTime: "2026-04-22T08:28:39Z"
-      message: Reached expected number of succeeded pods
-      reason: CompletionsReached
-      status: "True"
-      type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T08:28:39Z"
-      lastTransitionTime: "2026-04-22T08:28:39Z"
-      message: Reached expected number of succeeded pods
-      reason: CompletionsReached
-      status: "True"
-      type: Complete
-    ready: 0
-    startTime: "2026-04-22T08:25:28Z"
-    succeeded: 1
+    active: 1
+    ready: 1
+    startTime: "2026-04-25T01:15:00Z"
     terminating: 0
     uncountedTerminatedPods: {}
 kind: List

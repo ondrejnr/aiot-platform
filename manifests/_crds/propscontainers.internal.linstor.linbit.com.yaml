@@ -19,6 +19,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: 04e6adbd9fef8e078013b6eb798aa185c221567a42b9669fff0087d92d3e0151
+  spec:
+    prop_key: StorPoolName
+    prop_value: lvm-thin
+    props_instance: /RSCS/AIOT-WORKER-01/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: 054157a774f5267f29e1a90932e812718d527ca011b1b6f651ce487c57507a92
   spec:
     prop_key: DrbdOptions/Disk/block-size
@@ -32,6 +40,14 @@ items:
     prop_key: Cluster/LocalID
     prop_value: 8e8027c6-a761-48f5-9203-957e1fbb57a2
     props_instance: /STLT
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 069449a6140d07e483ad281588bcefe88b06531103ab0dad403cd00229b9edd9
+  spec:
+    prop_key: StorDriver/internal/AllocationGranularity
+    prop_value: "4096"
+    props_instance: /VLM_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F/0
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -110,7 +126,7 @@ items:
     name: 0e8fee3906a0a50a288b2f2b7012f76edc31a6b44f8aae9c9afe97fa3ebd2d82
   spec:
     prop_key: StorDriver/internal/lvmthin/thinPoolMetadataPercent
-    prop_value: "8.02"
+    prop_value: "10.13"
     props_instance: /STOR_POOLS/AIOT-WORKER-02/LVM-THIN
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
@@ -211,6 +227,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: 18a48a447fd76cfb4ae23c651e928e50af0a27f825e2cc1480ed8d09229e423b
+  spec:
+    prop_key: DrbdPrimarySetOn
+    prop_value: AIOT-WORKER-02
+    props_instance: /RSC_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: 1968f7df57bef96fbfd8d0be758c1eb5aed35c6d77edf5c5ecbcda215d4b868c
   spec:
     prop_key: DrbdOptions/Disk/discard-zeroes-if-aligned
@@ -224,6 +248,14 @@ items:
     prop_key: FileSystem/MkfsParams
     prop_value: ""
     props_instance: /RSC_DFNS/PVC-33099827-4B54-4D13-8588-122F969DEA72
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 1bec00d5efd83f6b5a277f77b65290469c36a15ee6b7e286b6910527da173527
+  spec:
+    prop_key: Aux/csi.storage.k8s.io/pvc/name
+    prop_value: pg-ha-2
+    props_instance: /RSC_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -275,6 +307,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: 25a18cf4de9b4cb0a09c54ef5882dd56f5e3b703712295d2ecb0b7aba87ea0af
+  spec:
+    prop_key: Aux/csi-provisioning-completed-by
+    prop_value: linstor-csi/v1.10.6
+    props_instance: /RSC_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: 25bb1543e1aeab1fc81ba851f05904e74ff2d22b19ffacebf5cb22dbc994e3cc
   spec:
     prop_key: Aux/csi.storage.k8s.io/pvc/name
@@ -323,6 +363,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: 2a26193e4956c030e07363409e547bfa27acd81480d72e8a1234e77d88d9f4b5
+  spec:
+    prop_key: DrbdOptions/Disk/discard-zeroes-if-aligned
+    prop_value: "yes"
+    props_instance: /VLM_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: 2a66ec55b71c4ee49c60e3e97fc135e0bcd759bf44f0f2eeb155e35c93eebef9
   spec:
     prop_key: DrbdOptions/auto-verify-alg
@@ -336,6 +384,14 @@ items:
     prop_key: DrbdOptions/auto-verify-alg
     prop_value: crct10dif
     props_instance: /RSC_DFNS/PVC-17D30D0E-224F-42EF-BC00-70349E931E33
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 2c7b56c32551435b61d29f6eb09c129a9fb2d4fcaa1381b4b56a047f00ef9376
+  spec:
+    prop_key: StorPoolName
+    prop_value: lvm-thin
+    props_instance: /RSCS/AIOT-WORKER-01/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -360,6 +416,14 @@ items:
     prop_key: DrbdOptions/Resource/quorum
     prop_value: "off"
     props_instance: /RSC_DFNS/PVC-15ABFC60-E493-48AD-A2C8-C7F7BE5A6607
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 2de698d8f824da111d13c06622b8112da3745c98919883875021aa240f5fead8
+  spec:
+    prop_key: DrbdOptions/Disk/block-size
+    prop_value: "4096"
+    props_instance: /VLM_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F/0
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -395,6 +459,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: 34186512d8f7824550449f885eafc46439bf9ff316506b07bb8aaa5d660911b1
+  spec:
+    prop_key: FileSystem/MkfsParams
+    prop_value: ""
+    props_instance: /RSC_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: 34364c5e55c5a06351326e951efc3d7786a32ef52a1a85f82a955d303190ccca
   spec:
     prop_key: FileSystem/MkfsParams
@@ -408,6 +480,14 @@ items:
     prop_key: NetCom/DebugSslConnector/Type
     prop_value: SSL
     props_instance: /CTRL
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 35f388dfa9efc60544464d992810cdbf2f7160705bba37f800ef8a208feba4d0
+  spec:
+    prop_key: Aux/csi.storage.k8s.io/pvc/namespace
+    prop_value: aiot
+    props_instance: /RSC_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -491,6 +571,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: 419a0f70aa3a03834eb8c34aa498bf97016c697bdf7c8286e57a2671350cb5bf
+  spec:
+    prop_key: DrbdOptions/Disk/rs-discard-granularity
+    prop_value: "65536"
+    props_instance: /VLM_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: 41e1e6b4ff88d943dd0ef7e8f020f534fd19e1e7ced0cb40fa7361f502079a25
   spec:
     prop_key: DrbdOptions/Resource/quorum
@@ -536,6 +624,14 @@ items:
     prop_key: DrbdOptions/Disk/block-size
     prop_value: "4096"
     props_instance: /VLM_DFNS/PVC-61A22797-A355-4F74-A517-BFE2C6257D14/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 44d02f0968f4be28925c9c07d8dde574d2ca8395a2372dcde127ec27d9145bd3
+  spec:
+    prop_key: DrbdOptions/auto-verify-alg
+    prop_value: crct10dif
+    props_instance: /RSC_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -630,8 +726,16 @@ items:
     name: 4f8b64854e9b6c49f3e6b46efd12dd72328c0c1250220a801a1bc218b54fc168
   spec:
     prop_key: __updated__
-    prop_value: "2026-04-23T04:15:53.245Z"
+    prop_value: "2026-04-24T16:17:20.600Z"
     props_instance: /KVS/__GUI__SETTINGS
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 4f8d27dbb1ff39dd2efe4fb1f7eb211a02ea1d478763a65ec38ae9a796cd121e
+  spec:
+    prop_key: Linstor/Drbd/freeze-block-size
+    prop_value: "True"
+    props_instance: /VLM_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB/0
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -811,6 +915,22 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: 65e0119ac829fa82f4abfe093fd0eb1644ff17fd15f1fb4960f1ece154fae590
+  spec:
+    prop_key: Linstor/Drbd/freeze-block-size
+    prop_value: "True"
+    props_instance: /VLM_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 665822fe4cfa431124c4f021bd6ebafa4098eecba1d26aec74f48e1e0e4ed596
+  spec:
+    prop_key: Aux/csi-provisioning-completed-by
+    prop_value: linstor-csi/v1.10.6
+    props_instance: /RSC_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: 667584933e687b106bb5466428bf3fb051be5ccd60bdad62c46e17df47a3d8a0
   spec:
     prop_key: Aux/piraeus.io/configured-interfaces
@@ -827,6 +947,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: 6869757e94a8352c4827f4dfb0bea4f2b0a100af74bcdb90e9c76c31a69c1909
+  spec:
+    prop_key: DrbdOptions/Disk/rs-discard-granularity
+    prop_value: "65536"
+    props_instance: /VLM_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: 6874b5152df07304081bcddeee246e4caea2323853f491b9b6706c8ba93d3bf1
   spec:
     prop_key: FileSystem/MkfsParams
@@ -840,6 +968,22 @@ items:
     prop_key: Linstor/Drbd/freeze-block-size
     prop_value: "True"
     props_instance: /VLM_DFNS/PVC-15ABFC60-E493-48AD-A2C8-C7F7BE5A6607/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 6a183cf08f69d04fd60e5c1e6d491fc4b9098edfae4cb16f441b43279ed8c43e
+  spec:
+    prop_key: FileSystem/MkfsParams
+    prop_value: ""
+    props_instance: /RSC_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 6a72e690877488652eb9b98792163621d1d86493446c4f06c2c8068a56722d83
+  spec:
+    prop_key: StorPoolName
+    prop_value: lvm-thin
+    props_instance: /RSCS/AIOT-WORKER-02/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -1059,6 +1203,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: 8d0dbe9b6dc2c5398db47c3df0b469decc5aafdad156aece796573ab45ca7624
+  spec:
+    prop_key: FileSystem/Type
+    prop_value: ext4
+    props_instance: /RSC_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: 8d72a201ce4cbaf7df9bfd97d53741f2ffb22de156595797b962230a28434362
   spec:
     prop_key: DrbdOptions/Resource/quorum
@@ -1168,6 +1320,22 @@ items:
     prop_key: FileSystem/MkfsParams
     prop_value: ""
     props_instance: /RSC_DFNS/PVC-17D30D0E-224F-42EF-BC00-70349E931E33
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 9b81c5f96aad8361fb0ce3ac3b1aa1c08cb7d7333acd38ea83928246aab4c10b
+  spec:
+    prop_key: DrbdCurrentGi
+    prop_value: 6F4B93D703DA7C9E
+    props_instance: /VLM_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: 9bdf2ad88770a909b569cabc8a0d72be4216ea5d8208812bb78ebbc617a809eb
+  spec:
+    prop_key: DrbdCurrentGi
+    prop_value: C35C47B151CE6C62
+    props_instance: /VLM_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F/0
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -1291,6 +1459,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: a91a0bed1d0f36659cfe3cc55ac9e6c5c57f652895d35fbff6fc46004fa9ab73
+  spec:
+    prop_key: DrbdPrimarySetOn
+    prop_value: AIOT-WORKER-01
+    props_instance: /RSC_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: aaf7c24426244baf9088d05368350f9eb8e8dcc840702f1e68460b0cb75fbe5e
   spec:
     prop_key: DrbdOptions/Disk/block-size
@@ -1304,6 +1480,22 @@ items:
     prop_key: DrbdOptions/AutoEvictAllowEviction
     prop_value: "false"
     props_instance: /CTRL
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: ab56630792ada7f52c9487de3a11e922f9906a2b25833738bfd1bc5a2e0d24c8
+  spec:
+    prop_key: Aux/csi.storage.k8s.io/pvc/name
+    prop_value: pg-ha-1
+    props_instance: /RSC_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: ac6841833f0686457321891fb424a9f6ee9760f905aa5f0d3be1ecdc0bec88a4
+  spec:
+    prop_key: StorPoolName
+    prop_value: lvm-thin
+    props_instance: /RSCS/AIOT-WORKER-02/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -1411,6 +1603,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: bd876cb77bb881971be3d13dde164a738f0f4fa81bf6412802a86e6daa17a6a4
+  spec:
+    prop_key: DrbdOptions/auto-verify-alg
+    prop_value: crct10dif
+    props_instance: /RSC_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: becd644af7cbf160a1da9998727a6cd971e352de64c6b756184862c702667b55
   spec:
     prop_key: StorPoolName
@@ -1475,6 +1675,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: c8bf5eb136cec8c3eea3498f5b0a6e4e620e6a1c76633ce3db552df6a4775e25
+  spec:
+    prop_key: DrbdOptions/Disk/block-size
+    prop_value: "4096"
+    props_instance: /VLM_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: c985514619941f6ad6e65a8c8470638f9a98f18d7010d26cbdb3c7415ead06da
   spec:
     prop_key: DrbdOptions/Disk/discard-zeroes-if-aligned
@@ -1496,6 +1704,22 @@ items:
     prop_key: StorDriver/internal/AllocationGranularity
     prop_value: "4096"
     props_instance: /VLM_DFNS/PVC-7496D803-A21D-484B-9756-4327047B07BD/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: cc44c9642251eeb55231c6845d8c216f5c4665207560572ce63d14f05299ee8a
+  spec:
+    prop_key: Aux/csi.storage.k8s.io/pvc/namespace
+    prop_value: aiot
+    props_instance: /RSC_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: ccaca2822fe3cac805196a34f4f29e5180c575c3a8317e2ebe5783b9abf9f124
+  spec:
+    prop_key: StorDriver/internal/AllocationGranularity
+    prop_value: "4096"
+    props_instance: /VLM_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB/0
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -1606,7 +1830,7 @@ items:
     name: d76e3e34865a46369e12b1c01b1c6128da5754d6067088eb2df1360af5895ee9
   spec:
     prop_key: StorDriver/internal/lvmthin/thinPoolMetadataPercent
-    prop_value: "7.87"
+    prop_value: "9.92"
     props_instance: /STOR_POOLS/AIOT-WORKER-01/LVM-THIN
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
@@ -1616,6 +1840,14 @@ items:
     prop_key: Aux/piraeus.io/last-applied
     prop_value: '["Aux/piraeus.io/managed-by","DrbdOptions/AutoEvictAllowEviction","DrbdOptions/Net/rr-conflict","DrbdOptions/Resource/on-no-data-accessible","DrbdOptions/Resource/on-no-quorum","DrbdOptions/Resource/on-suspended-primary-outdated"]'
     props_instance: /STLT
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: d7d26cabd54d0ba147731b59040f183bb4bb45c54fe2c478925350c5751f80f4
+  spec:
+    prop_key: DrbdOptions/Resource/quorum
+    prop_value: "off"
+    props_instance: /RSC_DFNS/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -1632,6 +1864,14 @@ items:
     prop_key: DrbdOptions/auto-verify-alg
     prop_value: crct10dif
     props_instance: /RSC_DFNS/PVC-27976678-7D15-4989-99F4-0B94C9EC069C
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: dca2d247eb0e0a785738920c4b02044fb178b43b5b2dc5ce024899b416212245
+  spec:
+    prop_key: DrbdOptions/Resource/quorum
+    prop_value: "off"
+    props_instance: /RSC_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
@@ -1819,6 +2059,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:
+    name: eeb30e28d4045336e1bf00036a82598e55376b2ba4d50f59366aa119bbfcb6cf
+  spec:
+    prop_key: DrbdOptions/Disk/discard-zeroes-if-aligned
+    prop_value: "yes"
+    props_instance: /VLM_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F/0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
     name: efda9a9b75583187395d6dd6ea168d926d38526d70f0fbe1d947180b49ecff05
   spec:
     prop_key: StorPoolName
@@ -1880,6 +2128,14 @@ items:
     prop_key: FileSystem/Type
     prop_value: ext4
     props_instance: /RSC_DFNS/PVC-3FFCF658-4DFC-4976-8B3C-8D1329648895
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: PropsContainers
+  metadata:
+    name: fe4429a14d74330b13ca394e3c22caccb3fa2ff2563dd5d7138c8a3470680450
+  spec:
+    prop_key: FileSystem/Type
+    prop_value: ext4
+    props_instance: /RSC_DFNS/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: PropsContainers
   metadata:

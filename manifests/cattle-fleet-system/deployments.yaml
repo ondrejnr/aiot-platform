@@ -389,18 +389,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T14:17:54Z"
-      lastUpdateTime: "2026-04-22T14:17:54Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:43:04Z"
       lastUpdateTime: "2026-04-23T05:05:04Z"
       message: ReplicaSet "helmops-6f5bd58f9b" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-24T06:03:41Z"
+      lastUpdateTime: "2026-04-24T06:03:41Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 2
     readyReplicas: 1
     replicas: 1

@@ -4,18 +4,18 @@ items:
   kind: Job
   metadata:
     labels:
-      k8up.io/owned-by: backup_adhoc-20260422-070041
+      k8up.io/owned-by: backup_aiot-backup-4pvj2
       k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
       k8up.io/type: backup
       k8upjob: "true"
-    name: backup-adhoc-20260422-070041-0
+    name: backup-aiot-backup-4pvj2-0
     namespace: semaphore
     ownerReferences:
     - apiVersion: k8up.io/v1
       blockOwnerDeletion: true
       controller: true
       kind: Backup
-      name: adhoc-20260422-070041
+      name: aiot-backup-4pvj2
   spec:
     backoffLimit: 6
     completionMode: NonIndexed
@@ -29,8 +29,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: backup-adhoc-20260422-070041-0
-          job-name: backup-adhoc-20260422-070041-0
+          batch.kubernetes.io/job-name: backup-aiot-backup-4pvj2-0
+          job-name: backup-aiot-backup-4pvj2-0
           k8upjob: "true"
       spec:
         containers:
@@ -41,36 +41,36 @@ items:
           - /usr/local/bin/k8up
           - restic
           env:
-          - name: HOSTNAME
-            value: semaphore
-          - name: CLUSTER_NAME
-            value: default
-          - name: FILEEXTENSION_ANNOTATION
-            value: k8up.io/file-extension
-          - name: AWS_ACCESS_KEY_ID
-            valueFrom:
-              secretKeyRef:
-                key: access_key
-                name: r2-creds
           - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
                 key: secret_key
                 name: r2-creds
+          - name: STATS_URL
+          - name: PROM_URL
+            value: http://127.0.0.1/
+          - name: CLUSTER_NAME
+            value: default
+          - name: BACKUPCOMMAND_ANNOTATION
+            value: k8up.io/backupcommand
           - name: RESTIC_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: password
                 name: k8up-repo
-          - name: STATS_URL
-          - name: PROM_URL
-            value: http://127.0.0.1/
-          - name: BACKUPCOMMAND_ANNOTATION
-            value: k8up.io/backupcommand
+          - name: FILEEXTENSION_ANNOTATION
+            value: k8up.io/file-extension
+          - name: HOSTNAME
+            value: semaphore
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                key: access_key
+                name: r2-creds
           - name: RESTIC_REPOSITORY
             value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
           - name: TARGET_PODS
-            value: semaphore-75b85ff97b-2m74z
+            value: semaphore-75b85ff97b-h4p8t
           - name: SKIP_PREBACKUP
             value: "true"
           image: ghcr.io/k8up-io/k8up:v2.15.0
@@ -118,22 +118,22 @@ items:
         - emptyDir: {}
           name: restic-cache-dir
   status:
-    completionTime: "2026-04-22T07:01:06Z"
+    completionTime: "2026-04-24T03:05:14Z"
     conditions:
-    - lastProbeTime: "2026-04-22T07:01:06Z"
-      lastTransitionTime: "2026-04-22T07:01:06Z"
+    - lastProbeTime: "2026-04-24T03:05:14Z"
+      lastTransitionTime: "2026-04-24T03:05:14Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T07:01:06Z"
-      lastTransitionTime: "2026-04-22T07:01:06Z"
+    - lastProbeTime: "2026-04-24T03:05:14Z"
+      lastTransitionTime: "2026-04-24T03:05:14Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T07:00:42Z"
+    startTime: "2026-04-24T03:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -278,18 +278,19 @@ items:
   kind: Job
   metadata:
     labels:
-      k8up.io/owned-by: backup_first-backup
+      k8up.io/owned-by: prune_aiot-prune-lgq6x
       k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
-      k8up.io/type: backup
+      k8up.io/type: prune
       k8upjob: "true"
-    name: backup-first-backup-0
+      k8upjob/exclusive: "true"
+    name: prune-aiot-prune-lgq6x
     namespace: semaphore
     ownerReferences:
     - apiVersion: k8up.io/v1
       blockOwnerDeletion: true
       controller: true
-      kind: Backup
-      name: first-backup
+      kind: Prune
+      name: aiot-prune-lgq6x
   spec:
     backoffLimit: 6
     completionMode: NonIndexed
@@ -303,33 +304,34 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: backup-first-backup-0
-          job-name: backup-first-backup-0
+          batch.kubernetes.io/job-name: prune-aiot-prune-lgq6x
+          job-name: prune-aiot-prune-lgq6x
           k8upjob: "true"
       spec:
         containers:
         - args:
           - -varDir
           - /k8up
+          - -prune
           command:
           - /usr/local/bin/k8up
           - restic
           env:
-          - name: AWS_ACCESS_KEY_ID
-            valueFrom:
-              secretKeyRef:
-                key: access_key
-                name: r2-creds
+          - name: HOSTNAME
+            value: semaphore
           - name: STATS_URL
-          - name: CLUSTER_NAME
-            value: default
-          - name: BACKUPCOMMAND_ANNOTATION
-            value: k8up.io/backupcommand
+          - name: KEEP_DAILY
+            value: "2"
           - name: RESTIC_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: password
                 name: k8up-repo
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                key: access_key
+                name: r2-creds
           - name: AWS_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
@@ -337,26 +339,15 @@ items:
                 name: r2-creds
           - name: PROM_URL
             value: http://127.0.0.1/
-          - name: FILEEXTENSION_ANNOTATION
-            value: k8up.io/file-extension
-          - name: HOSTNAME
-            value: semaphore
           - name: RESTIC_REPOSITORY
             value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
-          - name: TARGET_PODS
-            value: semaphore-75b85ff97b-2m74z
-          - name: SKIP_PREBACKUP
-            value: "true"
           image: ghcr.io/k8up-io/k8up:v2.15.0
           imagePullPolicy: IfNotPresent
-          name: backup
+          name: prune
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-          - mountPath: /data/semaphore-data
-            name: semaphore-data
-            readOnly: true
           - mountPath: /k8up
             name: k8up-dir
           - mountPath: /tmp
@@ -364,27 +355,13 @@ items:
           - mountPath: /.cache
             name: restic-cache-dir
         dnsPolicy: ClusterFirst
-        nodeSelector:
-          kubernetes.io/hostname: aiot-worker-01
         restartPolicy: OnFailure
         schedulerName: default-scheduler
         securityContext: {}
         serviceAccount: pod-executor
         serviceAccountName: pod-executor
         terminationGracePeriodSeconds: 30
-        tolerations:
-        - effect: NoExecute
-          key: node.kubernetes.io/not-ready
-          operator: Exists
-          tolerationSeconds: 300
-        - effect: NoExecute
-          key: node.kubernetes.io/unreachable
-          operator: Exists
-          tolerationSeconds: 300
         volumes:
-        - name: semaphore-data
-          persistentVolumeClaim:
-            claimName: semaphore-data
         - emptyDir: {}
           name: k8up-dir
         - emptyDir: {}
@@ -392,22 +369,22 @@ items:
         - emptyDir: {}
           name: restic-cache-dir
   status:
-    completionTime: "2026-04-22T06:04:42Z"
+    completionTime: "2026-04-24T04:05:10Z"
     conditions:
-    - lastProbeTime: "2026-04-22T06:04:42Z"
-      lastTransitionTime: "2026-04-22T06:04:42Z"
+    - lastProbeTime: "2026-04-24T04:05:10Z"
+      lastTransitionTime: "2026-04-24T04:05:10Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T06:04:42Z"
-      lastTransitionTime: "2026-04-22T06:04:42Z"
+    - lastProbeTime: "2026-04-24T04:05:10Z"
+      lastTransitionTime: "2026-04-24T04:05:10Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-22T06:04:30Z"
+    startTime: "2026-04-24T04:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

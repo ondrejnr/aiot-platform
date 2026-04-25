@@ -146,18 +146,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-23T05:02:21Z"
-      lastUpdateTime: "2026-04-23T05:02:21Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-22T11:41:19Z"
       lastUpdateTime: "2026-04-23T09:55:08Z"
       message: ReplicaSet "tekton-chains-controller-666b9684ff" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-24T10:19:14Z"
+      lastUpdateTime: "2026-04-24T10:19:14Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 12
     readyReplicas: 1
     replicas: 1
@@ -322,8 +322,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-23T05:02:18Z"
-      lastUpdateTime: "2026-04-23T05:02:18Z"
+    - lastTransitionTime: "2026-04-24T10:19:14Z"
+      lastUpdateTime: "2026-04-24T10:19:14Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -430,8 +430,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-23T05:02:34Z"
-      lastUpdateTime: "2026-04-23T05:02:34Z"
+    - lastTransitionTime: "2026-04-24T10:19:14Z"
+      lastUpdateTime: "2026-04-24T10:19:14Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -633,8 +633,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-23T05:02:16Z"
-      lastUpdateTime: "2026-04-23T05:02:16Z"
+    - lastTransitionTime: "2026-04-24T10:19:14Z"
+      lastUpdateTime: "2026-04-24T10:19:14Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -1287,12 +1287,6 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-23T05:02:10Z"
-      lastUpdateTime: "2026-04-23T05:02:10Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-22T11:41:29Z"
       lastUpdateTime: "2026-04-23T07:15:38Z"
       message: ReplicaSet "tekton-results-retention-policy-agent-58d6f7bfd5" has successfully
@@ -1300,6 +1294,12 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-24T10:19:14Z"
+      lastUpdateTime: "2026-04-24T10:19:14Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 3
     readyReplicas: 1
     replicas: 1
@@ -1615,8 +1615,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-23T05:01:59Z"
-      lastUpdateTime: "2026-04-23T05:01:59Z"
+    - lastTransitionTime: "2026-04-24T10:19:14Z"
+      lastUpdateTime: "2026-04-24T10:19:14Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -1747,8 +1747,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-23T05:01:58Z"
-      lastUpdateTime: "2026-04-23T05:01:58Z"
+    - lastTransitionTime: "2026-04-24T10:19:08Z"
+      lastUpdateTime: "2026-04-24T10:19:08Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -1871,8 +1871,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-23T05:01:55Z"
-      lastUpdateTime: "2026-04-23T05:01:55Z"
+    - lastTransitionTime: "2026-04-24T10:19:14Z"
+      lastUpdateTime: "2026-04-24T10:19:14Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"

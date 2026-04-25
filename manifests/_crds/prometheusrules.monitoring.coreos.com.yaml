@@ -5,6 +5,35 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"monitoring.coreos.com/v1","kind":"PrometheusRule","metadata":{"annotations":{},"labels":{"release":"prometheus"},"name":"ai-enricher-rules","namespace":"ai-enricher"},"spec":{"groups":[{"name":"ai-enricher","rules":[{"alert":"AIEnricherCircuitOpen","annotations":{"summary":"ai-enricher circuit breaker is open (LLM disabled)"},"expr":"ai_enricher_circuit_breaker_open == 1","for":"5m","labels":{"severity":"warning"}},{"alert":"AIEnricherBudgetExhausted","annotations":{"summary":"ai-enricher hit LLM budget limit"},"expr":"rate(ai_enricher_budget_exhausted_total[10m]) \u003e 0","for":"10m","labels":{"severity":"warning"}}]}]}}
+      prometheus-operator-validated: "true"
+    labels:
+      release: prometheus
+    name: ai-enricher-rules
+    namespace: ai-enricher
+  spec:
+    groups:
+    - name: ai-enricher
+      rules:
+      - alert: AIEnricherCircuitOpen
+        annotations:
+          summary: ai-enricher circuit breaker is open (LLM disabled)
+        expr: ai_enricher_circuit_breaker_open == 1
+        for: 5m
+        labels:
+          severity: warning
+      - alert: AIEnricherBudgetExhausted
+        annotations:
+          summary: ai-enricher hit LLM budget limit
+        expr: rate(ai_enricher_budget_exhausted_total[10m]) > 0
+        for: 10m
+        labels:
+          severity: warning
+- apiVersion: monitoring.coreos.com/v1
+  kind: PrometheusRule
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"monitoring.coreos.com/v1","kind":"PrometheusRule","metadata":{"annotations":{},"labels":{"release":"prometheus"},"name":"event-exporter-warnings","namespace":"event-exporter"},"spec":{"groups":[{"name":"kubernetes-warning-events","rules":[{"alert":"KubernetesWarningEvent","annotations":{"description":"At least one Warning event fired in the last 5m.","summary":"Warning K8s event"},"expr":"increase(event_exporter_events_sent_total{severity=\"Warning\"}[5m]) \u003e 0","for":"0m","labels":{"severity":"warning","source":"event-exporter"}}]}]}}
       prometheus-operator-validated: "true"
     labels:

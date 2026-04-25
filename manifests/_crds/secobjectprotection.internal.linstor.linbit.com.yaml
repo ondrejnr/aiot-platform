@@ -93,6 +93,15 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: SecObjectProtection
   metadata:
+    name: 2ced0a252dee33f03c5b1466e55890d547bf983a36fe6e7ffa1c30ce36d892fa
+  spec:
+    creator_identity_name: PUBLIC
+    object_path: /resources/AIOT-WORKER-01/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    owner_role_name: PUBLIC
+    security_type_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecObjectProtection
+  metadata:
     name: 314d6a7260c1c47534ac371cc0dbe62f6a2220fe4b14752de55ae3c45877a227
   spec:
     creator_identity_name: PUBLIC
@@ -210,6 +219,15 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: SecObjectProtection
   metadata:
+    name: 6c12350fdb0e46752d2b18738746463d11bfdb882b4b24a46d984a2101038dc6
+  spec:
+    creator_identity_name: PUBLIC
+    object_path: /resourcedefinitions/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+    owner_role_name: PUBLIC
+    security_type_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecObjectProtection
+  metadata:
     name: 751738215de580610fd428459074250c080fc19d41b2f055662c2ffcbc826730
   spec:
     creator_identity_name: PUBLIC
@@ -318,10 +336,28 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: SecObjectProtection
   metadata:
+    name: ac810277162d3e3a3f817fa0979f48b8dfb9e91d077f17673616bef1f4c44e50
+  spec:
+    creator_identity_name: PUBLIC
+    object_path: /resourcedefinitions/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    owner_role_name: PUBLIC
+    security_type_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecObjectProtection
+  metadata:
     name: afd0254b4cec1ca25bc4f515f17f257349ae26475c050738f382ff593bdac51a
   spec:
     creator_identity_name: PUBLIC
     object_path: /resourcedefinitions/PVC-FC2D6EE5-7B9E-4673-A88E-7079B254BB40
+    owner_role_name: PUBLIC
+    security_type_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecObjectProtection
+  metadata:
+    name: b216edcf76153f4cb69d4d4e89e973f22d6cd9e75b30ce07c52db6f9b8db049b
+  spec:
+    creator_identity_name: PUBLIC
+    object_path: /resources/AIOT-WORKER-01/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
     owner_role_name: PUBLIC
     security_type_name: PUBLIC
 - apiVersion: internal.linstor.linbit.com/v1-15-0
@@ -390,6 +426,15 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: SecObjectProtection
   metadata:
+    name: d89350359acc20a17b455a25257cb0ce20bc705c56e81f9ab5b9180d49e165cb
+  spec:
+    creator_identity_name: PUBLIC
+    object_path: /resources/AIOT-WORKER-02/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+    owner_role_name: PUBLIC
+    security_type_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecObjectProtection
+  metadata:
     name: da89d1e375612e032db07b3495ace960cac08024729d10fc4e84fbd17dbf8476
   spec:
     creator_identity_name: PUBLIC
@@ -448,6 +493,15 @@ items:
   spec:
     creator_identity_name: PUBLIC
     object_path: /resources/AIOT-WORKER-01/PVC-734704A4-89F1-4F12-B3A1-2C178791C993
+    owner_role_name: PUBLIC
+    security_type_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecObjectProtection
+  metadata:
+    name: ff74581fc6e970583c61dc281c1da92a6a0bc89e6c80bfec8e7c08e871314d22
+  spec:
+    creator_identity_name: PUBLIC
+    object_path: /resources/AIOT-WORKER-02/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
     owner_role_name: PUBLIC
     security_type_name: PUBLIC
 kind: List

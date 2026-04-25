@@ -4,8 +4,13 @@ items:
   kind: PodDisruptionBudget
   metadata:
     annotations:
-      cnpg.io/operatorVersion: 1.25.1
+      cnpg.io/operatorVersion: 1.28.0
     labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: pg-ha
+      app.kubernetes.io/managed-by: cloudnative-pg
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/version: "16"
       cnpg.io/cluster: pg-ha
     name: pg-ha-primary
     namespace: aiot
@@ -22,7 +27,7 @@ items:
         cnpg.io/instanceRole: primary
   status:
     conditions:
-    - lastTransitionTime: "2026-04-14T01:26:18Z"
+    - lastTransitionTime: "2026-04-24T07:17:16Z"
       message: ""
       observedGeneration: 1
       reason: InsufficientPods

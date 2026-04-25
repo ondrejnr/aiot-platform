@@ -64,23 +64,70 @@ items:
   kind: PersistentVolumeClaim
   metadata:
     annotations:
-      cnpg.io/nodeSerial: "2"
-      cnpg.io/operatorVersion: 1.25.1
+      cnpg.io/nodeSerial: "1"
+      cnpg.io/operatorVersion: 1.28.0
       cnpg.io/pvcStatus: ready
-      k8up.io/backup: "false"
       pv.kubernetes.io/bind-completed: "yes"
       pv.kubernetes.io/bound-by-controller: "yes"
-      volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-      volume.kubernetes.io/selected-node: aiot-worker-02
-      volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: aiot-worker-01
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
     finalizers:
     - kubernetes.io/pvc-protection
     labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/managed-by: cloudnative-pg
+      app.kubernetes.io/name: postgresql
       cnpg.io/cluster: pg-ha
-      cnpg.io/instanceName: pg-ha-2
+      cnpg.io/instanceName: pg-ha-1
       cnpg.io/instanceRole: replica
       cnpg.io/pvcRole: PG_DATA
       role: replica
+    name: pg-ha-1
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: postgresql.cnpg.io/v1
+      controller: true
+      kind: Cluster
+      name: pg-ha
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: piraeus-r2
+    volumeMode: Filesystem
+    volumeName: pvc-0c6ad1c4-ea10-4b24-95c5-12f0f48ef8ab
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 10Gi
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      cnpg.io/nodeSerial: "2"
+      cnpg.io/operatorVersion: 1.28.0
+      cnpg.io/pvcStatus: ready
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: aiot-worker-02
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/managed-by: cloudnative-pg
+      app.kubernetes.io/name: postgresql
+      cnpg.io/cluster: pg-ha
+      cnpg.io/instanceName: pg-ha-2
+      cnpg.io/instanceRole: primary
+      cnpg.io/pvcRole: PG_DATA
+      role: primary
     name: pg-ha-2
     namespace: aiot
     ownerReferences:
@@ -93,59 +140,15 @@ items:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 5Gi
-    storageClassName: local-path
+        storage: 10Gi
+    storageClassName: piraeus-r2
     volumeMode: Filesystem
-    volumeName: pvc-82882042-6e5b-4e14-b308-ee4c42242f52
+    volumeName: pvc-72715972-98c4-4f7c-b8eb-79d33f741d9f
   status:
     accessModes:
     - ReadWriteOnce
     capacity:
-      storage: 5Gi
-    phase: Bound
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    annotations:
-      cnpg.io/nodeSerial: "3"
-      cnpg.io/operatorVersion: 1.25.1
-      cnpg.io/pvcStatus: ready
-      k8up.io/backup: "false"
-      pv.kubernetes.io/bind-completed: "yes"
-      pv.kubernetes.io/bound-by-controller: "yes"
-      volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-      volume.kubernetes.io/selected-node: oci-e5-node2
-      volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-    finalizers:
-    - kubernetes.io/pvc-protection
-    labels:
-      cnpg.io/cluster: pg-ha
-      cnpg.io/instanceName: pg-ha-3
-      cnpg.io/instanceRole: primary
-      cnpg.io/pvcRole: PG_DATA
-      role: primary
-      velero.io/exclude-from-backup: "true"
-    name: pg-ha-3
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: postgresql.cnpg.io/v1
-      controller: true
-      kind: Cluster
-      name: pg-ha
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: 5Gi
-    storageClassName: local-path
-    volumeMode: Filesystem
-    volumeName: pvc-c9d136eb-b0b3-48f7-97d0-8a5663c926bf
-  status:
-    accessModes:
-    - ReadWriteOnce
-    capacity:
-      storage: 5Gi
+      storage: 10Gi
     phase: Bound
 - apiVersion: v1
   kind: PersistentVolumeClaim

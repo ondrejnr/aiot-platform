@@ -144,18 +144,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T17:18:51Z"
-      lastUpdateTime: "2026-04-22T17:18:51Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:43:00Z"
       lastUpdateTime: "2026-04-23T05:05:38Z"
       message: ReplicaSet "rancher-77cc876b9b" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-24T06:05:30Z"
+      lastUpdateTime: "2026-04-24T06:05:30Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 5
     readyReplicas: 1
     replicas: 1

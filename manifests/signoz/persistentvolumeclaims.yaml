@@ -48,7 +48,7 @@ items:
       clickhouse.altinity.com/chi: signoz-clickhouse
       clickhouse.altinity.com/cluster: cluster
       clickhouse.altinity.com/namespace: signoz
-      clickhouse.altinity.com/object-version: 2e2e69d110cacdbe605c0634d0d22f9106acb307
+      clickhouse.altinity.com/object-version: 4be92cbc2739084d33e956b8bed226df5bcca98f
       clickhouse.altinity.com/reclaimPolicy: Retain
       clickhouse.altinity.com/replica: "0"
       clickhouse.altinity.com/shard: "0"
@@ -60,15 +60,17 @@ items:
     - ReadWriteOnce
     resources:
       requests:
-        storage: 10Gi
+        storage: 30Gi
     storageClassName: piraeus-r2
     volumeMode: Filesystem
     volumeName: pvc-15abfc60-e493-48ad-a2c8-c7f7be5a6607
   status:
     accessModes:
     - ReadWriteOnce
+    allocatedResources:
+      storage: 30Gi
     capacity:
-      storage: 10Gi
+      storage: 30Gi
     phase: Bound
 - apiVersion: v1
   kind: PersistentVolumeClaim

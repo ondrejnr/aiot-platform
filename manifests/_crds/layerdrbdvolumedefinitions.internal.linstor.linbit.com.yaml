@@ -43,6 +43,16 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: LayerDrbdVolumeDefinitions
   metadata:
+    name: 90521c574ccd90a4147e2c46313a6fe9dbbe4bff88698ac6793cb9276619e333
+  spec:
+    resource_name: PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    resource_name_suffix: ""
+    snapshot_name: ""
+    vlm_minor_nr: 1000
+    vlm_nr: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerDrbdVolumeDefinitions
+  metadata:
     name: 93999ebdd93ea26d21ece648986e81a1cc3413a0929cb85202daa4dafc339b87
   spec:
     resource_name: PVC-734704A4-89F1-4F12-B3A1-2C178791C993
@@ -99,6 +109,16 @@ items:
     resource_name_suffix: ""
     snapshot_name: ""
     vlm_minor_nr: 1009
+    vlm_nr: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerDrbdVolumeDefinitions
+  metadata:
+    name: fb9ca6f48de2ca4da5e7089255030b02b3cdf8565866951615102dfaabb06911
+  spec:
+    resource_name: PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+    resource_name_suffix: ""
+    snapshot_name: ""
+    vlm_minor_nr: 1006
     vlm_nr: 0
 kind: List
 metadata:

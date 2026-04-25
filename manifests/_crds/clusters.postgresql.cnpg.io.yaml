@@ -5,7 +5,7 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"postgresql.cnpg.io/v1","kind":"Cluster","metadata":{"annotations":{},"name":"pg-ha","namespace":"aiot"},"spec":{"bootstrap":{"initdb":{"database":"aiot","owner":"aiot","secret":{"name":"pg-ha-app"}}},"imageName":"ghcr.io/cloudnative-pg/postgresql:16","instances":2,"postgresql":{"parameters":{"max_connections":"200","shared_buffers":"512MB"}},"storage":{"size":"5Gi","storageClass":"local-path"},"superuserSecret":{"name":"pg-ha-superuser"}}}
+        {"apiVersion":"postgresql.cnpg.io/v1","kind":"Cluster","metadata":{"annotations":{},"name":"pg-ha","namespace":"aiot"},"spec":{"bootstrap":{"initdb":{"database":"app","owner":"aiot","secret":{"name":"pg-ha-app"}}},"enableSuperuserAccess":true,"imageName":"ghcr.io/cloudnative-pg/postgresql:16.4","instances":2,"postgresql":{"parameters":{"effective_cache_size":"1GB","max_connections":"200","max_slot_wal_keep_size":"2GB","shared_buffers":"256MB"}},"primaryUpdateStrategy":"unsupervised","resources":{"limits":{"memory":"2Gi"},"requests":{"cpu":"250m","memory":"512Mi"}},"storage":{"size":"10Gi","storageClass":"piraeus-r2"},"superuserSecret":{"name":"pg-ha-superuser"}}}
     name: pg-ha
     namespace: aiot
   spec:
@@ -13,7 +13,7 @@ items:
       podAntiAffinityType: preferred
     bootstrap:
       initdb:
-        database: aiot
+        database: app
         encoding: UTF8
         localeCType: C
         localeCollate: C
@@ -23,7 +23,7 @@ items:
     enablePDB: true
     enableSuperuserAccess: true
     failoverDelay: 0
-    imageName: ghcr.io/cloudnative-pg/postgresql:16
+    imageName: ghcr.io/cloudnative-pg/postgresql:16.4
     instances: 2
     logLevel: info
     maxSyncReplicas: 0
@@ -40,7 +40,6 @@ items:
       parameters:
         archive_mode: "on"
         archive_timeout: 5min
-        autovacuum_naptime: 30s
         dynamic_shared_memory_type: posix
         effective_cache_size: 1GB
         full_page_writes: "on"
@@ -51,10 +50,10 @@ items:
         log_rotation_size: "0"
         log_truncate_on_rotation: "false"
         logging_collector: "on"
-        maintenance_work_mem: 128MB
-        max_connections: "100"
+        max_connections: "200"
         max_parallel_workers: "32"
         max_replication_slots: "32"
+        max_slot_wal_keep_size: 2GB
         max_worker_processes: "32"
         shared_buffers: 256MB
         shared_memory_type: mmap
@@ -66,11 +65,16 @@ items:
         wal_log_hints: "on"
         wal_receiver_timeout: 5s
         wal_sender_timeout: 5s
-        work_mem: 8MB
       syncReplicaElectionConstraint:
         enabled: false
     primaryUpdateMethod: restart
     primaryUpdateStrategy: unsupervised
+    probes:
+      liveness:
+        isolationCheck:
+          connectionTimeout: 1000
+          enabled: true
+          requestTimeout: 1000
     replicationSlots:
       highAvailability:
         enabled: true
@@ -82,29 +86,30 @@ items:
       limits:
         memory: 2Gi
       requests:
+        cpu: 250m
         memory: 512Mi
     smartShutdownTimeout: 180
     startDelay: 3600
     stopDelay: 1800
     storage:
       resizeInUseVolumes: true
-      size: 5Gi
-      storageClass: local-path
+      size: 10Gi
+      storageClass: piraeus-r2
     superuserSecret:
       name: pg-ha-superuser
     switchoverDelay: 3600
   status:
     availableArchitectures:
     - goArch: amd64
-      hash: 0a8f22a9c14805f67b92f6994d6487da7570929108443d1a70a66b8d47a51b2f
+      hash: 527e2e3b680dfba7f7578b98530f755f36156e7be00acda3318ef36fe4f4418f
     - goArch: arm64
-      hash: c8318d0576271cba8bdb120a6500f273038035a9bf97e36c9a367ea0ae3590c0
+      hash: aaa74c6061f3fe30f230a664b4f6076bb886c9a89d4eba3293483525c5cff533
     certificates:
       clientCASecret: pg-ha-ca
       expirations:
-        pg-ha-ca: 2026-07-13 01:21:18 +0000 UTC
-        pg-ha-replication: 2026-07-13 01:21:18 +0000 UTC
-        pg-ha-server: 2026-07-13 01:21:18 +0000 UTC
+        pg-ha-ca: 2026-07-23 07:12:16 +0000 UTC
+        pg-ha-replication: 2026-07-23 07:12:16 +0000 UTC
+        pg-ha-server: 2026-07-23 07:12:16 +0000 UTC
       replicationTLSSecret: pg-ha-replication
       serverAltDNSNames:
       - pg-ha-rw
@@ -121,45 +126,55 @@ items:
       - pg-ha-ro.aiot.svc.cluster.local
       serverCASecret: pg-ha-ca
       serverTLSSecret: pg-ha-server
-    cloudNativePGCommitHash: c56e00d4
-    cloudNativePGOperatorHash: 0a8f22a9c14805f67b92f6994d6487da7570929108443d1a70a66b8d47a51b2f
+    cloudNativePGCommitHash: a9696201f
+    cloudNativePGOperatorHash: 527e2e3b680dfba7f7578b98530f755f36156e7be00acda3318ef36fe4f4418f
     conditions:
-    - lastTransitionTime: "2026-04-18T05:08:16Z"
+    - lastTransitionTime: "2026-04-24T07:18:17Z"
+      message: A single, unique system ID was found across reporting instances.
+      reason: Unique
+      status: "True"
+      type: ConsistentSystemID
+    - lastTransitionTime: "2026-04-24T10:22:45Z"
       message: Cluster is Ready
       reason: ClusterIsReady
       status: "True"
       type: Ready
-    - lastTransitionTime: "2026-04-18T05:03:15Z"
+    - lastTransitionTime: "2026-04-24T10:22:29Z"
       message: Continuous archiving is working
       reason: ContinuousArchivingSuccess
       status: "True"
       type: ContinuousArchiving
     configMapResourceVersion:
       metrics:
-        cnpg-default-monitoring: "1683"
-    currentPrimary: pg-ha-3
-    currentPrimaryTimestamp: "2026-04-18T05:03:14.031774Z"
+        cnpg-default-monitoring: "8648101"
+    currentPrimary: pg-ha-2
+    currentPrimaryTimestamp: "2026-04-24T10:22:29.163084Z"
     healthyPVC:
+    - pg-ha-1
     - pg-ha-2
-    - pg-ha-3
-    image: ghcr.io/cloudnative-pg/postgresql:16
+    image: ghcr.io/cloudnative-pg/postgresql:16.4
     instanceNames:
+    - pg-ha-1
     - pg-ha-2
-    - pg-ha-3
     instances: 2
     instancesReportedState:
-      pg-ha-2:
+      pg-ha-1:
+        ip: 10.244.6.241
         isPrimary: false
-        timeLineID: 5
-      pg-ha-3:
+        timeLineID: 1
+      pg-ha-2:
+        ip: 10.244.2.91
         isPrimary: true
-        timeLineID: 5
+        timeLineID: 2
     instancesStatus:
       healthy:
+      - pg-ha-1
       - pg-ha-2
-      - pg-ha-3
-    latestGeneratedNode: 3
+    latestGeneratedNode: 2
     managedRolesStatus: {}
+    pgDataImageInfo:
+      image: ghcr.io/cloudnative-pg/postgresql:16.4
+      majorVersion: 16
     phase: Cluster in healthy state
     poolerIntegrations:
       pgBouncerIntegration: {}
@@ -167,20 +182,21 @@ items:
     readService: pg-ha-r
     readyInstances: 2
     secretsResourceVersion:
-      applicationSecretVersion: "1648"
-      clientCaSecretVersion: "1652"
-      replicationSecretVersion: "1654"
-      serverCaSecretVersion: "1652"
-      serverSecretVersion: "1653"
-      superuserSecretVersion: "1649"
+      applicationSecretVersion: "8647505"
+      clientCaSecretVersion: "8648075"
+      replicationSecretVersion: "8648078"
+      serverCaSecretVersion: "8648075"
+      serverSecretVersion: "8648076"
+      superuserSecretVersion: "8796857"
     switchReplicaClusterStatus: {}
-    targetPrimary: pg-ha-3
-    targetPrimaryTimestamp: "2026-04-18T05:03:12.886871Z"
-    timelineID: 5
+    systemID: "7632221646064402452"
+    targetPrimary: pg-ha-2
+    targetPrimaryTimestamp: "2026-04-24T10:22:27.082235Z"
+    timelineID: 2
     topology:
       instances:
+        pg-ha-1: {}
         pg-ha-2: {}
-        pg-ha-3: {}
       nodesUsed: 2
       successfullyExtracted: true
     writeService: pg-ha-rw

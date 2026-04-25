@@ -36,7 +36,7 @@ items:
       reason: ReadyForNewScale
       status: "True"
       type: AbleToScale
-    - lastTransitionTime: "2026-04-22T14:19:23Z"
+    - lastTransitionTime: "2026-04-24T06:04:02Z"
       message: the HPA was able to successfully calculate a replica count from cpu
         resource utilization (percentage of request)
       reason: ValidMetricFound
@@ -50,8 +50,8 @@ items:
     currentMetrics:
     - resource:
         current:
-          averageUtilization: 5
-          averageValue: 5m
+          averageUtilization: 3
+          averageValue: 3m
         name: cpu
       type: Resource
     currentReplicas: 1
@@ -92,7 +92,7 @@ items:
       reason: ReadyForNewScale
       status: "True"
       type: AbleToScale
-    - lastTransitionTime: "2026-04-20T19:52:08Z"
+    - lastTransitionTime: "2026-04-24T06:04:02Z"
       message: the HPA was able to successfully calculate a replica count from cpu
         resource utilization (percentage of request)
       reason: ValidMetricFound
@@ -106,8 +106,8 @@ items:
     currentMetrics:
     - resource:
         current:
-          averageUtilization: 2
-          averageValue: 4m
+          averageUtilization: 1
+          averageValue: 2m
         name: cpu
       type: Resource
     currentReplicas: 1

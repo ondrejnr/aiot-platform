@@ -4,8 +4,9 @@ items:
   kind: Role
   metadata:
     annotations:
-      cnpg.io/operatorVersion: 1.25.1
+      cnpg.io/operatorVersion: 1.28.0
     labels:
+      app.kubernetes.io/managed-by: cloudnative-pg
       cnpg.io/cluster: pg-ha
     name: pg-ha
     namespace: aiot
@@ -133,5 +134,26 @@ items:
     - get
     - patch
     - update
+  - apiGroups:
+    - postgresql.cnpg.io
+    resourceNames:
+    - pg-ha
+    resources:
+    - failoverquorums
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - postgresql.cnpg.io
+    resourceNames:
+    - pg-ha
+    resources:
+    - failoverquorums/status
+    verbs:
+    - get
+    - patch
+    - update
+    - watch
 kind: List
 metadata:

@@ -5,12 +5,12 @@ items:
   metadata:
     labels:
       app.kubernetes.io/managed-by: kyverno
-    name: 1a413a0b-39e7-489a-9a97-1542d175721a
+    name: 2a6dd828-0a8d-487e-abfe-60c0af8a3561
     namespace: default-tenant
     ownerReferences:
     - apiVersion: v1
       kind: Pod
-      name: hello-aiot-frontend-push-jwfgk-build-and-push-pod
+      name: hello-aiot-frontend-push-hsfr9-build-and-push-pod
   results:
   - message: 0 elements processed
     policy: reduce-tekton-pr-taskrun-resource-requests
@@ -22,45 +22,11 @@ items:
     source: kyverno
     timestamp:
       nanos: 0
-      seconds: 1776937442
+      seconds: 1777008312
   scope:
     apiVersion: v1
     kind: Pod
-    name: hello-aiot-frontend-push-jwfgk-build-and-push-pod
-    namespace: default-tenant
-  summary:
-    error: 0
-    fail: 0
-    pass: 0
-    skip: 1
-    warn: 0
-- apiVersion: wgpolicyk8s.io/v1alpha2
-  kind: PolicyReport
-  metadata:
-    labels:
-      app.kubernetes.io/managed-by: kyverno
-    name: 239dcb24-153b-48ca-b22f-3b92e47805fb
-    namespace: default-tenant
-    ownerReferences:
-    - apiVersion: v1
-      kind: Pod
-      name: hello-aiot-frontend-push-b7swr-build-and-push-pod
-  results:
-  - message: 0 elements processed
-    policy: reduce-tekton-pr-taskrun-resource-requests
-    properties:
-      process: admission review
-    result: skip
-    rule: reduce-tekton-pr-taskrun-resource-requests
-    scored: true
-    source: kyverno
-    timestamp:
-      nanos: 0
-      seconds: 1776937341
-  scope:
-    apiVersion: v1
-    kind: Pod
-    name: hello-aiot-frontend-push-b7swr-build-and-push-pod
+    name: hello-aiot-frontend-push-hsfr9-build-and-push-pod
     namespace: default-tenant
   summary:
     error: 0
@@ -107,12 +73,12 @@ items:
   metadata:
     labels:
       app.kubernetes.io/managed-by: kyverno
-    name: a9513bb5-9fc5-472e-aa0e-db1d075c67ca
+    name: a89d74ea-8ea8-40d6-a1c6-8b8d9f5ebf4b
     namespace: default-tenant
     ownerReferences:
     - apiVersion: v1
       kind: Pod
-      name: hello-aiot-backend-push-xtmbr-build-and-push-pod
+      name: hello-aiot-push-vpddp-build-and-push-pod
   results:
   - message: 0 elements processed
     policy: reduce-tekton-pr-taskrun-resource-requests
@@ -124,11 +90,11 @@ items:
     source: kyverno
     timestamp:
       nanos: 0
-      seconds: 1776937343
+      seconds: 1777039673
   scope:
     apiVersion: v1
     kind: Pod
-    name: hello-aiot-backend-push-xtmbr-build-and-push-pod
+    name: hello-aiot-push-vpddp-build-and-push-pod
     namespace: default-tenant
   summary:
     error: 0

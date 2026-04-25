@@ -11,6 +11,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: SecAclMap
   metadata:
+    name: 099ccf4129ad0de43d490674cb839d8e648e83de0c828484c2f7c863e9becd08
+  spec:
+    access_type: 15
+    object_path: /resources/AIOT-WORKER-02/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+    role_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAclMap
+  metadata:
     name: 0d93fa4607093a2db07a6f15994d3b8ade9ed867bbb3a7a4c1e15ced5e8c94b2
   spec:
     access_type: 15
@@ -91,6 +99,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: SecAclMap
   metadata:
+    name: 321bd8c9c43875fc94e8f32d3642ad77b1fd115990fec218983ffc879e2df832
+  spec:
+    access_type: 15
+    object_path: /resourcedefinitions/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    role_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAclMap
+  metadata:
     name: 34951f5c7187f339901ebb71f9de813b7eb184fe52ec763fc6ddf37215a3fdeb
   spec:
     access_type: 15
@@ -103,6 +119,14 @@ items:
   spec:
     access_type: 15
     object_path: /resources/AIOT-WORKER-01/PVC-33099827-4B54-4D13-8588-122F969DEA72
+    role_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAclMap
+  metadata:
+    name: 3acaab13d07dc73fabf0e771abf3bf0101db1993b1efab83824a186f7282cb0d
+  spec:
+    access_type: 15
+    object_path: /resources/AIOT-WORKER-01/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
     role_name: PUBLIC
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: SecAclMap
@@ -251,6 +275,14 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: SecAclMap
   metadata:
+    name: 7cbe488e8d61e8a8d5d856b18f8a0978fbb253e5150788147ec7f30294b22404
+  spec:
+    access_type: 15
+    object_path: /resources/AIOT-WORKER-01/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    role_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAclMap
+  metadata:
     name: 81147f2cb74659f02ac9de8996834b26cccf5eda82d116510fad1bbd64119116
   spec:
     access_type: 15
@@ -351,6 +383,22 @@ items:
   spec:
     access_type: 15
     object_path: /resources/AIOT-WORKER-01/PVC-13780103-955C-4B47-9417-E7C91ADA2649
+    role_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAclMap
+  metadata:
+    name: b554dc86a52093861bf214aa520b4cba0193c2fca86e9903630ad2fb6e0c5761
+  spec:
+    access_type: 15
+    object_path: /resourcedefinitions/PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+    role_name: PUBLIC
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: SecAclMap
+  metadata:
+    name: b7831b82dfdc185bed37f1cd4c1d8b7a0d040166344e6e4e3e396737f397df49
+  spec:
+    access_type: 15
+    object_path: /resources/AIOT-WORKER-02/PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
     role_name: PUBLIC
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: SecAclMap

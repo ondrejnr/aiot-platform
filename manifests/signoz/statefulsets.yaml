@@ -17,7 +17,7 @@ items:
       clickhouse.altinity.com/chi: signoz-clickhouse
       clickhouse.altinity.com/cluster: cluster
       clickhouse.altinity.com/namespace: signoz
-      clickhouse.altinity.com/object-version: 5eb563c5e4753a34ac6fe3246637353c80eb4e3f
+      clickhouse.altinity.com/object-version: 0cbb84fddd7453c5e95e03b74b041d267cfd3b46
       clickhouse.altinity.com/replica: "0"
       clickhouse.altinity.com/shard: "0"
       helm.sh/chart: clickhouse-24.1.18
@@ -234,7 +234,7 @@ items:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 10Gi
+            storage: 30Gi
         storageClassName: piraeus-r2
         volumeMode: Filesystem
       status:

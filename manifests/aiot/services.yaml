@@ -160,8 +160,13 @@ items:
   kind: Service
   metadata:
     annotations:
-      cnpg.io/operatorVersion: 1.25.1
+      cnpg.io/operatorVersion: 1.28.0
     labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: pg-ha
+      app.kubernetes.io/managed-by: cloudnative-pg
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/version: "16"
       cnpg.io/cluster: pg-ha
     name: pg-ha-r
     namespace: aiot
@@ -171,9 +176,9 @@ items:
       kind: Cluster
       name: pg-ha
   spec:
-    clusterIP: 10.101.230.129
+    clusterIP: 10.108.42.5
     clusterIPs:
-    - 10.101.230.129
+    - 10.108.42.5
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -194,8 +199,13 @@ items:
   kind: Service
   metadata:
     annotations:
-      cnpg.io/operatorVersion: 1.25.1
+      cnpg.io/operatorVersion: 1.28.0
     labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: pg-ha
+      app.kubernetes.io/managed-by: cloudnative-pg
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/version: "16"
       cnpg.io/cluster: pg-ha
     name: pg-ha-ro
     namespace: aiot
@@ -205,9 +215,9 @@ items:
       kind: Cluster
       name: pg-ha
   spec:
-    clusterIP: 10.99.2.0
+    clusterIP: 10.96.129.167
     clusterIPs:
-    - 10.99.2.0
+    - 10.96.129.167
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4
@@ -228,8 +238,13 @@ items:
   kind: Service
   metadata:
     annotations:
-      cnpg.io/operatorVersion: 1.25.1
+      cnpg.io/operatorVersion: 1.28.0
     labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: pg-ha
+      app.kubernetes.io/managed-by: cloudnative-pg
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/version: "16"
       cnpg.io/cluster: pg-ha
     name: pg-ha-rw
     namespace: aiot
@@ -239,9 +254,9 @@ items:
       kind: Cluster
       name: pg-ha
   spec:
-    clusterIP: 10.104.95.66
+    clusterIP: 10.106.38.157
     clusterIPs:
-    - 10.104.95.66
+    - 10.106.38.157
     internalTrafficPolicy: Cluster
     ipFamilies:
     - IPv4

@@ -93,18 +93,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T16:49:37Z"
-      lastUpdateTime: "2026-04-22T16:49:37Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T22:31:33Z"
       lastUpdateTime: "2026-04-22T16:49:37Z"
       message: ReplicaSet "gitea-8598474664" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-24T10:19:08Z"
+      lastUpdateTime: "2026-04-24T10:19:08Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 11
     readyReplicas: 1
     replicas: 1

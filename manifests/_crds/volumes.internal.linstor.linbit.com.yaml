@@ -3,6 +3,16 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: Volumes
   metadata:
+    name: 10aa43e38546b9acd990f5d410808f15f8068c4b4d2580aa3219f5d211950ce5
+  spec:
+    node_name: AIOT-WORKER-01
+    resource_name: PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    snapshot_name: ""
+    vlm_flags: 0
+    vlm_nr: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Volumes
+  metadata:
     name: 15c35d837c8b5917d15c8f87af918051a5b96a07aa8001350788dcf84f23161d
   spec:
     node_name: AIOT-WORKER-01
@@ -53,6 +63,16 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: Volumes
   metadata:
+    name: 7011195c938f03b9c7ca1f7d6eb137f3766c1d58272435f605dd740ce1ae3751
+  spec:
+    node_name: AIOT-WORKER-01
+    resource_name: PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+    snapshot_name: ""
+    vlm_flags: 0
+    vlm_nr: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Volumes
+  metadata:
     name: 7095b830c376d5f76dedc58caf7ae67a150a4c054740e2b16c5ce4f985fbefb5
   spec:
     node_name: AIOT-WORKER-02
@@ -67,6 +87,16 @@ items:
   spec:
     node_name: AIOT-WORKER-01
     resource_name: PVC-61A22797-A355-4F74-A517-BFE2C6257D14
+    snapshot_name: ""
+    vlm_flags: 0
+    vlm_nr: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Volumes
+  metadata:
+    name: 93b341532d720bbb63d0b03f2c445174a244f722162dc717e822e6cfe4a7fb7b
+  spec:
+    node_name: AIOT-WORKER-02
+    resource_name: PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
     snapshot_name: ""
     vlm_flags: 0
     vlm_nr: 0
@@ -97,6 +127,16 @@ items:
   spec:
     node_name: AIOT-WORKER-01
     resource_name: PVC-734704A4-89F1-4F12-B3A1-2C178791C993
+    snapshot_name: ""
+    vlm_flags: 0
+    vlm_nr: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Volumes
+  metadata:
+    name: b66782c3b42c88f7e9af0fcbd2c8293d5e719495e05c16fe43010179c04cd3c2
+  spec:
+    node_name: AIOT-WORKER-02
+    resource_name: PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
     snapshot_name: ""
     vlm_flags: 0
     vlm_nr: 0

@@ -8,7 +8,7 @@ items:
       build.appstudio.openshift.io/status: '{"pac":{"state":"enabled","merge-url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot","configuration-time":"2026-04-22T17:00:00Z"},"message":"done"}'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"appstudio.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{"build.appstudio.openshift.io/request":"configure-pac","skip-initial-checks":"true"},"name":"hello-aiot","namespace":"default-tenant"},"spec":{"application":"hello-aiot","componentName":"hello-aiot","containerImage":"internal-registry.registry.svc.cluster.local:5000/aiot/hello-aiot:latest","source":{"git":{"dockerfileUrl":"Dockerfile","revision":"main","url":"http://gitea.gitea.svc.cluster.local:3000/aiot/hello-aiot"}}}}
-      test.appstudio.openshift.io/lastbuilttime: "1776929284"
+      test.appstudio.openshift.io/lastbuilttime: "1777039672"
     finalizers:
     - test.appstudio.openshift.io/component
     name: hello-aiot
@@ -24,8 +24,8 @@ items:
         revision: main
         url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot
   status:
-    lastBuiltCommit: ff42065c6fc9bac5e1b28e3a807da34b856c5ba3
-    lastPromotedImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:2b3233806369b99f4cd68f4b2aa82123a6d264874c4563064b4dca701f00e836
+    lastBuiltCommit: 047105e6800d5bd3ab93e913068b89ee1bb10d56
+    lastPromotedImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot@sha256:67eb960d0b37eb57f6a1e9277f703c1d963f793ff347e601dded21dbfa6e72f0
 - apiVersion: appstudio.redhat.com/v1alpha1
   kind: Component
   metadata:
@@ -57,7 +57,7 @@ items:
       build.appstudio.openshift.io/status: '{"pac":{"state":"enabled","merge-url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend","configuration-time":"2026-04-23T00:00:00Z"},"message":"done"}'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"appstudio.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{"build.appstudio.openshift.io/status":"{\"pac\":{\"state\":\"enabled\",\"merge-url\":\"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend\",\"configuration-time\":\"2026-04-23T00:00:00Z\"},\"message\":\"done\"}"},"name":"hello-aiot-frontend","namespace":"default-tenant"},"spec":{"application":"hello-aiot","componentName":"hello-aiot-frontend","containerImage":"internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend:latest","source":{"git":{"dockerfileUrl":"Dockerfile","revision":"main","url":"https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend"}}}}
-      test.appstudio.openshift.io/lastbuilttime: "1776938342"
+      test.appstudio.openshift.io/lastbuilttime: "1777008312"
     finalizers:
     - test.appstudio.openshift.io/component
     name: hello-aiot-frontend
@@ -72,7 +72,7 @@ items:
         revision: main
         url: https://gitea.35.241.255.137.nip.io/aiot/hello-aiot-frontend
   status:
-    lastBuiltCommit: 546a482358e22e13a6857ae02f670c14103d1aea
-    lastPromotedImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:7e9c6ea915e6b20b8b9bf5a4329198ad6c869c2aef46fb357d4d3a81f3bdf2be
+    lastBuiltCommit: 06274a33272a899952c3597102471ad66e01729a
+    lastPromotedImage: internal-registry-http.registry.svc.cluster.local/aiot/hello-aiot-frontend@sha256:afe6190d07b5d6976c226da6a803434409e3363bf41483947322a0b4721fd2b9
 kind: List
 metadata:

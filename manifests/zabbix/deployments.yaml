@@ -4,7 +4,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "4"
+      deployment.kubernetes.io/revision: "5"
       meta.helm.sh/release-name: zabbix
       meta.helm.sh/release-namespace: zabbix
     labels:
@@ -29,6 +29,8 @@ items:
       type: Recreate
     template:
       metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-24T07:29:00Z"
         labels:
           app.kubernetes.io/component: server
           app.kubernetes.io/instance: zabbix
@@ -172,19 +174,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-23T05:05:25Z"
-      lastUpdateTime: "2026-04-23T05:05:25Z"
+    - lastTransitionTime: "2026-04-21T01:55:18Z"
+      lastUpdateTime: "2026-04-24T07:29:17Z"
+      message: ReplicaSet "zabbix-zabbix-server-6b7d979447" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-24T07:50:11Z"
+      lastUpdateTime: "2026-04-24T07:50:11Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-21T01:55:18Z"
-      lastUpdateTime: "2026-04-23T05:05:25Z"
-      message: ReplicaSet "zabbix-zabbix-server-54d8cf844" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    observedGeneration: 8
+    observedGeneration: 11
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -305,18 +307,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T14:18:50Z"
-      lastUpdateTime: "2026-04-22T14:18:50Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-21T01:43:04Z"
       lastUpdateTime: "2026-04-23T05:03:34Z"
       message: ReplicaSet "zabbix-zabbix-web-557d747ffc" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-24T05:59:26Z"
+      lastUpdateTime: "2026-04-24T05:59:26Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 5
     readyReplicas: 1
     replicas: 1

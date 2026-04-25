@@ -70,7 +70,7 @@ items:
       name: lvm-thin
   status:
     availableCapacityBytes: 51539607552
-    capacity: 13/52GiB
+    capacity: 29/52GiB
     conditions:
     - lastTransitionTime: "2026-04-22T15:13:09Z"
       message: Resources applied
@@ -78,13 +78,13 @@ items:
       reason: AsExpected
       status: "True"
       type: Applied
-    - lastTransitionTime: "2026-04-22T17:19:16Z"
+    - lastTransitionTime: "2026-04-24T10:20:45Z"
       message: ONLINE
       observedGeneration: 3
       reason: AsExpected
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-22T17:19:16Z"
+    - lastTransitionTime: "2026-04-24T10:20:45Z"
       message: Pools configured
       observedGeneration: 3
       reason: AsExpected
@@ -97,9 +97,9 @@ items:
     - NVME
     - STORAGE
     - WRITECACHE
-    freeCapacityBytes: 39283487744
+    freeCapacityBytes: 22811428864
     numberOfSnapshots: 0
-    numberOfVolumes: 10
+    numberOfVolumes: 12
     storageProviders:
     - DISKLESS
     - EBS_INIT
@@ -179,7 +179,7 @@ items:
       name: lvm-thin
   status:
     availableCapacityBytes: 51539607552
-    capacity: 14/52GiB
+    capacity: 30/52GiB
     conditions:
     - lastTransitionTime: "2026-04-22T13:49:55Z"
       message: Resources applied
@@ -187,13 +187,13 @@ items:
       reason: AsExpected
       status: "True"
       type: Applied
-    - lastTransitionTime: "2026-04-22T17:20:19Z"
+    - lastTransitionTime: "2026-04-24T07:30:41Z"
       message: ONLINE
       observedGeneration: 3
       reason: AsExpected
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-22T17:20:19Z"
+    - lastTransitionTime: "2026-04-24T07:30:41Z"
       message: Pools configured
       observedGeneration: 3
       reason: AsExpected
@@ -206,9 +206,9 @@ items:
     - NVME
     - STORAGE
     - WRITECACHE
-    freeCapacityBytes: 38263004160
+    freeCapacityBytes: 21790945280
     numberOfSnapshots: 0
-    numberOfVolumes: 10
+    numberOfVolumes: 12
     storageProviders:
     - DISKLESS
     - EBS_INIT

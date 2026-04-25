@@ -4,93 +4,6 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-22T00:05:00Z"
-    labels:
-      batch.kubernetes.io/job-name: rke2-machineconfig-cleanup-cronjob-29613605
-      job-name: rke2-machineconfig-cleanup-cronjob-29613605
-    name: rke2-machineconfig-cleanup-cronjob-29613605
-    namespace: fleet-default
-    ownerReferences:
-    - apiVersion: batch/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: CronJob
-      name: rke2-machineconfig-cleanup-cronjob
-  spec:
-    backoffLimit: 10
-    completionMode: NonIndexed
-    completions: 1
-    manualSelector: false
-    parallelism: 1
-    podReplacementPolicy: TerminatingOrFailed
-    selector:
-      matchLabels:
-    suspend: false
-    template:
-      metadata:
-        labels:
-          batch.kubernetes.io/job-name: rke2-machineconfig-cleanup-cronjob-29613605
-          job-name: rke2-machineconfig-cleanup-cronjob-29613605
-      spec:
-        containers:
-        - args:
-          - /helper/cleanup.sh
-          command:
-          - /bin/sh
-          env:
-          - name: CATTLE_SERVER
-            value: https://rancher.35.241.255.137.nip.io
-          - name: CATTLE_CA_CHECKSUM
-          - name: CATTLE_TOKEN
-            value: qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp
-          image: rancher/rancher-agent:v2.13.3
-          imagePullPolicy: IfNotPresent
-          name: rke2-machineconfig-cleanup-pod
-          resources: {}
-          securityContext:
-            runAsGroup: 65534
-            runAsUser: 65534
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /helper
-            name: config-volume
-        dnsPolicy: ClusterFirst
-        restartPolicy: Never
-        schedulerName: default-scheduler
-        securityContext: {}
-        serviceAccount: rke2-machineconfig-cleanup-sa
-        serviceAccountName: rke2-machineconfig-cleanup-sa
-        terminationGracePeriodSeconds: 30
-        volumes:
-        - configMap:
-            defaultMode: 420
-            name: rke2-machineconfig-cleanup-script
-          name: config-volume
-  status:
-    completionTime: "2026-04-22T00:05:10Z"
-    conditions:
-    - lastProbeTime: "2026-04-22T00:05:10Z"
-      lastTransitionTime: "2026-04-22T00:05:10Z"
-      message: Reached expected number of succeeded pods
-      reason: CompletionsReached
-      status: "True"
-      type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-22T00:05:10Z"
-      lastTransitionTime: "2026-04-22T00:05:10Z"
-      message: Reached expected number of succeeded pods
-      reason: CompletionsReached
-      status: "True"
-      type: Complete
-    ready: 0
-    startTime: "2026-04-22T00:05:00Z"
-    succeeded: 1
-    terminating: 0
-    uncountedTerminatedPods: {}
-- apiVersion: batch/v1
-  kind: Job
-  metadata:
-    annotations:
       batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-23T00:05:00Z"
     labels:
       batch.kubernetes.io/job-name: rke2-machineconfig-cleanup-cronjob-29615045
@@ -258,6 +171,93 @@ items:
       type: Complete
     ready: 0
     startTime: "2026-04-24T00:05:00Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-25T00:05:00Z"
+    labels:
+      batch.kubernetes.io/job-name: rke2-machineconfig-cleanup-cronjob-29617925
+      job-name: rke2-machineconfig-cleanup-cronjob-29617925
+    name: rke2-machineconfig-cleanup-cronjob-29617925
+    namespace: fleet-default
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: rke2-machineconfig-cleanup-cronjob
+  spec:
+    backoffLimit: 10
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: rke2-machineconfig-cleanup-cronjob-29617925
+          job-name: rke2-machineconfig-cleanup-cronjob-29617925
+      spec:
+        containers:
+        - args:
+          - /helper/cleanup.sh
+          command:
+          - /bin/sh
+          env:
+          - name: CATTLE_SERVER
+            value: https://rancher.35.241.255.137.nip.io
+          - name: CATTLE_CA_CHECKSUM
+          - name: CATTLE_TOKEN
+            value: qs89wbw9v5kb27lljxnbd7stjlnw78cw64b89jv8nvsqftkpvb86tp
+          image: rancher/rancher-agent:v2.13.3
+          imagePullPolicy: IfNotPresent
+          name: rke2-machineconfig-cleanup-pod
+          resources: {}
+          securityContext:
+            runAsGroup: 65534
+            runAsUser: 65534
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /helper
+            name: config-volume
+        dnsPolicy: ClusterFirst
+        restartPolicy: Never
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: rke2-machineconfig-cleanup-sa
+        serviceAccountName: rke2-machineconfig-cleanup-sa
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: rke2-machineconfig-cleanup-script
+          name: config-volume
+  status:
+    completionTime: "2026-04-25T00:05:35Z"
+    conditions:
+    - lastProbeTime: "2026-04-25T00:05:35Z"
+      lastTransitionTime: "2026-04-25T00:05:35Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-25T00:05:35Z"
+      lastTransitionTime: "2026-04-25T00:05:35Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-25T00:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

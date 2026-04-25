@@ -73,6 +73,16 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: Resources
   metadata:
+    name: 706912d9e2f9e614e5947b9f64a398cecfa9a512df62ce0e6c0b5e73e46e3075
+  spec:
+    create_timestamp: 1777015108239
+    node_name: AIOT-WORKER-01
+    resource_flags: 0
+    resource_name: PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Resources
+  metadata:
     name: 71191d3043690014c474edbece3d89a8d5f329fca9106f81f0009d8d6cb8e20d
   spec:
     create_timestamp: 1776849568130
@@ -119,6 +129,16 @@ items:
     node_name: AIOT-WORKER-01
     resource_flags: 0
     resource_name: PVC-61A22797-A355-4F74-A517-BFE2C6257D14
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Resources
+  metadata:
+    name: 8a3ef57ee5c22ea3733e7c0988ec353028507814d2e5da638fc79d678c9a1883
+  spec:
+    create_timestamp: 1777015047059
+    node_name: AIOT-WORKER-02
+    resource_flags: 0
+    resource_name: PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
     snapshot_name: ""
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: Resources
@@ -193,12 +213,32 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: Resources
   metadata:
+    name: e70fbe1fa5ddfe1a8b051824ed3fdfba0aa3852db4600ab3797bbffc378d04da
+  spec:
+    create_timestamp: 1777015043099
+    node_name: AIOT-WORKER-01
+    resource_flags: 0
+    resource_name: PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Resources
+  metadata:
     name: f0706c4c89ff85bd8991c24b08bdab71ad3b2511fc96abe16864481871bf011e
   spec:
     create_timestamp: 1776849654734
     node_name: AIOT-WORKER-02
     resource_flags: 0
     resource_name: PVC-13780103-955C-4B47-9417-E7C91ADA2649
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: Resources
+  metadata:
+    name: f5dd95e923586c6da9527394c860a3b700d96f45bf531e425780df888511215d
+  spec:
+    create_timestamp: 1777015106606
+    node_name: AIOT-WORKER-02
+    resource_flags: 0
+    resource_name: PVC-72715972-98C4-4F7C-B8EB-79D33F741D9F
     snapshot_name: ""
 kind: List
 metadata:
