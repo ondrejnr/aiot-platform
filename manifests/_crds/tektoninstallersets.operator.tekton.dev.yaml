@@ -1479,13 +1479,13 @@ items:
     - lastTransitionTime: "2026-04-22T11:40:16Z"
       status: "True"
       type: NamespaceScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-23T09:42:56Z"
+    - lastTransitionTime: "2026-04-25T18:15:18Z"
       status: "True"
       type: Ready
     - lastTransitionTime: "2026-04-22T11:40:17Z"
       status: "True"
       type: StatefulSetReady
-    - lastTransitionTime: "2026-04-23T09:42:56Z"
+    - lastTransitionTime: "2026-04-25T18:15:18Z"
       status: "True"
       type: WebhooksReady
 - apiVersion: operator.tekton.dev/v1alpha1
@@ -30206,7 +30206,7 @@ items:
         name: system:authenticated
   status:
     conditions:
-    - lastTransitionTime: "2026-04-23T05:02:28Z"
+    - lastTransitionTime: "2026-04-25T17:45:14Z"
       status: "True"
       type: AllDeploymentsReady
     - lastTransitionTime: "2026-04-22T11:41:28Z"
@@ -30227,7 +30227,7 @@ items:
     - lastTransitionTime: "2026-04-22T11:41:29Z"
       status: "True"
       type: NamespaceScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-23T05:02:28Z"
+    - lastTransitionTime: "2026-04-25T17:45:14Z"
       status: "True"
       type: Ready
     - lastTransitionTime: "2026-04-22T15:17:40Z"
@@ -32324,8 +32324,8 @@ items:
     labels:
       operator.tekton.dev/created-by: operator-webhook-init
       operator.tekton.dev/type: operatorValidatingDefaultingWebhook
-      operator.tekton.dev/webhook-unique-identifier: tekton-operator-webhook-65d7569769-xn96x
-    name: validating-mutating-webhook-lqxzd
+      operator.tekton.dev/webhook-unique-identifier: tekton-operator-webhook-65d7569769-7szb4
+    name: validating-mutating-webhook-7pjj8
   spec:
     manifests:
     - apiVersion: admissionregistration.k8s.io/v1
@@ -32385,34 +32385,34 @@ items:
         sideEffects: None
   status:
     conditions:
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: AllDeploymentsReady
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: ClusterScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: ControllersReady
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: CrdsInstalled
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: DeploymentsAvailable
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: JobsInstalled
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: NamespaceScopedResourcesInstalled
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: Ready
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: StatefulSetReady
-    - lastTransitionTime: "2026-04-22T14:21:43Z"
+    - lastTransitionTime: "2026-04-26T00:30:06Z"
       status: "True"
       type: WebhooksReady
 kind: List

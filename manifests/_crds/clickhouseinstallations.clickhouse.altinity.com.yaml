@@ -437,7 +437,7 @@ items:
             default/networks/ip:
             - ::1
             - 127.0.0.1
-            - 10.244.6.5
+            - 10.244.2.109
             default/profile: default
             default/quota: default
           zookeeper:
@@ -466,7 +466,7 @@ items:
           configMapPropagationTimeout: 10
           policy: unspecified
         stop: "False"
-        taskID: 523d478d-993a-4324-a094-600847f5832e
+        taskID: 4a2e01a1-91ec-41c2-9aa4-c255ac1f50be
         templates:
           PodTemplatesIndex: {}
           ServiceTemplatesIndex: {}
@@ -947,7 +947,7 @@ items:
           policy: manual
         troubleshoot: "False"
     pod-ips:
-    - 10.244.6.5
+    - 10.244.2.109
     pods:
     - chi-signoz-clickhouse-cluster-0-0-0
     shards: 1

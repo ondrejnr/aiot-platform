@@ -53,7 +53,7 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
-    name: aiot-backup-g9jbf
+    name: aiot-backup-np46q
     namespace: aiot
     ownerReferences:
     - apiVersion: k8up.io/v1
@@ -77,24 +77,24 @@ items:
     resources: {}
   status:
     conditions:
-    - lastTransitionTime: "2026-04-23T03:10:30Z"
+    - lastTransitionTime: "2026-04-25T03:10:30Z"
       message: The resource is ready
       reason: Finished
       status: "True"
       type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-23T03:11:30Z"
-      message: job 'backup_aiot-backup-g9jbf' completed successfully
+    - lastTransitionTime: "2026-04-25T03:11:25Z"
+      message: job 'backup_aiot-backup-np46q' completed successfully
       reason: Finished
       status: "False"
       type: Progressing
-    - lastTransitionTime: "2026-04-23T03:11:30Z"
-      message: '"backup_aiot-backup-g9jbf" has 1 succeeded, 0 failed, and 0 started
+    - lastTransitionTime: "2026-04-25T03:11:25Z"
+      message: '"backup_aiot-backup-np46q" has 1 succeeded, 0 failed, and 0 started
         jobs'
       reason: Succeeded
       status: "True"
       type: Completed
-    - lastTransitionTime: "2026-04-23T03:11:30Z"
-      message: Deleted 0 resources
+    - lastTransitionTime: "2026-04-25T03:11:25Z"
+      message: Deleted 1 resources
       reason: Succeeded
       status: "True"
       type: Scrubbed
@@ -103,7 +103,7 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
-    name: aiot-backup-2f6zc
+    name: aiot-backup-7vskw
     namespace: backrest
     ownerReferences:
     - apiVersion: k8up.io/v1
@@ -127,18 +127,18 @@ items:
     resources: {}
   status:
     conditions:
-    - lastTransitionTime: "2026-04-23T03:20:00Z"
+    - lastTransitionTime: "2026-04-25T03:20:00Z"
       message: no container definitions found
       reason: NoPreBackupPodsFound
       status: "True"
       type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-23T03:20:00Z"
+    - lastTransitionTime: "2026-04-25T03:20:00Z"
       message: nothing to backup
       reason: Succeeded
       status: "True"
       type: Completed
-    - lastTransitionTime: "2026-04-23T03:20:30Z"
-      message: Deleted 0 resources
+    - lastTransitionTime: "2026-04-25T03:20:30Z"
+      message: Deleted 1 resources
       reason: Succeeded
       status: "True"
       type: Scrubbed
@@ -187,6 +187,48 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
+    name: aiot-backup-mtx89
+    namespace: gitea
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    keepJobs: 2
+    resources: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-25T03:20:00Z"
+      message: no container definitions found
+      reason: NoPreBackupPodsFound
+      status: "True"
+      type: PreBackupPodReady
+    - lastTransitionTime: "2026-04-25T03:20:00Z"
+      message: nothing to backup
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-25T03:20:30Z"
+      message: Deleted 1 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+- apiVersion: k8up.io/v1
+  kind: Backup
+  metadata:
     name: aiot-backup-rmrc6
     namespace: gitea
     ownerReferences:
@@ -229,49 +271,7 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
-    name: aiot-backup-x5svz
-    namespace: gitea
-    ownerReferences:
-    - apiVersion: k8up.io/v1
-      kind: Schedule
-      name: aiot
-  spec:
-    backend:
-      repoPasswordSecretRef:
-        key: password
-        name: k8up-repo
-      s3:
-        accessKeyIDSecretRef:
-          key: access_key
-          name: r2-creds
-        bucket: aiot-velero
-        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
-        secretAccessKeySecretRef:
-          key: secret_key
-          name: r2-creds
-    keepJobs: 2
-    resources: {}
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-23T03:20:00Z"
-      message: no container definitions found
-      reason: NoPreBackupPodsFound
-      status: "True"
-      type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-23T03:20:00Z"
-      message: nothing to backup
-      reason: Succeeded
-      status: "True"
-      type: Completed
-    - lastTransitionTime: "2026-04-23T03:20:30Z"
-      message: Deleted 0 resources
-      reason: Succeeded
-      status: "True"
-      type: Scrubbed
-- apiVersion: k8up.io/v1
-  kind: Backup
-  metadata:
-    name: aiot-backup-gnbtg
+    name: aiot-backup-bk7vx
     namespace: jenkins
     ownerReferences:
     - apiVersion: k8up.io/v1
@@ -295,18 +295,18 @@ items:
     resources: {}
   status:
     conditions:
-    - lastTransitionTime: "2026-04-23T03:00:00Z"
+    - lastTransitionTime: "2026-04-25T03:00:00Z"
       message: no container definitions found
       reason: NoPreBackupPodsFound
       status: "True"
       type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-23T03:00:01Z"
+    - lastTransitionTime: "2026-04-25T03:00:01Z"
       message: nothing to backup
       reason: Succeeded
       status: "True"
       type: Completed
-    - lastTransitionTime: "2026-04-23T03:00:31Z"
-      message: Deleted 0 resources
+    - lastTransitionTime: "2026-04-25T03:00:31Z"
+      message: Deleted 1 resources
       reason: Succeeded
       status: "True"
       type: Scrubbed
@@ -405,6 +405,56 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
+    name: aiot-backup-7ps5d
+    namespace: semaphore
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      kind: Schedule
+      name: aiot
+  spec:
+    backend:
+      repoPasswordSecretRef:
+        key: password
+        name: k8up-repo
+      s3:
+        accessKeyIDSecretRef:
+          key: access_key
+          name: r2-creds
+        bucket: aiot-velero
+        endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+        secretAccessKeySecretRef:
+          key: secret_key
+          name: r2-creds
+    keepJobs: 2
+    resources: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-04-25T03:05:00Z"
+      message: no container definitions found
+      reason: NoPreBackupPodsFound
+      status: "True"
+      type: PreBackupPodReady
+    - lastTransitionTime: "2026-04-25T03:05:15Z"
+      message: job 'backup_aiot-backup-7ps5d' completed successfully
+      reason: Finished
+      status: "False"
+      type: Progressing
+    - lastTransitionTime: "2026-04-25T03:05:15Z"
+      message: '"backup_aiot-backup-7ps5d" has 1 succeeded, 0 failed, and 0 started
+        jobs'
+      reason: Succeeded
+      status: "True"
+      type: Completed
+    - lastTransitionTime: "2026-04-25T03:05:15Z"
+      message: Deleted 0 resources
+      reason: Succeeded
+      status: "True"
+      type: Scrubbed
+    finished: true
+    started: true
+- apiVersion: k8up.io/v1
+  kind: Backup
+  metadata:
     name: aiot-backup-vxfrp
     namespace: semaphore
     ownerReferences:
@@ -455,7 +505,7 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
-    name: aiot-backup-9xpmx
+    name: aiot-backup-m7t5m
     namespace: signoz
     ownerReferences:
     - apiVersion: k8up.io/v1
@@ -479,18 +529,18 @@ items:
     resources: {}
   status:
     conditions:
-    - lastTransitionTime: "2026-04-23T03:20:00Z"
+    - lastTransitionTime: "2026-04-25T03:20:00Z"
       message: no container definitions found
       reason: NoPreBackupPodsFound
       status: "True"
       type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-23T03:20:00Z"
+    - lastTransitionTime: "2026-04-25T03:20:00Z"
       message: nothing to backup
       reason: Succeeded
       status: "True"
       type: Completed
-    - lastTransitionTime: "2026-04-23T03:20:30Z"
-      message: Deleted 0 resources
+    - lastTransitionTime: "2026-04-25T03:20:30Z"
+      message: Deleted 1 resources
       reason: Succeeded
       status: "True"
       type: Scrubbed
@@ -581,7 +631,7 @@ items:
 - apiVersion: k8up.io/v1
   kind: Backup
   metadata:
-    name: aiot-backup-knz4c
+    name: aiot-backup-wt6d5
     namespace: victoriametrics
     ownerReferences:
     - apiVersion: k8up.io/v1
@@ -605,18 +655,18 @@ items:
     resources: {}
   status:
     conditions:
-    - lastTransitionTime: "2026-04-23T03:20:00Z"
+    - lastTransitionTime: "2026-04-25T03:20:00Z"
       message: no container definitions found
       reason: NoPreBackupPodsFound
       status: "True"
       type: PreBackupPodReady
-    - lastTransitionTime: "2026-04-23T03:20:00Z"
+    - lastTransitionTime: "2026-04-25T03:20:00Z"
       message: nothing to backup
       reason: Succeeded
       status: "True"
       type: Completed
-    - lastTransitionTime: "2026-04-23T03:20:30Z"
-      message: Deleted 0 resources
+    - lastTransitionTime: "2026-04-25T03:20:30Z"
+      message: Deleted 1 resources
       reason: Succeeded
       status: "True"
       type: Scrubbed

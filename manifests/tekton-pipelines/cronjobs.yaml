@@ -4,12 +4,12 @@ items:
   kind: CronJob
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: 9fd81c27c21fb4c54e2afb34bed2a98d93dbf355c60bf7dd579a43c4e479f34f
+      operator.tekton.dev/last-applied-hash: 99f7009287847f403a4baef5f6d9d697834544b160ccf297320a4dc6ba01f562
     generateName: tekton-resource-pruner-
     labels:
       operator.tekton.dev/created-by: tektoncd-pruner
       tektonconfig.operator.tekton.dev/pruner: "true"
-    name: tekton-resource-pruner-28gp6
+    name: tekton-resource-pruner-4ch5v
     namespace: tekton-pipelines
     ownerReferences:
     - apiVersion: operator.tekton.dev/v1alpha1
@@ -40,29 +40,33 @@ items:
                 cattle-turtles-system;--keep=20;pipelinerun,taskrun;false cattle-ui-plugin-system;--keep=20;pipelinerun,taskrun;false
                 cert-manager;--keep=20;pipelinerun,taskrun;false chef;--keep=20;pipelinerun,taskrun;false
                 chef-webhook;--keep=20;pipelinerun,taskrun;false cluster-fleet-local-local-1a3d67d0a899;--keep=20;pipelinerun,taskrun;false
-                cnpg-system;--keep=20;pipelinerun,taskrun;false default;--keep=20;pipelinerun,taskrun;false
-                default-tenant;--keep=20;pipelinerun,taskrun;false descheduler;--keep=20;pipelinerun,taskrun;false
-                dr-ops;--keep=20;pipelinerun,taskrun;false emqx;--keep=20;pipelinerun,taskrun;false
-                enterprise-contract-service;--keep=20;pipelinerun,taskrun;false etcd-backup;--keep=20;pipelinerun,taskrun;false
-                event-exporter;--keep=20;pipelinerun,taskrun;false fleet-default;--keep=20;pipelinerun,taskrun;false
-                fleet-local;--keep=20;pipelinerun,taskrun;false gitea;--keep=20;pipelinerun,taskrun;false
-                gitea-bootstrap;--keep=20;pipelinerun,taskrun;false headlamp;--keep=20;pipelinerun,taskrun;false
-                ingress-nginx;--keep=20;pipelinerun,taskrun;false integration-service;--keep=20;pipelinerun,taskrun;false
-                istio-system;--keep=20;pipelinerun,taskrun;false jenkins;--keep=20;pipelinerun,taskrun;false
-                k8sgpt;--keep=20;pipelinerun,taskrun;false k8up-system;--keep=20;pipelinerun,taskrun;false
-                knative-serving;--keep=20;pipelinerun,taskrun;false konflux-cli;--keep=20;pipelinerun,taskrun;false
-                konflux-info;--keep=20;pipelinerun,taskrun;false konflux-operator;--keep=20;pipelinerun,taskrun;false
-                konflux-ui;--keep=20;pipelinerun,taskrun;false kyverno;--keep=20;pipelinerun,taskrun;false
-                local;--keep=20;pipelinerun,taskrun;false local-path-storage;--keep=20;pipelinerun,taskrun;false
-                mattermost;--keep=20;pipelinerun,taskrun;false monitoring;--keep=20;pipelinerun,taskrun;false
-                namespace-lister;--keep=20;pipelinerun,taskrun;false opentelemetry-operator-system;--keep=20;pipelinerun,taskrun;false
+                cluster-twin;--keep=20;pipelinerun,taskrun;false cnpg-system;--keep=20;pipelinerun,taskrun;false
+                default;--keep=20;pipelinerun,taskrun;false default-tenant;--keep=20;pipelinerun,taskrun;false
+                descheduler;--keep=20;pipelinerun,taskrun;false dr-ops;--keep=20;pipelinerun,taskrun;false
+                emqx;--keep=20;pipelinerun,taskrun;false enterprise-contract-service;--keep=20;pipelinerun,taskrun;false
+                etcd-backup;--keep=20;pipelinerun,taskrun;false event-exporter;--keep=20;pipelinerun,taskrun;false
+                fleet-default;--keep=20;pipelinerun,taskrun;false fleet-local;--keep=20;pipelinerun,taskrun;false
+                gitea;--keep=20;pipelinerun,taskrun;false gitea-bootstrap;--keep=20;pipelinerun,taskrun;false
+                habitat-demo;--keep=20;pipelinerun,taskrun;false headlamp;--keep=20;pipelinerun,taskrun;false
+                ingress-nginx;--keep=20;pipelinerun,taskrun;false inspec-scans;--keep=20;pipelinerun,taskrun;false
+                integration-service;--keep=20;pipelinerun,taskrun;false istio-system;--keep=20;pipelinerun,taskrun;false
+                jenkins;--keep=20;pipelinerun,taskrun;false k8sgpt;--keep=20;pipelinerun,taskrun;false
+                k8up-system;--keep=20;pipelinerun,taskrun;false knative-serving;--keep=20;pipelinerun,taskrun;false
+                konflux-cli;--keep=20;pipelinerun,taskrun;false konflux-info;--keep=20;pipelinerun,taskrun;false
+                konflux-operator;--keep=20;pipelinerun,taskrun;false konflux-ui;--keep=20;pipelinerun,taskrun;false
+                kyverno;--keep=20;pipelinerun,taskrun;false local;--keep=20;pipelinerun,taskrun;false
+                local-path-storage;--keep=20;pipelinerun,taskrun;false mattermost;--keep=20;pipelinerun,taskrun;false
+                monitoring;--keep=20;pipelinerun,taskrun;false namespace-lister;--keep=20;pipelinerun,taskrun;false
+                opentelemetry-operator-system;--keep=20;pipelinerun,taskrun;false
                 p-sqf5p;--keep=20;pipelinerun,taskrun;false p-wpbsz;--keep=20;pipelinerun,taskrun;false
                 pipelines-as-code;--keep=20;pipelinerun,taskrun;false piraeus-datastore;--keep=20;pipelinerun,taskrun;false
-                registry;--keep=20;pipelinerun,taskrun;false release-service;--keep=20;pipelinerun,taskrun;false
-                robusta;--keep=20;pipelinerun,taskrun;false semaphore;--keep=20;pipelinerun,taskrun;false
-                signoz;--keep=20;pipelinerun,taskrun;false tekton-operator;--keep=20;pipelinerun,taskrun;false
-                tekton-pipelines;--keep=20;pipelinerun,taskrun;false user-b2zsr;--keep=20;pipelinerun,taskrun;false
-                victoriametrics;--keep=20;pipelinerun,taskrun;false zabbix;--keep=20;pipelinerun,taskrun;false
+                platform-meta;--keep=20;pipelinerun,taskrun;false registry;--keep=20;pipelinerun,taskrun;false
+                release-service;--keep=20;pipelinerun,taskrun;false robusta;--keep=20;pipelinerun,taskrun;false
+                semaphore;--keep=20;pipelinerun,taskrun;false signoz;--keep=20;pipelinerun,taskrun;false
+                tekton-operator;--keep=20;pipelinerun,taskrun;false tekton-pipelines;--keep=20;pipelinerun,taskrun;false
+                tf-demo;--keep=20;pipelinerun,taskrun;false user-b2zsr;--keep=20;pipelinerun,taskrun;false
+                victoriametrics;--keep=20;pipelinerun,taskrun;false vui;--keep=20;pipelinerun,taskrun;false
+                zabbix;--keep=20;pipelinerun,taskrun;false
               command:
               - /bin/sh
               - -c
@@ -113,7 +117,7 @@ items:
     successfulJobsHistoryLimit: 2
     suspend: false
   status:
-    lastScheduleTime: "2026-04-25T00:00:00Z"
-    lastSuccessfulTime: "2026-04-25T00:00:24Z"
+    lastScheduleTime: "2026-04-26T00:00:00Z"
+    lastSuccessfulTime: "2026-04-26T00:00:27Z"
 kind: List
 metadata:

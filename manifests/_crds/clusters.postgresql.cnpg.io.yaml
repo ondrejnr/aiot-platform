@@ -146,7 +146,7 @@ items:
       type: ContinuousArchiving
     configMapResourceVersion:
       metrics:
-        cnpg-default-monitoring: "8648101"
+        cnpg-default-monitoring: "10500961"
     currentPrimary: pg-ha-2
     currentPrimaryTimestamp: "2026-04-24T10:22:29.163084Z"
     healthyPVC:
@@ -161,7 +161,7 @@ items:
       pg-ha-1:
         ip: 10.244.6.241
         isPrimary: false
-        timeLineID: 1
+        timeLineID: 2
       pg-ha-2:
         ip: 10.244.2.91
         isPrimary: true
@@ -182,12 +182,12 @@ items:
     readService: pg-ha-r
     readyInstances: 2
     secretsResourceVersion:
-      applicationSecretVersion: "8647505"
+      applicationSecretVersion: "10500515"
       clientCaSecretVersion: "8648075"
       replicationSecretVersion: "8648078"
       serverCaSecretVersion: "8648075"
       serverSecretVersion: "8648076"
-      superuserSecretVersion: "8796857"
+      superuserSecretVersion: "10500462"
     switchReplicaClusterStatus: {}
     systemID: "7632221646064402452"
     targetPrimary: pg-ha-2

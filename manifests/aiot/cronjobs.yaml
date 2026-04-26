@@ -26,7 +26,7 @@ items:
               - |
                 set -e
                 H="postgres.aiot.svc.cluster.local"
-                U="postgres"
+                U="aiot_admin"
                 D="aiot"
                 echo "=== Partition manager ==="
                 # Drop partitions older than 2 hours
@@ -79,14 +79,14 @@ items:
     successfulJobsHistoryLimit: 3
     suspend: false
   status:
-    lastScheduleTime: "2026-04-25T01:05:00Z"
-    lastSuccessfulTime: "2026-04-25T01:05:04Z"
+    lastScheduleTime: "2026-04-26T01:05:00Z"
+    lastSuccessfulTime: "2026-04-26T01:05:04Z"
 - apiVersion: batch/v1
   kind: CronJob
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"batch/v1","kind":"CronJob","metadata":{"annotations":{},"creationTimestamp":"2026-04-14T02:08:32Z","generation":3,"name":"pg-sensor-cleanup","namespace":"aiot","resourceVersion":"8696444","uid":"4a5bd473-2cfb-4c3a-afeb-da16335df4f8"},"spec":{"concurrencyPolicy":"Forbid","failedJobsHistoryLimit":2,"jobTemplate":{"metadata":{"creationTimestamp":null},"spec":{"activeDeadlineSeconds":300,"backoffLimit":1,"template":{"metadata":{"creationTimestamp":null},"spec":{"containers":[{"command":["/bin/bash","-c","set -e\nH=\"postgres.aiot.svc.cluster.local\"\nU=\"postgres\"\nD=\"aiot\"\necho \"Deleting sensor_data older than 10 days...\"\npsql -h \"$H\" -U \"$U\" -d \"$D\" -c \"DELETE FROM sensor_data WHERE ts \u003c NOW() - INTERVAL '10 days';\"\necho \"VACUUM...\"\npsql -h \"$H\" -U \"$U\" -d \"$D\" -c \"VACUUM sensor_data;\"\necho \"Done\"\n"],"env":[{"name":"PGPASSWORD","valueFrom":{"secretKeyRef":{"key":"PGPASSWORD","name":"pg-credentials"}}}],"image":"postgres:16","imagePullPolicy":"IfNotPresent","name":"cleanup","resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File"}],"dnsPolicy":"ClusterFirst","restartPolicy":"Never","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30}}}},"schedule":"0 */4 * * *","successfulJobsHistoryLimit":2,"suspend":false},"status":{"lastScheduleTime":"2026-04-24T08:00:00Z","lastSuccessfulTime":"2026-04-24T04:00:03Z"}}
+        {"apiVersion":"batch/v1","kind":"CronJob","metadata":{"annotations":{},"name":"pg-sensor-cleanup","namespace":"aiot"},"spec":{"concurrencyPolicy":"Forbid","failedJobsHistoryLimit":2,"jobTemplate":{"metadata":{"creationTimestamp":null},"spec":{"activeDeadlineSeconds":300,"backoffLimit":1,"template":{"metadata":{"creationTimestamp":null},"spec":{"containers":[{"command":["/bin/bash","-c","set -e\nH=\"postgres.aiot.svc.cluster.local\"\nU=\"postgres\"\nD=\"aiot\"\necho \"Deleting sensor_data older than 10 days...\"\npsql -h \"$H\" -U \"$U\" -d \"$D\" -c \"DELETE FROM sensor_data WHERE ts \u003c NOW() - INTERVAL '10 days';\"\necho \"VACUUM...\"\npsql -h \"$H\" -U \"$U\" -d \"$D\" -c \"VACUUM sensor_data;\"\necho \"Done\"\n"],"env":[{"name":"PGPASSWORD","valueFrom":{"secretKeyRef":{"key":"PGPASSWORD","name":"pg-credentials"}}}],"image":"postgres:16","imagePullPolicy":"IfNotPresent","name":"cleanup","resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File"}],"dnsPolicy":"ClusterFirst","restartPolicy":"Never","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30}}}},"schedule":"0 */4 * * *","successfulJobsHistoryLimit":2,"suspend":false}}
     name: pg-sensor-cleanup
     namespace: aiot
   spec:
@@ -135,8 +135,8 @@ items:
     successfulJobsHistoryLimit: 2
     suspend: false
   status:
-    lastScheduleTime: "2026-04-25T00:00:00Z"
-    lastSuccessfulTime: "2026-04-25T00:00:04Z"
+    lastScheduleTime: "2026-04-26T00:00:00Z"
+    lastSuccessfulTime: "2026-04-26T00:00:06Z"
 - apiVersion: batch/v1
   kind: CronJob
   metadata:
@@ -217,12 +217,68 @@ items:
             volumes:
             - name: backups
               persistentVolumeClaim:
-                claimName: postgres-backup-data-piraeus
+                claimName: postgres-backup-data
     schedule: 0 3 * * *
     successfulJobsHistoryLimit: 3
     suspend: false
   status:
-    lastScheduleTime: "2026-04-24T03:00:00Z"
-    lastSuccessfulTime: "2026-04-24T03:00:49Z"
+    lastScheduleTime: "2026-04-25T03:00:00Z"
+    lastSuccessfulTime: "2026-04-25T03:00:43Z"
+- apiVersion: batch/v1
+  kind: CronJob
+  metadata:
+    name: sensor-data-retention
+    namespace: aiot
+  spec:
+    concurrencyPolicy: Forbid
+    failedJobsHistoryLimit: 2
+    jobTemplate:
+      metadata:
+      spec:
+        activeDeadlineSeconds: 1800
+        backoffLimit: 1
+        template:
+          metadata:
+          spec:
+            containers:
+            - command:
+              - python3
+              - -c
+              - |
+                import psycopg2, os
+                conn = psycopg2.connect(host=os.environ['PG_HOST'], user=os.environ['PG_USER'],
+                                         password=os.environ['PG_PASS'], dbname='aiot')
+                conn.autocommit = True
+                cur = conn.cursor()
+                for t in ['sensor_data','predictions']:
+                    cur.execute(f"DELETE FROM {t} WHERE ts < NOW() - INTERVAL '14 days'")
+                    print(f"Cleaned {t}: {cur.rowcount} rows")
+                cur.close(); conn.close()
+              env:
+              - name: PG_HOST
+                value: postgres.aiot.svc.cluster.local
+              - name: PG_USER
+                value: postgres
+              - name: PG_PASS
+                valueFrom:
+                  secretKeyRef:
+                    key: PG_PASS
+                    name: pg-credentials
+              image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+              imagePullPolicy: Always
+              name: retention
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+            dnsPolicy: ClusterFirst
+            restartPolicy: Never
+            schedulerName: default-scheduler
+            securityContext: {}
+            terminationGracePeriodSeconds: 30
+    schedule: 0 */6 * * *
+    successfulJobsHistoryLimit: 2
+    suspend: false
+  status:
+    lastScheduleTime: "2026-04-26T00:00:00Z"
 kind: List
 metadata:

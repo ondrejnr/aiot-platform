@@ -4,7 +4,7 @@ items:
   kind: DaemonSet
   metadata:
     annotations:
-      field.cattle.io/publicEndpoints: '[{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-57qjm","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-5jfnz","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-6n2tf","allNodes":false},{"nodeName":":aiot-master","addresses":["10.132.0.2"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-thjgg","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-zmjnq","allNodes":false}]'
+      field.cattle.io/publicEndpoints: '[{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-28vzm","allNodes":false},{"nodeName":":aiot-worker-02","addresses":["10.132.0.4"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-6h9k9","allNodes":false},{"nodeName":":oci-e5-node2","addresses":["172.16.200.11"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-zxfgv","allNodes":false},{"nodeName":":oci-e5-node1","addresses":["172.16.200.10"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-bxvtl","allNodes":false},{"nodeName":":aiot-master","addresses":["10.132.0.2"],"port":9100,"protocol":"TCP","podName":"monitoring:prometheus-prometheus-node-exporter-jskb8","allNodes":false}]'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"annotations":{},"labels":{"app.kubernetes.io/component":"metrics","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"prometheus-node-exporter","app.kubernetes.io/part-of":"prometheus-node-exporter","app.kubernetes.io/version":"1.11.1","helm.sh/chart":"prometheus-node-exporter-4.53.1","release":"prometheus"},"name":"prometheus-prometheus-node-exporter","namespace":"monitoring"},"spec":{"revisionHistoryLimit":10,"selector":{"matchLabels":{"app.kubernetes.io/instance":"prometheus","app.kubernetes.io/name":"prometheus-node-exporter"}},"template":{"metadata":{"annotations":{"cluster-autoscaler.kubernetes.io/safe-to-evict":"true"},"labels":{"app.kubernetes.io/component":"metrics","app.kubernetes.io/instance":"prometheus","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"prometheus-node-exporter","app.kubernetes.io/part-of":"prometheus-node-exporter","app.kubernetes.io/version":"1.11.1","helm.sh/chart":"prometheus-node-exporter-4.53.1","jobLabel":"node-exporter","release":"prometheus"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"eks.amazonaws.com/compute-type","operator":"NotIn","values":["fargate"]},{"key":"type","operator":"NotIn","values":["virtual-kubelet"]}]}]}}},"automountServiceAccountToken":false,"containers":[{"args":["--path.procfs=/host/proc","--path.sysfs=/host/sys","--path.rootfs=/host/root","--path.udev.data=/host/root/run/udev/data","--web.listen-address=[$(HOST_IP)]:9100","--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/containerd/.+|var/lib/docker/.+|var/lib/kubelet/.+)($|/)","--collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs|erofs)$"],"env":[{"name":"HOST_IP","value":"0.0.0.0"}],"image":"quay.io/prometheus/node-exporter:v1.11.1","imagePullPolicy":"IfNotPresent","livenessProbe":{"failureThreshold":3,"httpGet":{"httpHeaders":null,"path":"/","port":"http-metrics","scheme":"HTTP"},"initialDelaySeconds":0,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"name":"node-exporter","ports":[{"containerPort":9100,"name":"http-metrics","protocol":"TCP"}],"readinessProbe":{"failureThreshold":3,"httpGet":{"httpHeaders":null,"path":"/","port":"http-metrics","scheme":"HTTP"},"initialDelaySeconds":0,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1},"securityContext":{"readOnlyRootFilesystem":true},"volumeMounts":[{"mountPath":"/host/proc","name":"proc","readOnly":true},{"mountPath":"/host/sys","name":"sys","readOnly":true},{"mountPath":"/host/root","mountPropagation":"HostToContainer","name":"root","readOnly":true}]}],"hostIPC":false,"hostNetwork":true,"hostPID":true,"nodeSelector":{"kubernetes.io/os":"linux"},"securityContext":{"fsGroup":65534,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534},"serviceAccountName":"prometheus-prometheus-node-exporter","tolerations":[{"effect":"NoSchedule","operator":"Exists"}],"volumes":[{"hostPath":{"path":"/proc"},"name":"proc"},{"hostPath":{"path":"/sys"},"name":"sys"},{"hostPath":{"path":"/"},"name":"root"}]}},"updateStrategy":{"rollingUpdate":{"maxUnavailable":1},"type":"RollingUpdate"}}}
       meta.helm.sh/release-name: prometheus
@@ -75,9 +75,9 @@ items:
               path: /
               port: http-metrics
               scheme: HTTP
-            periodSeconds: 10
+            periodSeconds: 15
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           name: node-exporter
           ports:
           - containerPort: 9100
@@ -89,9 +89,9 @@ items:
               path: /
               port: http-metrics
               scheme: HTTP
-            periodSeconds: 10
+            periodSeconds: 15
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           resources: {}
           securityContext:
             readOnlyRootFilesystem: true
@@ -150,7 +150,7 @@ items:
     numberAvailable: 5
     numberMisscheduled: 0
     numberReady: 5
-    observedGeneration: 3
+    observedGeneration: 4
     updatedNumberScheduled: 5
 kind: List
 metadata:

@@ -362,6 +362,23 @@ items:
   kind: Namespace
   metadata:
     annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-25T07:37:22Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-25T07:37:22Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: cluster-twin
+      managed-by: terraform
+      owner: platform-team
+      tier: app
+    name: cluster-twin
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-24T07:15:57Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-24T07:15:57Z"}]}'
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
@@ -599,6 +616,23 @@ items:
   kind: Namespace
   metadata:
     annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-25T07:37:30Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-25T07:37:30Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: habitat-demo
+      managed-by: terraform
+      owner: platform-team
+      tier: app
+    name: habitat-demo
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"}]}'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"headlamp"},"spec":{},"status":{}}
@@ -631,6 +665,23 @@ items:
       owner: platform-team
       tier: platform
     name: ingress-nginx
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-25T07:37:17Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-25T07:37:17Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: inspec-scans
+      managed-by: terraform
+      owner: platform-team
+      tier: platform
+    name: inspec-scans
   spec:
     finalizers:
     - kubernetes
@@ -1118,6 +1169,25 @@ items:
   kind: Namespace
   metadata:
     annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-25T11:15:54Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-25T11:15:54Z"}]}'
+      description: Platform catalog and metadata (read-only)
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      app.kubernetes.io/name: platform-meta
+      kubernetes.io/metadata.name: platform-meta
+      managed-by: terraform
+      owner: platform-team
+      tier: platform
+    name: platform-meta
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"}]}'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"creationTimestamp":null,"name":"registry"},"spec":{},"status":{}}
@@ -1252,6 +1322,22 @@ items:
   kind: Namespace
   metadata:
     annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-25T11:15:54Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-25T11:15:54Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: tf-demo
+      managed-by: terraform
+      purpose: w4-d1-demo
+    name: tf-demo
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:54:26Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-19T20:54:26Z"}]}'
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
@@ -1276,6 +1362,23 @@ items:
       owner: sre-team
       tier: observability
     name: victoriametrics
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-25T07:37:32Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-25T07:37:32Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: vui
+      managed-by: terraform
+      owner: platform-team
+      tier: app
+    name: vui
   spec:
     finalizers:
     - kubernetes

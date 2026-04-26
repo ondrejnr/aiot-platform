@@ -25,22 +25,22 @@ items:
 - apiVersion: k8up.io/v1
   kind: Snapshot
   metadata:
-    name: 6abd1c40
+    name: 5e972f0d
     namespace: aiot
   spec:
-    date: "2026-04-24T03:10:33Z"
-    id: 6abd1c40ff04cd7fceeaf2f17937b1698ec76fd9431293cf6bbdd4d27f6e0fe0
+    date: "2026-04-25T03:10:33Z"
+    id: 5e972f0d78bd4560bd309d26a7794f6e780780d1d5e2de5da5a4f7195063245f
     paths:
     - /aiot-pg-ha-dump.sql
     repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
 - apiVersion: k8up.io/v1
   kind: Snapshot
   metadata:
-    name: d28991df
+    name: 6abd1c40
     namespace: aiot
   spec:
-    date: "2026-04-23T03:10:35Z"
-    id: d28991df620745dfb3ec919d7668b76cb882e4b3ee70c6cea3d1b386b36bd911
+    date: "2026-04-24T03:10:33Z"
+    id: 6abd1c40ff04cd7fceeaf2f17937b1698ec76fd9431293cf6bbdd4d27f6e0fe0
     paths:
     - /aiot-pg-ha-dump.sql
     repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
@@ -69,22 +69,22 @@ items:
 - apiVersion: k8up.io/v1
   kind: Snapshot
   metadata:
-    name: 2d09f3cd
+    name: 5430f51d
     namespace: semaphore
   spec:
-    date: "2026-04-23T03:05:07Z"
-    id: 2d09f3cdfed102f5ced9d7fcfde18cd696c9f3feac39b36d9ae5cc9a88617c3f
+    date: "2026-04-24T03:05:06Z"
+    id: 5430f51d64178d17eae6424ae65cec88f7221171aea255ce291fc75ab8aad1af
     paths:
     - /data/semaphore-data
     repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
 - apiVersion: k8up.io/v1
   kind: Snapshot
   metadata:
-    name: 5430f51d
+    name: 71c4c2f6
     namespace: semaphore
   spec:
-    date: "2026-04-24T03:05:06Z"
-    id: 5430f51d64178d17eae6424ae65cec88f7221171aea255ce291fc75ab8aad1af
+    date: "2026-04-25T03:05:06Z"
+    id: 71c4c2f6b4d4d6e633a11fe56e22fccafa1baafb961d6ea8b403fdb8e1561795
     paths:
     - /data/semaphore-data
     repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero

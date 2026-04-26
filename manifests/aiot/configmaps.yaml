@@ -930,6 +930,315 @@ items:
     namespace: aiot
 - apiVersion: v1
   data:
+    connector.py: |
+      """AIoT Inference Connector - subscribes MQTT, calls KServe, stores predictions."""
+      import collections
+      import json
+      import logging
+      import os
+      import threading
+      import time
+      from datetime import datetime, timezone
+
+      import numpy as np
+      import paho.mqtt.client as mqtt
+      import psycopg2
+      from psycopg2.extras import execute_values
+      import requests
+
+      logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+      log = logging.getLogger("inference-connector")
+
+      # ── config ──
+      MQTT_HOST = os.getenv("MQTT_HOST", "emqx.emqx.svc.cluster.local")
+      MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
+      KSERVE_URL = os.getenv("KSERVE_URL", "http://aiot-maintenance-predictor-00001-private.kubeflow-user-example-com.svc.cluster.local/v1/models/aiot-maintenance")
+      PG_HOST = os.getenv("PG_HOST", "postgres.aiot.svc.cluster.local")
+      PG_PORT = int(os.getenv("PG_PORT", "5432"))
+      PG_DB = os.getenv("PG_DB", "aiot")
+      PG_USER = os.getenv("PG_USER", "aiot_admin")
+      PG_PASS = os.getenv("PG_PASS", "AioT2026!Prod")
+      MM_WEBHOOK = os.getenv("MM_WEBHOOK", "http://mattermost.mattermost.svc.cluster.local:8065/hooks/4ko7reuoai833j7mt7hg7d6iuy")
+      ALERT_THRESHOLD = float(os.getenv("ALERT_THRESHOLD", "0.85"))
+      ALERT_COOLDOWN = int(os.getenv("ALERT_COOLDOWN", "300"))
+      BATCH_INTERVAL = float(os.getenv("BATCH_INTERVAL", "5"))
+      INFERENCE_EVERY_N = int(os.getenv("INFERENCE_EVERY_N", "50"))
+
+      # ── state ──
+      CANONICAL = ["compressor-01","compressor-02","conveyor-01","conveyor-02",
+                   "generator-01","motor-01","motor-02","pump-01","pump-02","turbine-01"]
+      MACHINE_TYPES = sorted(set(m.rsplit("-",1)[0] for m in CANONICAL))
+      BASE = ["temperature","vibration","pressure","rpm","humidity","power_consumption","anomaly_score","violations_count"]
+
+      buffer_lock = threading.Lock()
+      msg_buffer = []  # raw messages
+      history = {m: collections.deque(maxlen=3) for m in CANONICAL}  # rolling window
+      last_alert = {}  # machine_id -> timestamp
+      feature_names = None  # loaded from model metadata
+      pred_buffer = []
+      pred_lock = threading.Lock()
+      stats = {"msgs": 0, "inferences": 0, "positives": 0, "errors": 0}
+
+
+      def connect_pg():
+          while True:
+              try:
+                  conn = psycopg2.connect(host=PG_HOST, port=PG_PORT, dbname=PG_DB,
+                                          user=PG_USER, password=PG_PASS)
+                  conn.autocommit = False
+                  log.info("Postgres connected")
+                  return conn
+              except Exception as e:
+                  log.warning("PG connect failed: %s", e)
+                  time.sleep(5)
+
+
+      def load_feature_names():
+          global feature_names
+          for _ in range(10):
+              try:
+                  r = requests.get(KSERVE_URL + "/metadata", timeout=10)
+                  if r.ok:
+                      meta = r.json()
+                      feature_names = meta.get("feature_names")
+                      n = meta.get("n_features", "?")
+                      log.info("Model has %s features, got %d names from metadata", n, len(feature_names) if feature_names else 0)
+                      return
+              except Exception as e:
+                  log.warning("Metadata fetch failed: %s", e)
+              time.sleep(5)
+          log.warning("Could not load feature names, will build manually")
+
+
+      def norm_mid(mid):
+          import re
+          m = re.match(r"^(pump)-(\d)$", mid)
+          return f"{m.group(1)}-0{m.group(2)}" if m else mid
+
+
+      def build_features(msg):
+          """Build feature vector from a single message + history."""
+          mid = norm_mid(msg.get("machine_id", "unknown"))
+          if mid not in history:
+              return None, mid
+
+          row = {}
+          for f in BASE:
+              row[f] = float(msg.get(f, 0))
+
+          hist = list(history[mid])
+          hist.append(row)
+          history[mid].append(row)
+
+          # diffs
+          if len(hist) >= 2:
+              prev = hist[-2]
+              for f in BASE:
+                  row[f"{f}_d1"] = row[f] - prev.get(f, row[f])
+          else:
+              for f in BASE:
+                  row[f"{f}_d1"] = 0.0
+
+          # rolling mean/std (window=3)
+          if len(hist) >= 3:
+              for f in BASE:
+                  vals = [h[f] for h in hist[-3:]]
+                  row[f"{f}_m5"] = float(np.mean(vals))
+                  row[f"{f}_s5"] = float(np.std(vals))
+          else:
+              for f in BASE:
+                  row[f"{f}_m5"] = row[f]
+                  row[f"{f}_s5"] = 0.0
+
+          # time features
+          now = datetime.now(timezone.utc)
+          h = now.hour + now.minute / 60.0
+          row["hour_sin"] = float(np.sin(2 * np.pi * h / 24))
+          row["hour_cos"] = float(np.cos(2 * np.pi * h / 24))
+
+          # machine dummies
+          for m in CANONICAL:
+              row[f"m_{m}"] = 1.0 if m == mid else 0.0
+
+          # type dummies
+          mtype = mid.rsplit("-", 1)[0]
+          for t in MACHINE_TYPES:
+              row[f"t_{t}"] = 1.0 if t == mtype else 0.0
+
+          return row, mid
+
+
+      def call_kserve(features_batch):
+          """Send batch to KServe, return predictions."""
+          try:
+              # Build ordered feature vectors
+              feat_keys = sorted(f for f in features_batch[0].keys())
+              instances = [[row.get(k, 0.0) for k in feat_keys] for row in features_batch]
+              r = requests.post(KSERVE_URL, json={"instances": instances}, timeout=15)
+              if r.ok:
+                  return r.json()
+              log.error("KServe %d: %s", r.status_code, r.text[:200])
+              return None
+          except Exception as e:
+              log.error("KServe call failed: %s", e)
+              return None
+
+
+      def send_alert(mid, prob, msg):
+          now = time.time()
+          if mid in last_alert and (now - last_alert[mid]) < ALERT_COOLDOWN:
+              return
+          last_alert[mid] = now
+          temp = msg.get("temperature", "?")
+          vib = msg.get("vibration", "?")
+          pres = msg.get("pressure", "?")
+          rpm_v = msg.get("rpm", "?")
+          text = (f":warning: **Maintenance Alert: {mid}** — probability {prob:.0%}\n"
+                  f"| Metric | Value |\n|---|---|\n"
+                  f"| Temperature | {temp}°C |\n"
+                  f"| Vibration | {vib} |\n"
+                  f"| Pressure | {pres} bar |\n"
+                  f"| RPM | {rpm_v} |")
+          try:
+              requests.post(MM_WEBHOOK, json={"text": text}, timeout=5)
+              log.info("Alert sent for %s (prob=%.2f)", mid, prob)
+          except Exception as e:
+              log.warning("Alert send failed: %s", e)
+
+
+      def flush_predictions(pg):
+          with pred_lock:
+              batch = pred_buffer[:]
+              pred_buffer.clear()
+          if not batch:
+              return
+          try:
+              cur = pg.cursor()
+              execute_values(cur,
+                  "INSERT INTO predictions (ts, machine_id, machine_type, location, prediction, probability, temperature, vibration, pressure, rpm) VALUES %s",
+                  batch)
+              pg.commit()
+              log.info("Stored %d predictions (%d positive)", len(batch),
+                       sum(1 for b in batch if b[5] == 1))
+          except Exception as e:
+              pg.rollback()
+              log.error("PG insert failed: %s", e)
+
+
+      def on_message(client, userdata, mqtt_msg):
+          try:
+              payload = json.loads(mqtt_msg.payload)
+          except Exception:
+              return
+          mid = norm_mid(payload.get("machine_id", ""))
+          if mid not in CANONICAL:
+              return
+          stats["msgs"] += 1
+          with buffer_lock:
+              msg_buffer.append(payload)
+
+
+      def inference_loop():
+          pg = connect_pg()
+          counter = 0
+          while True:
+              time.sleep(BATCH_INTERVAL)
+              with buffer_lock:
+                  batch = msg_buffer[:]
+                  msg_buffer.clear()
+              if not batch:
+                  continue
+
+              # Only run inference every N messages to avoid overloading
+              counter += len(batch)
+              # Process latest message per machine
+              latest = {}
+              for msg in batch:
+                  mid = norm_mid(msg.get("machine_id", ""))
+                  if mid in CANONICAL:
+                      latest[mid] = msg
+
+              if not latest:
+                  continue
+
+              features_batch = []
+              mids = []
+              raw_msgs = []
+              for mid, msg in latest.items():
+                  feat, resolved_mid = build_features(msg)
+                  if feat:
+                      features_batch.append(feat)
+                      mids.append(resolved_mid)
+                      raw_msgs.append(msg)
+
+              if not features_batch:
+                  continue
+
+              result = call_kserve(features_batch)
+              if not result:
+                  stats["errors"] += 1
+                  continue
+
+              preds = result.get("predictions", [])
+              probs = result.get("probabilities", [0.0] * len(preds))
+              stats["inferences"] += len(preds)
+
+              now = datetime.now(timezone.utc)
+              for i, (mid, msg) in enumerate(zip(mids, raw_msgs)):
+                  pred = int(preds[i]) if i < len(preds) else 0
+                  prob = float(probs[i]) if i < len(probs) else 0.0
+                  if pred == 1:
+                      stats["positives"] += 1
+                  if prob >= ALERT_THRESHOLD:
+                      send_alert(mid, prob, msg)
+
+                  mtype = mid.rsplit("-", 1)[0]
+                  loc = msg.get("location", "unknown")
+                  with pred_lock:
+                      pred_buffer.append((now, mid, mtype, loc, pred, prob,
+                          msg.get("temperature"), msg.get("vibration"),
+                          msg.get("pressure"), msg.get("rpm")))
+
+              flush_predictions(pg)
+
+              if stats["inferences"] % 100 < len(preds):
+                  log.info("Stats: msgs=%d inferences=%d positives=%d errors=%d",
+                           stats["msgs"], stats["inferences"], stats["positives"], stats["errors"])
+
+
+      def main():
+          log.info("Starting AIoT Inference Connector")
+          log.info("KSERVE_URL=%s  BATCH_INTERVAL=%s  ALERT_THRESHOLD=%s",
+                   KSERVE_URL, BATCH_INTERVAL, ALERT_THRESHOLD)
+          load_feature_names()
+
+          # Start inference loop in background
+          t = threading.Thread(target=inference_loop, daemon=True)
+          t.start()
+
+          # MQTT
+          client = mqtt.Client(client_id="inference-connector")
+          client.on_message = on_message
+          while True:
+              try:
+                  client.connect(MQTT_HOST, MQTT_PORT, 60)
+                  break
+              except Exception as e:
+                  log.warning("MQTT connect failed: %s", e)
+                  time.sleep(5)
+          client.subscribe("sensors/#", qos=0)
+          log.info("Subscribed to sensors/#")
+          client.loop_forever()
+
+
+      if __name__ == "__main__":
+          main()
+  kind: ConfigMap
+  metadata:
+    name: inference-connector-code
+    namespace: aiot
+- apiVersion: v1
+  data:
     root-cert.pem: |
       -----BEGIN CERTIFICATE-----
       MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY

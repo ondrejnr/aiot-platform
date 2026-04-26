@@ -1,0 +1,27 @@
+apiVersion: v1
+items:
+- apiVersion: monitoring.coreos.com/v1alpha1
+  kind: ScrapeConfig
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"monitoring.coreos.com/v1alpha1","kind":"ScrapeConfig","metadata":{"annotations":{},"labels":{"release":"prometheus"},"name":"habitat-pg-exporter","namespace":"monitoring"},"spec":{"metricsPath":"/metrics","scrapeInterval":"30s","scrapeTimeout":"10s","staticConfigs":[{"labels":{"habitat_origin":"aiot","habitat_pkg":"pg-exporter","managed_by":"habitat","service":"pg-exporter","target_db":"pg-ha"},"targets":["10.132.0.2:9187"]}]}}
+    labels:
+      release: prometheus
+    name: habitat-pg-exporter
+    namespace: monitoring
+  spec:
+    metricsPath: /metrics
+    scrapeInterval: 30s
+    scrapeTimeout: 10s
+    staticConfigs:
+    - labels:
+        habitat_origin: aiot
+        habitat_pkg: pg-exporter
+        managed_by: habitat
+        service: pg-exporter
+        target_db: pg-ha
+      targets:
+      - 10.132.0.2:9187
+kind: List
+metadata:

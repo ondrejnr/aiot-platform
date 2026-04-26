@@ -4,6 +4,37 @@ items:
   kind: Service
   metadata:
     annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app.kubernetes.io/name":"tekton-results-postgres","app.kubernetes.io/part-of":"tekton-results"},"name":"postgres","namespace":"tekton-pipelines"},"spec":{"clusterIP":"None","ports":[{"name":"postgres","port":5432,"targetPort":5432}],"selector":{"app.kubernetes.io/name":"tekton-results-postgres","app.kubernetes.io/version":"devel"}}}
+    labels:
+      app.kubernetes.io/name: tekton-results-postgres
+      app.kubernetes.io/part-of: tekton-results
+    name: postgres
+    namespace: tekton-pipelines
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+    selector:
+      app.kubernetes.io/name: tekton-results-postgres
+      app.kubernetes.io/version: devel
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
       operator.tekton.dev/last-applied-hash: 8f980c9b630ca9f1949a08f8a596504c616464f83a9cf01432676cb12341e20a
     labels:
       app: tekton-chains-controller

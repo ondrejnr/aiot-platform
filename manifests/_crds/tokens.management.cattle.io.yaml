@@ -8,7 +8,7 @@ items:
   expiresAt: ""
   isDerived: false
   kind: Token
-  lastUsedAt: "2026-04-24T13:46:04Z"
+  lastUsedAt: "2026-04-25T14:32:38Z"
   metadata:
     generateName: token-
     labels:
@@ -16,6 +16,32 @@ items:
       authn.management.cattle.io/token-userId: user-b2zsr
     name: token-5nztq
   token: vxl2tf9fl8l2qlczmgjnftb8kjqfdmgx9xzvwsp9mptcf7c5pzg6mz
+  ttl: 0
+  userId: user-b2zsr
+  userPrincipal:
+    displayName: Default Admin
+    loginName: admin
+    me: true
+    metadata:
+      name: local://user-b2zsr
+    principalType: user
+    provider: local
+- apiVersion: management.cattle.io/v3
+  authProvider: local
+  current: false
+  description: UI session
+  expired: false
+  expiresAt: ""
+  isDerived: false
+  kind: Token
+  lastUsedAt: "2026-04-25T18:48:17Z"
+  metadata:
+    generateName: token-
+    labels:
+      authn.management.cattle.io/kind: session
+      authn.management.cattle.io/token-userId: user-b2zsr
+    name: token-l97rv
+  token: 44jm5z6qvqmqkl59hwpzqs2gmxr6qq9226ws68jz4g4wlqht78bvbb
   ttl: 0
   userId: user-b2zsr
   userPrincipal:

@@ -96,5 +96,29 @@ items:
     type: ClusterIP
   status:
     loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: k8sgpt-robusta-bridge
+    namespace: k8sgpt
+  spec:
+    clusterIP: 10.98.215.242
+    clusterIPs:
+    - 10.98.215.242
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8090
+      protocol: TCP
+      targetPort: 8090
+    selector:
+      app: k8sgpt-robusta-bridge
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
 kind: List
 metadata:
