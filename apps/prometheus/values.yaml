@@ -28,3 +28,7 @@ kube-prometheus-stack:
   prometheusOperator:
     nodeSelector:
       node-role.kubernetes.io/worker: ""
+
+  # Cilium replaces kube-proxy → no kube-proxy service exists, ServiceMonitor would be empty
+  kubeProxy:
+    enabled: false

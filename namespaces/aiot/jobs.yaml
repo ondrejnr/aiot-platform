@@ -362,7 +362,7 @@ items:
                 - |
                   set -e
                   H="postgres.aiot.svc.cluster.local"
-                  U="aiot_admin"
+                  U="aiot"
                   D="aiot"
                   echo "=== Partition manager ==="
                   # Drop partitions older than 2 hours
@@ -396,8 +396,8 @@ items:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      key: PGPASSWORD
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
                 - name: PGOPTIONS
                   value: -c statement_timeout=0
               image: postgres:16
@@ -458,7 +458,7 @@ items:
                 - |
                   set -e
                   H="postgres.aiot.svc.cluster.local"
-                  U="aiot_admin"
+                  U="aiot"
                   D="aiot"
                   echo "=== Partition manager ==="
                   # Drop partitions older than 2 hours
@@ -492,8 +492,8 @@ items:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      key: PGPASSWORD
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
                 - name: PGOPTIONS
                   value: -c statement_timeout=0
               image: postgres:16
@@ -554,7 +554,7 @@ items:
                 - |
                   set -e
                   H="postgres.aiot.svc.cluster.local"
-                  U="aiot_admin"
+                  U="aiot"
                   D="aiot"
                   echo "=== Partition manager ==="
                   # Drop partitions older than 2 hours
@@ -588,8 +588,8 @@ items:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      key: PGPASSWORD
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
                 - name: PGOPTIONS
                   value: -c statement_timeout=0
               image: postgres:16
@@ -661,8 +661,8 @@ items:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      key: PGPASSWORD
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
               image: postgres:16
               imagePullPolicy: IfNotPresent
               name: cleanup
@@ -732,8 +732,8 @@ items:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      key: PGPASSWORD
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
               image: postgres:16
               imagePullPolicy: IfNotPresent
               name: cleanup
@@ -792,7 +792,7 @@ items:
                 - |
                   set -e
                   H="postgres.aiot.svc.cluster.local"
-                  U="aiot_admin"
+                  U="aiot"
                   D="aiot"
                   echo "Deleting sensor_data older than 10 days..."
                   psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '10 days';"
@@ -803,8 +803,8 @@ items:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      key: PGPASSWORD
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
               image: postgres:16
               imagePullPolicy: IfNotPresent
               name: cleanup
@@ -863,7 +863,7 @@ items:
                 - |
                   set -e
                   H="postgres.aiot.svc.cluster.local"
-                  U="aiot_admin"
+                  U="aiot"
                   D="aiot"
                   echo "Deleting sensor_data older than 10 days..."
                   psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '10 days';"
@@ -874,8 +874,8 @@ items:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      key: PGPASSWORD
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
               image: postgres:16
               imagePullPolicy: IfNotPresent
               name: cleanup
@@ -1549,8 +1549,8 @@ items:
                 - name: PG_PASS
                   valueFrom:
                     secretKeyRef:
-                      key: PG_PASS
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
               image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
               imagePullPolicy: Always
               name: retention
@@ -1620,12 +1620,12 @@ items:
                 - name: PG_HOST
                   value: postgres.aiot.svc.cluster.local
                 - name: PG_USER
-                  value: aiot_admin
+                  value: aiot
                 - name: PG_PASS
                   valueFrom:
                     secretKeyRef:
-                      key: PG_PASS
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
               image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
               imagePullPolicy: Always
               name: retention
@@ -1695,12 +1695,12 @@ items:
                 - name: PG_HOST
                   value: postgres.aiot.svc.cluster.local
                 - name: PG_USER
-                  value: aiot_admin
+                  value: aiot
                 - name: PG_PASS
                   valueFrom:
                     secretKeyRef:
-                      key: PG_PASS
-                      name: pg-credentials
+                      key: password
+                      name: pg-ha-app
               image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
               imagePullPolicy: Always
               name: retention

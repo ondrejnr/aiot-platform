@@ -550,12 +550,12 @@ items:
           - name: PG_HOST
             value: postgres
           - name: PG_USER
-            value: aiot_admin
+            value: aiot
           - name: PG_PASS
             valueFrom:
               secretKeyRef:
-                key: PG_PASS
-                name: pg-credentials
+                key: password
+                name: pg-ha-app
           image: 10.132.0.2:30500/aiot/aiot-python-runtime:v3
           imagePullPolicy: IfNotPresent
           livenessProbe:
