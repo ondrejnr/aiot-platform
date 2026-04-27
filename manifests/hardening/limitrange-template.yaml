@@ -1,0 +1,19 @@
+# Default LimitRange template applied to all user namespaces.
+# Prevents a single uncapped pod (e.g. Karpor ES OOM) from killing a node.
+# Applied dynamically by infra/apply-limitrange.sh.
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+spec:
+  limits:
+  - type: Container
+    default:
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 50m
+      memory: 64Mi
+    max:
+      memory: 4Gi
+      cpu: "4"

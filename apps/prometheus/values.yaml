@@ -5,12 +5,20 @@ alertmanager:
   alertmanagerSpec:
     nodeSelector:
       node-role.kubernetes.io/worker: ""
+    priorityClassName: system-cluster-critical
     resources:
       requests:
         cpu: 20m
         memory: 64Mi
       limits:
         memory: 256Mi
+    topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: alertmanager
 
 grafana:
   adminPassword: admin123
@@ -28,17 +36,26 @@ grafana:
     ingressClassName: nginx
   nodeSelector:
     node-role.kubernetes.io/worker: ""
+  priorityClassName: system-cluster-critical
   resources:
     requests:
       cpu: 50m
       memory: 128Mi
     limits:
       memory: 512Mi
+  topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: grafana
 
 prometheus:
   prometheusSpec:
     nodeSelector:
       node-role.kubernetes.io/worker: ""
+    priorityClassName: system-cluster-critical
     # Hard memory cap prevents runaway scrape buffers from killing the node
     resources:
       requests:
@@ -59,6 +76,7 @@ prometheus:
 prometheusOperator:
   nodeSelector:
     node-role.kubernetes.io/worker: ""
+  priorityClassName: system-cluster-critical
   resources:
     requests:
       cpu: 20m
