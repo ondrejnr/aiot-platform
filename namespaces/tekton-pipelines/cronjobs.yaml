@@ -1,0 +1,70 @@
+apiVersion: v1
+items:
+  - apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: fbeddaa47548139e32d5d2001a921e4e2c4cc14f163ff019d0b2a4a96e081573
+      generateName: tekton-resource-pruner-
+      labels:
+        operator.tekton.dev/created-by: tektoncd-pruner
+        tektonconfig.operator.tekton.dev/pruner: "true"
+      name: tekton-resource-pruner-dxpzp
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonConfig
+          name: config
+          uid: b44b239b-9588-4392-b94d-dcd5fa9ece48
+    spec:
+      concurrencyPolicy: Forbid
+      failedJobsHistoryLimit: 2
+      jobTemplate:
+        metadata:
+          creationTimestamp: null
+        spec:
+          backoffLimit: 1
+          template:
+            metadata:
+              creationTimestamp: null
+            spec:
+              containers:
+                - args:
+                    - -s
+                    - ai-enricher;--keep=20;pipelinerun,taskrun;false ai-enricher-build;--keep=20;pipelinerun,taskrun;false aiot;--keep=20;pipelinerun,taskrun;false argocd;--keep=20;pipelinerun,taskrun;false auth;--keep=20;pipelinerun,taskrun;false backrest;--keep=20;pipelinerun,taskrun;false build-service;--keep=20;pipelinerun,taskrun;false cattle-capi-system;--keep=20;pipelinerun,taskrun;false cattle-fleet-clusters-system;--keep=20;pipelinerun,taskrun;false cattle-fleet-local-system;--keep=20;pipelinerun,taskrun;false cattle-fleet-system;--keep=20;pipelinerun,taskrun;false cattle-global-data;--keep=20;pipelinerun,taskrun;false cattle-impersonation-system;--keep=20;pipelinerun,taskrun;false cattle-local-user-passwords;--keep=20;pipelinerun,taskrun;false cattle-system;--keep=20;pipelinerun,taskrun;false cattle-turtles-system;--keep=20;pipelinerun,taskrun;false cattle-ui-plugin-system;--keep=20;pipelinerun,taskrun;false cert-manager;--keep=20;pipelinerun,taskrun;false chef;--keep=20;pipelinerun,taskrun;false chef-webhook;--keep=20;pipelinerun,taskrun;false cluster-fleet-local-local-1a3d67d0a899;--keep=20;pipelinerun,taskrun;false cluster-twin;--keep=20;pipelinerun,taskrun;false cnpg-system;--keep=20;pipelinerun,taskrun;false default;--keep=20;pipelinerun,taskrun;false default-tenant;--keep=20;pipelinerun,taskrun;false descheduler;--keep=20;pipelinerun,taskrun;false dr-ops;--keep=20;pipelinerun,taskrun;false emqx;--keep=20;pipelinerun,taskrun;false enterprise-contract-service;--keep=20;pipelinerun,taskrun;false etcd-backup;--keep=20;pipelinerun,taskrun;false event-exporter;--keep=20;pipelinerun,taskrun;false fleet-default;--keep=20;pipelinerun,taskrun;false fleet-local;--keep=20;pipelinerun,taskrun;false gitea;--keep=20;pipelinerun,taskrun;false gitea-bootstrap;--keep=20;pipelinerun,taskrun;false habitat-demo;--keep=20;pipelinerun,taskrun;false headlamp;--keep=20;pipelinerun,taskrun;false helloweb;--keep=20;pipelinerun,taskrun;false ingress-nginx;--keep=20;pipelinerun,taskrun;false inspec-scans;--keep=20;pipelinerun,taskrun;false integration-service;--keep=20;pipelinerun,taskrun;false istio-system;--keep=20;pipelinerun,taskrun;false jenkins;--keep=20;pipelinerun,taskrun;false k8sgpt;--keep=20;pipelinerun,taskrun;false k8up-system;--keep=20;pipelinerun,taskrun;false karpor;--keep=20;pipelinerun,taskrun;false knative-serving;--keep=20;pipelinerun,taskrun;false konflux-cli;--keep=20;pipelinerun,taskrun;false konflux-info;--keep=20;pipelinerun,taskrun;false konflux-operator;--keep=20;pipelinerun,taskrun;false konflux-ui;--keep=20;pipelinerun,taskrun;false kubeflow;--keep=20;pipelinerun,taskrun;false kyverno;--keep=20;pipelinerun,taskrun;false local;--keep=20;pipelinerun,taskrun;false local-path-storage;--keep=20;pipelinerun,taskrun;false mattermost;--keep=20;pipelinerun,taskrun;false monitoring;--keep=20;pipelinerun,taskrun;false namespace-lister;--keep=20;pipelinerun,taskrun;false opentelemetry-operator-system;--keep=20;pipelinerun,taskrun;false p-sqf5p;--keep=20;pipelinerun,taskrun;false p-wpbsz;--keep=20;pipelinerun,taskrun;false pipelines-as-code;--keep=20;pipelinerun,taskrun;false piraeus-datastore;--keep=20;pipelinerun,taskrun;false platform-meta;--keep=20;pipelinerun,taskrun;false registry;--keep=20;pipelinerun,taskrun;false release-service;--keep=20;pipelinerun,taskrun;false robusta;--keep=20;pipelinerun,taskrun;false semaphore;--keep=20;pipelinerun,taskrun;false signoz;--keep=20;pipelinerun,taskrun;false tekton-operator;--keep=20;pipelinerun,taskrun;false tekton-pipelines;--keep=20;pipelinerun,taskrun;false tf-demo;--keep=20;pipelinerun,taskrun;false user-b2zsr;--keep=20;pipelinerun,taskrun;false victoriametrics;--keep=20;pipelinerun,taskrun;false vui;--keep=20;pipelinerun,taskrun;false zabbix;--keep=20;pipelinerun,taskrun;false
+                  command:
+                    - /bin/sh
+                    - -c
+                    - "\n\tfunction prune() {\n\t\tnamespace=$1\n\t\tflags=$2\n\t\tresources=$3\n\t\tprune_per_resource=$4\n\t\tupdated_flags=$(echo $flags | tr ',' ' ')\n\t\tfor resource in ${resources//,/ }; do\n\t\t\techo \"\"\t\n\t\t\tif [[ \"$prune_per_resource\" == \"true\" ]]; then\n\t\t\t\tparent_resource=$(echo $resource | sed \"s/run$//\")\n\t\t\t\tresource_names=$(tkn $parent_resource list --namespace=$namespace --no-headers --output=jsonpath={.items[*].metadata.name})\n\t\t\t\tif [ $? -ne 0 ]; then\n\t\t\t\t\techo \"error on getting list of '$parent_resource'\"\n\t\t\t\t\terror_status=1\n\t\t\t\t\tcontinue\n\t\t\t\tfi\n\t\t\t\tif [[ \"$resource_names\" == \"\" ]]; then\n\t\t\t\t\techo \"there is no '$parent_resource' available in '$namespace'\"\n\t\t\t\t\tcontinue\n\t\t\t\tfi\n\t\t\t\tfor resource_name in $resource_names; do\n\t\t\t\t\techo \"\"\n\t\t\t\t\ttarget_cmd=\"tkn $resource delete --$parent_resource=\\\"$resource_name\\\" $updated_flags --namespace=$namespace --force\"\n\t\t\t\t\techo \"\\$ ${target_cmd}\"\n\t\t\t\t\teval $target_cmd\n\t\t\t\t\tif [ $? -ne 0 ]; then\n\t\t\t\t\t\terror_status=1\n\t\t\t\t\tfi\n\t\t\t\tdone\n\t\t\telse\n\t\t\t\ttarget_cmd=\"tkn $resource delete $updated_flags --namespace=$namespace --force\"\n\t\t\t\techo \"\\$ ${target_cmd}\"\n\t\t\t\teval $target_cmd\n\t\t\t\tif [ $? -ne 0 ]; then\n\t\t\t\t\terror_status=1\n\t\t\t\tfi\n\t\t\tfi\n\t\tdone\n\t}\n\t\n\terror_status=0\n\tfor c in $*; do\n\t\tnamespace=$(echo $c | cut -d ';' -f 1)\n\t\tflags=$(echo $c | cut -d ';' -f 2)\n\t\tresources=$(echo $c | cut -d ';' -f 3)\n\t\tprune_per_resource=$(echo $c | cut -d ';' -f 4)\n\t\tprune $namespace $flags $resources $prune_per_resource\n\tdone\n\texit $error_status\n\t"
+                  image: ghcr.io/tektoncd/plumbing/tkn@sha256:233de6c8b8583a34c2379fa98d42dba739146c9336e8d41b66030484357481ed
+                  imagePullPolicy: IfNotPresent
+                  name: tkn-pruner
+                  resources: {}
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                      drop:
+                        - ALL
+                  terminationMessagePath: /dev/termination-log
+                  terminationMessagePolicy: FallbackToLogsOnError
+              dnsPolicy: ClusterFirst
+              restartPolicy: Never
+              schedulerName: default-scheduler
+              securityContext:
+                fsGroup: 65532
+                runAsNonRoot: true
+                runAsUser: 65532
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccount: tekton-resource-pruner
+              serviceAccountName: tekton-resource-pruner
+              terminationGracePeriodSeconds: 30
+          ttlSecondsAfterFinished: 3600
+      schedule: 0 */6 * * *
+      successfulJobsHistoryLimit: 2
+      suspend: false
+kind: List
+metadata:
+  resourceVersion: ""

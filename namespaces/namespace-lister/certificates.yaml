@@ -1,0 +1,28 @@
+apiVersion: v1
+items:
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      labels:
+        konflux.konflux-ci.dev/component: namespace-lister
+        konflux.konflux-ci.dev/owner: konflux-namespace-lister
+      name: namespace-lister
+      namespace: namespace-lister
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxNamespaceLister
+          name: konflux-namespace-lister
+          uid: 5c73c0d9-2728-4d9f-9e2c-dea6ad764f89
+    spec:
+      dnsNames:
+        - namespace-lister.namespace-lister.svc
+        - namespace-lister.namespace-lister.svc.cluster.local
+      issuerRef:
+        kind: ClusterIssuer
+        name: ca-issuer
+      secretName: namespace-lister-tls
+kind: List
+metadata:
+  resourceVersion: ""

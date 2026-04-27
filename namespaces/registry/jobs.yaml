@@ -1,137 +1,161 @@
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    revisions: '{"1":{"status":"completed","succeed":1,"desire":1,"uid":"134f8df9-6a7a-4b37-a290-ee5ebda357ae","start-time":"2026-04-15T15:55:31Z","completion-time":"2026-04-15T15:59:06Z"}}'
-  labels:
-    batch.kubernetes.io/controller-uid: 134f8df9-6a7a-4b37-a290-ee5ebda357ae
-    batch.kubernetes.io/job-name: build-ml-trainer-v3
-    controller-uid: 134f8df9-6a7a-4b37-a290-ee5ebda357ae
-    job-name: build-ml-trainer-v3
-  name: build-ml-trainer-v3
-  namespace: registry
-spec:
-  backoffLimit: 0
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 134f8df9-6a7a-4b37-a290-ee5ebda357ae
-  suspend: false
-  template:
+apiVersion: v1
+items:
+  - apiVersion: batch/v1
+    kind: Job
     metadata:
+      annotations: {}
       labels:
-        batch.kubernetes.io/controller-uid: 134f8df9-6a7a-4b37-a290-ee5ebda357ae
-        batch.kubernetes.io/job-name: build-ml-trainer-v3
-        controller-uid: 134f8df9-6a7a-4b37-a290-ee5ebda357ae
-        job-name: build-ml-trainer-v3
+        batch.kubernetes.io/controller-uid: b663d517-74f6-4fd9-ab7b-750e4d8b0b93
+        batch.kubernetes.io/job-name: build-py-runtime-v2
+        controller-uid: b663d517-74f6-4fd9-ab7b-750e4d8b0b93
+        job-name: build-py-runtime-v2
+      name: build-py-runtime-v2
+      namespace: registry
     spec:
-      containers:
-      - args:
-        - --dockerfile=Dockerfile
-        - --context=dir:///workspace
-        - --destination=internal-registry.registry.svc.cluster.local:5000/ml-trainer:v3
-        - --insecure
-        - --cache=false
-        image: gcr.io/kaniko-project/executor:latest
-        imagePullPolicy: Always
-        name: kaniko
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /workspace
-          name: workspace
-      dnsPolicy: ClusterFirst
-      initContainers:
-      - command:
-        - sh
-        - -c
-        - cp -L /src/* /workspace/
-        image: busybox
-        imagePullPolicy: Always
-        name: copy-src
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /src
-          name: src
-        - mountPath: /workspace
-          name: workspace
-      nodeSelector:
-        node-role.kubernetes.io/worker: ''
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - configMap:
-          defaultMode: 420
-          name: ml-trainer-build
-        name: src
-      - emptyDir: {}
-        name: workspace
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    revisions: '{"1":{"status":"completed","succeed":1,"desire":1,"uid":"52a8b200-64ca-4a60-b6ff-2472c193a5d2","start-time":"2026-04-14T01:42:48Z","completion-time":"2026-04-14T01:43:51Z"}}'
-  labels:
-    batch.kubernetes.io/controller-uid: 52a8b200-64ca-4a60-b6ff-2472c193a5d2
-    batch.kubernetes.io/job-name: kaniko-build
-    controller-uid: 52a8b200-64ca-4a60-b6ff-2472c193a5d2
-    job-name: kaniko-build
-  name: kaniko-build
-  namespace: registry
-spec:
-  backoffLimit: 0
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 52a8b200-64ca-4a60-b6ff-2472c193a5d2
-  suspend: false
-  template:
+      backoffLimit: 0
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: b663d517-74f6-4fd9-ab7b-750e4d8b0b93
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: b663d517-74f6-4fd9-ab7b-750e4d8b0b93
+            batch.kubernetes.io/job-name: build-py-runtime-v2
+            controller-uid: b663d517-74f6-4fd9-ab7b-750e4d8b0b93
+            job-name: build-py-runtime-v2
+        spec:
+          containers:
+            - args:
+                - --dockerfile=Dockerfile
+                - --context=dir:///workspace
+                - --destination=internal-registry.registry.svc.cluster.local:5000/aiot/aiot-python-runtime:v2
+                - --destination=internal-registry.registry.svc.cluster.local:5000/aiot/aiot-python-runtime:latest
+                - --insecure
+                - --cache=false
+              image: gcr.io/kaniko-project/executor:latest
+              imagePullPolicy: Always
+              name: kaniko
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /workspace
+                  name: workspace
+          dnsPolicy: ClusterFirst
+          initContainers:
+            - command:
+                - sh
+                - -c
+                - cp -L /src/* /workspace/
+              image: busybox
+              imagePullPolicy: Always
+              name: copy-src
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /src
+                  name: src
+                - mountPath: /workspace
+                  name: workspace
+          nodeSelector:
+            node-role.kubernetes.io/worker: ""
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: py-runtime-build
+              name: src
+            - emptyDir: {}
+              name: workspace
+  - apiVersion: batch/v1
+    kind: Job
     metadata:
+      annotations: {}
       labels:
-        batch.kubernetes.io/controller-uid: 52a8b200-64ca-4a60-b6ff-2472c193a5d2
-        batch.kubernetes.io/job-name: kaniko-build
-        controller-uid: 52a8b200-64ca-4a60-b6ff-2472c193a5d2
-        job-name: kaniko-build
+        batch.kubernetes.io/controller-uid: 14d08953-bb81-4253-986f-bc23140d319d
+        batch.kubernetes.io/job-name: build-py-runtime-v3
+        controller-uid: 14d08953-bb81-4253-986f-bc23140d319d
+        job-name: build-py-runtime-v3
+      name: build-py-runtime-v3
+      namespace: registry
     spec:
-      containers:
-      - args:
-        - --dockerfile=/workspace/Dockerfile
-        - --context=dir:///workspace
-        - --destination=10.132.0.2:30500/aiot/aiot-python-runtime:latest
-        - --insecure
-        - --skip-tls-verify
-        image: gcr.io/kaniko-project/executor:latest
-        imagePullPolicy: Always
-        name: kaniko
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /workspace
-          name: dockerfile
-      dnsPolicy: ClusterFirst
-      nodeSelector:
-        node-role.kubernetes.io/worker: ''
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - configMap:
-          defaultMode: 420
-          name: aiot-dockerfile
-        name: dockerfile
+      backoffLimit: 0
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 14d08953-bb81-4253-986f-bc23140d319d
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 14d08953-bb81-4253-986f-bc23140d319d
+            batch.kubernetes.io/job-name: build-py-runtime-v3
+            controller-uid: 14d08953-bb81-4253-986f-bc23140d319d
+            job-name: build-py-runtime-v3
+        spec:
+          containers:
+            - args:
+                - --dockerfile=Dockerfile
+                - --context=dir:///workspace
+                - --destination=internal-registry.registry.svc.cluster.local:5000/aiot/aiot-python-runtime:v3
+                - --destination=internal-registry.registry.svc.cluster.local:5000/aiot/aiot-python-runtime:latest
+                - --insecure
+                - --cache=false
+              image: gcr.io/kaniko-project/executor:latest
+              imagePullPolicy: Always
+              name: kaniko
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /workspace
+                  name: workspace
+          dnsPolicy: ClusterFirst
+          initContainers:
+            - command:
+                - sh
+                - -c
+                - cp -L /src/* /workspace/
+              image: busybox
+              imagePullPolicy: Always
+              name: copy-src
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /src
+                  name: src
+                - mountPath: /workspace
+                  name: workspace
+          nodeSelector:
+            node-role.kubernetes.io/worker: ""
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: py-runtime-build-v3
+              name: src
+            - emptyDir: {}
+              name: workspace
+kind: List
+metadata:
+  resourceVersion: ""

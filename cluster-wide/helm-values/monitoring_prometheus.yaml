@@ -1,0 +1,27 @@
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+grafana:
+  adminPassword: admin123
+  grafana.ini:
+    auth:
+      disable_login_form: true
+    auth.anonymous:
+      enabled: true
+      org_name: Main Org.
+      org_role: Admin
+  ingress:
+    enabled: true
+    hosts:
+    - grafana.35.241.255.137.nip.io
+    ingressClassName: nginx
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+prometheusOperator:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""

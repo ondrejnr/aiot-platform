@@ -1,8 +1,8 @@
 # aiot-platform
 
 ![Kubernetes](https://img.shields.io/badge/kubernetes-v1.32.13-326ce5?logo=kubernetes&logoColor=white)
-![Nodes](https://img.shields.io/badge/nodes-6%20(3%20GCP%20%2B%203%20OCI)-success)
-![Namespaces](https://img.shields.io/badge/namespaces-41-blue)
+![Nodes](https://img.shields.io/badge/nodes-5%20(3%20GCP%20%2B%202%20OCI)-success)
+![Namespaces](https://img.shields.io/badge/namespaces-80-blue)
 ![Backup](https://img.shields.io/badge/velero-Cloudflare%20R2-f38020?logo=cloudflare&logoColor=white)
 ![LLM](https://img.shields.io/badge/LLM-Open--WebUI%20%2B%20RAG-ff6f00)
 ![K8sGPT](https://img.shields.io/badge/self--monitoring-K8sGPT-purple)
@@ -158,7 +158,6 @@ flowchart TB
     subgraph OCI["🔶 OCI · eu-frankfurt-1"]
         O1["⚙️ oci-e5-node1<br/>172.16.200.10"]
         O2["⚙️ oci-e5-node2<br/>172.16.200.11<br/>SigNoz · ClickHouse"]
-        O3["🧪 oci-test-node1<br/>172.16.200.12<br/>ML training"]
     end
 
     WG{{"🔐 WireGuard mesh"}}
@@ -170,14 +169,14 @@ flowchart TB
 
     M <-.-> W1 & W2
     M <==> WG
-    WG <==> O1 & O2 & O3
+    WG <==> O1 & O2
 
     classDef gcp fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e
     classDef oci fill:#fef3c7,stroke:#ea580c,color:#7c2d12
     classDef tun fill:#f3e8ff,stroke:#9333ea,color:#581c87
     classDef ext fill:#f3f4f6,stroke:#6b7280
     class M,W1,W2,HA gcp
-    class O1,O2,O3 oci
+    class O1,O2 oci
     class WG tun
     class USER ext
 ```
@@ -189,10 +188,9 @@ flowchart TB
 | aiot-worker-02   | worker         | 10.132.0.4            | CentOS Stream 9   | GCP `europe-west1-b`  |
 | oci-e5-node1     | worker         | 172.16.200.10 (WG)    | Oracle Linux 9.7  | OCI `eu-frankfurt-1`  |
 | oci-e5-node2     | worker         | 172.16.200.11 (WG)    | Oracle Linux 9.7  | OCI `eu-frankfurt-1`  |
-| oci-test-node1   | worker (ml)    | 172.16.200.12 (WG)    | Oracle Linux 9.7  | OCI `eu-frankfurt-1`  |
 
 - **Kubernetes**: v1.32.13 (vanilla kubeadm)
-- **CNI**: flannel — pod CIDR `10.244.0.0/16`, vxlan overlay
+- **CNI**: Cilium 1.16.6 — pod CIDR `10.245.0.0/16`, vxlan overlay (port 8473), kubeProxyReplacement=true, Hubble enabled (migrated from flannel 2026-04-26)
 - **Multi-cloud**: OCI nodes join the GCP control plane over a **WireGuard** tunnel; the OCI tenancy is independent of the GCP project and survives GCP outages
 - **Public entrypoint**: single IP `35.241.255.137` → **HAProxy** on master → SNI-based TCP proxy to workers' `nginx-ingress` DaemonSet (ports 80/443), with SSH fallback on port 443
 - **TLS**: `cert-manager` + Let's Encrypt (HTTP-01), ClusterIssuer `letsencrypt-prod`
@@ -345,7 +343,7 @@ flowchart LR
 
 - **Target**: Cloudflare R2 bucket `s3://aiot-velero` (S3-compatible, endpoint `*.r2.cloudflarestorage.com`)
 - **Schedule** `daily-cluster-backup` (namespace `velero`) — every day at 03:00 UTC, retention 7 days
-- **Scope**: all cluster + namespaced Kubernetes objects (manifests, CRs, ConfigMaps, Secrets metadata), excluding ephemeral/log-like resources (`events`, `replicasets.apps`, `nodes`) and noisy namespaces (`kube-system`, `kube-flannel`, `local-path-storage`, `monitoring`, `signoz`, `victoriametrics`, `velero`, `knative-serving`, `opentelemetry-operator-system`)
+- **Scope**: all cluster + namespaced Kubernetes objects (manifests, CRs, ConfigMaps, Secrets metadata), excluding ephemeral/log-like resources (`events`, `replicasets.apps`, `nodes`) and noisy namespaces (`kube-system`, `local-path-storage`, `monitoring`, `signoz`, `victoriametrics`, `velero`, `knative-serving`, `opentelemetry-operator-system`)
 - **File-system backup** (Kopia) per-pod-volume is available per-namespace via `BackupRepository` CRs (`aiot-default-kopia-*`, `kubeflow-default-kopia-*`, `mlflow-default-kopia-*`, `jenkins-default-kopia-*`, etc.) — enabled selectively for stateful workloads whose data must survive a node loss
 - **Restore is the exit strategy**: rebuilding a new cluster consists of applying the manifests from this repo, then running `velero restore create --from-backup <latest>` to rehydrate CRs and (optionally) volume data
 
@@ -404,14 +402,14 @@ aiot-platform/
 │   ├── kubelet-config.yaml
 │   ├── kube-apiserver.yaml
 │   ├── etcd.yaml
-│   ├── cni-flannel.conflist
+│   ├── cni-cilium.conflist
 │   ├── haproxy/                (HAProxy master config)
 │   ├── registry/               (internal registry config)
 │   ├── gcp-instances.yaml
 │   └── gcp-firewall-rules.yaml
 ├── inventory/               ← Ansible inventory snapshot
 ├── cluster/                 ← misc cluster-level dumps
-└── namespaces/              ← 41 namespaces, one folder each
+└── namespaces/              ← 80 namespaces, one folder each
     └── <ns>/
         ├── deployments.yaml
         ├── statefulsets.yaml

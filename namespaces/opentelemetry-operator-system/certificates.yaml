@@ -1,48 +1,32 @@
 apiVersion: v1
 items:
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: opentelemetry-operator
-      meta.helm.sh/release-namespace: opentelemetry-operator-system
-    creationTimestamp: "2026-04-15T20:01:38Z"
-    generation: 1
-    labels:
-      app.kubernetes.io/component: webhook
-      app.kubernetes.io/instance: opentelemetry-operator
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/name: opentelemetry-operator
-      app.kubernetes.io/part-of: opentelemetry-operator
-      app.kubernetes.io/version: 0.148.0
-      helm.sh/chart: opentelemetry-operator-0.109.2
-    name: opentelemetry-operator-serving-cert
-    namespace: opentelemetry-operator-system
-    resourceVersion: "1275008"
-    uid: d27bc3dc-be2d-4e1e-b2c2-33f7de6b9c0b
-  spec:
-    dnsNames:
-    - opentelemetry-operator-webhook.opentelemetry-operator-system.svc
-    - opentelemetry-operator-webhook.opentelemetry-operator-system.svc.cluster.local
-    issuerRef:
-      kind: Issuer
-      name: opentelemetry-operator-selfsigned-issuer
-    secretName: opentelemetry-operator-controller-manager-service-cert
-    subject:
-      organizationalUnits:
-      - opentelemetry-operator
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-15T20:01:38Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-14T20:01:38Z"
-    notBefore: "2026-04-15T20:01:38Z"
-    renewalTime: "2026-06-14T20:01:38Z"
-    revision: 1
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: opentelemetry-operator
+        meta.helm.sh/release-namespace: opentelemetry-operator-system
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/instance: opentelemetry-operator
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: opentelemetry-operator
+        app.kubernetes.io/part-of: opentelemetry-operator
+        app.kubernetes.io/version: 0.148.0
+        helm.sh/chart: opentelemetry-operator-0.109.2
+      name: opentelemetry-operator-serving-cert
+      namespace: opentelemetry-operator-system
+    spec:
+      dnsNames:
+        - opentelemetry-operator-webhook.opentelemetry-operator-system.svc
+        - opentelemetry-operator-webhook.opentelemetry-operator-system.svc.cluster.local
+      issuerRef:
+        kind: Issuer
+        name: opentelemetry-operator-selfsigned-issuer
+      secretName: opentelemetry-operator-controller-manager-service-cert
+      subject:
+        organizationalUnits:
+          - opentelemetry-operator
 kind: List
 metadata:
   resourceVersion: ""

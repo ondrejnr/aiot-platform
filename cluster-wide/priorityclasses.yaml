@@ -1,28 +1,45 @@
-apiVersion: scheduling.k8s.io/v1
-description: Used for system critical pods that must run in the cluster, but can be
-  moved to another node if necessary.
-kind: PriorityClass
+apiVersion: v1
+items:
+  - apiVersion: scheduling.k8s.io/v1
+    description: Priority class used by pods critical to rancher's functionality.
+    kind: PriorityClass
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: rancher
+        meta.helm.sh/release-namespace: cattle-system
+      labels:
+        app: rancher
+        app.kubernetes.io/managed-by: Helm
+        chart: rancher-2.13.3
+        heritage: Helm
+        release: rancher
+      name: rancher-critical
+    preemptionPolicy: PreemptLowerPriority
+    value: 1000000000
+  - apiVersion: scheduling.k8s.io/v1
+    description: Used for system critical pods that must run in the cluster, but can be moved to another node if necessary.
+    kind: PriorityClass
+    metadata:
+      name: system-cluster-critical
+    preemptionPolicy: PreemptLowerPriority
+    value: 2000000000
+  - apiVersion: scheduling.k8s.io/v1
+    description: Used for system critical pods that must not be moved from their current node.
+    kind: PriorityClass
+    metadata:
+      name: system-node-critical
+    preemptionPolicy: PreemptLowerPriority
+    value: 2000001000
+  - apiVersion: scheduling.k8s.io/v1
+    kind: PriorityClass
+    metadata:
+      annotations:
+        internal.kpt.dev/upstream-identifier: scheduling.k8s.io|PriorityClass|default|workflow-controller
+      labels:
+        application-crd-id: kubeflow-pipelines
+      name: workflow-controller
+    preemptionPolicy: PreemptLowerPriority
+    value: 1000000
+kind: List
 metadata:
-  name: system-cluster-critical
-preemptionPolicy: PreemptLowerPriority
-value: 2000000000
----
-apiVersion: scheduling.k8s.io/v1
-description: Used for system critical pods that must not be moved from their current
-  node.
-kind: PriorityClass
-metadata:
-  name: system-node-critical
-preemptionPolicy: PreemptLowerPriority
-value: 2000001000
----
-apiVersion: scheduling.k8s.io/v1
-kind: PriorityClass
-metadata:
-  annotations:
-    internal.kpt.dev/upstream-identifier: scheduling.k8s.io|PriorityClass|default|workflow-controller
-  labels:
-    application-crd-id: kubeflow-pipelines
-  name: workflow-controller
-preemptionPolicy: PreemptLowerPriority
-value: 1000000
+  resourceVersion: ""

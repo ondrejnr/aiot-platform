@@ -1,0 +1,62 @@
+apiVersion: v1
+items:
+  - apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      labels:
+        konflux.konflux-ci.dev/component: integration
+        konflux.konflux-ci.dev/owner: konflux-integration-service
+      name: integration-service-snapshot-garbage-collector
+      namespace: integration-service
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxIntegrationService
+          name: konflux-integration-service
+          uid: 9d9ad16b-1e8b-4d51-bef5-3253a210a783
+    spec:
+      concurrencyPolicy: Allow
+      failedJobsHistoryLimit: 1
+      jobTemplate:
+        metadata:
+          creationTimestamp: null
+        spec:
+          template:
+            metadata:
+              creationTimestamp: null
+            spec:
+              containers:
+                - command:
+                    - /snapshotgc
+                    - --zap-log-level=debug
+                    - --pr-snapshots-to-keep=70
+                    - --non-pr-snapshots-to-keep=640
+                  image: quay.io/konflux-ci/integration-service:ef2610ecd344292fb85e01321f7b613c7e621ec5
+                  imagePullPolicy: Always
+                  name: test-gc
+                  resources:
+                    limits:
+                      cpu: "1"
+                      memory: 2000Mi
+                    requests:
+                      cpu: 50m
+                      memory: 64Mi
+                  securityContext:
+                    readOnlyRootFilesystem: true
+                    runAsNonRoot: true
+                  terminationMessagePath: /dev/termination-log
+                  terminationMessagePolicy: File
+              dnsPolicy: ClusterFirst
+              restartPolicy: Never
+              schedulerName: default-scheduler
+              securityContext: {}
+              serviceAccount: integration-service-snapshot-garbage-collector
+              serviceAccountName: integration-service-snapshot-garbage-collector
+              terminationGracePeriodSeconds: 30
+      schedule: 0 */6 * * *
+      successfulJobsHistoryLimit: 3
+      suspend: false
+kind: List
+metadata:
+  resourceVersion: ""

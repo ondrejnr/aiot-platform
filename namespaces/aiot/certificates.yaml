@@ -1,317 +1,189 @@
 apiVersion: v1
 items:
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:15Z"
-    generation: 1
-    name: tls-api-gateway
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: api-gateway
-      uid: 13fc663b-d252-4607-b890-92bb7eb45cc1
-    resourceVersion: "274058"
-    uid: c5e9ae09-d38e-4bea-9818-11f551f348cf
-  spec:
-    dnsNames:
-    - api.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-api-gateway
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:51:51Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:53:18Z"
-    notBefore: "2026-04-14T08:53:19Z"
-    renewalTime: "2026-06-13T08:53:18Z"
-    revision: 1
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:15Z"
-    generation: 1
-    name: tls-cloudbeaver
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: cloudbeaver
-      uid: e2f673c1-f2e3-47a5-9f9b-2a16b4b1a6a6
-    resourceVersion: "274225"
-    uid: 5a84317c-30a2-4cae-9506-a79f5e25c1a7
-  spec:
-    dnsNames:
-    - cloudbeaver.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-cloudbeaver
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:51:56Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:53:23Z"
-    notBefore: "2026-04-14T08:53:24Z"
-    renewalTime: "2026-06-13T08:53:23Z"
-    revision: 1
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:15Z"
-    generation: 1
-    name: tls-digital-twin
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: digital-twin
-      uid: 37444148-82a2-4c99-adcb-35d374a20340
-    resourceVersion: "274020"
-    uid: 0c07023e-6643-48e0-9bde-8f3f0d11ccf3
-  spec:
-    dnsNames:
-    - twin.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-digital-twin
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:51:49Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:53:16Z"
-    notBefore: "2026-04-14T08:53:17Z"
-    renewalTime: "2026-06-13T08:53:16Z"
-    revision: 1
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:15Z"
-    generation: 1
-    name: tls-ngrok-proxy
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: ngrok-proxy
-      uid: dc7e3340-9f8b-4144-9c95-587c05ada2b7
-    resourceVersion: "274419"
-    uid: e3eb26a5-0ce5-46eb-b0e2-e2f294e37e2e
-  spec:
-    dnsNames:
-    - ngrok.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-ngrok-proxy
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:52:00Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:53:27Z"
-    notBefore: "2026-04-14T08:53:28Z"
-    renewalTime: "2026-06-13T08:53:27Z"
-    revision: 1
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:16Z"
-    generation: 1
-    name: tls-open-webui
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: open-webui
-      uid: 3dbabc39-c8af-4e81-b35b-3b8492bf09ea
-    resourceVersion: "274476"
-    uid: 0dbe1bb8-a6f3-4836-ad6b-74062bbd1b7d
-  spec:
-    dnsNames:
-    - chat.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-open-webui
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:52:03Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:53:29Z"
-    notBefore: "2026-04-14T08:53:30Z"
-    renewalTime: "2026-06-13T08:53:29Z"
-    revision: 1
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:16Z"
-    generation: 1
-    name: tls-pgadmin
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: pgadmin
-      uid: 4ae79c85-0029-4fb4-a2f8-da5ec8fec4cd
-    resourceVersion: "274624"
-    uid: 4aeab27d-5b57-4fba-81bd-2321ad7ad5fb
-  spec:
-    dnsNames:
-    - pgadmin.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-pgadmin
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:52:07Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:53:35Z"
-    notBefore: "2026-04-14T08:53:36Z"
-    renewalTime: "2026-06-13T08:53:35Z"
-    revision: 1
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:17Z"
-    generation: 1
-    name: tls-qdrant
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: qdrant
-      uid: 2a17fdd6-cb6b-4ae8-b9f2-4220b1975454
-    resourceVersion: "274952"
-    uid: bfbd5a34-db84-468e-b4d9-21f51ae0418b
-  spec:
-    dnsNames:
-    - qdrant.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-qdrant
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:52:28Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:53:56Z"
-    notBefore: "2026-04-14T08:53:57Z"
-    renewalTime: "2026-06-13T08:53:56Z"
-    revision: 1
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:17Z"
-    generation: 1
-    name: tls-rag
-    namespace: aiot
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: rag
-      uid: 95edff34-d65d-4d10-a4d0-2f09b0fe8282
-    resourceVersion: "274485"
-    uid: e6fe3132-a6c6-4b13-a3c8-fd549697c8b6
-  spec:
-    dnsNames:
-    - rag.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-rag
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:52:03Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:53:28Z"
-    notBefore: "2026-04-14T08:53:29Z"
-    renewalTime: "2026-06-13T08:53:28Z"
-    revision: 1
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: tls-api-gateway
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: api-gateway
+          uid: 13fc663b-d252-4607-b890-92bb7eb45cc1
+    spec:
+      dnsNames:
+        - api.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-api-gateway
+      usages:
+        - digital signature
+        - key encipherment
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: tls-cloudbeaver
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: cloudbeaver
+          uid: e2f673c1-f2e3-47a5-9f9b-2a16b4b1a6a6
+    spec:
+      dnsNames:
+        - cloudbeaver.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-cloudbeaver
+      usages:
+        - digital signature
+        - key encipherment
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: tls-digital-twin
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: digital-twin
+          uid: 37444148-82a2-4c99-adcb-35d374a20340
+    spec:
+      dnsNames:
+        - twin.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-digital-twin
+      usages:
+        - digital signature
+        - key encipherment
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: tls-ngrok-proxy
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: ngrok-proxy
+          uid: dc7e3340-9f8b-4144-9c95-587c05ada2b7
+    spec:
+      dnsNames:
+        - ngrok.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-ngrok-proxy
+      usages:
+        - digital signature
+        - key encipherment
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: tls-open-webui
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: open-webui
+          uid: 3dbabc39-c8af-4e81-b35b-3b8492bf09ea
+    spec:
+      dnsNames:
+        - chat.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-open-webui
+      usages:
+        - digital signature
+        - key encipherment
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: tls-pgadmin
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: pgadmin
+          uid: 4ae79c85-0029-4fb4-a2f8-da5ec8fec4cd
+    spec:
+      dnsNames:
+        - pgadmin.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-pgadmin
+      usages:
+        - digital signature
+        - key encipherment
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: tls-qdrant
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: qdrant
+          uid: 2a17fdd6-cb6b-4ae8-b9f2-4220b1975454
+    spec:
+      dnsNames:
+        - qdrant.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-qdrant
+      usages:
+        - digital signature
+        - key encipherment
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: tls-rag
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: rag
+          uid: 95edff34-d65d-4d10-a4d0-2f09b0fe8282
+    spec:
+      dnsNames:
+        - rag.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-rag
+      usages:
+        - digital signature
+        - key encipherment
 kind: List
 metadata:
   resourceVersion: ""

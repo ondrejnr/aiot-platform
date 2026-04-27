@@ -1,0 +1,111 @@
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        cattle.io/creator: norman
+      name: cluster-owner
+      namespace: local
+    rules:
+      - apiGroups:
+          - management.cattle.io
+        resources:
+          - clusterscans
+        verbs:
+          - '*'
+      - apiGroups:
+          - management.cattle.io
+        resources:
+          - clusterregistrationtokens
+        verbs:
+          - '*'
+      - apiGroups:
+          - management.cattle.io
+        resources:
+          - clusterroletemplatebindings
+        verbs:
+          - '*'
+      - apiGroups:
+          - management.cattle.io
+        resources:
+          - etcdbackups
+        verbs:
+          - '*'
+      - apiGroups:
+          - management.cattle.io
+        resources:
+          - nodes
+        verbs:
+          - '*'
+      - apiGroups:
+          - management.cattle.io
+        resources:
+          - nodepools
+        verbs:
+          - '*'
+      - apiGroups:
+          - management.cattle.io
+        resources:
+          - projects
+        verbs:
+          - '*'
+          - updatepsa
+      - apiGroups:
+          - rke.cattle.io
+        resources:
+          - etcdsnapshots
+        verbs:
+          - '*'
+          - get
+          - list
+          - watch
+kind: List
+metadata:
+  resourceVersion: ""
+---
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        cattle.io/creator: norman
+      name: local-fleet-local-owner-cluster-owner
+      namespace: local
+      ownerReferences:
+        - apiVersion: management.cattle.io/v3
+          kind: ClusterRoleTemplateBinding
+          name: local-fleet-local-owner
+          uid: 461fe41c-b5aa-47ba-97f5-7ea8e682835d
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: cluster-owner
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: User
+        name: u-mo773yttt4
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        cattle.io/creator: norman
+      name: u-b4qkhsnliz-admin-cluster-owner
+      namespace: local
+      ownerReferences:
+        - apiVersion: management.cattle.io/v3
+          kind: ClusterRoleTemplateBinding
+          name: u-b4qkhsnliz-admin
+          uid: 7bf18a46-a032-4722-ac44-037102675672
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: cluster-owner
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: User
+        name: u-b4qkhsnliz
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,788 +1,1717 @@
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T13:05:00Z'
-  labels:
-    batch.kubernetes.io/controller-uid: 232a9dc1-8c1e-4540-92ef-21fc64e3f998
-    batch.kubernetes.io/job-name: pg-partition-mgr-29610065
-    controller-uid: 232a9dc1-8c1e-4540-92ef-21fc64e3f998
-    job-name: pg-partition-mgr-29610065
-  name: pg-partition-mgr-29610065
-  namespace: aiot
-  ownerReferences:
+apiVersion: v1
+items:
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: pg-partition-mgr
-spec:
-  activeDeadlineSeconds: 120
-  backoffLimit: 2
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 232a9dc1-8c1e-4540-92ef-21fc64e3f998
-  suspend: false
-  template:
+    kind: Job
     metadata:
       labels:
-        batch.kubernetes.io/controller-uid: 232a9dc1-8c1e-4540-92ef-21fc64e3f998
-        batch.kubernetes.io/job-name: pg-partition-mgr-29610065
-        controller-uid: 232a9dc1-8c1e-4540-92ef-21fc64e3f998
-        job-name: pg-partition-mgr-29610065
+        k8up.io/owned-by: backup_aiot-backup-7xqtf
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: backup
+        k8upjob: "true"
+      name: backup-aiot-backup-7xqtf-prebackup
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Backup
+          name: aiot-backup-7xqtf
+          uid: 35fd76fd-9ff8-454e-b543-806afb2950be
     spec:
-      containers:
-      - command:
-        - /bin/bash
-        - -c
-        - "set -e\nH=\"postgres.aiot.svc.cluster.local\"\nU=\"aiot_admin\"\nD=\"aiot\"\
-          \necho \"=== Partition manager ===\"\n# Drop partitions older than 2 hours\n\
-          psql -h \"$H\" -U \"$U\" -d \"$D\" -t -A -c \"\n  SELECT tablename FROM\
-          \ pg_tables\n  WHERE schemaname='public'\n    AND tablename ~ '^sensor_data_20'\n\
-          \  ORDER BY tablename;\" | while read -r part; do\n  ts=$(echo \"$part\"\
-          \ | sed 's/sensor_data_//' | sed 's/_/ /g' | head -c13)\n  if [ -n \"$ts\"\
-          \ ]; then\n    cutoff=$(date -u -d '2 hours ago' '+%Y %m %d %H')\n    if\
-          \ [[ \"$ts\" < \"$cutoff\" ]]; then\n      echo \"DROP $part\"\n      psql\
-          \ -h \"$H\" -U \"$U\" -d \"$D\" -c \"DROP TABLE IF EXISTS $part;\"\n   \
-          \ fi\n  fi\ndone\n# Create 4 future hourly partitions\nfor i in 0 1 2 3;\
-          \ do\n  start=$(date -u -d \"+${i} hours\" '+%Y-%m-%d %H:00:00')\n  end=$(date\
-          \ -u -d \"+$((i+1)) hours\" '+%Y-%m-%d %H:00:00')\n  name=\"sensor_data_$(date\
-          \ -u -d \"+${i} hours\" '+%Y_%m_%d_%H')\"\n  psql -h \"$H\" -U \"$U\" -d\
-          \ \"$D\" -c \"\n    CREATE TABLE IF NOT EXISTS $name\n    PARTITION OF sensor_data\n\
-          \    FOR VALUES FROM ('$start') TO ('$end');\" 2>/dev/null || true\n  echo\
-          \ \"Ensured partition $name\"\ndone\necho \"=== Done ===\"\n"
-        env:
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: PGPASSWORD
-              name: pg-credentials
-        - name: PGOPTIONS
-          value: -c statement_timeout=0
-        image: postgres:16
-        imagePullPolicy: IfNotPresent
-        name: partition
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T14:05:00Z'
-  labels:
-    batch.kubernetes.io/controller-uid: 3a5d920c-4ced-4393-92c5-f66a02479de1
-    batch.kubernetes.io/job-name: pg-partition-mgr-29610125
-    controller-uid: 3a5d920c-4ced-4393-92c5-f66a02479de1
-    job-name: pg-partition-mgr-29610125
-  name: pg-partition-mgr-29610125
-  namespace: aiot
-  ownerReferences:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 56193d0a-131f-4491-b793-6405b0eb4f69
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 56193d0a-131f-4491-b793-6405b0eb4f69
+            batch.kubernetes.io/job-name: backup-aiot-backup-7xqtf-prebackup
+            controller-uid: 56193d0a-131f-4491-b793-6405b0eb4f69
+            job-name: backup-aiot-backup-7xqtf-prebackup
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: CLUSTER_NAME
+                  value: default
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: STATS_URL
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: BACKUPCOMMAND_ANNOTATION
+                  value: k8up.io/backupcommand
+                - name: FILEEXTENSION_ANNOTATION
+                  value: k8up.io/file-extension
+                - name: HOSTNAME
+                  value: aiot
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+                - name: TARGET_PODS
+                  value: pg-ha-dump-7f56d764b7-9z5n5
+                - name: SLEEP_DURATION
+                  value: 0s
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: backup
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: pg-partition-mgr
-spec:
-  activeDeadlineSeconds: 120
-  backoffLimit: 2
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 3a5d920c-4ced-4393-92c5-f66a02479de1
-  suspend: false
-  template:
+    kind: Job
     metadata:
       labels:
-        batch.kubernetes.io/controller-uid: 3a5d920c-4ced-4393-92c5-f66a02479de1
-        batch.kubernetes.io/job-name: pg-partition-mgr-29610125
-        controller-uid: 3a5d920c-4ced-4393-92c5-f66a02479de1
-        job-name: pg-partition-mgr-29610125
+        k8up.io/owned-by: backup_aiot-backup-np46q
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: backup
+        k8upjob: "true"
+      name: backup-aiot-backup-np46q-prebackup
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Backup
+          name: aiot-backup-np46q
+          uid: f19c9983-072e-479f-9285-00d98fc58e70
     spec:
-      containers:
-      - command:
-        - /bin/bash
-        - -c
-        - "set -e\nH=\"postgres.aiot.svc.cluster.local\"\nU=\"aiot_admin\"\nD=\"aiot\"\
-          \necho \"=== Partition manager ===\"\n# Drop partitions older than 2 hours\n\
-          psql -h \"$H\" -U \"$U\" -d \"$D\" -t -A -c \"\n  SELECT tablename FROM\
-          \ pg_tables\n  WHERE schemaname='public'\n    AND tablename ~ '^sensor_data_20'\n\
-          \  ORDER BY tablename;\" | while read -r part; do\n  ts=$(echo \"$part\"\
-          \ | sed 's/sensor_data_//' | sed 's/_/ /g' | head -c13)\n  if [ -n \"$ts\"\
-          \ ]; then\n    cutoff=$(date -u -d '2 hours ago' '+%Y %m %d %H')\n    if\
-          \ [[ \"$ts\" < \"$cutoff\" ]]; then\n      echo \"DROP $part\"\n      psql\
-          \ -h \"$H\" -U \"$U\" -d \"$D\" -c \"DROP TABLE IF EXISTS $part;\"\n   \
-          \ fi\n  fi\ndone\n# Create 4 future hourly partitions\nfor i in 0 1 2 3;\
-          \ do\n  start=$(date -u -d \"+${i} hours\" '+%Y-%m-%d %H:00:00')\n  end=$(date\
-          \ -u -d \"+$((i+1)) hours\" '+%Y-%m-%d %H:00:00')\n  name=\"sensor_data_$(date\
-          \ -u -d \"+${i} hours\" '+%Y_%m_%d_%H')\"\n  psql -h \"$H\" -U \"$U\" -d\
-          \ \"$D\" -c \"\n    CREATE TABLE IF NOT EXISTS $name\n    PARTITION OF sensor_data\n\
-          \    FOR VALUES FROM ('$start') TO ('$end');\" 2>/dev/null || true\n  echo\
-          \ \"Ensured partition $name\"\ndone\necho \"=== Done ===\"\n"
-        env:
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: PGPASSWORD
-              name: pg-credentials
-        - name: PGOPTIONS
-          value: -c statement_timeout=0
-        image: postgres:16
-        imagePullPolicy: IfNotPresent
-        name: partition
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T15:05:00Z'
-  labels:
-    batch.kubernetes.io/controller-uid: c7a77fc7-c374-410e-8524-d655bef31ee2
-    batch.kubernetes.io/job-name: pg-partition-mgr-29610185
-    controller-uid: c7a77fc7-c374-410e-8524-d655bef31ee2
-    job-name: pg-partition-mgr-29610185
-  name: pg-partition-mgr-29610185
-  namespace: aiot
-  ownerReferences:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: ec858d41-0992-4d72-8ab3-3553595a6c93
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: ec858d41-0992-4d72-8ab3-3553595a6c93
+            batch.kubernetes.io/job-name: backup-aiot-backup-np46q-prebackup
+            controller-uid: ec858d41-0992-4d72-8ab3-3553595a6c93
+            job-name: backup-aiot-backup-np46q-prebackup
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: CLUSTER_NAME
+                  value: default
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: STATS_URL
+                - name: BACKUPCOMMAND_ANNOTATION
+                  value: k8up.io/backupcommand
+                - name: FILEEXTENSION_ANNOTATION
+                  value: k8up.io/file-extension
+                - name: HOSTNAME
+                  value: aiot
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+                - name: TARGET_PODS
+                  value: pg-ha-dump-9954f5cd6-vbq84
+                - name: SLEEP_DURATION
+                  value: 0s
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: backup
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: pg-partition-mgr
-spec:
-  activeDeadlineSeconds: 120
-  backoffLimit: 2
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: c7a77fc7-c374-410e-8524-d655bef31ee2
-  suspend: false
-  template:
+    kind: Job
     metadata:
       labels:
-        batch.kubernetes.io/controller-uid: c7a77fc7-c374-410e-8524-d655bef31ee2
-        batch.kubernetes.io/job-name: pg-partition-mgr-29610185
-        controller-uid: c7a77fc7-c374-410e-8524-d655bef31ee2
-        job-name: pg-partition-mgr-29610185
+        k8up.io/owned-by: backup_aiot-backup-p4w2k
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: backup
+        k8upjob: "true"
+      name: backup-aiot-backup-p4w2k-prebackup
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Backup
+          name: aiot-backup-p4w2k
+          uid: 1ca08fc9-2b9b-4752-a332-2ebae2b13bdb
     spec:
-      containers:
-      - command:
-        - /bin/bash
-        - -c
-        - "set -e\nH=\"postgres.aiot.svc.cluster.local\"\nU=\"aiot_admin\"\nD=\"aiot\"\
-          \necho \"=== Partition manager ===\"\n# Drop partitions older than 2 hours\n\
-          psql -h \"$H\" -U \"$U\" -d \"$D\" -t -A -c \"\n  SELECT tablename FROM\
-          \ pg_tables\n  WHERE schemaname='public'\n    AND tablename ~ '^sensor_data_20'\n\
-          \  ORDER BY tablename;\" | while read -r part; do\n  ts=$(echo \"$part\"\
-          \ | sed 's/sensor_data_//' | sed 's/_/ /g' | head -c13)\n  if [ -n \"$ts\"\
-          \ ]; then\n    cutoff=$(date -u -d '2 hours ago' '+%Y %m %d %H')\n    if\
-          \ [[ \"$ts\" < \"$cutoff\" ]]; then\n      echo \"DROP $part\"\n      psql\
-          \ -h \"$H\" -U \"$U\" -d \"$D\" -c \"DROP TABLE IF EXISTS $part;\"\n   \
-          \ fi\n  fi\ndone\n# Create 4 future hourly partitions\nfor i in 0 1 2 3;\
-          \ do\n  start=$(date -u -d \"+${i} hours\" '+%Y-%m-%d %H:00:00')\n  end=$(date\
-          \ -u -d \"+$((i+1)) hours\" '+%Y-%m-%d %H:00:00')\n  name=\"sensor_data_$(date\
-          \ -u -d \"+${i} hours\" '+%Y_%m_%d_%H')\"\n  psql -h \"$H\" -U \"$U\" -d\
-          \ \"$D\" -c \"\n    CREATE TABLE IF NOT EXISTS $name\n    PARTITION OF sensor_data\n\
-          \    FOR VALUES FROM ('$start') TO ('$end');\" 2>/dev/null || true\n  echo\
-          \ \"Ensured partition $name\"\ndone\necho \"=== Done ===\"\n"
-        env:
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: PGPASSWORD
-              name: pg-credentials
-        - name: PGOPTIONS
-          value: -c statement_timeout=0
-        image: postgres:16
-        imagePullPolicy: IfNotPresent
-        name: partition
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T08:00:00Z'
-  labels:
-    batch.kubernetes.io/controller-uid: 6c1a8422-d276-4ce2-b8a3-8bb109b5b0f1
-    batch.kubernetes.io/job-name: pg-sensor-cleanup-29609760
-    controller-uid: 6c1a8422-d276-4ce2-b8a3-8bb109b5b0f1
-    job-name: pg-sensor-cleanup-29609760
-  name: pg-sensor-cleanup-29609760
-  namespace: aiot
-  ownerReferences:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: b95627d9-136a-42c3-8982-5f0d42ad4a9c
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: b95627d9-136a-42c3-8982-5f0d42ad4a9c
+            batch.kubernetes.io/job-name: backup-aiot-backup-p4w2k-prebackup
+            controller-uid: b95627d9-136a-42c3-8982-5f0d42ad4a9c
+            job-name: backup-aiot-backup-p4w2k-prebackup
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: STATS_URL
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: BACKUPCOMMAND_ANNOTATION
+                  value: k8up.io/backupcommand
+                - name: FILEEXTENSION_ANNOTATION
+                  value: k8up.io/file-extension
+                - name: HOSTNAME
+                  value: aiot
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: CLUSTER_NAME
+                  value: default
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+                - name: TARGET_PODS
+                  value: pg-ha-dump-fcd4c9595-m4hwg
+                - name: SLEEP_DURATION
+                  value: 0s
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: backup
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: pg-sensor-cleanup
-spec:
-  activeDeadlineSeconds: 300
-  backoffLimit: 1
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 6c1a8422-d276-4ce2-b8a3-8bb109b5b0f1
-  suspend: false
-  template:
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T02:05:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 79f5bef6-d407-47a4-8b59-e2c7c286f2c7
+        batch.kubernetes.io/job-name: pg-partition-mgr-29620925
+        controller-uid: 79f5bef6-d407-47a4-8b59-e2c7c286f2c7
+        job-name: pg-partition-mgr-29620925
+      name: pg-partition-mgr-29620925
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: pg-partition-mgr
+          uid: a7f57470-8465-4966-8a54-8a1390b57d37
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 2
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 79f5bef6-d407-47a4-8b59-e2c7c286f2c7
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 79f5bef6-d407-47a4-8b59-e2c7c286f2c7
+            batch.kubernetes.io/job-name: pg-partition-mgr-29620925
+            controller-uid: 79f5bef6-d407-47a4-8b59-e2c7c286f2c7
+            job-name: pg-partition-mgr-29620925
+        spec:
+          containers:
+            - command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  H="postgres.aiot.svc.cluster.local"
+                  U="aiot_admin"
+                  D="aiot"
+                  echo "=== Partition manager ==="
+                  # Drop partitions older than 2 hours
+                  psql -h "$H" -U "$U" -d "$D" -t -A -c "
+                    SELECT tablename FROM pg_tables
+                    WHERE schemaname='public'
+                      AND tablename ~ '^sensor_data_20'
+                    ORDER BY tablename;" | while read -r part; do
+                    ts=$(echo "$part" | sed 's/sensor_data_//' | sed 's/_/ /g' | head -c13)
+                    if [ -n "$ts" ]; then
+                      cutoff=$(date -u -d '2 hours ago' '+%Y %m %d %H')
+                      if [[ "$ts" < "$cutoff" ]]; then
+                        echo "DROP $part"
+                        psql -h "$H" -U "$U" -d "$D" -c "DROP TABLE IF EXISTS $part;"
+                      fi
+                    fi
+                  done
+                  # Create 4 future hourly partitions
+                  for i in 0 1 2 3; do
+                    start=$(date -u -d "+${i} hours" '+%Y-%m-%d %H:00:00')
+                    end=$(date -u -d "+$((i+1)) hours" '+%Y-%m-%d %H:00:00')
+                    name="sensor_data_$(date -u -d "+${i} hours" '+%Y_%m_%d_%H')"
+                    psql -h "$H" -U "$U" -d "$D" -c "
+                      CREATE TABLE IF NOT EXISTS $name
+                      PARTITION OF sensor_data
+                      FOR VALUES FROM ('$start') TO ('$end');" 2>/dev/null || true
+                    echo "Ensured partition $name"
+                  done
+                  echo "=== Done ==="
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: PGPASSWORD
+                      name: pg-credentials
+                - name: PGOPTIONS
+                  value: -c statement_timeout=0
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: partition
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T03:05:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 54635689-b96f-4adf-ad25-8f8bec5e34f2
+        batch.kubernetes.io/job-name: pg-partition-mgr-29620985
+        controller-uid: 54635689-b96f-4adf-ad25-8f8bec5e34f2
+        job-name: pg-partition-mgr-29620985
+      name: pg-partition-mgr-29620985
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: pg-partition-mgr
+          uid: a7f57470-8465-4966-8a54-8a1390b57d37
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 2
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 54635689-b96f-4adf-ad25-8f8bec5e34f2
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 54635689-b96f-4adf-ad25-8f8bec5e34f2
+            batch.kubernetes.io/job-name: pg-partition-mgr-29620985
+            controller-uid: 54635689-b96f-4adf-ad25-8f8bec5e34f2
+            job-name: pg-partition-mgr-29620985
+        spec:
+          containers:
+            - command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  H="postgres.aiot.svc.cluster.local"
+                  U="aiot_admin"
+                  D="aiot"
+                  echo "=== Partition manager ==="
+                  # Drop partitions older than 2 hours
+                  psql -h "$H" -U "$U" -d "$D" -t -A -c "
+                    SELECT tablename FROM pg_tables
+                    WHERE schemaname='public'
+                      AND tablename ~ '^sensor_data_20'
+                    ORDER BY tablename;" | while read -r part; do
+                    ts=$(echo "$part" | sed 's/sensor_data_//' | sed 's/_/ /g' | head -c13)
+                    if [ -n "$ts" ]; then
+                      cutoff=$(date -u -d '2 hours ago' '+%Y %m %d %H')
+                      if [[ "$ts" < "$cutoff" ]]; then
+                        echo "DROP $part"
+                        psql -h "$H" -U "$U" -d "$D" -c "DROP TABLE IF EXISTS $part;"
+                      fi
+                    fi
+                  done
+                  # Create 4 future hourly partitions
+                  for i in 0 1 2 3; do
+                    start=$(date -u -d "+${i} hours" '+%Y-%m-%d %H:00:00')
+                    end=$(date -u -d "+$((i+1)) hours" '+%Y-%m-%d %H:00:00')
+                    name="sensor_data_$(date -u -d "+${i} hours" '+%Y_%m_%d_%H')"
+                    psql -h "$H" -U "$U" -d "$D" -c "
+                      CREATE TABLE IF NOT EXISTS $name
+                      PARTITION OF sensor_data
+                      FOR VALUES FROM ('$start') TO ('$end');" 2>/dev/null || true
+                    echo "Ensured partition $name"
+                  done
+                  echo "=== Done ==="
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: PGPASSWORD
+                      name: pg-credentials
+                - name: PGOPTIONS
+                  value: -c statement_timeout=0
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: partition
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T04:05:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 56772f55-aaa5-45e6-abd1-64befcbfc9cd
+        batch.kubernetes.io/job-name: pg-partition-mgr-29621045
+        controller-uid: 56772f55-aaa5-45e6-abd1-64befcbfc9cd
+        job-name: pg-partition-mgr-29621045
+      name: pg-partition-mgr-29621045
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: pg-partition-mgr
+          uid: a7f57470-8465-4966-8a54-8a1390b57d37
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 2
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 56772f55-aaa5-45e6-abd1-64befcbfc9cd
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 56772f55-aaa5-45e6-abd1-64befcbfc9cd
+            batch.kubernetes.io/job-name: pg-partition-mgr-29621045
+            controller-uid: 56772f55-aaa5-45e6-abd1-64befcbfc9cd
+            job-name: pg-partition-mgr-29621045
+        spec:
+          containers:
+            - command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  H="postgres.aiot.svc.cluster.local"
+                  U="aiot_admin"
+                  D="aiot"
+                  echo "=== Partition manager ==="
+                  # Drop partitions older than 2 hours
+                  psql -h "$H" -U "$U" -d "$D" -t -A -c "
+                    SELECT tablename FROM pg_tables
+                    WHERE schemaname='public'
+                      AND tablename ~ '^sensor_data_20'
+                    ORDER BY tablename;" | while read -r part; do
+                    ts=$(echo "$part" | sed 's/sensor_data_//' | sed 's/_/ /g' | head -c13)
+                    if [ -n "$ts" ]; then
+                      cutoff=$(date -u -d '2 hours ago' '+%Y %m %d %H')
+                      if [[ "$ts" < "$cutoff" ]]; then
+                        echo "DROP $part"
+                        psql -h "$H" -U "$U" -d "$D" -c "DROP TABLE IF EXISTS $part;"
+                      fi
+                    fi
+                  done
+                  # Create 4 future hourly partitions
+                  for i in 0 1 2 3; do
+                    start=$(date -u -d "+${i} hours" '+%Y-%m-%d %H:00:00')
+                    end=$(date -u -d "+$((i+1)) hours" '+%Y-%m-%d %H:00:00')
+                    name="sensor_data_$(date -u -d "+${i} hours" '+%Y_%m_%d_%H')"
+                    psql -h "$H" -U "$U" -d "$D" -c "
+                      CREATE TABLE IF NOT EXISTS $name
+                      PARTITION OF sensor_data
+                      FOR VALUES FROM ('$start') TO ('$end');" 2>/dev/null || true
+                    echo "Ensured partition $name"
+                  done
+                  echo "=== Done ==="
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: PGPASSWORD
+                      name: pg-credentials
+                - name: PGOPTIONS
+                  value: -c statement_timeout=0
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: partition
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T04:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 721fc7af-36fc-4e6f-832e-fd576c31f116
+        batch.kubernetes.io/job-name: pg-sensor-cleanup-29619600
+        controller-uid: 721fc7af-36fc-4e6f-832e-fd576c31f116
+        job-name: pg-sensor-cleanup-29619600
+      name: pg-sensor-cleanup-29619600
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: pg-sensor-cleanup
+          uid: 4a5bd473-2cfb-4c3a-afeb-da16335df4f8
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 1
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 721fc7af-36fc-4e6f-832e-fd576c31f116
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 721fc7af-36fc-4e6f-832e-fd576c31f116
+            batch.kubernetes.io/job-name: pg-sensor-cleanup-29619600
+            controller-uid: 721fc7af-36fc-4e6f-832e-fd576c31f116
+            job-name: pg-sensor-cleanup-29619600
+        spec:
+          containers:
+            - command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  H="postgres.aiot.svc.cluster.local"
+                  U="postgres"
+                  D="aiot"
+                  echo "Deleting sensor_data older than 10 days..."
+                  psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '10 days';"
+                  echo "VACUUM..."
+                  psql -h "$H" -U "$U" -d "$D" -c "VACUUM sensor_data;"
+                  echo "Done"
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: PGPASSWORD
+                      name: pg-credentials
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: cleanup
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T08:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: d9cb0729-c7cf-4dc1-b4e4-4aa74bd9d4ef
+        batch.kubernetes.io/job-name: pg-sensor-cleanup-29619840
+        controller-uid: d9cb0729-c7cf-4dc1-b4e4-4aa74bd9d4ef
+        job-name: pg-sensor-cleanup-29619840
+      name: pg-sensor-cleanup-29619840
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: pg-sensor-cleanup
+          uid: 4a5bd473-2cfb-4c3a-afeb-da16335df4f8
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 1
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: d9cb0729-c7cf-4dc1-b4e4-4aa74bd9d4ef
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: d9cb0729-c7cf-4dc1-b4e4-4aa74bd9d4ef
+            batch.kubernetes.io/job-name: pg-sensor-cleanup-29619840
+            controller-uid: d9cb0729-c7cf-4dc1-b4e4-4aa74bd9d4ef
+            job-name: pg-sensor-cleanup-29619840
+        spec:
+          containers:
+            - command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  H="postgres.aiot.svc.cluster.local"
+                  U="postgres"
+                  D="aiot"
+                  echo "Deleting sensor_data older than 10 days..."
+                  psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '10 days';"
+                  echo "VACUUM..."
+                  psql -h "$H" -U "$U" -d "$D" -c "VACUUM sensor_data;"
+                  echo "Done"
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: PGPASSWORD
+                      name: pg-credentials
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: cleanup
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T00:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: daebbe1c-7a68-4c0c-929b-a420eeca46c0
+        batch.kubernetes.io/job-name: pg-sensor-cleanup-29620800
+        controller-uid: daebbe1c-7a68-4c0c-929b-a420eeca46c0
+        job-name: pg-sensor-cleanup-29620800
+      name: pg-sensor-cleanup-29620800
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: pg-sensor-cleanup
+          uid: 4a5bd473-2cfb-4c3a-afeb-da16335df4f8
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 1
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: daebbe1c-7a68-4c0c-929b-a420eeca46c0
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: daebbe1c-7a68-4c0c-929b-a420eeca46c0
+            batch.kubernetes.io/job-name: pg-sensor-cleanup-29620800
+            controller-uid: daebbe1c-7a68-4c0c-929b-a420eeca46c0
+            job-name: pg-sensor-cleanup-29620800
+        spec:
+          containers:
+            - command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  H="postgres.aiot.svc.cluster.local"
+                  U="aiot_admin"
+                  D="aiot"
+                  echo "Deleting sensor_data older than 10 days..."
+                  psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '10 days';"
+                  echo "VACUUM..."
+                  psql -h "$H" -U "$U" -d "$D" -c "VACUUM sensor_data;"
+                  echo "Done"
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: PGPASSWORD
+                      name: pg-credentials
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: cleanup
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T04:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 89ee8e57-f93a-48f6-8aa1-ba30580f8bee
+        batch.kubernetes.io/job-name: pg-sensor-cleanup-29621040
+        controller-uid: 89ee8e57-f93a-48f6-8aa1-ba30580f8bee
+        job-name: pg-sensor-cleanup-29621040
+      name: pg-sensor-cleanup-29621040
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: pg-sensor-cleanup
+          uid: 4a5bd473-2cfb-4c3a-afeb-da16335df4f8
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 1
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 89ee8e57-f93a-48f6-8aa1-ba30580f8bee
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 89ee8e57-f93a-48f6-8aa1-ba30580f8bee
+            batch.kubernetes.io/job-name: pg-sensor-cleanup-29621040
+            controller-uid: 89ee8e57-f93a-48f6-8aa1-ba30580f8bee
+            job-name: pg-sensor-cleanup-29621040
+        spec:
+          containers:
+            - command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  H="postgres.aiot.svc.cluster.local"
+                  U="aiot_admin"
+                  D="aiot"
+                  echo "Deleting sensor_data older than 10 days..."
+                  psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '10 days';"
+                  echo "VACUUM..."
+                  psql -h "$H" -U "$U" -d "$D" -c "VACUUM sensor_data;"
+                  echo "Done"
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: PGPASSWORD
+                      name: pg-credentials
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: cleanup
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-25T03:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 040f909e-0bf4-440f-9e78-0d5e8544774f
+        batch.kubernetes.io/job-name: postgres-backup-29618100
+        controller-uid: 040f909e-0bf4-440f-9e78-0d5e8544774f
+        job-name: postgres-backup-29618100
+      name: postgres-backup-29618100
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: postgres-backup
+          uid: 515024ad-c555-4843-a936-039849383dc7
+    spec:
+      activeDeadlineSeconds: 3600
+      backoffLimit: 1
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 040f909e-0bf4-440f-9e78-0d5e8544774f
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 040f909e-0bf4-440f-9e78-0d5e8544774f
+            batch.kubernetes.io/job-name: postgres-backup-29618100
+            controller-uid: 040f909e-0bf4-440f-9e78-0d5e8544774f
+            job-name: postgres-backup-29618100
+        spec:
+          containers:
+            - command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  TS=$(date -u +%Y-%m-%d-%H%M%S)
+                  DBS="aiot mlflow n8n open_webui grafana mattermost"
+                  for DB in $DBS; do
+                    mkdir -p "$BACKUP_DIR/$DB"
+                    echo "==> Dumping $DB"
+                    pg_dump -Fc -Z6 -d "postgresql://$PGUSER:$PGPASSWORD@$PGHOST:5432/$DB" -f "$BACKUP_DIR/$DB/$DB-$TS.dump"
+                    ls -lh "$BACKUP_DIR/$DB/$DB-$TS.dump"
+                  done
+                  echo "==> Pruning >${RETENTION_DAYS}d"
+                  find "$BACKUP_DIR" -type f -name '*.dump' -mtime +${RETENTION_DAYS} -print -delete
+                  echo "==> Disk usage:"
+                  du -sh "$BACKUP_DIR"/*
+                  echo "==> Backup complete"
+              env:
+                - name: PGHOST
+                  value: postgres.aiot.svc.cluster.local
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      key: username
+                      name: pg-ha-superuser
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: pg-ha-superuser
+                - name: RETENTION_DAYS
+                  value: "30"
+                - name: BACKUP_DIR
+                  value: /backups
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: backup
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /backups
+                  name: backups
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            piraeus.io/storage: "yes"
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: backups
+              persistentVolumeClaim:
+                claimName: postgres-backup-data-piraeus
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T03:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 7547d112-d656-4ead-a69c-3ed5e8f4a6b4
+        batch.kubernetes.io/job-name: postgres-backup-29620980
+        controller-uid: 7547d112-d656-4ead-a69c-3ed5e8f4a6b4
+        job-name: postgres-backup-29620980
+      name: postgres-backup-29620980
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: postgres-backup
+          uid: 515024ad-c555-4843-a936-039849383dc7
+    spec:
+      activeDeadlineSeconds: 3600
+      backoffLimit: 1
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 7547d112-d656-4ead-a69c-3ed5e8f4a6b4
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 7547d112-d656-4ead-a69c-3ed5e8f4a6b4
+            batch.kubernetes.io/job-name: postgres-backup-29620980
+            controller-uid: 7547d112-d656-4ead-a69c-3ed5e8f4a6b4
+            job-name: postgres-backup-29620980
+        spec:
+          containers:
+            - command:
+                - /bin/bash
+                - -c
+                - |
+                  set -e
+                  TS=$(date -u +%Y-%m-%d-%H%M%S)
+                  DBS="aiot mlflow n8n open_webui grafana mattermost"
+                  for DB in $DBS; do
+                    mkdir -p "$BACKUP_DIR/$DB"
+                    echo "==> Dumping $DB"
+                    pg_dump -Fc -Z6 -d "postgresql://$PGUSER:$PGPASSWORD@$PGHOST:5432/$DB" -f "$BACKUP_DIR/$DB/$DB-$TS.dump"
+                    ls -lh "$BACKUP_DIR/$DB/$DB-$TS.dump"
+                  done
+                  echo "==> Pruning >${RETENTION_DAYS}d"
+                  find "$BACKUP_DIR" -type f -name '*.dump' -mtime +${RETENTION_DAYS} -print -delete
+                  echo "==> Disk usage:"
+                  du -sh "$BACKUP_DIR"/*
+                  echo "==> Backup complete"
+              env:
+                - name: PGHOST
+                  value: postgres.aiot.svc.cluster.local
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      key: username
+                      name: pg-ha-superuser
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: pg-ha-superuser
+                - name: RETENTION_DAYS
+                  value: "30"
+                - name: BACKUP_DIR
+                  value: /backups
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              name: backup
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /backups
+                  name: backups
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            piraeus.io/storage: "yes"
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: backups
+              persistentVolumeClaim:
+                claimName: postgres-backup-data-piraeus
+  - apiVersion: batch/v1
+    kind: Job
     metadata:
       labels:
-        batch.kubernetes.io/controller-uid: 6c1a8422-d276-4ce2-b8a3-8bb109b5b0f1
-        batch.kubernetes.io/job-name: pg-sensor-cleanup-29609760
-        controller-uid: 6c1a8422-d276-4ce2-b8a3-8bb109b5b0f1
-        job-name: pg-sensor-cleanup-29609760
+        k8up.io/owned-by: prune_aiot-prune-bj4lc
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-bj4lc
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-bj4lc
+          uid: 342d2137-c9f6-435d-9a77-726ebb2434cd
     spec:
-      containers:
-      - command:
-        - /bin/bash
-        - -c
-        - 'set -e
-
-          H="postgres.aiot.svc.cluster.local"
-
-          U="aiot_admin"
-
-          D="aiot"
-
-          echo "Deleting sensor_data older than 10 days..."
-
-          psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts < NOW()
-          - INTERVAL ''10 days'';"
-
-          echo "VACUUM..."
-
-          psql -h "$H" -U "$U" -d "$D" -c "VACUUM sensor_data;"
-
-          echo "Done"
-
-          '
-        env:
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: PGPASSWORD
-              name: pg-credentials
-        image: postgres:16
-        imagePullPolicy: IfNotPresent
-        name: cleanup
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T12:00:00Z'
-  labels:
-    batch.kubernetes.io/controller-uid: 63f767e3-6cd6-4cec-80ec-13449ed3c404
-    batch.kubernetes.io/job-name: pg-sensor-cleanup-29610000
-    controller-uid: 63f767e3-6cd6-4cec-80ec-13449ed3c404
-    job-name: pg-sensor-cleanup-29610000
-  name: pg-sensor-cleanup-29610000
-  namespace: aiot
-  ownerReferences:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: cd155b78-e98b-4d2f-963a-f23827d25674
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: cd155b78-e98b-4d2f-963a-f23827d25674
+            batch.kubernetes.io/job-name: prune-aiot-prune-bj4lc
+            controller-uid: cd155b78-e98b-4d2f-963a-f23827d25674
+            job-name: prune-aiot-prune-bj4lc
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: HOSTNAME
+                  value: aiot
+                - name: STATS_URL
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: pg-sensor-cleanup
-spec:
-  activeDeadlineSeconds: 300
-  backoffLimit: 1
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 63f767e3-6cd6-4cec-80ec-13449ed3c404
-  suspend: false
-  template:
+    kind: Job
     metadata:
       labels:
-        batch.kubernetes.io/controller-uid: 63f767e3-6cd6-4cec-80ec-13449ed3c404
-        batch.kubernetes.io/job-name: pg-sensor-cleanup-29610000
-        controller-uid: 63f767e3-6cd6-4cec-80ec-13449ed3c404
-        job-name: pg-sensor-cleanup-29610000
+        k8up.io/owned-by: prune_aiot-prune-g9572
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-g9572
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-g9572
+          uid: 61df9e46-5a8f-4d22-94f6-0e69babd8ea9
     spec:
-      containers:
-      - command:
-        - /bin/bash
-        - -c
-        - 'set -e
-
-          H="postgres.aiot.svc.cluster.local"
-
-          U="aiot_admin"
-
-          D="aiot"
-
-          echo "Deleting sensor_data older than 10 days..."
-
-          psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts < NOW()
-          - INTERVAL ''10 days'';"
-
-          echo "VACUUM..."
-
-          psql -h "$H" -U "$U" -d "$D" -c "VACUUM sensor_data;"
-
-          echo "Done"
-
-          '
-        env:
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: PGPASSWORD
-              name: pg-credentials
-        image: postgres:16
-        imagePullPolicy: IfNotPresent
-        name: cleanup
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-18T03:00:00Z'
-    revisions: '{"1":{"status":"completed","succeed":1,"desire":1,"uid":"9e90c430-5f2f-482b-98ad-0a12832f996b","start-time":"2026-04-18T03:00:00Z","completion-time":"2026-04-18T03:00:17Z"}}'
-  labels:
-    batch.kubernetes.io/controller-uid: 9e90c430-5f2f-482b-98ad-0a12832f996b
-    batch.kubernetes.io/job-name: postgres-backup-29608020
-    controller-uid: 9e90c430-5f2f-482b-98ad-0a12832f996b
-    job-name: postgres-backup-29608020
-  name: postgres-backup-29608020
-  namespace: aiot
-  ownerReferences:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 10b47185-ad74-40a8-bb31-c43064319b0e
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 10b47185-ad74-40a8-bb31-c43064319b0e
+            batch.kubernetes.io/job-name: prune-aiot-prune-g9572
+            controller-uid: 10b47185-ad74-40a8-bb31-c43064319b0e
+            job-name: prune-aiot-prune-g9572
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: HOSTNAME
+                  value: aiot
+                - name: STATS_URL
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: postgres-backup
-spec:
-  activeDeadlineSeconds: 3600
-  backoffLimit: 1
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 9e90c430-5f2f-482b-98ad-0a12832f996b
-  suspend: false
-  template:
+    kind: Job
     metadata:
       labels:
-        batch.kubernetes.io/controller-uid: 9e90c430-5f2f-482b-98ad-0a12832f996b
-        batch.kubernetes.io/job-name: postgres-backup-29608020
-        controller-uid: 9e90c430-5f2f-482b-98ad-0a12832f996b
-        job-name: postgres-backup-29608020
+        k8up.io/owned-by: prune_aiot-prune-wsngd
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-wsngd
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-wsngd
+          uid: 0261ca34-d91b-4576-9b65-b5bd40569821
     spec:
-      containers:
-      - command:
-        - /bin/bash
-        - -c
-        - "set -e\nTS=$(date -u +%Y-%m-%d-%H%M%S)\nDBS=\"aiot mlflow n8n open_webui\
-          \ grafana mattermost\"\nfor DB in $DBS; do\n  mkdir -p \"$BACKUP_DIR/$DB\"\
-          \n  echo \"==> Dumping $DB\"\n  pg_dump -Fc -Z6 -d \"postgresql://$PGUSER:$PGPASSWORD@$PGHOST:5432/$DB\"\
-          \ -f \"$BACKUP_DIR/$DB/$DB-$TS.dump\"\n  ls -lh \"$BACKUP_DIR/$DB/$DB-$TS.dump\"\
-          \ndone\necho \"==> Pruning >${RETENTION_DAYS}d\"\nfind \"$BACKUP_DIR\" -type\
-          \ f -name '*.dump' -mtime +${RETENTION_DAYS} -print -delete\necho \"==>\
-          \ Disk usage:\"\ndu -sh \"$BACKUP_DIR\"/*\necho \"==> Backup complete\"\n"
-        env:
-        - name: PGHOST
-          value: postgres.aiot.svc.cluster.local
-        - name: PGUSER
-          valueFrom:
-            secretKeyRef:
-              key: username
-              name: pg-ha-superuser
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: pg-ha-superuser
-        - name: RETENTION_DAYS
-          value: '30'
-        - name: BACKUP_DIR
-          value: /backups
-        image: postgres:16
-        imagePullPolicy: IfNotPresent
-        name: backup
-        resources:
-          limits:
-            cpu: '1'
-            memory: 1Gi
-          requests:
-            cpu: 100m
-            memory: 256Mi
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /backups
-          name: backups
-      dnsPolicy: ClusterFirst
-      restartPolicy: OnFailure
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - name: backups
-        persistentVolumeClaim:
-          claimName: postgres-backup-data
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T03:00:00Z'
-  labels:
-    batch.kubernetes.io/controller-uid: b4bd660a-5188-464d-9eb2-cc251bf7fc5f
-    batch.kubernetes.io/job-name: postgres-backup-29609460
-    controller-uid: b4bd660a-5188-464d-9eb2-cc251bf7fc5f
-    job-name: postgres-backup-29609460
-  name: postgres-backup-29609460
-  namespace: aiot
-  ownerReferences:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: d4f3030c-1a17-4622-8c40-0a7778a3e77e
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: d4f3030c-1a17-4622-8c40-0a7778a3e77e
+            batch.kubernetes.io/job-name: prune-aiot-prune-wsngd
+            controller-uid: d4f3030c-1a17-4622-8c40-0a7778a3e77e
+            job-name: prune-aiot-prune-wsngd
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: STATS_URL
+                - name: HOSTNAME
+                  value: aiot
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: postgres-backup
-spec:
-  activeDeadlineSeconds: 3600
-  backoffLimit: 1
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: b4bd660a-5188-464d-9eb2-cc251bf7fc5f
-  suspend: false
-  template:
+    kind: Job
     metadata:
       labels:
-        batch.kubernetes.io/controller-uid: b4bd660a-5188-464d-9eb2-cc251bf7fc5f
-        batch.kubernetes.io/job-name: postgres-backup-29609460
-        controller-uid: b4bd660a-5188-464d-9eb2-cc251bf7fc5f
-        job-name: postgres-backup-29609460
+        k8up.io/owned-by: prune_aiot-prune-xxcts
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-xxcts
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-xxcts
+          uid: 38699084-58ab-4473-89bb-24a03a5f6126
     spec:
-      containers:
-      - command:
-        - /bin/bash
-        - -c
-        - "set -e\nTS=$(date -u +%Y-%m-%d-%H%M%S)\nDBS=\"aiot mlflow n8n open_webui\
-          \ grafana mattermost\"\nfor DB in $DBS; do\n  mkdir -p \"$BACKUP_DIR/$DB\"\
-          \n  echo \"==> Dumping $DB\"\n  pg_dump -Fc -Z6 -d \"postgresql://$PGUSER:$PGPASSWORD@$PGHOST:5432/$DB\"\
-          \ -f \"$BACKUP_DIR/$DB/$DB-$TS.dump\"\n  ls -lh \"$BACKUP_DIR/$DB/$DB-$TS.dump\"\
-          \ndone\necho \"==> Pruning >${RETENTION_DAYS}d\"\nfind \"$BACKUP_DIR\" -type\
-          \ f -name '*.dump' -mtime +${RETENTION_DAYS} -print -delete\necho \"==>\
-          \ Disk usage:\"\ndu -sh \"$BACKUP_DIR\"/*\necho \"==> Backup complete\"\n"
-        env:
-        - name: PGHOST
-          value: postgres.aiot.svc.cluster.local
-        - name: PGUSER
-          valueFrom:
-            secretKeyRef:
-              key: username
-              name: pg-ha-superuser
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: password
-              name: pg-ha-superuser
-        - name: RETENTION_DAYS
-          value: '30'
-        - name: BACKUP_DIR
-          value: /backups
-        image: postgres:16
-        imagePullPolicy: IfNotPresent
-        name: backup
-        resources:
-          limits:
-            cpu: '1'
-            memory: 1Gi
-          requests:
-            cpu: 100m
-            memory: 256Mi
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /backups
-          name: backups
-      dnsPolicy: ClusterFirst
-      restartPolicy: OnFailure
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - name: backups
-        persistentVolumeClaim:
-          claimName: postgres-backup-data
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-17T18:00:00Z'
-    revisions: '{"1":{"status":"failed","reasons":["DeadlineExceeded"],"messages":["Job
-      was active longer than specified deadline"],"desire":1,"failed":1,"uid":"19d4f6b5-1367-45f7-b5ca-3074bc61954b","start-time":"2026-04-17T18:00:00Z","completion-time":"0001-01-01T00:00:00Z"}}'
-  labels:
-    batch.kubernetes.io/controller-uid: 19d4f6b5-1367-45f7-b5ca-3074bc61954b
-    batch.kubernetes.io/job-name: sensor-data-retention-29607480
-    controller-uid: 19d4f6b5-1367-45f7-b5ca-3074bc61954b
-    job-name: sensor-data-retention-29607480
-  name: sensor-data-retention-29607480
-  namespace: aiot
-  ownerReferences:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: c220d463-b1bb-4676-b3f9-344322e7a437
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: c220d463-b1bb-4676-b3f9-344322e7a437
+            batch.kubernetes.io/job-name: prune-aiot-prune-xxcts
+            controller-uid: c220d463-b1bb-4676-b3f9-344322e7a437
+            job-name: prune-aiot-prune-xxcts
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: STATS_URL
+                - name: HOSTNAME
+                  value: aiot
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: sensor-data-retention
-spec:
-  activeDeadlineSeconds: 1800
-  backoffLimit: 1
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 19d4f6b5-1367-45f7-b5ca-3074bc61954b
-  suspend: false
-  template:
+    kind: Job
     metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T06:00:00Z"
       labels:
-        batch.kubernetes.io/controller-uid: 19d4f6b5-1367-45f7-b5ca-3074bc61954b
-        batch.kubernetes.io/job-name: sensor-data-retention-29607480
-        controller-uid: 19d4f6b5-1367-45f7-b5ca-3074bc61954b
-        job-name: sensor-data-retention-29607480
+        batch.kubernetes.io/controller-uid: c4afc898-dbd3-4cf0-889d-49ef0a628440
+        batch.kubernetes.io/job-name: sensor-data-retention-29619720
+        controller-uid: c4afc898-dbd3-4cf0-889d-49ef0a628440
+        job-name: sensor-data-retention-29619720
+      name: sensor-data-retention-29619720
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: sensor-data-retention
+          uid: c9c75bf9-cca1-470f-b9b6-88c16b824174
     spec:
-      containers:
-      - command:
-        - python3
-        - -c
-        - "import psycopg2, os\nconn = psycopg2.connect(host=os.environ['PG_HOST'],\
-          \ user=os.environ['PG_USER'],\n                         password=os.environ['PG_PASS'],\
-          \ dbname='aiot')\nconn.autocommit = True\ncur = conn.cursor()\nfor t in\
-          \ ['sensor_data','predictions']:\n    cur.execute(f\"DELETE FROM {t} WHERE\
-          \ ts < NOW() - INTERVAL '10 days'\")\n    print(f\"Cleaned {t}: {cur.rowcount}\
-          \ rows\")\ncur.close(); conn.close()\n"
-        env:
-        - name: PG_HOST
-          value: postgres.aiot.svc.cluster.local
-        - name: PG_USER
-          value: aiot_admin
-        - name: PG_PASS
-          valueFrom:
-            secretKeyRef:
-              key: PG_PASS
-              name: pg-credentials
-        image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
-        imagePullPolicy: Always
-        name: retention
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T06:00:00Z'
-  labels:
-    batch.kubernetes.io/controller-uid: 2303e713-e2a3-4d11-8b91-7947961b6b37
-    batch.kubernetes.io/job-name: sensor-data-retention-29609640
-    controller-uid: 2303e713-e2a3-4d11-8b91-7947961b6b37
-    job-name: sensor-data-retention-29609640
-  name: sensor-data-retention-29609640
-  namespace: aiot
-  ownerReferences:
+      activeDeadlineSeconds: 1800
+      backoffLimit: 1
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: c4afc898-dbd3-4cf0-889d-49ef0a628440
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: c4afc898-dbd3-4cf0-889d-49ef0a628440
+            batch.kubernetes.io/job-name: sensor-data-retention-29619720
+            controller-uid: c4afc898-dbd3-4cf0-889d-49ef0a628440
+            job-name: sensor-data-retention-29619720
+        spec:
+          containers:
+            - command:
+                - python3
+                - -c
+                - |
+                  import psycopg2, os
+                  conn = psycopg2.connect(host=os.environ["PG_HOST"], user=os.environ["PG_USER"],
+                                           password=os.environ["PG_PASS"], dbname="aiot")
+                  conn.autocommit = True
+                  cur = conn.cursor()
+                  for t in ["sensor_data"]:
+                      cur.execute(f"DELETE FROM {t} WHERE ts < NOW() - INTERVAL '14 days'")
+                      print(f"Cleaned {t}: {cur.rowcount} rows")
+                  cur.close(); conn.close()
+              env:
+                - name: PG_HOST
+                  value: postgres.aiot.svc.cluster.local
+                - name: PG_USER
+                  value: postgres
+                - name: PG_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      key: PG_PASS
+                      name: pg-credentials
+              image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+              imagePullPolicy: Always
+              name: retention
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: sensor-data-retention
-spec:
-  activeDeadlineSeconds: 1800
-  backoffLimit: 1
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 2303e713-e2a3-4d11-8b91-7947961b6b37
-  suspend: false
-  template:
+    kind: Job
     metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T18:00:00Z"
       labels:
-        batch.kubernetes.io/controller-uid: 2303e713-e2a3-4d11-8b91-7947961b6b37
-        batch.kubernetes.io/job-name: sensor-data-retention-29609640
-        controller-uid: 2303e713-e2a3-4d11-8b91-7947961b6b37
-        job-name: sensor-data-retention-29609640
+        batch.kubernetes.io/controller-uid: ac1858bc-8e00-4f55-b910-9e2962a82242
+        batch.kubernetes.io/job-name: sensor-data-retention-29620440
+        controller-uid: ac1858bc-8e00-4f55-b910-9e2962a82242
+        job-name: sensor-data-retention-29620440
+      name: sensor-data-retention-29620440
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: sensor-data-retention
+          uid: c9c75bf9-cca1-470f-b9b6-88c16b824174
     spec:
-      containers:
-      - command:
-        - python3
-        - -c
-        - "import psycopg2, os\nconn = psycopg2.connect(host=os.environ['PG_HOST'],\
-          \ user=os.environ['PG_USER'],\n                         password=os.environ['PG_PASS'],\
-          \ dbname='aiot')\nconn.autocommit = True\ncur = conn.cursor()\nfor t in\
-          \ ['sensor_data','predictions']:\n    cur.execute(f\"DELETE FROM {t} WHERE\
-          \ ts < NOW() - INTERVAL '14 days'\")\n    print(f\"Cleaned {t}: {cur.rowcount}\
-          \ rows\")\ncur.close(); conn.close()\n"
-        env:
-        - name: PG_HOST
-          value: postgres.aiot.svc.cluster.local
-        - name: PG_USER
-          value: aiot_admin
-        - name: PG_PASS
-          valueFrom:
-            secretKeyRef:
-              key: PG_PASS
-              name: pg-credentials
-        image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
-        imagePullPolicy: Always
-        name: retention
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    batch.kubernetes.io/cronjob-scheduled-timestamp: '2026-04-19T12:00:00Z'
-  labels:
-    batch.kubernetes.io/controller-uid: 09c75c84-1f91-469b-b050-4fec93785b88
-    batch.kubernetes.io/job-name: sensor-data-retention-29610000
-    controller-uid: 09c75c84-1f91-469b-b050-4fec93785b88
-    job-name: sensor-data-retention-29610000
-  name: sensor-data-retention-29610000
-  namespace: aiot
-  ownerReferences:
+      activeDeadlineSeconds: 1800
+      backoffLimit: 1
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: ac1858bc-8e00-4f55-b910-9e2962a82242
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: ac1858bc-8e00-4f55-b910-9e2962a82242
+            batch.kubernetes.io/job-name: sensor-data-retention-29620440
+            controller-uid: ac1858bc-8e00-4f55-b910-9e2962a82242
+            job-name: sensor-data-retention-29620440
+        spec:
+          containers:
+            - command:
+                - python3
+                - -c
+                - |
+                  import psycopg2, os
+                  conn = psycopg2.connect(host=os.environ['PG_HOST'], user=os.environ['PG_USER'],
+                                           password=os.environ['PG_PASS'], dbname='aiot')
+                  conn.autocommit = True
+                  cur = conn.cursor()
+                  for t in ['sensor_data']:
+                      cur.execute(f"DELETE FROM {t} WHERE ts < NOW() - INTERVAL '14 days'")
+                      print(f"Cleaned {t}: {cur.rowcount} rows")
+                  cur.close(); conn.close()
+              env:
+                - name: PG_HOST
+                  value: postgres.aiot.svc.cluster.local
+                - name: PG_USER
+                  value: aiot_admin
+                - name: PG_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      key: PG_PASS
+                      name: pg-credentials
+              image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+              imagePullPolicy: Always
+              name: retention
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
   - apiVersion: batch/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: CronJob
-    name: sensor-data-retention
-spec:
-  activeDeadlineSeconds: 1800
-  backoffLimit: 1
-  completionMode: NonIndexed
-  completions: 1
-  manualSelector: false
-  parallelism: 1
-  podReplacementPolicy: TerminatingOrFailed
-  selector:
-    matchLabels:
-      batch.kubernetes.io/controller-uid: 09c75c84-1f91-469b-b050-4fec93785b88
-  suspend: false
-  template:
+    kind: Job
     metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T00:00:00Z"
       labels:
-        batch.kubernetes.io/controller-uid: 09c75c84-1f91-469b-b050-4fec93785b88
-        batch.kubernetes.io/job-name: sensor-data-retention-29610000
-        controller-uid: 09c75c84-1f91-469b-b050-4fec93785b88
-        job-name: sensor-data-retention-29610000
+        batch.kubernetes.io/controller-uid: c0727054-d48a-4a36-80f8-734507c70fde
+        batch.kubernetes.io/job-name: sensor-data-retention-29620800
+        controller-uid: c0727054-d48a-4a36-80f8-734507c70fde
+        job-name: sensor-data-retention-29620800
+      name: sensor-data-retention-29620800
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: sensor-data-retention
+          uid: c9c75bf9-cca1-470f-b9b6-88c16b824174
     spec:
-      containers:
-      - command:
-        - python3
-        - -c
-        - "import psycopg2, os\nconn = psycopg2.connect(host=os.environ['PG_HOST'],\
-          \ user=os.environ['PG_USER'],\n                         password=os.environ['PG_PASS'],\
-          \ dbname='aiot')\nconn.autocommit = True\ncur = conn.cursor()\nfor t in\
-          \ ['sensor_data','predictions']:\n    cur.execute(f\"DELETE FROM {t} WHERE\
-          \ ts < NOW() - INTERVAL '14 days'\")\n    print(f\"Cleaned {t}: {cur.rowcount}\
-          \ rows\")\ncur.close(); conn.close()\n"
-        env:
-        - name: PG_HOST
-          value: postgres.aiot.svc.cluster.local
-        - name: PG_USER
-          value: aiot_admin
-        - name: PG_PASS
-          valueFrom:
-            secretKeyRef:
-              key: PG_PASS
-              name: pg-credentials
-        image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
-        imagePullPolicy: Always
-        name: retention
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Never
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
+      activeDeadlineSeconds: 1800
+      backoffLimit: 1
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: c0727054-d48a-4a36-80f8-734507c70fde
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: c0727054-d48a-4a36-80f8-734507c70fde
+            batch.kubernetes.io/job-name: sensor-data-retention-29620800
+            controller-uid: c0727054-d48a-4a36-80f8-734507c70fde
+            job-name: sensor-data-retention-29620800
+        spec:
+          containers:
+            - command:
+                - python3
+                - -c
+                - |
+                  import psycopg2, os
+                  conn = psycopg2.connect(host=os.environ['PG_HOST'], user=os.environ['PG_USER'],
+                                           password=os.environ['PG_PASS'], dbname='aiot')
+                  conn.autocommit = True
+                  cur = conn.cursor()
+                  for t in ['sensor_data']:
+                      cur.execute(f"DELETE FROM {t} WHERE ts < NOW() - INTERVAL '14 days'")
+                      print(f"Cleaned {t}: {cur.rowcount} rows")
+                  cur.close(); conn.close()
+              env:
+                - name: PG_HOST
+                  value: postgres.aiot.svc.cluster.local
+                - name: PG_USER
+                  value: aiot_admin
+                - name: PG_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      key: PG_PASS
+                      name: pg-credentials
+              image: 10.132.0.2:30500/aiot/aiot-python-runtime:latest
+              imagePullPolicy: Always
+              name: retention
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+kind: List
+metadata:
+  resourceVersion: ""

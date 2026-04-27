@@ -1,0 +1,130 @@
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        ignore-check.kube-linter.io/liveness-port: Keeping upstream configs
+        ignore-check.kube-linter.io/readiness-port: Keeping upstream configs
+      labels:
+        control-plane: controller-manager
+        konflux.konflux-ci.dev/component: release
+        konflux.konflux-ci.dev/owner: konflux-release-service
+      name: release-service-controller-manager
+      namespace: release-service
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxReleaseService
+          name: konflux-release-service
+          uid: 4b064250-17e5-46bc-b604-28beb73fb209
+    spec:
+      progressDeadlineSeconds: 2147483647
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          control-plane: controller-manager
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/default-container: manager
+          creationTimestamp: null
+          labels:
+            control-plane: controller-manager
+        spec:
+          containers:
+            - args:
+                - --metrics-bind-address=:8080
+                - --leader-elect=false
+              command:
+                - /manager
+              env:
+                - name: DEFAULT_RELEASE_PVC
+                  valueFrom:
+                    configMapKeyRef:
+                      key: DEFAULT_RELEASE_PVC
+                      name: release-service-manager-properties
+                      optional: true
+                - name: DEFAULT_RELEASE_WORKSPACE_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      key: DEFAULT_RELEASE_WORKSPACE_NAME
+                      name: release-service-manager-properties
+                      optional: true
+                - name: DEFAULT_RELEASE_WORKSPACE_SIZE
+                  valueFrom:
+                    configMapKeyRef:
+                      key: DEFAULT_RELEASE_WORKSPACE_SIZE
+                      name: release-service-manager-properties
+                      optional: true
+                - name: SERVICE_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.namespace
+              image: quay.io/konflux-ci/release-service:5f0b67ab53d64072c1fce4d9e18e3297e91da126
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: 8081
+                  scheme: HTTP
+                initialDelaySeconds: 15
+                periodSeconds: 20
+                successThreshold: 1
+                timeoutSeconds: 1
+              name: manager
+              ports:
+                - containerPort: 9443
+                  name: webhook-server
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /readyz
+                  port: 8081
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+                requests:
+                  cpu: 30m
+                  memory: 128Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /tmp/k8s-webhook-server/serving-certs
+                  name: cert
+                  readOnly: true
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext:
+            runAsNonRoot: true
+          serviceAccount: release-service-controller-manager
+          serviceAccountName: release-service-controller-manager
+          terminationGracePeriodSeconds: 10
+          volumes:
+            - name: cert
+              secret:
+                defaultMode: 420
+                secretName: webhook-server-cert
+kind: List
+metadata:
+  resourceVersion: ""

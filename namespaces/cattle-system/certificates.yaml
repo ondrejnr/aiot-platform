@@ -1,0 +1,34 @@
+apiVersion: v1
+items:
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      labels:
+        app: rancher
+        app.kubernetes.io/managed-by: Helm
+        chart: rancher-2.13.3
+        heritage: Helm
+        release: rancher
+      name: tls-rancher-ingress
+      namespace: cattle-system
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: rancher
+          uid: fb92ba4e-8530-497e-87af-d0f205aeda0c
+    spec:
+      dnsNames:
+        - rancher.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-rancher-ingress
+      usages:
+        - digital signature
+        - key encipherment
+kind: List
+metadata:
+  resourceVersion: ""

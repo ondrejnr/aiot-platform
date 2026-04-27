@@ -1,0 +1,28 @@
+apiVersion: v1
+items:
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: linstor-ui-tls
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: linstor-ui
+          uid: 1d4b3bf1-1f00-49f8-aa42-208f757f6130
+    spec:
+      dnsNames:
+        - linstor.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: linstor-ui-tls
+      usages:
+        - digital signature
+        - key encipherment
+kind: List
+metadata:
+  resourceVersion: ""

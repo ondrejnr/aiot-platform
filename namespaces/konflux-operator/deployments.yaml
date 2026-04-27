@@ -1,0 +1,96 @@
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/name: konflux-operator
+        control-plane: controller-manager
+      name: konflux-operator-controller-manager
+      namespace: konflux-operator
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 0
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: konflux-operator
+          control-plane: controller-manager
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/default-container: manager
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/name: konflux-operator
+            control-plane: controller-manager
+        spec:
+          containers:
+            - args:
+                - --metrics-bind-address=:8443
+                - --leader-elect
+                - --health-probe-bind-address=:8081
+              command:
+                - /manager
+              image: quay.io/konflux-ci/konflux-operator:latest
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: 8081
+                  scheme: HTTP
+                initialDelaySeconds: 15
+                periodSeconds: 20
+                successThreshold: 1
+                timeoutSeconds: 1
+              name: manager
+              ports:
+                - containerPort: 8081
+                  name: probes
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /readyz
+                  port: 8081
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          serviceAccount: konflux-operator-controller-manager
+          serviceAccountName: konflux-operator-controller-manager
+          terminationGracePeriodSeconds: 10
+kind: List
+metadata:
+  resourceVersion: ""

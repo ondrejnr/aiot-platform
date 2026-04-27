@@ -1,0 +1,363 @@
+apiVersion: v1
+items:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations: {}
+      labels:
+        batch.kubernetes.io/controller-uid: 1edbbf5c-c4e3-4f3c-bdbc-2f0cce18c495
+        batch.kubernetes.io/job-name: migrate-gitea-data
+        controller-uid: 1edbbf5c-c4e3-4f3c-bdbc-2f0cce18c495
+        job-name: migrate-gitea-data
+      name: migrate-gitea-data
+      namespace: gitea
+    spec:
+      backoffLimit: 0
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 1edbbf5c-c4e3-4f3c-bdbc-2f0cce18c495
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 1edbbf5c-c4e3-4f3c-bdbc-2f0cce18c495
+            batch.kubernetes.io/job-name: migrate-gitea-data
+            controller-uid: 1edbbf5c-c4e3-4f3c-bdbc-2f0cce18c495
+            job-name: migrate-gitea-data
+        spec:
+          containers:
+            - command:
+                - sh
+                - -c
+                - rsync -aHAX --numeric-ids --info=stats2 /old/ /new/ && echo DONE
+              image: instrumentisto/rsync-ssh:latest
+              imagePullPolicy: Always
+              name: rsync
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /old
+                  name: old
+                - mountPath: /new
+                  name: new
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            piraeus.io/storage: "yes"
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: old
+              persistentVolumeClaim:
+                claimName: gitea-data
+            - name: new
+              persistentVolumeClaim:
+                claimName: gitea-data-piraeus
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      labels:
+        k8up.io/owned-by: prune_aiot-prune-8plf5
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-8plf5
+      namespace: gitea
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-8plf5
+          uid: d0938e93-cd68-47ad-9f55-aa88824d7839
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 03a9b665-0e51-4361-80ae-94f41286930c
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 03a9b665-0e51-4361-80ae-94f41286930c
+            batch.kubernetes.io/job-name: prune-aiot-prune-8plf5
+            controller-uid: 03a9b665-0e51-4361-80ae-94f41286930c
+            job-name: prune-aiot-prune-8plf5
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: HOSTNAME
+                  value: gitea
+                - name: STATS_URL
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      labels:
+        k8up.io/owned-by: prune_aiot-prune-bw6pf
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-bw6pf
+      namespace: gitea
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-bw6pf
+          uid: 99638b64-69ed-4595-878a-f56b9fc7b076
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: a4187bbb-c339-4a43-9fc0-af6ca7a34941
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: a4187bbb-c339-4a43-9fc0-af6ca7a34941
+            batch.kubernetes.io/job-name: prune-aiot-prune-bw6pf
+            controller-uid: a4187bbb-c339-4a43-9fc0-af6ca7a34941
+            job-name: prune-aiot-prune-bw6pf
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: STATS_URL
+                - name: HOSTNAME
+                  value: gitea
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      labels:
+        k8up.io/owned-by: prune_aiot-prune-wbd9v
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-wbd9v
+      namespace: gitea
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-wbd9v
+          uid: 6a5882e4-64e7-48b9-a5fc-07fcd58120cf
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: db021ed3-1a1d-40a8-a339-45f553efecde
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: db021ed3-1a1d-40a8-a339-45f553efecde
+            batch.kubernetes.io/job-name: prune-aiot-prune-wbd9v
+            controller-uid: db021ed3-1a1d-40a8-a339-45f553efecde
+            job-name: prune-aiot-prune-wbd9v
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: STATS_URL
+                - name: HOSTNAME
+                  value: gitea
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
+kind: List
+metadata:
+  resourceVersion: ""

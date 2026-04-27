@@ -1,68 +1,71 @@
 apiVersion: v1
-kind: PersistentVolumeClaim
+items:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        k8up.io/backup: "false"
+        volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+        volume.kubernetes.io/selected-node: aiot-worker-01
+        volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+      finalizers:
+        - kubernetes.io/pvc-protection
+      labels:
+        velero.io/exclude-from-backup: "true"
+      name: jenkins-kaniko-cache
+      namespace: jenkins
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: local-path
+      volumeMode: Filesystem
+      volumeName: pvc-c0ab0824-11ea-4a86-8003-558ce2fa7ce9
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+        volume.kubernetes.io/selected-node: aiot-worker-01
+        volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      finalizers:
+        - kubernetes.io/pvc-protection
+      name: jenkins-lp-piraeus
+      namespace: jenkins
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      storageClassName: piraeus-r2
+      volumeMode: Filesystem
+      volumeName: pvc-7496d803-a21d-484b-9756-4327047b07bd
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        k8up.io/backup: "false"
+        volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
+        volume.kubernetes.io/selected-node: aiot-worker-01
+        volume.kubernetes.io/storage-provisioner: rancher.io/local-path
+      finalizers:
+        - kubernetes.io/pvc-protection
+      labels:
+        velero.io/exclude-from-backup: "true"
+      name: jenkins-pip-cache
+      namespace: jenkins
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+      storageClassName: local-path
+      volumeMode: Filesystem
+      volumeName: pvc-6f51064f-3823-411b-867c-7ba4e7a59080
+kind: List
 metadata:
-  annotations:
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: aiot-worker-01
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  name: jenkins-kaniko-cache
-  namespace: jenkins
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-c0ab0824-11ea-4a86-8003-558ce2fa7ce9
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: oci-e5-node1
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  name: jenkins-lp
-  namespace: jenkins
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 8Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-398e2403-7c85-4ffa-8982-8e65f521902e
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: aiot-worker-01
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  name: jenkins-pip-cache
-  namespace: jenkins
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-6f51064f-3823-411b-867c-7ba4e7a59080
+  resourceVersion: ""

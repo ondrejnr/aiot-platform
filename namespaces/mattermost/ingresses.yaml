@@ -1,29 +1,34 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: v1
+items:
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"mattermost:mattermost","ingressName":"mattermost:mattermost","hostname":"mm.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+        nginx.ingress.kubernetes.io/proxy-body-size: 50m
+        nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      name: mattermost
+      namespace: mattermost
+    spec:
+      ingressClassName: nginx
+      rules:
+        - host: mm.35.241.255.137.nip.io
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: mattermost
+                    port:
+                      number: 8065
+                path: /
+                pathType: Prefix
+      tls:
+        - hosts:
+            - mm.35.241.255.137.nip.io
+          secretName: tls-mattermost
+kind: List
 metadata:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"mattermost:mattermost","ingressName":"mattermost:mattermost","hostname":"mm.35.241.255.137.nip.io","path":"/","allNodes":false}]'
-    nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: '60'
-    nginx.ingress.kubernetes.io/proxy-read-timeout: '3600'
-    nginx.ingress.kubernetes.io/proxy-send-timeout: '3600'
-  name: mattermost
-  namespace: mattermost
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: mm.35.241.255.137.nip.io
-    http:
-      paths:
-      - backend:
-          service:
-            name: mattermost
-            port:
-              number: 8065
-        path: /
-        pathType: Prefix
-  tls:
-  - hosts:
-    - mm.35.241.255.137.nip.io
-    secretName: tls-mattermost
+  resourceVersion: ""

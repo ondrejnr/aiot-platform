@@ -1,0 +1,475 @@
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-affinity-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-affinity-controller
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    rules:
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - create
+          - update
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-controller
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    rules:
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - patch
+          - update
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - get
+          - create
+          - patch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-csi-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-csi-controller
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    rules:
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - watch
+          - list
+          - delete
+          - update
+          - create
+      - apiGroups:
+          - storage.k8s.io
+        resources:
+          - csistoragecapacities
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+      - apiGroups:
+          - apps
+        resources:
+          - replicasets
+        verbs:
+          - get
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-csi-nfs-server
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-csi-nfs-server
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    rules:
+      - apiGroups:
+          - discovery.k8s.io
+        resources:
+          - endpointslices
+          - endpointslices/restricted
+        verbs:
+          - create
+          - delete
+      - apiGroups:
+          - ""
+        resourceNames:
+          - linstor-csi-nfs-server-reactor-config
+        resources:
+          - configmaps
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - security.openshift.io
+        resourceNames:
+          - privileged
+        resources:
+          - securitycontextconstraints
+        verbs:
+          - use
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-csi-node
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-csi-node
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    rules:
+      - apiGroups:
+          - security.openshift.io
+        resourceNames:
+          - privileged
+        resources:
+          - securitycontextconstraints
+        verbs:
+          - use
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/name: piraeus-datastore
+      name: piraeus-operator-gencert
+      namespace: piraeus-datastore
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - patch
+          - update
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/name: piraeus-datastore
+      name: piraeus-operator-leader-election-role
+      namespace: piraeus-datastore
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - events
+        verbs:
+          - create
+          - patch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-satellite
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: satellite
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    rules:
+      - apiGroups:
+          - security.openshift.io
+        resourceNames:
+          - privileged
+        resources:
+          - securitycontextconstraints
+        verbs:
+          - use
+kind: List
+metadata:
+  resourceVersion: ""
+---
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-affinity-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-affinity-controller
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: linstor-affinity-controller
+    subjects:
+      - kind: ServiceAccount
+        name: linstor-affinity-controller
+        namespace: piraeus-datastore
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-controller
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: linstor-controller
+    subjects:
+      - kind: ServiceAccount
+        name: linstor-controller
+        namespace: piraeus-datastore
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-csi-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-csi-controller
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: linstor-csi-controller
+    subjects:
+      - kind: ServiceAccount
+        name: linstor-csi-controller
+        namespace: piraeus-datastore
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: linstor-csi-nfs-server
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-csi-nfs-server
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: linstor-csi-nfs-server
+    subjects:
+      - kind: ServiceAccount
+        name: linstor-csi-nfs-server
+        namespace: piraeus-datastore
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-csi-node
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: linstor-csi-node
+    subjects:
+      - kind: ServiceAccount
+        name: linstor-csi-node
+        namespace: piraeus-datastore
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/name: piraeus-datastore
+      name: piraeus-operator-gencert
+      namespace: piraeus-datastore
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: piraeus-operator-gencert
+    subjects:
+      - kind: ServiceAccount
+        name: piraeus-operator-gencert
+        namespace: piraeus-datastore
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/name: piraeus-datastore
+      name: piraeus-operator-leader-election-rolebinding
+      namespace: piraeus-datastore
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: piraeus-operator-leader-election-role
+    subjects:
+      - kind: ServiceAccount
+        name: piraeus-operator-controller-manager
+        namespace: piraeus-datastore
+      - kind: ServiceAccount
+        name: piraeus-operator-gencert
+        namespace: piraeus-datastore
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: satellite
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: satellite
+    subjects:
+      - kind: ServiceAccount
+        name: satellite
+        namespace: piraeus-datastore
+kind: List
+metadata:
+  resourceVersion: ""

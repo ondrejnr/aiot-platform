@@ -1,14 +1,55 @@
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
+apiVersion: v1
+items:
+  - apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      annotations: {}
+      labels:
+        konflux.konflux-ci.dev/component: cert-manager
+        konflux.konflux-ci.dev/owner: konflux-cert-manager
+      name: ca-issuer
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxCertManager
+          name: konflux-cert-manager
+          uid: 85aaf2c6-bdf3-46c0-855d-91d280ce3625
+    spec:
+      ca:
+        secretName: root-secret
+  - apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      annotations: {}
+      name: letsencrypt-prod
+    spec:
+      acme:
+        email: ondrejko1.gulkas@dpdhl.com
+        privateKeySecretRef:
+          name: letsencrypt-prod-key
+        server: https://acme-v02.api.letsencrypt.org/directory
+        solvers:
+          - http01:
+              ingress:
+                class: nginx
+  - apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      annotations: {}
+      labels:
+        konflux.konflux-ci.dev/component: cert-manager
+        konflux.konflux-ci.dev/owner: konflux-cert-manager
+      name: self-signed-cluster-issuer
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxCertManager
+          name: konflux-cert-manager
+          uid: 85aaf2c6-bdf3-46c0-855d-91d280ce3625
+    spec:
+      selfSigned: {}
+kind: List
 metadata:
-  name: letsencrypt-prod
-spec:
-  acme:
-    email: ondrejko1.gulkas@dpdhl.com
-    privateKeySecretRef:
-      name: letsencrypt-prod-key
-    server: https://acme-v02.api.letsencrypt.org/directory
-    solvers:
-    - http01:
-        ingress:
-          class: nginx
+  resourceVersion: ""

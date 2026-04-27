@@ -1,935 +1,1862 @@
 apiVersion: v1
-data:
-  01-clickhouse-01-listen.xml: "<yandex>\n    <!-- Listen wildcard address to allow\
-    \ accepting connections from other containers and host network. -->\n    <listen_host>::</listen_host>\n\
-    \    <listen_host>0.0.0.0</listen_host>\n    <listen_try>1</listen_try>\n</yandex>\n"
-  01-clickhouse-02-logger.xml: "<yandex>\n    <logger>\n        <!-- Possible levels:\
-    \ https://github.com/pocoproject/poco/blob/devel/Foundation/include/Poco/Logger.h#L105\
-    \ -->\n        <level>information</level>\n        <formatting>\n          <type>json</type>\n\
-    \        </formatting>\n        <log>/var/log/clickhouse-server/clickhouse-server.log</log>\n\
-    \        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>\n\
-    \        <size>1000M</size>\n        <count>10</count>\n        <!-- Default behavior\
-    \ is autodetection (log to console if not daemon mode and is tty) -->\n      \
-    \  <console>1</console>\n    </logger>\n</yandex>\n"
-  01-clickhouse-03-query_log.xml: "<yandex>\n    <query_log replace=\"1\">\n     \
-    \   <database>system</database>\n        <table>query_log</table>\n        <engine>Engine\
-    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
-    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </query_log>\n</yandex>\n"
-  01-clickhouse-04-part_log.xml: "<yandex>\n    <part_log replace=\"1\">\n       \
-    \ <database>system</database>\n        <table>part_log</table>\n        <engine>Engine\
-    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
-    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </part_log>\n</yandex>\n"
-  01-clickhouse-05-trace_log.xml: "<yandex>\n    <trace_log replace=\"1\">\n     \
-    \   <database>system</database>\n        <table>trace_log</table>\n        <engine>Engine\
-    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
-    \ 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </trace_log>\n</yandex>"
-  01-clickhouse-06-asynchronous_insert_log.xml: "<yandex>\n    <asynchronous_insert_log\
-    \ replace=\"1\">\n        <database>system</database>\n        <table>asynchronous_insert_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </asynchronous_insert_log>\n</yandex>\n"
-  01-clickhouse-07-asynchronous_metric_log.xml: "<yandex>\n    <asynchronous_metric_log\
-    \ replace=\"1\">\n        <database>system</database>\n        <table>asynchronous_metric_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </asynchronous_metric_log>\n</yandex>\n"
-  01-clickhouse-08-backup_log.xml: "<yandex>\n    <backup_log replace=\"1\">\n   \
-    \     <database>system</database>\n        <table>backup_log</table>\n       \
-    \ <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date\
-    \ + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </backup_log>\n</yandex>\n"
-  01-clickhouse-09-blob_storage_log.xml: "<yandex>\n    <blob_storage_log replace=\"\
-    1\">\n        <database>system</database>\n        <table>blob_storage_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </blob_storage_log>\n</yandex>\n"
-  01-clickhouse-10-crash_log.xml: "<yandex>\n    <crash_log replace=\"1\">\n     \
-    \   <database>system</database>\n        <table>crash_log</table>\n        <engine>Engine\
-    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
-    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </crash_log>\n</yandex>\n"
-  01-clickhouse-11-metric_log.xml: "<yandex>\n    <metric_log replace=\"1\">\n   \
-    \     <database>system</database>\n        <table>metric_log</table>\n       \
-    \ <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date\
-    \ + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </metric_log>\n</yandex>\n"
-  01-clickhouse-12-query_thread_log.xml: "<yandex>\n    <query_thread_log replace=\"\
-    1\">\n        <database>system</database>\n        <table>query_thread_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </query_thread_log>\n</yandex>\n"
-  01-clickhouse-13-query_views_log.xml: "<yandex>\n    <query_views_log replace=\"\
-    1\">\n        <database>system</database>\n        <table>query_views_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 15 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </query_views_log>\n</yandex>\n"
-  01-clickhouse-14-session_log.xml: "<yandex>\n    <session_log replace=\"1\">\n \
-    \       <database>system</database>\n        <table>session_log</table>\n    \
-    \    <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL\
-    \ event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </session_log>\n</yandex>\n"
-  01-clickhouse-15-zookeeper_log.xml: "<yandex>\n    <zookeeper_log replace=\"1\"\
-    >\n        <database>system</database>\n        <table>zookeeper_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </zookeeper_log>\n</yandex>\n"
-  01-clickhouse-16-processors_profile_log.xml: "<yandex>\n    <processors_profile_log\
-    \ replace=\"1\">\n        <database>system</database>\n        <table>processors_profile_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </processors_profile_log>\n</yandex>\n"
-  chop-generated-remote_servers.xml: "<yandex>\n    <remote_servers>\n        <!--\
-    \ User-specified clusters -->\n        <cluster>\n            <shard>\n      \
-    \          <internal_replication>False</internal_replication>\n              \
-    \  <replica>\n                    <host>chi-signoz-clickhouse-cluster-0-0</host>\n\
-    \                    <port>9000</port>\n                    <secure>0</secure>\n\
-    \                </replica>\n            </shard>\n        </cluster>\n      \
-    \  <!-- Autogenerated clusters -->\n        <all-replicated>\n            <shard>\n\
-    \                <internal_replication>true</internal_replication>\n         \
-    \       <replica>\n                    <host>chi-signoz-clickhouse-cluster-0-0</host>\n\
-    \                    <port>9000</port>\n                    <secure>0</secure>\n\
-    \                </replica>\n            </shard>\n        </all-replicated>\n\
-    \        <all-sharded>\n            <shard>\n                <internal_replication>false</internal_replication>\n\
-    \                <replica>\n                    <host>chi-signoz-clickhouse-cluster-0-0</host>\n\
-    \                    <port>9000</port>\n                    <secure>0</secure>\n\
-    \                </replica>\n            </shard>\n        </all-sharded>\n  \
-    \  </remote_servers>\n</yandex>\n"
-  chop-generated-settings.xml: "<yandex>\n    <format_schema_path>/etc/clickhouse-server/config.d/</format_schema_path>\n\
-    \    <max_server_memory_usage>7516192768</max_server_memory_usage>\n    <prometheus>\n\
-    \        <endpoint>/metrics</endpoint>\n        <port>9363</port>\n    </prometheus>\n\
-    \    <user_defined_executable_functions_config>/etc/clickhouse-server/functions/custom-functions.xml</user_defined_executable_functions_config>\n\
-    \    <user_scripts_path>/var/lib/clickhouse/user_scripts/</user_scripts_path>\n\
-    </yandex>\n"
-  crash.xml: "<clickhouse>\n  <send_crash_reports replace=\"replace\">\n    <enabled>false</enabled>\n\
-    \  </send_crash_reports>\n</clickhouse>\n"
-  events.proto: "syntax = \"proto3\";\nmessage Event {\n  string uuid = 1;\n  string\
-    \ event = 2;\n  string properties = 3;\n  string timestamp = 4;\n  uint64 team_id\
-    \ = 5;\n  string distinct_id = 6;\n  string created_at = 7;\n  string elements_chain\
-    \ = 8;\n}\n    \n"
-  formatting.xml: "<clickhouse>\n  <logger>\n    <formatting replace=\"replace\">\n\
-    \      <type>json</type>\n      <names>\n        <date_time>date_time</date_time>\n\
-    \        <thread_name>thread_name</thread_name>\n        <thread_id>thread_id</thread_id>\n\
-    \        <level>level</level>\n        <query_id>query_id</query_id>\n       \
-    \ <logger_name>logger_name</logger_name>\n        <message>message</message>\n\
-    \        <source_file>source_file</source_file>\n        <source_line>source_line</source_line>\n\
-    \      </names>\n    </formatting>\n  </logger>\n</clickhouse>\n"
-  load.xml: "<clickhouse>\n  <async_load_databases replace=\"replace\">false</async_load_databases>\n\
-    </clickhouse>\n"
-  system_log.xml: "<clickhouse>\n  <text_log>\n    <ttl>event_date + INTERVAL 3 DAY\
-    \ DELETE</ttl>\n  </text_log>\n  <latency_log>\n    <ttl>event_date + INTERVAL\
-    \ 3 DAY DELETE</ttl>\n  </latency_log>\n  <error_log>\n    <ttl>event_date + INTERVAL\
-    \ 7 DAY DELETE</ttl>\n  </error_log>\n  <query_metric_log>\n    <ttl>event_date\
-    \ + INTERVAL 3 DAY DELETE</ttl>\n  </query_metric_log>\n</clickhouse>\n"
-kind: ConfigMap
+items:
+  - apiVersion: v1
+    data:
+      dashboard.json: '{"title": "AIOT \u2014 Everything", "description": "Comprehensive dashboard: nodes, pods, services (RED), DB, ingress, ML, storage, logs, traces", "tags": ["aiot", "platform", "everything"], "layout": [{"i": "1581f986-64bd-48c5-9b82-0f34eb3b8a22", "x": 0, "y": 0, "w": 2, "h": 2, "moved": false, "static": false}, {"i": "b6f402e1-0eab-4078-af00-5f3780fafdf5", "x": 2, "y": 0, "w": 2, "h": 2, "moved": false, "static": false}, {"i": "02c9698c-8a55-4363-be04-3c6323a68f40", "x": 4, "y": 0, "w": 2, "h": 2, "moved": false, "static": false}, {"i": "d852634e-cb7b-4eb2-a684-3b48b6a0788a", "x": 6, "y": 0, "w": 2, "h": 2, "moved": false, "static": false}, {"i": "32899351-f3f3-4e88-a44d-e42e09769d10", "x": 8, "y": 0, "w": 2, "h": 2, "moved": false, "static": false}, {"i": "0e4fd711-f76e-4e87-a726-a1b2892020a0", "x": 10, "y": 0, "w": 2, "h": 2, "moved": false, "static": false}, {"i": "07f0422a-2fe7-46f7-885d-f92698bad7b4", "x": 0, "y": 2, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "19f6dda9-1363-403e-908c-9f1c74275422", "x": 6, "y": 2, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "864ee692-7e90-4300-a46f-6a9ba9c1818a", "x": 0, "y": 5, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "ec683f32-94c3-4eb1-b450-40defce950cd", "x": 6, "y": 5, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "54e4ec82-9925-4921-aaba-8fd196a05fe2", "x": 0, "y": 8, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "005162c1-3782-4b30-919a-b56ace18a89c", "x": 6, "y": 8, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "6bfdbdab-d8db-4df1-a6fe-4ca90d5452a9", "x": 0, "y": 11, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "7609de91-284f-414d-a503-562002a07154", "x": 6, "y": 11, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "7d077e96-9074-436c-a2ed-cbdd34dde561", "x": 0, "y": 14, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "8795cffd-6dfa-4ab2-a4a6-1a4749f21bbb", "x": 6, "y": 14, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "5afabc6e-32f9-4b8c-83c9-78199299479f", "x": 0, "y": 17, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "a114ad28-95fc-4950-a382-15b026f738f2", "x": 6, "y": 17, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "58545140-db72-44d8-9aa7-fc8797fd4f19", "x": 0, "y": 20, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "ad6166e0-c0a4-4973-bd7b-9c44108d55f1", "x": 6, "y": 20, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "ecdba4b7-72fe-4bd9-af0c-13351e8da2c9", "x": 0, "y": 23, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "96fa3527-efb2-48df-87fa-66728dd1c093", "x": 6, "y": 23, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "1224da84-1e01-4d76-af66-60705cdd03ef", "x": 0, "y": 26, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "bc98757a-b316-4425-8398-fbec6498114a", "x": 6, "y": 26, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "80a0709c-9ce6-4f62-b03f-71109b301c26", "x": 0, "y": 29, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "0a9690b0-03bd-4edf-a053-7eb1b932350f", "x": 6, "y": 29, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "76b7f633-fde4-48e8-b589-a581a50a9f14", "x": 0, "y": 32, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "d57a80b0-35a0-4952-9ee1-633c8b6646f4", "x": 6, "y": 32, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "8028abc4-b0c1-4264-b0f8-c8f8a1d4cfd8", "x": 0, "y": 35, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "3b025a03-34f8-4e93-b0ce-39aacc12f32d", "x": 6, "y": 35, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "d9d9708d-e949-4845-81c7-9de9a1bfb4cf", "x": 0, "y": 38, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "268fda35-9fb3-4351-bd82-bef48a6a9e41", "x": 6, "y": 38, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "d7ed0927-7058-4658-b0ac-dc904373be5e", "x": 0, "y": 41, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "f5614371-e373-420f-a6d1-eb6f6a6409f8", "x": 6, "y": 41, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "52c5f2da-2835-4ce9-8af6-d35cb2d59af2", "x": 0, "y": 44, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "61405a3b-c971-4c9c-af95-4d3517cf9366", "x": 6, "y": 44, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "2f950d73-6054-4c60-ae37-d290aa50a18d", "x": 0, "y": 47, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "9d0ec1bc-17f9-4733-a394-b6e9bbe70e71", "x": 6, "y": 47, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "658032ad-d2bb-4f6c-9c5e-559a322b0687", "x": 0, "y": 50, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "1f4d28fe-2368-4a62-b3b9-41f0066bb4a8", "x": 6, "y": 50, "w": 6, "h": 3, "moved": false, "static": false}, {"i": "e19abb99-1242-47ad-86ed-53d960a2f751", "x": 0, "y": 53, "w": 6, "h": 3, "moved": false, "static": false}], "widgets": [{"id": "1581f986-64bd-48c5-9b82-0f34eb3b8a22", "title": "Nodes Ready", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "value", "yAxisUnit": "short", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.node.condition_ready", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.node.condition_ready--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "b19a42d3-ec33-4203-a514-23917058362f"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "b6f402e1-0eab-4078-af00-5f3780fafdf5", "title": "Nodes with DiskPressure", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "value", "yAxisUnit": "short", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.node.condition_disk_pressure", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.node.condition_disk_pressure--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "43003bca-5f3c-4148-9b81-906b6d9e8265"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "02c9698c-8a55-4363-be04-3c6323a68f40", "title": "Nodes with MemoryPressure", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "value", "yAxisUnit": "short", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.node.condition_memory_pressure", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.node.condition_memory_pressure--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "b6ddcd09-ac60-49bd-947a-8923d734ffc4"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "d852634e-cb7b-4eb2-a684-3b48b6a0788a", "title": "Pods Running", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "value", "yAxisUnit": "short", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.pod.phase", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.pod.phase--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "sum", "functions": [], "filters": {"items": [{"key": {"key": "phase", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "phase--string--tag--false"}, "op": "=", "value": "Running"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "93e27c14-901e-4f7f-996d-5b6e46319ada"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "32899351-f3f3-4e88-a44d-e42e09769d10", "title": "Pods Pending", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "value", "yAxisUnit": "short", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.pod.phase", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.pod.phase--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "sum", "functions": [], "filters": {"items": [{"key": {"key": "phase", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "phase--string--tag--false"}, "op": "=", "value": "Pending"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "9591362d-da2a-44d0-8a3d-36137b6edbd8"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "0e4fd711-f76e-4e87-a726-a1b2892020a0", "title": "Pods Failed", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "value", "yAxisUnit": "short", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.pod.phase", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.pod.phase--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "sum", "functions": [], "filters": {"items": [{"key": {"key": "phase", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "phase--string--tag--false"}, "op": "=", "value": "Failed"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "c4232432-8617-481d-a33c-5b7b670ad35c"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "07f0422a-2fe7-46f7-885d-f92698bad7b4", "title": "Node CPU usage", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "percentunit", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "avg", "aggregateAttribute": {"key": "k8s.node.cpu.usage", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.node.cpu.usage--float64--Gauge--true"}, "timeAggregation": "avg", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_node_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_node_name--string--tag--false"}], "legend": "{{k8s_node_name}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "e1ee20cc-75ec-4faa-a2f4-960c55d02591"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "19f6dda9-1363-403e-908c-9f1c74275422", "title": "Node Memory usage (bytes)", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "bytes", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "avg", "aggregateAttribute": {"key": "k8s.node.memory.usage", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.node.memory.usage--float64--Gauge--true"}, "timeAggregation": "avg", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_node_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_node_name--string--tag--false"}], "legend": "{{k8s_node_name}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "42c3c294-14f5-41d1-a4ee-bdf3f985a9f4"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "864ee692-7e90-4300-a46f-6a9ba9c1818a", "title": "Node Filesystem usage", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "bytes", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "avg", "aggregateAttribute": {"key": "k8s.node.filesystem.usage", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.node.filesystem.usage--float64--Gauge--true"}, "timeAggregation": "avg", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_node_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_node_name--string--tag--false"}], "legend": "{{k8s_node_name}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "28efb2c1-d98f-41ec-9782-aecbc4ead83b"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "ec683f32-94c3-4eb1-b450-40defce950cd", "title": "Node Network I/O (bytes/s)", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "Bps", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "rate", "aggregateAttribute": {"key": "k8s.node.network.io", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.node.network.io--float64--Gauge--true"}, "timeAggregation": "rate", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_node_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_node_name--string--tag--false"}, {"key": "direction", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "direction--string--tag--false"}], "legend": "{{k8s_node_name}}-{{direction}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "6c8cdb24-85d7-4c2d-bc5b-46ec9858d361"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "54e4ec82-9925-4921-aaba-8fd196a05fe2", "title": "Pod CPU by namespace", "description": "", "isStacked": true, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "short", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "sum", "aggregateAttribute": {"key": "k8s.pod.cpu.usage", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.pod.cpu.usage--float64--Gauge--true"}, "timeAggregation": "sum", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}], "legend": "{{k8s_namespace_name}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "84f38cd3-eddd-47a4-80df-453c11597c18"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "005162c1-3782-4b30-919a-b56ace18a89c", "title": "Pod Memory by namespace", "description": "", "isStacked": true, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "bytes", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "avg", "aggregateAttribute": {"key": "k8s.pod.memory.usage", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.pod.memory.usage--float64--Gauge--true"}, "timeAggregation": "avg", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}], "legend": "{{k8s_namespace_name}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "f4a230a6-4bb1-4c8d-9c9b-ef03fe9ae67e"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "6bfdbdab-d8db-4df1-a6fe-4ca90d5452a9", "title": "Top 10 pods \u2014 CPU limit utilization", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "percentunit", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "avg", "aggregateAttribute": {"key": "k8s.pod.cpu_limit_utilization", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.pod.cpu_limit_utilization--float64--Gauge--true"}, "timeAggregation": "avg", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_pod_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_pod_name--string--tag--false"}], "legend": "{{k8s_pod_name}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "c02950c7-7b22-4b2b-84dc-db76cf05259a"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "7609de91-284f-414d-a503-562002a07154", "title": "Top 10 pods \u2014 Memory limit utilization", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "percentunit", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "avg", "aggregateAttribute": {"key": "k8s.pod.memory_limit_utilization", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.pod.memory_limit_utilization--float64--Gauge--true"}, "timeAggregation": "avg", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_pod_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_pod_name--string--tag--false"}], "legend": "{{k8s_pod_name}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "f7e292ef-6e31-47c7-9f6c-98b602da9ff3"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "7d077e96-9074-436c-a2ed-cbdd34dde561", "title": "Container restarts (24h) \u2014 top 20", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "table", "yAxisUnit": "short", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "max", "aggregateAttribute": {"key": "k8s.container.restarts", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.container.restarts--float64--Gauge--true"}, "timeAggregation": "max", "spaceAggregation": "max", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}, {"key": "k8s_pod_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_pod_name--string--tag--false"}, {"key": "k8s_container_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_container_name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "108c7949-e1ab-48c1-b881-b62c09866597"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "8795cffd-6dfa-4ab2-a4a6-1a4749f21bbb", "title": "Deployments \u2014 desired vs available", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "table", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.deployment.desired", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.deployment.desired--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "max", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}, {"key": "k8s_deployment_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_deployment_name--string--tag--false"}], "legend": "desired", "reduceTo": "avg"}, {"queryName": "B", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.deployment.available", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.deployment.available--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "max", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "B", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}, {"key": "k8s_deployment_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_deployment_name--string--tag--false"}], "legend": "available", "reduceTo": "avg"}], "queryFormulas": []}, "id": "687d9955-e341-46bc-9101-03ed82221aa7"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "5afabc6e-32f9-4b8c-83c9-78199299479f", "title": "StatefulSets \u2014 ready vs desired", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "table", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.statefulset.desired_pods", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.statefulset.desired_pods--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "max", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}, {"key": "k8s_statefulset_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_statefulset_name--string--tag--false"}], "legend": "desired", "reduceTo": "avg"}, {"queryName": "B", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.statefulset.ready_pods", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.statefulset.ready_pods--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "max", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "B", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}, {"key": "k8s_statefulset_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_statefulset_name--string--tag--false"}], "legend": "ready", "reduceTo": "avg"}], "queryFormulas": []}, "id": "e465c1ce-e417-494a-9efe-ce8561ecf523"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "a114ad28-95fc-4950-a382-15b026f738f2", "title": "Jobs \u2014 failed pods", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "table", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.job.failed_pods", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.job.failed_pods--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "max", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}, {"key": "k8s_job_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_job_name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "82c01e4f-1c45-419d-8b13-16cf0095e5d7"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "58545140-db72-44d8-9aa7-fc8797fd4f19", "title": "Request rate (req/s) per service", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "rate", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "rate", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "1b447fc2-dc03-458b-88ff-5272c161851e"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "ad6166e0-c0a4-4973-bd7b-9c44108d55f1", "title": "Latency p95 per service (ms)", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "p95", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "p95", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "4e6d258d-74a3-4938-b335-d58d23dc075f"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "ecdba4b7-72fe-4bd9-af0c-13351e8da2c9", "title": "Latency p99 per service (ms)", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "p99", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "p99", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "1b9f1de2-d097-4f99-beba-c6fa655fe871"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "96fa3527-efb2-48df-87fa-66728dd1c093", "title": "Error rate per service", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "rate", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "rate", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "hasError", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "hasError--string--tag--false"}, "op": "=", "value": "true"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "e9502639-324a-4dcf-9709-45e872a46813"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "1224da84-1e01-4d76-af66-60705cdd03ef", "title": "Span volume per service (1h)", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "count", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "count", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "b28849c5-f07d-4e39-81fd-b63c2d85ba73"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "bc98757a-b316-4425-8398-fbec6498114a", "title": "Top 20 slowest operations (p99)", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "table", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "p99", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "p99", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, {"key": "name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "0aa51917-49b5-4955-a5e4-849fe7498871"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "80a0709c-9ce6-4f62-b03f-71109b301c26", "title": "Top 20 error operations", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "table", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "count", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "count", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "hasError", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "hasError--string--tag--false"}, "op": "=", "value": "true"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, {"key": "name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "9bfb1266-6efe-4af2-900b-acb16e3b0b1e"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "0a9690b0-03bd-4edf-a053-7eb1b932350f", "title": "DB latency p95 per service", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "ns", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "rate", "aggregateAttribute": {"key": "signoz_db_latency_sum", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "signoz_db_latency_sum--float64--Gauge--true"}, "timeAggregation": "rate", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "service_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "service_name--string--tag--false"}], "legend": "{{service_name}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "84f50108-5657-4295-ab95-ea4ca3ed46db"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "76b7f633-fde4-48e8-b589-a581a50a9f14", "title": "Top 20 slow SQL (p99)", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "table", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "p99", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "p99", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "dbSystem", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "dbSystem--string--tag--false"}, "op": "exists", "value": ""}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, {"key": "db.statement", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "db.statement--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "53feb20c-3878-445d-a899-691fa3f016e3"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "d57a80b0-35a0-4952-9ee1-633c8b6646f4", "title": "Ingress req/s by endpoint", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "rate", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "rate", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, "op": "=", "value": "istio-ingressgateway.istio-system"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "http.route", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "http.route--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "4f16f4ea-7b58-4d61-be23-56ed77fa5b6c"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "8028abc4-b0c1-4264-b0f8-c8f8a1d4cfd8", "title": "Ingress p95 latency by endpoint", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "p95", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "p95", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, "op": "=", "value": "istio-ingressgateway.istio-system"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "http.route", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "http.route--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "261a31f6-f29e-48da-8352-427a31acf5b0"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "3b025a03-34f8-4e93-b0ce-39aacc12f32d", "title": "Ingress 5xx count", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "count", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "count", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, "op": "=", "value": "istio-ingressgateway.istio-system"}, {"key": {"key": "http.status_code", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "http.status_code--string--tag--false"}, "op": ">=", "value": "500"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "http.route", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "http.route--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "aabbac65-41a5-48a9-8707-e8db5c8f7d27"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "d9d9708d-e949-4845-81c7-9de9a1bfb4cf", "title": "KServe inference req/s", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "rate", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "rate", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, "op": "=", "value": "kserve.kubeflow"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "43cb3ba5-6e6b-4448-aad8-5cb724f4fbc2"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "268fda35-9fb3-4351-bd82-bef48a6a9e41", "title": "KServe latency p95", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "p95", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "p95", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, "op": "=", "value": "kserve.kubeflow"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "f85a3d01-b7e1-4696-a276-d82c11fec66f"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "d7ed0927-7058-4658-b0ac-dc904373be5e", "title": "digital-twin req/s", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "rate", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "rate", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, "op": "=", "value": "digital-twin"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "1c98c8dc-a6b0-49e1-9dbf-f26f556bb3ce"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "f5614371-e373-420f-a6d1-eb6f6a6409f8", "title": "digital-twin latency p95", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "traces", "aggregateOperator": "p95", "aggregateAttribute": {"key": "durationNano", "dataType": "float64", "type": "tag", "isColumn": true}, "timeAggregation": "p95", "spaceAggregation": "avg", "functions": [], "filters": {"items": [{"key": {"key": "serviceName", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "serviceName--string--tag--false"}, "op": "=", "value": "digital-twin"}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": 20, "orderBy": [], "groupBy": [{"key": "name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "6136d0a9-9b0f-41cf-8a60-6f0de1d91775"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "52c5f2da-2835-4ce9-8af6-d35cb2d59af2", "title": "PVC usage (available bytes)", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "bytes", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "avg", "aggregateAttribute": {"key": "k8s.volume.available", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.volume.available--float64--Gauge--true"}, "timeAggregation": "avg", "spaceAggregation": "avg", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_persistentvolumeclaim_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_persistentvolumeclaim_name--string--tag--false"}, {"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}], "legend": "{{k8s_namespace_name}}/{{k8s_persistentvolumeclaim_name}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "590f5058-83e7-40b4-a61c-93b9a1e7fc9a"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "61405a3b-c971-4c9c-af95-4d3517cf9366", "title": "PVC capacity", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "table", "yAxisUnit": "bytes", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.volume.capacity", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.volume.capacity--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "max", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_persistentvolumeclaim_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_persistentvolumeclaim_name--string--tag--false"}, {"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}], "legend": "", "reduceTo": "avg"}, {"queryName": "B", "dataSource": "metrics", "aggregateOperator": "latest", "aggregateAttribute": {"key": "k8s.volume.available", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "k8s.volume.available--float64--Gauge--true"}, "timeAggregation": "latest", "spaceAggregation": "max", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "B", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_persistentvolumeclaim_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_persistentvolumeclaim_name--string--tag--false"}, {"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "0d86bab5-7a7a-44a7-a4dd-4df62fc82039"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "2f950d73-6054-4c60-ae37-d290aa50a18d", "title": "Node disk I/O", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "Bps", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "rate", "aggregateAttribute": {"key": "system.disk.io", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "system.disk.io--float64--Gauge--true"}, "timeAggregation": "rate", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "host_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "host_name--string--tag--false"}, {"key": "direction", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "direction--string--tag--false"}], "legend": "{{host_name}}-{{direction}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "c53625c2-6d76-4f5a-a05d-afc1ce6971b8"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "9d0ec1bc-17f9-4733-a394-b6e9bbe70e71", "title": "Node disk IOPS", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "iops", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "metrics", "aggregateOperator": "rate", "aggregateAttribute": {"key": "system.disk.operations", "dataType": "float64", "type": "Gauge", "isColumn": true, "isJSON": false, "id": "system.disk.operations--float64--Gauge--true"}, "timeAggregation": "rate", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "host_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "host_name--string--tag--false"}, {"key": "direction", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "direction--string--tag--false"}], "legend": "{{host_name}}-{{direction}}", "reduceTo": "avg"}], "queryFormulas": []}, "id": "9daaa09c-696b-4760-bcc6-c8872fa870b8"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "658032ad-d2bb-4f6c-9c5e-559a322b0687", "title": "Log rate by namespace", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "logs", "aggregateOperator": "count", "aggregateAttribute": {"key": ""}, "timeAggregation": "count", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "2a65cadb-2f78-43b9-ae49-ccda900d9269"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "1f4d28fe-2368-4a62-b3b9-41f0066bb4a8", "title": "Error/warning log rate", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "graph", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "logs", "aggregateOperator": "count", "aggregateAttribute": {"key": ""}, "timeAggregation": "count", "spaceAggregation": "sum", "functions": [], "filters": {"items": [{"key": {"key": "severity_text", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "severity_text--string--tag--false"}, "op": "in", "value": ["ERROR", "WARN", "FATAL", "Error", "Warning"]}], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "5da89ee1-63e8-423e-bbe0-bc5a99f1a9ff"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}, {"id": "e19abb99-1242-47ad-86ed-53d960a2f751", "title": "Top 20 noisy pods (log rate)", "description": "", "isStacked": false, "nullZeroValues": "zero", "opacity": "1", "panelTypes": "table", "yAxisUnit": "", "query": {"queryType": "builder", "promql": [], "clickhouse_sql": [], "builder": {"queryData": [{"queryName": "A", "dataSource": "logs", "aggregateOperator": "count", "aggregateAttribute": {"key": ""}, "timeAggregation": "count", "spaceAggregation": "sum", "functions": [], "filters": {"items": [], "op": "AND"}, "expression": "A", "disabled": false, "stepInterval": 60, "having": [], "limit": null, "orderBy": [], "groupBy": [{"key": "k8s_namespace_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_namespace_name--string--tag--false"}, {"key": "k8s_pod_name", "dataType": "string", "type": "tag", "isColumn": false, "isJSON": false, "id": "k8s_pod_name--string--tag--false"}], "legend": "", "reduceTo": "avg"}], "queryFormulas": []}, "id": "ef49613a-d9d1-4799-bada-692ee99ff0a4"}, "timePreferance": "GLOBAL_TIME", "softMin": 0, "softMax": 0}], "variables": {}}'
+    kind: ConfigMap
+    metadata:
+      annotations: {}
+      labels:
+        managed-by: aiot-ops
+      name: aiot-dashboard-backup
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      seed.sh: |
+        #!/bin/sh
+        set -e
+        DB=/var/lib/signoz/signoz.db
+        DASH_ID=d912d23b-055d-4116-a0cf-e77f09dace73
+
+        if [ ! -f "$DB" ]; then
+          echo "DB not initialized yet — first-run, skipping seed"
+          exit 0
+        fi
+
+        COUNT=$(sqlite3 "$DB" "SELECT count(*) FROM dashboard WHERE id='$DASH_ID'" 2>/dev/null || echo 0)
+        if [ "$COUNT" = "1" ]; then
+          echo "AIOT dashboard already present"
+          exit 0
+        fi
+
+        echo "Seeding AIOT dashboard..."
+        ORG_ID=$(sqlite3 "$DB" "SELECT id FROM organizations LIMIT 1")
+        USER_ID=$(sqlite3 "$DB" "SELECT id FROM users WHERE is_root=1 LIMIT 1")
+        NOW=$(date -u +"%Y-%m-%d %H:%M:%S+00:00")
+
+        if [ -z "$ORG_ID" ] || [ -z "$USER_ID" ]; then
+          echo "org_id or root user not yet present — skipping seed (will retry on next pod start)"
+          exit 0
+        fi
+
+        cp /backup/dashboard.json /tmp/dash.json
+        cat > /tmp/insert.sql <<SQLEOF
+        INSERT INTO dashboard (id, created_at, updated_at, created_by, updated_by, locked, org_id, data)
+        VALUES ('$DASH_ID', '$NOW', '$NOW', '$USER_ID', '$USER_ID', 0, '$ORG_ID', readfile('/tmp/dash.json'));
+        SQLEOF
+        sqlite3 "$DB" < /tmp/insert.sql
+        echo "AIOT dashboard seeded (ID=$DASH_ID)"
+    kind: ConfigMap
+    metadata:
+      annotations: {}
+      name: aiot-dashboard-seed-script
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      01-clickhouse-01-listen.xml: |
+        <yandex>
+            <!-- Listen wildcard address to allow accepting connections from other containers and host network. -->
+            <listen_host>::</listen_host>
+            <listen_host>0.0.0.0</listen_host>
+            <listen_try>1</listen_try>
+        </yandex>
+      01-clickhouse-02-logger.xml: |
+        <yandex>
+            <logger>
+                <!-- Possible levels: https://github.com/pocoproject/poco/blob/devel/Foundation/include/Poco/Logger.h#L105 -->
+                <level>information</level>
+                <formatting>
+                  <type>json</type>
+                </formatting>
+                <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+                <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+                <size>1000M</size>
+                <count>10</count>
+                <!-- Default behavior is autodetection (log to console if not daemon mode and is tty) -->
+                <console>1</console>
+            </logger>
+        </yandex>
+      01-clickhouse-03-query_log.xml: |
+        <yandex>
+            <query_log replace="1">
+                <database>system</database>
+                <table>query_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </query_log>
+        </yandex>
+      01-clickhouse-04-part_log.xml: |
+        <yandex>
+            <part_log replace="1">
+                <database>system</database>
+                <table>part_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </part_log>
+        </yandex>
+      01-clickhouse-05-trace_log.xml: |-
+        <yandex>
+            <trace_log replace="1">
+                <database>system</database>
+                <table>trace_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </trace_log>
+        </yandex>
+      01-clickhouse-06-asynchronous_insert_log.xml: |
+        <yandex>
+            <asynchronous_insert_log replace="1">
+                <database>system</database>
+                <table>asynchronous_insert_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </asynchronous_insert_log>
+        </yandex>
+      01-clickhouse-07-asynchronous_metric_log.xml: |
+        <yandex>
+            <asynchronous_metric_log replace="1">
+                <database>system</database>
+                <table>asynchronous_metric_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </asynchronous_metric_log>
+        </yandex>
+      01-clickhouse-08-backup_log.xml: |
+        <yandex>
+            <backup_log replace="1">
+                <database>system</database>
+                <table>backup_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </backup_log>
+        </yandex>
+      01-clickhouse-09-blob_storage_log.xml: |
+        <yandex>
+            <blob_storage_log replace="1">
+                <database>system</database>
+                <table>blob_storage_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </blob_storage_log>
+        </yandex>
+      01-clickhouse-10-crash_log.xml: |
+        <yandex>
+            <crash_log replace="1">
+                <database>system</database>
+                <table>crash_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </crash_log>
+        </yandex>
+      01-clickhouse-11-metric_log.xml: |
+        <yandex>
+            <metric_log replace="1">
+                <database>system</database>
+                <table>metric_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </metric_log>
+        </yandex>
+      01-clickhouse-12-query_thread_log.xml: |
+        <yandex>
+            <query_thread_log replace="1">
+                <database>system</database>
+                <table>query_thread_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </query_thread_log>
+        </yandex>
+      01-clickhouse-13-query_views_log.xml: |
+        <yandex>
+            <query_views_log replace="1">
+                <database>system</database>
+                <table>query_views_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 15 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </query_views_log>
+        </yandex>
+      01-clickhouse-14-session_log.xml: |
+        <yandex>
+            <session_log replace="1">
+                <database>system</database>
+                <table>session_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </session_log>
+        </yandex>
+      01-clickhouse-15-zookeeper_log.xml: |
+        <yandex>
+            <zookeeper_log replace="1">
+                <database>system</database>
+                <table>zookeeper_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </zookeeper_log>
+        </yandex>
+      01-clickhouse-16-processors_profile_log.xml: |
+        <yandex>
+            <processors_profile_log replace="1">
+                <database>system</database>
+                <table>processors_profile_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </processors_profile_log>
+        </yandex>
+      chop-generated-remote_servers.xml: |
+        <yandex>
+            <remote_servers>
+                <!-- User-specified clusters -->
+                <cluster>
+                    <shard>
+                        <internal_replication>False</internal_replication>
+                        <replica>
+                            <host>chi-signoz-clickhouse-cluster-0-0</host>
+                            <port>9000</port>
+                            <secure>0</secure>
+                        </replica>
+                    </shard>
+                </cluster>
+                <!-- Autogenerated clusters -->
+                <all-replicated>
+                    <shard>
+                        <internal_replication>true</internal_replication>
+                        <replica>
+                            <host>chi-signoz-clickhouse-cluster-0-0</host>
+                            <port>9000</port>
+                            <secure>0</secure>
+                        </replica>
+                    </shard>
+                </all-replicated>
+                <all-sharded>
+                    <shard>
+                        <internal_replication>false</internal_replication>
+                        <replica>
+                            <host>chi-signoz-clickhouse-cluster-0-0</host>
+                            <port>9000</port>
+                            <secure>0</secure>
+                        </replica>
+                    </shard>
+                </all-sharded>
+            </remote_servers>
+        </yandex>
+      chop-generated-settings.xml: |
+        <yandex>
+            <format_schema_path>/etc/clickhouse-server/config.d/</format_schema_path>
+            <max_server_memory_usage>7516192768</max_server_memory_usage>
+            <prometheus>
+                <endpoint>/metrics</endpoint>
+                <port>9363</port>
+            </prometheus>
+            <user_defined_executable_functions_config>/etc/clickhouse-server/functions/custom-functions.xml</user_defined_executable_functions_config>
+            <user_scripts_path>/var/lib/clickhouse/user_scripts/</user_scripts_path>
+        </yandex>
+      crash.xml: |
+        <clickhouse>
+          <send_crash_reports replace="replace">
+            <enabled>false</enabled>
+          </send_crash_reports>
+        </clickhouse>
+      events.proto: "syntax = \"proto3\";\nmessage Event {\n  string uuid = 1;\n  string event = 2;\n  string properties = 3;\n  string timestamp = 4;\n  uint64 team_id = 5;\n  string distinct_id = 6;\n  string created_at = 7;\n  string elements_chain = 8;\n}\n    \n"
+      formatting.xml: |
+        <clickhouse>
+          <logger>
+            <formatting replace="replace">
+              <type>json</type>
+              <names>
+                <date_time>date_time</date_time>
+                <thread_name>thread_name</thread_name>
+                <thread_id>thread_id</thread_id>
+                <level>level</level>
+                <query_id>query_id</query_id>
+                <logger_name>logger_name</logger_name>
+                <message>message</message>
+                <source_file>source_file</source_file>
+                <source_line>source_line</source_line>
+              </names>
+            </formatting>
+          </logger>
+        </clickhouse>
+      load.xml: |
+        <clickhouse>
+          <async_load_databases replace="replace">false</async_load_databases>
+        </clickhouse>
+      system_log.xml: |
+        <clickhouse>
+          <text_log>
+            <ttl>event_date + INTERVAL 3 DAY DELETE</ttl>
+          </text_log>
+          <latency_log>
+            <ttl>event_date + INTERVAL 3 DAY DELETE</ttl>
+          </latency_log>
+          <error_log>
+            <ttl>event_date + INTERVAL 7 DAY DELETE</ttl>
+          </error_log>
+          <query_metric_log>
+            <ttl>event_date + INTERVAL 3 DAY DELETE</ttl>
+          </query_metric_log>
+        </clickhouse>
+    kind: ConfigMap
+    metadata:
+      annotations:
+        clickhouse-operator-reconcile: force-2
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: clickhouse
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/ConfigMap: ChiCommon
+        clickhouse.altinity.com/app: chop
+        clickhouse.altinity.com/chi: signoz-clickhouse
+        clickhouse.altinity.com/namespace: signoz
+        clickhouse.altinity.com/object-version: 3af64c7190a4cae2396bd20c110294e02865d6c1
+        helm.sh/chart: clickhouse-24.1.18
+      name: chi-signoz-clickhouse-common-configd
+      namespace: signoz
+      ownerReferences:
+        - apiVersion: clickhouse.altinity.com/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: ClickHouseInstallation
+          name: signoz-clickhouse
+          uid: 58deef7b-2779-48e7-b592-a6996e3c1434
+  - apiVersion: v1
+    data:
+      01-clickhouse-user.xml: |
+        <yandex>
+            <users>
+                <clickhouse_operator>
+                    <networks>
+                        <ip>127.0.0.1</ip>
+                    </networks>
+                    <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>
+                    <profile>clickhouse_operator</profile>
+                    <quota>default</quota>
+                </clickhouse_operator>
+            </users>
+            <profiles>
+                <clickhouse_operator>
+                    <log_queries>0</log_queries>
+                    <skip_unavailable_shards>1</skip_unavailable_shards>
+                    <http_connection_timeout>10</http_connection_timeout>
+                </clickhouse_operator>
+            </profiles>
+        </yandex>
+      02-clickhouse-default-profile.xml: |
+        <yandex>
+          <profiles>
+            <default>
+              <log_queries>1</log_queries>
+              <connect_timeout_with_failover_ms>1000</connect_timeout_with_failover_ms>
+              <distributed_aggregation_memory_efficient>1</distributed_aggregation_memory_efficient>
+              <parallel_view_processing>1</parallel_view_processing>
+            </default>
+          </profiles>
+        </yandex>
+      03-database-ordinary.xml: |
+        <yandex>
+            <profiles>
+                <default>
+                    <default_database_engine>Ordinary</default_database_engine>
+                </default>
+            </profiles>
+        </yandex>
+      chop-generated-profiles.xml: |
+        <yandex>
+            <profiles>
+                <admin>
+                    <query_plan_max_limit_for_lazy_materialization>0</query_plan_max_limit_for_lazy_materialization>
+                    <secondary_indices_enable_bulk_filtering>0</secondary_indices_enable_bulk_filtering>
+                </admin>
+                <default>
+                    <allow_experimental_window_functions>1</allow_experimental_window_functions>
+                    <allow_nondeterministic_mutations>1</allow_nondeterministic_mutations>
+                    <query_plan_max_limit_for_lazy_materialization>0</query_plan_max_limit_for_lazy_materialization>
+                    <secondary_indices_enable_bulk_filtering>0</secondary_indices_enable_bulk_filtering>
+                </default>
+            </profiles>
+        </yandex>
+      chop-generated-users.xml: |
+        <yandex>
+            <users>
+                <admin>
+                    <networks>
+                        <host_regexp>(chi-signoz-clickhouse-[^.]+\d+-\d+|clickhouse\-signoz-clickhouse)\.signoz\.svc\.cluster\.local$</host_regexp>
+                        <ip>::1</ip>
+                        <ip>127.0.0.1</ip>
+                        <ip>10.0.0.0/8</ip>
+                        <ip>100.64.0.0/10</ip>
+                        <ip>172.16.0.0/12</ip>
+                        <ip>192.0.0.0/24</ip>
+                        <ip>198.18.0.0/15</ip>
+                        <ip>192.168.0.0/16</ip>
+                    </networks>
+                    <password_sha256_hex>da90cf0836f8ac8f8a298293eafe856634b622df0c1ac2c82538f2cbe5406a6c</password_sha256_hex>
+                    <profile>default</profile>
+                    <quota>default</quota>
+                </admin>
+                <clickhouse_operator>
+                    <networks>
+                        <ip>10.245.1.103</ip>
+                    </networks>
+                    <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>
+                    <profile>clickhouse_operator</profile>
+                </clickhouse_operator>
+                <default>
+                    <networks>
+                        <host_regexp>(chi-signoz-clickhouse-[^.]+\d+-\d+|clickhouse\-signoz-clickhouse)\.signoz\.svc\.cluster\.local$</host_regexp>
+                        <ip>::1</ip>
+                        <ip>127.0.0.1</ip>
+                        <ip>10.245.3.203</ip>
+                    </networks>
+                    <profile>default</profile>
+                    <quota>default</quota>
+                </default>
+            </users>
+        </yandex>
+    kind: ConfigMap
+    metadata:
+      annotations:
+        clickhouse-operator-reconcile: force-2
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: clickhouse
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/ConfigMap: ChiCommonUsers
+        clickhouse.altinity.com/app: chop
+        clickhouse.altinity.com/chi: signoz-clickhouse
+        clickhouse.altinity.com/namespace: signoz
+        clickhouse.altinity.com/object-version: 5f5d22002aded679beeba397858ffb169d5351a0
+        helm.sh/chart: clickhouse-24.1.18
+      name: chi-signoz-clickhouse-common-usersd
+      namespace: signoz
+      ownerReferences:
+        - apiVersion: clickhouse.altinity.com/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: ClickHouseInstallation
+          name: signoz-clickhouse
+          uid: 58deef7b-2779-48e7-b592-a6996e3c1434
+  - apiVersion: v1
+    data:
+      chop-generated-hostname-ports.xml: |
+        <yandex>
+            <tcp_port_secure>0</tcp_port_secure>
+            <https_port>0</https_port>
+            <interserver_http_host>chi-signoz-clickhouse-cluster-0-0</interserver_http_host>
+        </yandex>
+      chop-generated-macros.xml: |
+        <yandex>
+            <macros>
+                <installation>signoz-clickhouse</installation>
+                <all-sharded-shard>0</all-sharded-shard>
+                <cluster>cluster</cluster>
+                <shard>0</shard>
+                <replica>chi-signoz-clickhouse-cluster-0-0</replica>
+            </macros>
+        </yandex>
+      chop-generated-zookeeper.xml: |
+        <yandex>
+            <zookeeper>
+                <node>
+                    <host>signoz-zookeeper-0.signoz-zookeeper-headless</host>
+                    <port>2181</port>
+                </node>
+            </zookeeper>
+            <distributed_ddl>
+                <path>/clickhouse/signoz-clickhouse/task_queue/ddl</path>
+            </distributed_ddl>
+        </yandex>
+    kind: ConfigMap
+    metadata:
+      annotations:
+        clickhouse-operator-reconcile: force-2
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: clickhouse
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/ConfigMap: Host
+        clickhouse.altinity.com/app: chop
+        clickhouse.altinity.com/chi: signoz-clickhouse
+        clickhouse.altinity.com/cluster: cluster
+        clickhouse.altinity.com/namespace: signoz
+        clickhouse.altinity.com/object-version: 39f26e118da457cf0be177685b30631daa7e5ff9
+        clickhouse.altinity.com/replica: "0"
+        clickhouse.altinity.com/shard: "0"
+        helm.sh/chart: clickhouse-24.1.18
+      name: chi-signoz-clickhouse-deploy-confd-cluster-0-0
+      namespace: signoz
+      ownerReferences:
+        - apiVersion: clickhouse.altinity.com/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: ClickHouseInstallation
+          name: signoz-clickhouse
+          uid: 58deef7b-2779-48e7-b592-a6996e3c1434
+  - apiVersion: v1
+    data:
+      root-cert.pem: |
+        -----BEGIN CERTIFICATE-----
+        MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
+        MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
+        MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
+        AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
+        j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
+        H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
+        v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
+        UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
+        ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
+        VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
+        XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
+        y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
+        nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
+        P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
+        y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
+        H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
+        -----END CERTIFICATE-----
+    kind: ConfigMap
+    metadata:
+      labels:
+        istio.io/config: "true"
+      name: istio-ca-root-cert
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      otel-agent-config.yaml: |
+        exporters:
+          otlp:
+            endpoint: ${env:OTEL_EXPORTER_OTLP_ENDPOINT}
+            headers:
+              signoz-access-token: ${env:SIGNOZ_API_KEY}
+            tls:
+              insecure: true
+              insecure_skip_verify: false
+        extensions:
+          health_check:
+            endpoint: 0.0.0.0:13133
+          pprof:
+            endpoint: localhost:1777
+          zpages:
+            endpoint: localhost:55679
+        processors:
+          batch:
+            send_batch_size: 10000
+            timeout: 200ms
+          k8sattributes:
+            extract:
+              annotations: []
+              labels: []
+              metadata:
+              - k8s.namespace.name
+              - k8s.deployment.name
+              - k8s.statefulset.name
+              - k8s.daemonset.name
+              - k8s.cronjob.name
+              - k8s.job.name
+              - k8s.node.name
+              - k8s.node.uid
+              - k8s.pod.name
+              - k8s.pod.uid
+              - k8s.pod.start_time
+            filter:
+              node_from_env_var: K8S_NODE_NAME
+            passthrough: false
+            pod_association:
+            - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+            - sources:
+              - from: resource_attribute
+                name: k8s.pod.uid
+            - sources:
+              - from: connection
+          resourcedetection:
+            detectors:
+            - k8snode
+            - env
+            - system
+            k8snode:
+              auth_type: serviceAccount
+              node_from_env_var: K8S_NODE_NAME
+            override: false
+            system:
+              resource_attributes:
+                host.id:
+                  enabled: false
+                host.name:
+                  enabled: false
+                os.type:
+                  enabled: true
+            timeout: 2s
+          transform/severity:
+            error_mode: ignore
+            log_statements:
+            - context: log
+              statements:
+              - set(severity_text, "ERROR") where severity_text == "" and IsMatch(body, "(?i)\\b(error|fatal|panic|exception|critical)\\b")
+              - set(severity_text, "WARN") where severity_text == "" and IsMatch(body, "(?i)\\b(warn|warning)\\b")
+              - set(severity_text, "DEBUG") where severity_text == "" and IsMatch(body, "(?i)\\bdebug\\b")
+              - set(severity_text, "INFO") where severity_text == "" and IsMatch(body, "(?i)\\b(info|notice)\\b")
+        receivers:
+          filelog/k8s:
+            exclude:
+            - /var/log/pods/signoz_k8s-infra*-signoz-*/*/*.log
+            - /var/log/pods/signoz_k8s-infra*-k8s-infra-*/*/*.log
+            - /var/log/pods/kube-system_*/*/*.log
+            - /var/log/pods/*_hotrod*_*/*/*.log
+            - /var/log/pods/*_locust*_*/*/*.log
+            include:
+            - /var/log/pods/*/*/*.log
+            include_file_name: false
+            include_file_path: true
+            operators:
+            - id: container-parser
+              type: container
+            start_at: end
+          hostmetrics:
+            collection_interval: 30s
+            root_path: /hostfs
+            scrapers:
+              cpu: {}
+              disk:
+                exclude:
+                  devices:
+                  - ^ram\d+$
+                  - ^zram\d+$
+                  - ^loop\d+$
+                  - ^fd\d+$
+                  - ^hd[a-z]\d+$
+                  - ^sd[a-z]\d+$
+                  - ^vd[a-z]\d+$
+                  - ^xvd[a-z]\d+$
+                  - ^nvme\d+n\d+p\d+$
+                  match_type: regexp
+              filesystem:
+                exclude_fs_types:
+                  fs_types:
+                  - autofs
+                  - binfmt_misc
+                  - bpf
+                  - cgroup2?
+                  - configfs
+                  - debugfs
+                  - devpts
+                  - devtmpfs
+                  - fusectl
+                  - hugetlbfs
+                  - iso9660
+                  - mqueue
+                  - nsfs
+                  - overlay
+                  - proc
+                  - procfs
+                  - pstore
+                  - rpc_pipefs
+                  - securityfs
+                  - selinuxfs
+                  - squashfs
+                  - sysfs
+                  - tracefs
+                  match_type: strict
+                exclude_mount_points:
+                  match_type: regexp
+                  mount_points:
+                  - /dev/*
+                  - /proc/*
+                  - /sys/*
+                  - /run/credentials/*
+                  - /run/k3s/containerd/*
+                  - /var/lib/docker/*
+                  - /var/lib/containers/storage/*
+                  - /var/lib/kubelet/*
+                  - /snap/*
+              load: {}
+              memory: {}
+              network:
+                exclude:
+                  interfaces:
+                  - ^veth.*$
+                  - ^docker.*$
+                  - ^br-.*$
+                  - ^flannel.*$
+                  - ^cali.*$
+                  - ^cbr.*$
+                  - ^cni.*$
+                  - ^dummy.*$
+                  - ^tailscale.*$
+                  - ^lo$
+                  match_type: regexp
+          kubeletstats:
+            auth_type: serviceAccount
+            collection_interval: 30s
+            endpoint: ${env:K8S_HOST_IP}:10250
+            extra_metadata_labels:
+            - container.id
+            - k8s.volume.type
+            insecure_skip_verify: true
+            metric_groups:
+            - container
+            - pod
+            - node
+            - volume
+            metrics:
+              container.cpu.usage:
+                enabled: true
+              container.uptime:
+                enabled: true
+              k8s.container.cpu_limit_utilization:
+                enabled: true
+              k8s.container.cpu_request_utilization:
+                enabled: true
+              k8s.container.memory_limit_utilization:
+                enabled: true
+              k8s.container.memory_request_utilization:
+                enabled: true
+              k8s.node.cpu.usage:
+                enabled: true
+              k8s.node.uptime:
+                enabled: true
+              k8s.pod.cpu.usage:
+                enabled: true
+              k8s.pod.cpu_limit_utilization:
+                enabled: true
+              k8s.pod.cpu_request_utilization:
+                enabled: true
+              k8s.pod.memory_limit_utilization:
+                enabled: true
+              k8s.pod.memory_request_utilization:
+                enabled: true
+              k8s.pod.uptime:
+                enabled: true
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+                max_recv_msg_size_mib: 4
+              http:
+                endpoint: 0.0.0.0:4318
+        service:
+          extensions:
+          - health_check
+          - zpages
+          - pprof
+          pipelines:
+            logs:
+              exporters:
+              - otlp
+              processors:
+              - resourcedetection
+              - k8sattributes
+              - transform/severity
+              - batch
+              receivers:
+              - otlp
+              - filelog/k8s
+            metrics:
+              exporters:
+              - otlp
+              processors:
+              - resourcedetection
+              - k8sattributes
+              - batch
+              receivers:
+              - otlp
+              - hostmetrics
+              - kubeletstats
+            traces:
+              exporters:
+              - otlp
+              processors:
+              - resourcedetection
+              - k8sattributes
+              - batch
+              receivers:
+              - otlp
+          telemetry:
+            logs:
+              encoding: json
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: k8s-infra
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: otel-agent
+        app.kubernetes.io/instance: k8s-infra
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: k8s-infra
+        app.kubernetes.io/version: 0.139.0
+        helm.sh/chart: k8s-infra-0.15.0
+      name: k8s-infra-otel-agent
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      otel-deployment-config.yaml: |
+        exporters:
+          otlp:
+            endpoint: ${env:OTEL_EXPORTER_OTLP_ENDPOINT}
+            headers:
+              signoz-access-token: ${env:SIGNOZ_API_KEY}
+            tls:
+              insecure: true
+              insecure_skip_verify: false
+        extensions:
+          health_check:
+            endpoint: 0.0.0.0:13133
+          pprof:
+            endpoint: localhost:1777
+          zpages:
+            endpoint: localhost:55679
+        processors:
+          batch:
+            send_batch_size: 10000
+            timeout: 1s
+          k8sattributes:
+            extract:
+              metadata:
+              - k8s.namespace.name
+              - k8s.deployment.name
+              - k8s.statefulset.name
+              - k8s.daemonset.name
+              - k8s.cronjob.name
+              - k8s.job.name
+              - k8s.node.name
+              - k8s.node.uid
+              - k8s.pod.name
+              - k8s.pod.uid
+              - k8s.pod.start_time
+            passthrough: false
+            pod_association:
+            - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+            - sources:
+              - from: resource_attribute
+                name: k8s.pod.uid
+            - sources:
+              - from: connection
+          resourcedetection:
+            detectors:
+            - env
+            override: false
+            timeout: 2s
+        receivers:
+          k8s_cluster:
+            allocatable_types_to_report:
+            - cpu
+            - memory
+            collection_interval: 30s
+            metrics:
+              k8s.node.condition:
+                enabled: true
+              k8s.pod.status_reason:
+                enabled: true
+            node_conditions_to_report:
+            - Ready
+            - MemoryPressure
+            - DiskPressure
+            - PIDPressure
+            - NetworkUnavailable
+            resource_attributes:
+              container.runtime:
+                enabled: true
+              container.runtime.version:
+                enabled: true
+              k8s.container.status.last_terminated_reason:
+                enabled: true
+              k8s.kubelet.version:
+                enabled: true
+              k8s.pod.qos_class:
+                enabled: true
+          k8s_events:
+            auth_type: serviceAccount
+          prometheus/ingress:
+            config:
+              scrape_configs:
+              - job_name: ingress-nginx
+                scrape_interval: 30s
+                metrics_path: /metrics
+                kubernetes_sd_configs:
+                - role: pod
+                relabel_configs:
+                - source_labels:
+                  - __meta_kubernetes_pod_label_app_kubernetes_io_name
+                  action: keep
+                  regex: ingress-nginx
+                - source_labels:
+                  - __meta_kubernetes_pod_ip
+                  action: replace
+                  target_label: __address__
+                  replacement: $$1:10254
+                - source_labels:
+                  - __meta_kubernetes_pod_node_name
+                  target_label: node
+                - source_labels:
+                  - __meta_kubernetes_pod_name
+                  target_label: pod
+                - source_labels:
+                  - __meta_kubernetes_namespace
+                  target_label: namespace
+        service:
+          extensions:
+          - health_check
+          - zpages
+          - pprof
+          pipelines:
+            logs:
+              exporters:
+              - otlp
+              processors:
+              - k8sattributes
+              - resourcedetection
+              - batch
+              receivers:
+              - k8s_events
+            metrics/internal:
+              exporters:
+              - otlp
+              processors:
+              - k8sattributes
+              - resourcedetection
+              - batch
+              receivers:
+              - k8s_cluster
+              - prometheus/ingress
+          telemetry:
+            logs:
+              encoding: json
+    kind: ConfigMap
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/component: otel-deployment
+        app.kubernetes.io/instance: k8s-infra
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: k8s-infra
+        app.kubernetes.io/version: 0.139.0
+        helm.sh/chart: k8s-infra-0.15.0
+      name: k8s-infra-otel-deployment
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      ca.crt: |
+        -----BEGIN CERTIFICATE-----
+        MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+        AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
+        EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+        AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
+        HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
+        0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
+        CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
+        k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
+        1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+        BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
+        BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
+        4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
+        46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
+        qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
+        fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
+        PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
+        szTc1uZpUffa
+        -----END CERTIFICATE-----
+    kind: ConfigMap
+    metadata:
+      annotations:
+        kubernetes.io/description: Contains a CA bundle that can be used to verify the kube-apiserver when using internal endpoints such as the internal service IP or kubernetes.default.svc. No other usage is guaranteed across distributions of Kubernetes clusters.
+      name: kube-root-ca.crt
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      custom-functions.xml: |
+        <functions>
+            <function>
+                <type>executable</type>
+                <name>histogramQuantile</name>
+                <return_type>Float64</return_type>
+                <argument>
+                    <type>Array(Float64)</type>
+                    <name>buckets</name>
+                </argument>
+                <argument>
+                    <type>Array(Float64)</type>
+                    <name>counts</name>
+                </argument>
+                <argument>
+                    <type>Float64</type>
+                    <name>quantile</name>
+                </argument>
+                <format>CSV</format>
+                <command>./histogramQuantile</command>
+            </function>
+        </functions>
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: clickhouse
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        helm.sh/chart: clickhouse-24.1.18
+      name: signoz-clickhouse-custom-functions
+      namespace: signoz
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/chop: 0.21.2
+        helm.sh/chart: clickhouse-24.1.18
+      name: signoz-clickhouse-operator-etc-confd-files
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      01-clickhouse-01-listen.xml: |
+        <yandex>
+            <!-- Listen wildcard address to allow accepting connections from other containers and host network. -->
+            <listen_host>::</listen_host>
+            <listen_host>0.0.0.0</listen_host>
+            <listen_try>1</listen_try>
+        </yandex>
+      01-clickhouse-02-logger.xml: |
+        <yandex>
+            <logger>
+                <!-- Possible levels: https://github.com/pocoproject/poco/blob/devel/Foundation/include/Poco/Logger.h#L105 -->
+                <level>information</level>
+                <formatting>
+                  <type>json</type>
+                </formatting>
+                <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+                <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+                <size>1000M</size>
+                <count>10</count>
+                <!-- Default behavior is autodetection (log to console if not daemon mode and is tty) -->
+                <console>1</console>
+            </logger>
+        </yandex>
+      01-clickhouse-03-query_log.xml: |
+        <yandex>
+            <query_log replace="1">
+                <database>system</database>
+                <table>query_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </query_log>
+        </yandex>
+      01-clickhouse-04-part_log.xml: |
+        <yandex>
+            <part_log replace="1">
+                <database>system</database>
+                <table>part_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </part_log>
+        </yandex>
+      01-clickhouse-05-trace_log.xml: |-
+        <yandex>
+            <trace_log replace="1">
+                <database>system</database>
+                <table>trace_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </trace_log>
+        </yandex>
+      01-clickhouse-06-asynchronous_insert_log.xml: |
+        <yandex>
+            <asynchronous_insert_log replace="1">
+                <database>system</database>
+                <table>asynchronous_insert_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </asynchronous_insert_log>
+        </yandex>
+      01-clickhouse-07-asynchronous_metric_log.xml: |
+        <yandex>
+            <asynchronous_metric_log replace="1">
+                <database>system</database>
+                <table>asynchronous_metric_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </asynchronous_metric_log>
+        </yandex>
+      01-clickhouse-08-backup_log.xml: |
+        <yandex>
+            <backup_log replace="1">
+                <database>system</database>
+                <table>backup_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </backup_log>
+        </yandex>
+      01-clickhouse-09-blob_storage_log.xml: |
+        <yandex>
+            <blob_storage_log replace="1">
+                <database>system</database>
+                <table>blob_storage_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </blob_storage_log>
+        </yandex>
+      01-clickhouse-10-crash_log.xml: |
+        <yandex>
+            <crash_log replace="1">
+                <database>system</database>
+                <table>crash_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </crash_log>
+        </yandex>
+      01-clickhouse-11-metric_log.xml: |
+        <yandex>
+            <metric_log replace="1">
+                <database>system</database>
+                <table>metric_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </metric_log>
+        </yandex>
+      01-clickhouse-12-query_thread_log.xml: |
+        <yandex>
+            <query_thread_log replace="1">
+                <database>system</database>
+                <table>query_thread_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </query_thread_log>
+        </yandex>
+      01-clickhouse-13-query_views_log.xml: |
+        <yandex>
+            <query_views_log replace="1">
+                <database>system</database>
+                <table>query_views_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 15 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </query_views_log>
+        </yandex>
+      01-clickhouse-14-session_log.xml: |
+        <yandex>
+            <session_log replace="1">
+                <database>system</database>
+                <table>session_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </session_log>
+        </yandex>
+      01-clickhouse-15-zookeeper_log.xml: |
+        <yandex>
+            <zookeeper_log replace="1">
+                <database>system</database>
+                <table>zookeeper_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 30 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </zookeeper_log>
+        </yandex>
+      01-clickhouse-16-processors_profile_log.xml: |
+        <yandex>
+            <processors_profile_log replace="1">
+                <database>system</database>
+                <table>processors_profile_log</table>
+                <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval 7 day</engine>
+                <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+            </processors_profile_log>
+        </yandex>
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/chop: 0.21.2
+        helm.sh/chart: clickhouse-24.1.18
+      name: signoz-clickhouse-operator-etc-configd-files
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      config.yaml: |
+        #
+        # Template parameters available:
+        #   WATCH_NAMESPACES=
+        #   CH_USERNAME_PLAIN=
+        #   CH_PASSWORD_PLAIN=
+        #   CH_CREDENTIALS_SECRET_NAMESPACE=
+        #   CH_CREDENTIALS_SECRET_NAME=clickhouse-operator
+
+        ################################################
+        ##
+        ## Watch Section
+        ##
+        ################################################
+        watch:
+          # List of namespaces where clickhouse-operator watches for events.
+          # Concurrently running operators should watch on different namespaces.
+          #namespaces: ["dev", "test"]
+          namespaces: []
+
+        clickhouse:
+          configuration:
+            ################################################
+            ##
+            ## Configuration Files Section
+            ##
+            ################################################
+            file:
+              path:
+                # Path to the folder where ClickHouse configuration files common for all instances within a CHI are located.
+                common: config.d
+                # Path to the folder where ClickHouse configuration files unique for each instance (host) within a CHI are located.
+                host: conf.d
+                # Path to the folder where ClickHouse configuration files with users' settings are located.
+                # Files are common for all instances within a CHI.
+                user: users.d
+            ################################################
+            ##
+            ## Configuration Users Section
+            ##
+            ################################################
+            user:
+              # Default settings for user accounts, created by the operator.
+              # NB. These are not access credentials or settings for 'default' user account,
+              # it is a template for filling out missing fields for all user accounts to be created by the operator, except:
+              # 1. 'default' account, which DOES NOT use provided password, but uses all the rest of the fields
+              # Password for 'default' account as to be provided explicitly, if to be used
+              # 2. CHOP account, which DOES NOT use profile, quota, password and regexp, but uses network IPs - extending them
+              # Password for CHOP account is used from `clickhouse.access.password` section
+              default:
+                # Default values for ClickHouse user configuration
+                # 1. user/profile - string
+                # 2. user/quota - string
+                # 3. user/networks/ip - multiple strings
+                # 4. user/password - string
+                profile: "default"
+                quota: "default"
+                networksIP:
+                  - "::1"
+                  - "127.0.0.1"
+                password: "default"
+            ################################################
+            ##
+            ## Configuration Network Section
+            ##
+            ################################################
+            network:
+              # Default host_regexp to limit network connectivity from outside
+              hostRegexpTemplate: "(chi-{chi}-[^.]+\\d+-\\d+|clickhouse\\-{chi})\\.{namespace}\\.svc\\.cluster\\.local$"
+
+          ################################################
+          ##
+          ## Configuration Restart Policy Section
+          ## Configuration restart policy describes what configuration changes require ClickHouse restart
+          ##
+          ################################################
+          configurationRestartPolicy:
+            rules:
+              - version: "*"
+                rules:
+                  - settings/*: "yes"
+                  - settings/dictionaries_config: "no"
+                  - settings/logger: "no"
+                  - settings/macros/*: "no"
+                  - settings/max_server_memory_*: "no"
+                  - settings/max_*_to_drop: "no"
+                  - settings/max_concurrent_queries: "no"
+                  - settings/models_config: "no"
+                  - settings/user_defined_executable_functions_config: "no"
+
+                  - zookeeper/*: "yes"
+
+                  - files/config.d/*.xml: "yes"
+                  - files/config.d/*dict*.xml: "no"
+
+                  - profiles/default/background_*_pool_size: "yes"
+                  - profiles/default/max_*_for_server: "yes"
+              - version: "21.*"
+                rules:
+                  - settings/logger: "yes"
+
+          #################################################
+          ##
+          ## Access to ClickHouse instances
+          ##
+          ################################################
+          access:
+            # Possible values for `scheme` are:
+            # 1. http
+            # 2. https
+            scheme: ""
+            # ClickHouse credentials (username, password and port) to be used by the operator to connect to ClickHouse instances.
+            # Used for:
+            # 1. Metrics requests
+            # 2. Schema maintenance
+            # 3. DROP DNS CACHE
+            # User with these credentials can be specified in additional ClickHouse .xml config files,
+            # located in `clickhouse.configuration.file.path.user` folder
+            username: ""
+            password: ""
+            rootCA: ""
+
+            # Location of the k8s Secret with username and password to be used by the operator to connect to ClickHouse instances.
+            # Can be used instead of explicitly specified username and password which are:
+            # clickhouse.access.username
+            # clickhouse.access.password
+            # Secret should have two keys:
+            # 1. username
+            # 2. password
+            secret:
+              # Empty `namespace` means that k8s secret would be looked in the same namespace where operator's pod is running.
+              namespace: ""
+              # Empty `name` means no k8s Secret would be looked for
+              name: "signoz-clickhouse-operator"
+            # Port where to connect to ClickHouse instances to
+            port: 8123
+
+            # Timeouts used to limit connection and queries from the operator to ClickHouse instances
+            # Specified in seconds.
+            timeouts:
+              connect: 2
+              query: 5
+
+          metrics:
+            timeouts:
+              collect: 9
+
+        ################################################
+        ##
+        ## Templates Section
+        ##
+        ################################################
+        template:
+          chi:
+            # Path to the folder where ClickHouseInstallation .yaml manifests are located.
+            # Manifests are applied in sorted alpha-numeric order.
+            path: templates.d
+
+        ################################################
+        ##
+        ## Reconcile Section
+        ##
+        ################################################
+        reconcile:
+          runtime:
+            # Max number of concurrent CHI reconciles in progress
+            reconcileCHIsThreadsNumber: 10
+            # Max number of concurrent shard reconciles in progress
+            reconcileShardsThreadsNumber: 1
+            # The maximum percentage of cluster shards that may be reconciled in parallel
+            reconcileShardsMaxConcurrencyPercent: 50
+
+          statefulSet:
+            create:
+              # What to do in case created StatefulSet is not in 'Ready' after `reconcile.statefulSet.update.timeout` seconds
+              # Possible options:
+              # 1. abort - do nothing, just break the process and wait for an admin to assist
+              # 2. delete - delete newly created problematic StatefulSet
+              # 3. ignore - ignore an error, pretend nothing happened and move on to the next StatefulSet
+              onFailure: ignore
+
+            update:
+              # How many seconds to wait for created/updated StatefulSet to be 'Ready'
+              timeout: 900
+              # How many seconds to wait between checks/polls for created/updated StatefulSet status
+              pollInterval: 5
+              # What to do in case updated StatefulSet is not in 'Ready' after `reconcile.statefulSet.update.timeout` seconds
+              # Possible options:
+              # 1. abort - do nothing, just break the process and wait for an admin to assist
+              # 2. rollback - delete Pod and rollback StatefulSet to previous Generation.
+              # Pod would be recreated by StatefulSet based on rollback-ed configuration
+              # 3. ignore - ignore an error, pretend nothing happened and move on to the next StatefulSet
+              onFailure: abort
+
+          host:
+            # Whether reconciler should wait for a host:
+            # - to be excluded from a cluster
+            # OR
+            # - to be included into a cluster
+            # respectfully
+            wait:
+              exclude: true
+              include: false
+
+        ################################################
+        ##
+        ## Annotations management
+        ##
+        ################################################
+        annotation:
+          # Applied when:
+          #  1. Propagating annotations from the CHI's `metadata.annotations` to child objects' `metadata.annotations`,
+          #  2. Propagating annotations from the CHI Template's `metadata.annotations` to CHI's `metadata.annotations`,
+          # Include annotations from the following list:
+          # Applied only when not empty. Empty list means "include all, no selection"
+          include: []
+          # Exclude annotations from the following list:
+          exclude: []
+
+        ################################################
+        ##
+        ## Labels management
+        ##
+        ################################################
+        label:
+          # Applied when:
+          #  1. Propagating labels from the CHI's `metadata.labels` to child objects' `metadata.labels`,
+          #  2. Propagating labels from the CHI Template's `metadata.labels` to CHI's `metadata.labels`,
+          # Include labels from the following list:
+          # Applied only when not empty. Empty list means "include all, no selection"
+          include: []
+          # Exclude labels from the following list:
+          # Applied only when not empty. Empty list means "nothing to exclude, no selection"
+          exclude: []
+          # Whether to append *Scope* labels to StatefulSet and Pod.
+          # Full list of available *scope* labels check in 'labeler.go'
+          #  LabelShardScopeIndex
+          #  LabelReplicaScopeIndex
+          #  LabelCHIScopeIndex
+          #  LabelCHIScopeCycleSize
+          #  LabelCHIScopeCycleIndex
+          #  LabelCHIScopeCycleOffset
+          #  LabelClusterScopeIndex
+          #  LabelClusterScopeCycleSize
+          #  LabelClusterScopeCycleIndex
+          #  LabelClusterScopeCycleOffset
+          appendScope: "no"
+
+        ################################################
+        ##
+        ## StatefulSet management
+        ##
+        ################################################
+        statefulSet:
+          revisionHistoryLimit: 0
+
+        ################################################
+        ##
+        ## Pod management
+        ##
+        ################################################
+        pod:
+          # Grace period for Pod termination.
+          # How many seconds to wait between sending
+          # SIGTERM and SIGKILL during Pod termination process.
+          # Increase this number is case of slow shutdown.
+          terminationGracePeriod: 30
+
+        ################################################
+        ##
+        ## Log parameters
+        ##
+        ################################################
+        logger:
+          logtostderr: "true"
+          alsologtostderr: "false"
+          v: "1"
+          stderrthreshold: ""
+          vmodule: ""
+          log_backtrace_at: ""
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/chop: 0.21.2
+        helm.sh/chart: clickhouse-24.1.18
+      name: signoz-clickhouse-operator-etc-files
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      001-templates.json.example: |
+        {
+          "apiVersion": "clickhouse.altinity.com/v1",
+          "kind": "ClickHouseInstallationTemplate",
+          "metadata": {
+            "name": "01-default-volumeclaimtemplate"
+          },
+          "spec": {
+            "templates": {
+              "volumeClaimTemplates": [
+                {
+                  "name": "chi-default-volume-claim-template",
+                  "spec": {
+                    "accessModes": [
+                      "ReadWriteOnce"
+                    ],
+                    "resources": {
+                      "requests": {
+                        "storage": "2Gi"
+                      }
+                    }
+                  }
+                }
+              ],
+              "podTemplates": [
+                {
+                  "name": "chi-default-oneperhost-pod-template",
+                  "distribution": "OnePerHost",
+                  "spec": {
+                    "containers" : [
+                      {
+                        "name": "clickhouse",
+                        "image": "clickhouse/clickhouse-server:22.3",
+                        "ports": [
+                          {
+                            "name": "http",
+                            "containerPort": 8123
+                          },
+                          {
+                            "name": "client",
+                            "containerPort": 9000
+                          },
+                          {
+                            "name": "interserver",
+                            "containerPort": 9009
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      default-pod-template.yaml.example: |
+        apiVersion: "clickhouse.altinity.com/v1"
+        kind: "ClickHouseInstallationTemplate"
+        metadata:
+          name: "default-oneperhost-pod-template"
+        spec:
+          templates:
+            podTemplates:
+              - name: default-oneperhost-pod-template
+                distribution: "OnePerHost"
+      default-storage-template.yaml.example: |
+        apiVersion: "clickhouse.altinity.com/v1"
+        kind: "ClickHouseInstallationTemplate"
+        metadata:
+          name: "default-storage-template-2Gi"
+        spec:
+          templates:
+            volumeClaimTemplates:
+              - name: default-storage-template-2Gi
+                spec:
+                  accessModes:
+                    - ReadWriteOnce
+                  resources:
+                    requests:
+                      storage: 2Gi
+      readme: Templates in this folder are packaged with an operator and available via 'useTemplate'
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/chop: 0.21.2
+        helm.sh/chart: clickhouse-24.1.18
+      name: signoz-clickhouse-operator-etc-templatesd-files
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      01-clickhouse-user.xml: |
+        <yandex>
+            <users>
+                <clickhouse_operator>
+                    <networks>
+                        <ip>127.0.0.1</ip>
+                    </networks>
+                    <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>
+                    <profile>clickhouse_operator</profile>
+                    <quota>default</quota>
+                </clickhouse_operator>
+            </users>
+            <profiles>
+                <clickhouse_operator>
+                    <log_queries>0</log_queries>
+                    <skip_unavailable_shards>1</skip_unavailable_shards>
+                    <http_connection_timeout>10</http_connection_timeout>
+                </clickhouse_operator>
+            </profiles>
+        </yandex>
+      02-clickhouse-default-profile.xml: |
+        <yandex>
+          <profiles>
+            <default>
+              <log_queries>1</log_queries>
+              <connect_timeout_with_failover_ms>1000</connect_timeout_with_failover_ms>
+              <distributed_aggregation_memory_efficient>1</distributed_aggregation_memory_efficient>
+              <parallel_view_processing>1</parallel_view_processing>
+            </default>
+          </profiles>
+        </yandex>
+      03-database-ordinary.xml: |
+        <yandex>
+            <profiles>
+                <default>
+                    <default_database_engine>Ordinary</default_database_engine>
+                </default>
+            </profiles>
+        </yandex>
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        clickhouse.altinity.com/chop: 0.21.2
+        helm.sh/chart: clickhouse-24.1.18
+      name: signoz-clickhouse-operator-etc-usersd-files
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      wait-until-ready.sh: "#!/bin/bash\n\n# Delay between attempts in seconds\nDELAY=10\n# Default host and port\nHOST=\"localhost\"\nPORT=\"8123\"\n\necho \"Waiting for Clickhouse to become ready...\"\n\nwhile true; do\n    response=$(wget --spider -S \"http://${HOST}:${PORT}/ping\" 2>&1)\n    exit_code=$?\n    \n    if [ $exit_code -eq 0 ]; then\n        echo \"Clickhouse is ready!\"\n        exit 0\n    else\n        echo \"Clickhouse is not ready yet. Retrying in ${DELAY} seconds...\"\n        sleep $DELAY\n    fi\ndone\n"
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: clickhouse
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: clickhouse
+        app.kubernetes.io/version: 24.1.2
+        helm.sh/chart: clickhouse-24.1.18
+      name: signoz-clickhouse-scripts
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      otel-collector-config.yaml: |-
+        connectors:
+          signozmeter:
+            dimensions:
+            - name: service.name
+            - name: deployment.environment
+            - name: host.name
+            metrics_flush_interval: 1h
+        exporters:
+          clickhouselogsexporter:
+            dsn: tcp://${env:CLICKHOUSE_USER}:${env:CLICKHOUSE_PASSWORD}@${env:CLICKHOUSE_HOST}:${env:CLICKHOUSE_PORT}/${env:CLICKHOUSE_LOG_DATABASE}
+            timeout: 10s
+            use_new_schema: true
+          clickhousetraces:
+            datasource: tcp://${env:CLICKHOUSE_USER}:${env:CLICKHOUSE_PASSWORD}@${env:CLICKHOUSE_HOST}:${env:CLICKHOUSE_PORT}/${env:CLICKHOUSE_TRACE_DATABASE}
+            low_cardinal_exception_grouping: ${env:LOW_CARDINAL_EXCEPTION_GROUPING}
+            use_new_schema: true
+          metadataexporter:
+            cache:
+              provider: in_memory
+            dsn: tcp://${env:CLICKHOUSE_USER}:${env:CLICKHOUSE_PASSWORD}@${env:CLICKHOUSE_HOST}:${env:CLICKHOUSE_PORT}/signoz_metadata
+            enabled: true
+            tenant_id: ${env:TENANT_ID}
+            timeout: 10s
+          signozclickhousemeter:
+            dsn: tcp://${env:CLICKHOUSE_USER}:${env:CLICKHOUSE_PASSWORD}@${env:CLICKHOUSE_HOST}:${env:CLICKHOUSE_PORT}/${env:CLICKHOUSE_METER_DATABASE}
+            sending_queue:
+              enabled: false
+            timeout: 45s
+          signozclickhousemetrics:
+            dsn: tcp://${env:CLICKHOUSE_USER}:${env:CLICKHOUSE_PASSWORD}@${env:CLICKHOUSE_HOST}:${env:CLICKHOUSE_PORT}/${env:CLICKHOUSE_DATABASE}
+            timeout: 45s
+        extensions:
+          health_check:
+            endpoint: 0.0.0.0:13133
+          pprof:
+            endpoint: localhost:1777
+          zpages:
+            endpoint: localhost:55679
+        processors:
+          batch:
+            send_batch_size: 50000
+            timeout: 1s
+          batch/meter:
+            send_batch_max_size: 25000
+            send_batch_size: 20000
+            timeout: 1s
+          signozspanmetrics/delta:
+            aggregation_temporality: AGGREGATION_TEMPORALITY_DELTA
+            dimensions:
+            - default: default
+              name: service.namespace
+            - default: default
+              name: deployment.environment
+            - name: signoz.collector.id
+            dimensions_cache_size: 100000
+            latency_histogram_buckets:
+            - 100us
+            - 1ms
+            - 2ms
+            - 6ms
+            - 10ms
+            - 50ms
+            - 100ms
+            - 250ms
+            - 500ms
+            - 1000ms
+            - 1400ms
+            - 2000ms
+            - 5s
+            - 10s
+            - 20s
+            - 40s
+            - 60s
+            metrics_exporter: signozclickhousemetrics
+        receivers:
+          httplogreceiver/heroku:
+            endpoint: 0.0.0.0:8081
+            source: heroku
+          httplogreceiver/json:
+            endpoint: 0.0.0.0:8082
+            source: json
+          jaeger:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:14250
+              thrift_http:
+                endpoint: 0.0.0.0:14268
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+                max_recv_msg_size_mib: 16
+              http:
+                endpoint: 0.0.0.0:4318
+        service:
+          extensions:
+          - health_check
+          - zpages
+          - pprof
+          pipelines:
+            logs:
+              exporters:
+              - clickhouselogsexporter
+              - metadataexporter
+              - signozmeter
+              processors:
+              - batch
+              receivers:
+              - otlp
+              - httplogreceiver/heroku
+              - httplogreceiver/json
+            metrics:
+              exporters:
+              - metadataexporter
+              - signozclickhousemetrics
+              - signozmeter
+              processors:
+              - batch
+              receivers:
+              - otlp
+            metrics/meter:
+              exporters:
+              - signozclickhousemeter
+              processors:
+              - batch/meter
+              receivers:
+              - signozmeter
+            traces:
+              exporters:
+              - clickhousetraces
+              - metadataexporter
+              - signozmeter
+              processors:
+              - signozspanmetrics/delta
+              - batch
+              receivers:
+              - otlp
+              - jaeger
+          telemetry:
+            logs:
+              encoding: json
+      otel-collector-opamp-config.yaml: 'server_endpoint: "ws://signoz:4320/v1/opamp"'
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: otel-collector
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: signoz
+        app.kubernetes.io/version: v0.117.1
+        helm.sh/chart: signoz-0.117.1
+      name: signoz-otel-collector
+      namespace: signoz
+  - apiVersion: v1
+    data:
+      init-certs.sh: '#!/bin/bash'
+      setup.sh: |-
+        #!/bin/bash
+
+        # Execute entrypoint as usual after obtaining ZOO_SERVER_ID
+        # check ZOO_SERVER_ID in persistent volume via myid
+        # if not present, set based on POD hostname
+        if [[ -f "/bitnami/zookeeper/data/myid" ]]; then
+            export ZOO_SERVER_ID="$(cat /bitnami/zookeeper/data/myid)"
+        else
+            HOSTNAME="$(hostname -s)"
+            if [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]]; then
+                ORD=${BASH_REMATCH[2]}
+                export ZOO_SERVER_ID="$((ORD + 1 ))"
+            else
+                echo "Failed to get index from hostname $HOSTNAME"
+                exit 1
+            fi
+        fi
+        exec /entrypoint.sh /run.sh
+    kind: ConfigMap
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: signoz
+        meta.helm.sh/release-namespace: signoz
+      labels:
+        app.kubernetes.io/component: zookeeper
+        app.kubernetes.io/instance: signoz
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: zookeeper
+        helm.sh/chart: zookeeper-0.0.1
+      name: signoz-zookeeper-scripts
+      namespace: signoz
+kind: List
 metadata:
-  annotations:
-    clickhouse-operator-reconcile: force-2
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: clickhouse
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    clickhouse.altinity.com/ConfigMap: ChiCommon
-    clickhouse.altinity.com/app: chop
-    clickhouse.altinity.com/chi: signoz-clickhouse
-    clickhouse.altinity.com/namespace: signoz
-    clickhouse.altinity.com/object-version: 3af64c7190a4cae2396bd20c110294e02865d6c1
-    helm.sh/chart: clickhouse-24.1.18
-  name: chi-signoz-clickhouse-common-configd
-  namespace: signoz
-  ownerReferences:
-  - apiVersion: clickhouse.altinity.com/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: ClickHouseInstallation
-    name: signoz-clickhouse
----
-apiVersion: v1
-data:
-  01-clickhouse-user.xml: "<yandex>\n    <users>\n        <clickhouse_operator>\n\
-    \            <networks>\n                <ip>127.0.0.1</ip>\n            </networks>\n\
-    \            <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>\n\
-    \            <profile>clickhouse_operator</profile>\n            <quota>default</quota>\n\
-    \        </clickhouse_operator>\n    </users>\n    <profiles>\n        <clickhouse_operator>\n\
-    \            <log_queries>0</log_queries>\n            <skip_unavailable_shards>1</skip_unavailable_shards>\n\
-    \            <http_connection_timeout>10</http_connection_timeout>\n        </clickhouse_operator>\n\
-    \    </profiles>\n</yandex>\n"
-  02-clickhouse-default-profile.xml: "<yandex>\n  <profiles>\n    <default>\n    \
-    \  <log_queries>1</log_queries>\n      <connect_timeout_with_failover_ms>1000</connect_timeout_with_failover_ms>\n\
-    \      <distributed_aggregation_memory_efficient>1</distributed_aggregation_memory_efficient>\n\
-    \      <parallel_view_processing>1</parallel_view_processing>\n    </default>\n\
-    \  </profiles>\n</yandex>\n"
-  03-database-ordinary.xml: "<yandex>\n    <profiles>\n        <default>\n       \
-    \     <default_database_engine>Ordinary</default_database_engine>\n        </default>\n\
-    \    </profiles>\n</yandex>\n"
-  chop-generated-profiles.xml: "<yandex>\n    <profiles>\n        <admin>\n      \
-    \      <query_plan_max_limit_for_lazy_materialization>0</query_plan_max_limit_for_lazy_materialization>\n\
-    \            <secondary_indices_enable_bulk_filtering>0</secondary_indices_enable_bulk_filtering>\n\
-    \        </admin>\n        <default>\n            <allow_experimental_window_functions>1</allow_experimental_window_functions>\n\
-    \            <allow_nondeterministic_mutations>1</allow_nondeterministic_mutations>\n\
-    \            <query_plan_max_limit_for_lazy_materialization>0</query_plan_max_limit_for_lazy_materialization>\n\
-    \            <secondary_indices_enable_bulk_filtering>0</secondary_indices_enable_bulk_filtering>\n\
-    \        </default>\n    </profiles>\n</yandex>\n"
-  chop-generated-users.xml: "<yandex>\n    <users>\n        <admin>\n            <networks>\n\
-    \                <host_regexp>(chi-signoz-clickhouse-[^.]+\\d+-\\d+|clickhouse\\\
-    -signoz-clickhouse)\\.signoz\\.svc\\.cluster\\.local$</host_regexp>\n        \
-    \        <ip>::1</ip>\n                <ip>127.0.0.1</ip>\n                <ip>10.0.0.0/8</ip>\n\
-    \                <ip>100.64.0.0/10</ip>\n                <ip>172.16.0.0/12</ip>\n\
-    \                <ip>192.0.0.0/24</ip>\n                <ip>198.18.0.0/15</ip>\n\
-    \                <ip>192.168.0.0/16</ip>\n            </networks>\n          \
-    \  <password_sha256_hex>da90cf0836f8ac8f8a298293eafe856634b622df0c1ac2c82538f2cbe5406a6c</password_sha256_hex>\n\
-    \            <profile>default</profile>\n            <quota>default</quota>\n\
-    \        </admin>\n        <clickhouse_operator>\n            <networks>\n   \
-    \             <ip>10.244.4.155</ip>\n            </networks>\n            <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>\n\
-    \            <profile>clickhouse_operator</profile>\n        </clickhouse_operator>\n\
-    \        <default>\n            <networks>\n                <host_regexp>(chi-signoz-clickhouse-[^.]+\\\
-    d+-\\d+|clickhouse\\-signoz-clickhouse)\\.signoz\\.svc\\.cluster\\.local$</host_regexp>\n\
-    \                <ip>::1</ip>\n                <ip>127.0.0.1</ip>\n          \
-    \      <ip>10.244.4.119</ip>\n            </networks>\n            <profile>default</profile>\n\
-    \            <quota>default</quota>\n        </default>\n    </users>\n</yandex>\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    clickhouse-operator-reconcile: force-2
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: clickhouse
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    clickhouse.altinity.com/ConfigMap: ChiCommonUsers
-    clickhouse.altinity.com/app: chop
-    clickhouse.altinity.com/chi: signoz-clickhouse
-    clickhouse.altinity.com/namespace: signoz
-    clickhouse.altinity.com/object-version: ac02f39c3e06b97af3fdfa34de1054c4a7a9bc03
-    helm.sh/chart: clickhouse-24.1.18
-  name: chi-signoz-clickhouse-common-usersd
-  namespace: signoz
-  ownerReferences:
-  - apiVersion: clickhouse.altinity.com/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: ClickHouseInstallation
-    name: signoz-clickhouse
----
-apiVersion: v1
-data:
-  chop-generated-hostname-ports.xml: "<yandex>\n    <tcp_port_secure>0</tcp_port_secure>\n\
-    \    <https_port>0</https_port>\n    <interserver_http_host>chi-signoz-clickhouse-cluster-0-0</interserver_http_host>\n\
-    </yandex>\n"
-  chop-generated-macros.xml: "<yandex>\n    <macros>\n        <installation>signoz-clickhouse</installation>\n\
-    \        <all-sharded-shard>0</all-sharded-shard>\n        <cluster>cluster</cluster>\n\
-    \        <shard>0</shard>\n        <replica>chi-signoz-clickhouse-cluster-0-0</replica>\n\
-    \    </macros>\n</yandex>\n"
-  chop-generated-zookeeper.xml: "<yandex>\n    <zookeeper>\n        <node>\n     \
-    \       <host>signoz-zookeeper-0.signoz-zookeeper-headless.signoz.svc.cluster.local</host>\n\
-    \            <port>2181</port>\n        </node>\n    </zookeeper>\n    <distributed_ddl>\n\
-    \        <path>/clickhouse/signoz-clickhouse/task_queue/ddl</path>\n    </distributed_ddl>\n\
-    </yandex>\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    clickhouse-operator-reconcile: force-2
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: clickhouse
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    clickhouse.altinity.com/ConfigMap: Host
-    clickhouse.altinity.com/app: chop
-    clickhouse.altinity.com/chi: signoz-clickhouse
-    clickhouse.altinity.com/cluster: cluster
-    clickhouse.altinity.com/namespace: signoz
-    clickhouse.altinity.com/object-version: 459a7283573bdfde70614305aeb6c641eba9432c
-    clickhouse.altinity.com/replica: '0'
-    clickhouse.altinity.com/shard: '0'
-    helm.sh/chart: clickhouse-24.1.18
-  name: chi-signoz-clickhouse-deploy-confd-cluster-0-0
-  namespace: signoz
-  ownerReferences:
-  - apiVersion: clickhouse.altinity.com/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: ClickHouseInstallation
-    name: signoz-clickhouse
----
-apiVersion: v1
-data:
-  root-cert.pem: '-----BEGIN CERTIFICATE-----
-
-    MIIC/DCCAeSgAwIBAgIQRRabq+yMXyRafntlJeCv/jANBgkqhkiG9w0BAQsFADAY
-
-    MRYwFAYDVQQKEw1jbHVzdGVyLmxvY2FsMB4XDTI2MDQxNDAyMjQyMVoXDTM2MDQx
-
-    MTAyMjQyMVowGDEWMBQGA1UEChMNY2x1c3Rlci5sb2NhbDCCASIwDQYJKoZIhvcN
-
-    AQEBBQADggEPADCCAQoCggEBAJ/zEnuc8b/DvAWOjZMkKqHgP4Poo94NHrE7KVEu
-
-    j9RQ00TmBUN1eMjFJbOUR3M/EHbjrjXO4asqC6B9X3zITZ1r1nGkjZBd2vm1b7cW
-
-    H6cMKySq/ILkvmO+y7k/IunD8re+jDoXdvRnR1lLUHBwp9JISqm9EK6dt5Xc6BVZ
-
-    v8cDSFCeON+RUVHhIh2p/AYLkNamHfRb/EbCWn5jXR43udBrjWd+5Ack4OgNK/QL
-
-    UUIUbzsfcQz70ZXW0SIs/NGq7/AEFcFMo31E/IUpVHslROq/vINS9ARU28FndRsF
-
-    ORTEFwZKtEFpoiYG3uLSlvUrl+n6obYw0t274HMn1wSJCJUCAwEAAaNCMEAwDgYD
-
-    VR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFOw7AyQg+Bl3
-
-    XZ0MvJUVjwL6OBrbMA0GCSqGSIb3DQEBCwUAA4IBAQCXFXruCYGPYjgUg0B2CAQR
-
-    y1rzx+fiNZx5AuKoS/RFaKjhMkPtGD2Oi03RI8Rz0I+hiuOGrj4d0sfiYOfpZTb9
-
-    nb0RN19QhFTXmcGrM1asFmTCEoIOktsE4S3xcMk5X6/rc+PxcBvBZsi54PC9gA+h
-
-    P6j5OVgg8gkRyh646mtR9fDobGyZ12hOTHF4LJkGpOko/tG+/P8pmyLtOsBH6f7G
-
-    y69tNOwXl5M6ujtK+oE09hGStwP0YW6dGLuqNFspcn8Nmf63PeHk+pFTI2RH5tG+
-
-    H1YZsJ7+UfhcJ5PnzjHHBIHrIurvLcuiwDyBPW18bJAV6xLC0VgDrCAxEDOJD6T4
-
-    -----END CERTIFICATE-----
-
-    '
-kind: ConfigMap
-metadata:
-  labels:
-    istio.io/config: 'true'
-  name: istio-ca-root-cert
-  namespace: signoz
----
-apiVersion: v1
-data:
-  otel-agent-config.yaml: "\nexporters:\n  otlp:\n    endpoint: ${env:OTEL_EXPORTER_OTLP_ENDPOINT}\n\
-    \    headers:\n      signoz-access-token: ${env:SIGNOZ_API_KEY}\n    tls:\n  \
-    \    insecure: true\n      insecure_skip_verify: false\nextensions:\n  health_check:\n\
-    \    endpoint: 0.0.0.0:13133\n  pprof:\n    endpoint: localhost:1777\n  zpages:\n\
-    \    endpoint: localhost:55679\nprocessors:\n  batch:\n    send_batch_size: 10000\n\
-    \    timeout: 200ms\n  k8sattributes:\n    extract:\n      annotations: []\n \
-    \     labels: []\n      metadata:\n      - k8s.namespace.name\n      - k8s.deployment.name\n\
-    \      - k8s.statefulset.name\n      - k8s.daemonset.name\n      - k8s.cronjob.name\n\
-    \      - k8s.job.name\n      - k8s.node.name\n      - k8s.node.uid\n      - k8s.pod.name\n\
-    \      - k8s.pod.uid\n      - k8s.pod.start_time\n    filter:\n      node_from_env_var:\
-    \ K8S_NODE_NAME\n    passthrough: false\n    pod_association:\n    - sources:\n\
-    \      - from: resource_attribute\n        name: k8s.pod.ip\n    - sources:\n\
-    \      - from: resource_attribute\n        name: k8s.pod.uid\n    - sources:\n\
-    \      - from: connection\n  resourcedetection:\n    detectors:\n    - k8snode\n\
-    \    - env\n    - system\n    k8snode:\n      auth_type: serviceAccount\n    \
-    \  node_from_env_var: K8S_NODE_NAME\n    override: false\n    system:\n      resource_attributes:\n\
-    \        host.id:\n          enabled: false\n        host.name:\n          enabled:\
-    \ false\n        os.type:\n          enabled: true\n    timeout: 2s\nreceivers:\n\
-    \  filelog/k8s:\n    exclude:\n    - /var/log/pods/signoz_k8s-infra*-signoz-*/*/*.log\n\
-    \    - /var/log/pods/signoz_k8s-infra*-k8s-infra-*/*/*.log\n    - /var/log/pods/kube-system_*/*/*.log\n\
-    \    - /var/log/pods/*_hotrod*_*/*/*.log\n    - /var/log/pods/*_locust*_*/*/*.log\n\
-    \    include:\n    - /var/log/pods/*/*/*.log\n    include_file_name: false\n \
-    \   include_file_path: true\n    operators:\n    - id: container-parser\n    \
-    \  type: container\n    start_at: end\n  hostmetrics:\n    collection_interval:\
-    \ 30s\n    root_path: /hostfs\n    scrapers:\n      cpu: {}\n      disk:\n   \
-    \     exclude:\n          devices:\n          - ^ram\\d+$\n          - ^zram\\\
-    d+$\n          - ^loop\\d+$\n          - ^fd\\d+$\n          - ^hd[a-z]\\d+$\n\
-    \          - ^sd[a-z]\\d+$\n          - ^vd[a-z]\\d+$\n          - ^xvd[a-z]\\\
-    d+$\n          - ^nvme\\d+n\\d+p\\d+$\n          match_type: regexp\n      filesystem:\n\
-    \        exclude_fs_types:\n          fs_types:\n          - autofs\n        \
-    \  - binfmt_misc\n          - bpf\n          - cgroup2?\n          - configfs\n\
-    \          - debugfs\n          - devpts\n          - devtmpfs\n          - fusectl\n\
-    \          - hugetlbfs\n          - iso9660\n          - mqueue\n          - nsfs\n\
-    \          - overlay\n          - proc\n          - procfs\n          - pstore\n\
-    \          - rpc_pipefs\n          - securityfs\n          - selinuxfs\n     \
-    \     - squashfs\n          - sysfs\n          - tracefs\n          match_type:\
-    \ strict\n        exclude_mount_points:\n          match_type: regexp\n      \
-    \    mount_points:\n          - /dev/*\n          - /proc/*\n          - /sys/*\n\
-    \          - /run/credentials/*\n          - /run/k3s/containerd/*\n         \
-    \ - /var/lib/docker/*\n          - /var/lib/containers/storage/*\n          -\
-    \ /var/lib/kubelet/*\n          - /snap/*\n      load: {}\n      memory: {}\n\
-    \      network:\n        exclude:\n          interfaces:\n          - ^veth.*$\n\
-    \          - ^docker.*$\n          - ^br-.*$\n          - ^flannel.*$\n      \
-    \    - ^cali.*$\n          - ^cbr.*$\n          - ^cni.*$\n          - ^dummy.*$\n\
-    \          - ^tailscale.*$\n          - ^lo$\n          match_type: regexp\n \
-    \ kubeletstats:\n    auth_type: serviceAccount\n    collection_interval: 30s\n\
-    \    endpoint: ${env:K8S_HOST_IP}:10250\n    extra_metadata_labels:\n    - container.id\n\
-    \    - k8s.volume.type\n    insecure_skip_verify: true\n    metric_groups:\n \
-    \   - container\n    - pod\n    - node\n    - volume\n    metrics:\n      container.cpu.usage:\n\
-    \        enabled: true\n      container.uptime:\n        enabled: true\n     \
-    \ k8s.container.cpu_limit_utilization:\n        enabled: true\n      k8s.container.cpu_request_utilization:\n\
-    \        enabled: true\n      k8s.container.memory_limit_utilization:\n      \
-    \  enabled: true\n      k8s.container.memory_request_utilization:\n        enabled:\
-    \ true\n      k8s.node.cpu.usage:\n        enabled: true\n      k8s.node.uptime:\n\
-    \        enabled: true\n      k8s.pod.cpu.usage:\n        enabled: true\n    \
-    \  k8s.pod.cpu_limit_utilization:\n        enabled: true\n      k8s.pod.cpu_request_utilization:\n\
-    \        enabled: true\n      k8s.pod.memory_limit_utilization:\n        enabled:\
-    \ true\n      k8s.pod.memory_request_utilization:\n        enabled: true\n   \
-    \   k8s.pod.uptime:\n        enabled: true\n  otlp:\n    protocols:\n      grpc:\n\
-    \        endpoint: 0.0.0.0:4317\n        max_recv_msg_size_mib: 4\n      http:\n\
-    \        endpoint: 0.0.0.0:4318\nservice:\n  extensions:\n  - health_check\n \
-    \ - zpages\n  - pprof\n  pipelines:\n    logs:\n      exporters:\n      - otlp\n\
-    \      processors:\n      - resourcedetection\n      - k8sattributes\n      -\
-    \ batch\n      receivers:\n      - otlp\n      - filelog/k8s\n    metrics:\n \
-    \     exporters:\n      - otlp\n      processors:\n      - resourcedetection\n\
-    \      - k8sattributes\n      - batch\n      receivers:\n      - otlp\n      -\
-    \ hostmetrics\n      - kubeletstats\n    traces:\n      exporters:\n      - otlp\n\
-    \      processors:\n      - resourcedetection\n      - k8sattributes\n      -\
-    \ batch\n      receivers:\n      - otlp\n  telemetry:\n    logs:\n      encoding:\
-    \ json"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: k8s-infra
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: otel-agent
-    app.kubernetes.io/instance: k8s-infra
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: k8s-infra
-    app.kubernetes.io/version: 0.139.0
-    helm.sh/chart: k8s-infra-0.15.0
-  name: k8s-infra-otel-agent
-  namespace: signoz
----
-apiVersion: v1
-data:
-  otel-deployment-config.yaml: "exporters:\n  otlp:\n    endpoint: ${env:OTEL_EXPORTER_OTLP_ENDPOINT}\n\
-    \    headers:\n      signoz-access-token: ${env:SIGNOZ_API_KEY}\n    tls:\n  \
-    \    insecure: true\n      insecure_skip_verify: false\nextensions:\n  health_check:\n\
-    \    endpoint: 0.0.0.0:13133\n  pprof:\n    endpoint: localhost:1777\n  zpages:\n\
-    \    endpoint: localhost:55679\nprocessors:\n  batch:\n    send_batch_size: 10000\n\
-    \    timeout: 1s\n  k8sattributes:\n    extract:\n      metadata:\n      - k8s.namespace.name\n\
-    \      - k8s.deployment.name\n      - k8s.statefulset.name\n      - k8s.daemonset.name\n\
-    \      - k8s.cronjob.name\n      - k8s.job.name\n      - k8s.node.name\n     \
-    \ - k8s.node.uid\n      - k8s.pod.name\n      - k8s.pod.uid\n      - k8s.pod.start_time\n\
-    \    passthrough: false\n    pod_association:\n    - sources:\n      - from: resource_attribute\n\
-    \        name: k8s.pod.ip\n    - sources:\n      - from: resource_attribute\n\
-    \        name: k8s.pod.uid\n    - sources:\n      - from: connection\n  resourcedetection:\n\
-    \    detectors:\n    - env\n    override: false\n    timeout: 2s\n  resource/clickhouse:\n\
-    \    attributes:\n    - key: host.name\n      value: signoz-clickhouse\n     \
-    \ action: upsert\nreceivers:\n  k8s_cluster:\n    allocatable_types_to_report:\n\
-    \    - cpu\n    - memory\n    collection_interval: 30s\n    metrics:\n      k8s.node.condition:\n\
-    \        enabled: true\n      k8s.pod.status_reason:\n        enabled: true\n\
-    \    node_conditions_to_report:\n    - Ready\n    - MemoryPressure\n    - DiskPressure\n\
-    \    - PIDPressure\n    - NetworkUnavailable\n    resource_attributes:\n     \
-    \ container.runtime:\n        enabled: true\n      container.runtime.version:\n\
-    \        enabled: true\n      k8s.container.status.last_terminated_reason:\n \
-    \       enabled: true\n      k8s.kubelet.version:\n        enabled: true\n   \
-    \   k8s.pod.qos_class:\n        enabled: true\n  k8s_events:\n    auth_type: serviceAccount\n\
-    \  prometheus:\n    config:\n      scrape_configs:\n      - job_name: clickhouse\n\
-    \        scrape_interval: 30s\n        static_configs:\n        - targets:\n \
-    \         - chi-signoz-clickhouse-cluster-0-0-0.chi-signoz-clickhouse-cluster-0-0.signoz.svc.cluster.local:9363\n\
-    service:\n  extensions:\n  - health_check\n  - zpages\n  - pprof\n  pipelines:\n\
-    \    logs:\n      exporters:\n      - otlp\n      processors:\n      - k8sattributes\n\
-    \      - resourcedetection\n      - batch\n      receivers:\n      - k8s_events\n\
-    \    metrics/internal:\n      exporters:\n      - otlp\n      processors:\n  \
-    \    - k8sattributes\n      - resourcedetection\n      - batch\n      receivers:\n\
-    \      - k8s_cluster\n    metrics/clickhouse:\n      exporters:\n      - otlp\n\
-    \      processors:\n      - resource/clickhouse\n      - batch\n      receivers:\n\
-    \      - prometheus\n  telemetry:\n    logs:\n      encoding: json"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: k8s-infra
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: otel-deployment
-    app.kubernetes.io/instance: k8s-infra
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: k8s-infra
-    app.kubernetes.io/version: 0.139.0
-    helm.sh/chart: k8s-infra-0.15.0
-  name: k8s-infra-otel-deployment
-  namespace: signoz
----
-apiVersion: v1
-data:
-  ca.crt: '-----BEGIN CERTIFICATE-----
-
-    MIIDBTCCAe2gAwIBAgIICFZ7LDONfKkwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
-
-    AxMKa3ViZXJuZXRlczAeFw0yNjA0MTQwMTEyMjlaFw0zNjA0MTEwMTE3MjlaMBUx
-
-    EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
-
-    AoIBAQCgWEcelObEPb57j3B7s7K16UNHMXZZETdrPKjbPYQ2u88dvocDWXgX+S9G
-
-    HzJ/81TqbJCft0kT4QiYqU32mKQSy/ncsA6UQGSBVlTAfzpDfM/PSL8DIyA59U6C
-
-    0OgPMcK3ot99ZBiv/LTkDfIyw5y1uc201DYVQ9kAyNAcqCjubtbYHiHOa/IJbVZh
-
-    CK8PlpvHj7JBncsnb08EUEHvI5vVYE+hKJKIArqWyPEfG0oB/ZilmR3B3gVF2ev8
-
-    k/G1FZ2Jx8ln5ZDdbGYB+VxZ7Bio4PAS0TUplA/xp9qJUXBJjhIZbAy1Xfpv3PLB
-
-    1NFd7xlpAa8UErTFxGXMTydi6mTvAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
-
-    BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBTY9OiYpct4GkXOdcDgjJsBhNmGxjAV
-
-    BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAYdZl446N4
-
-    4VF0kezqF8wSivD07V9WdWi+SMLiOHCeMm1p1S0gEK3S9H3wsDrF7cKnomFqBwAg
-
-    46Sv0iu3hel8w+qg5F1UOoy4PUFUkwx3pNBaA+s4IjkR5yERwpwDGqNDUmlkL3PJ
-
-    qDkvCDBgU9sEeY2V+2GBwkEaUiwKt7xqiw6t60NkFIpEvm8HQNDU6nXarceAfYOJ
-
-    fUNowmy6m8xS/FivcYs+Wqvv5yu+mwtvkxy9t026y+XCT+R8VQLG/QabiQRolzH6
-
-    PSjYAW4HZYcjaXqAmQk7N8kElJ1hkymxppUQWvfpN1LhYs/3YCULS+fmzLR/w6ZO
-
-    szTc1uZpUffa
-
-    -----END CERTIFICATE-----
-
-    '
-kind: ConfigMap
-metadata:
-  annotations:
-    kubernetes.io/description: Contains a CA bundle that can be used to verify the
-      kube-apiserver when using internal endpoints such as the internal service IP
-      or kubernetes.default.svc. No other usage is guaranteed across distributions
-      of Kubernetes clusters.
-  name: kube-root-ca.crt
-  namespace: signoz
----
-apiVersion: v1
-data:
-  custom-functions.xml: "<functions>\n    <function>\n        <type>executable</type>\n\
-    \        <name>histogramQuantile</name>\n        <return_type>Float64</return_type>\n\
-    \        <argument>\n            <type>Array(Float64)</type>\n            <name>buckets</name>\n\
-    \        </argument>\n        <argument>\n            <type>Array(Float64)</type>\n\
-    \            <name>counts</name>\n        </argument>\n        <argument>\n  \
-    \          <type>Float64</type>\n            <name>quantile</name>\n        </argument>\n\
-    \        <format>CSV</format>\n        <command>./histogramQuantile</command>\n\
-    \    </function>\n</functions>\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: clickhouse
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    helm.sh/chart: clickhouse-24.1.18
-  name: signoz-clickhouse-custom-functions
-  namespace: signoz
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: operator
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    clickhouse.altinity.com/chop: 0.21.2
-    helm.sh/chart: clickhouse-24.1.18
-  name: signoz-clickhouse-operator-etc-confd-files
-  namespace: signoz
----
-apiVersion: v1
-data:
-  01-clickhouse-01-listen.xml: "<yandex>\n    <!-- Listen wildcard address to allow\
-    \ accepting connections from other containers and host network. -->\n    <listen_host>::</listen_host>\n\
-    \    <listen_host>0.0.0.0</listen_host>\n    <listen_try>1</listen_try>\n</yandex>\n"
-  01-clickhouse-02-logger.xml: "<yandex>\n    <logger>\n        <!-- Possible levels:\
-    \ https://github.com/pocoproject/poco/blob/devel/Foundation/include/Poco/Logger.h#L105\
-    \ -->\n        <level>information</level>\n        <formatting>\n          <type>json</type>\n\
-    \        </formatting>\n        <log>/var/log/clickhouse-server/clickhouse-server.log</log>\n\
-    \        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>\n\
-    \        <size>1000M</size>\n        <count>10</count>\n        <!-- Default behavior\
-    \ is autodetection (log to console if not daemon mode and is tty) -->\n      \
-    \  <console>1</console>\n    </logger>\n</yandex>\n"
-  01-clickhouse-03-query_log.xml: "<yandex>\n    <query_log replace=\"1\">\n     \
-    \   <database>system</database>\n        <table>query_log</table>\n        <engine>Engine\
-    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
-    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </query_log>\n</yandex>\n"
-  01-clickhouse-04-part_log.xml: "<yandex>\n    <part_log replace=\"1\">\n       \
-    \ <database>system</database>\n        <table>part_log</table>\n        <engine>Engine\
-    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
-    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </part_log>\n</yandex>\n"
-  01-clickhouse-05-trace_log.xml: "<yandex>\n    <trace_log replace=\"1\">\n     \
-    \   <database>system</database>\n        <table>trace_log</table>\n        <engine>Engine\
-    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
-    \ 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </trace_log>\n</yandex>"
-  01-clickhouse-06-asynchronous_insert_log.xml: "<yandex>\n    <asynchronous_insert_log\
-    \ replace=\"1\">\n        <database>system</database>\n        <table>asynchronous_insert_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </asynchronous_insert_log>\n</yandex>\n"
-  01-clickhouse-07-asynchronous_metric_log.xml: "<yandex>\n    <asynchronous_metric_log\
-    \ replace=\"1\">\n        <database>system</database>\n        <table>asynchronous_metric_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </asynchronous_metric_log>\n</yandex>\n"
-  01-clickhouse-08-backup_log.xml: "<yandex>\n    <backup_log replace=\"1\">\n   \
-    \     <database>system</database>\n        <table>backup_log</table>\n       \
-    \ <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date\
-    \ + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </backup_log>\n</yandex>\n"
-  01-clickhouse-09-blob_storage_log.xml: "<yandex>\n    <blob_storage_log replace=\"\
-    1\">\n        <database>system</database>\n        <table>blob_storage_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </blob_storage_log>\n</yandex>\n"
-  01-clickhouse-10-crash_log.xml: "<yandex>\n    <crash_log replace=\"1\">\n     \
-    \   <database>system</database>\n        <table>crash_log</table>\n        <engine>Engine\
-    \ = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date + interval\
-    \ 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </crash_log>\n</yandex>\n"
-  01-clickhouse-11-metric_log.xml: "<yandex>\n    <metric_log replace=\"1\">\n   \
-    \     <database>system</database>\n        <table>metric_log</table>\n       \
-    \ <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL event_date\
-    \ + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </metric_log>\n</yandex>\n"
-  01-clickhouse-12-query_thread_log.xml: "<yandex>\n    <query_thread_log replace=\"\
-    1\">\n        <database>system</database>\n        <table>query_thread_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </query_thread_log>\n</yandex>\n"
-  01-clickhouse-13-query_views_log.xml: "<yandex>\n    <query_views_log replace=\"\
-    1\">\n        <database>system</database>\n        <table>query_views_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 15 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </query_views_log>\n</yandex>\n"
-  01-clickhouse-14-session_log.xml: "<yandex>\n    <session_log replace=\"1\">\n \
-    \       <database>system</database>\n        <table>session_log</table>\n    \
-    \    <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time TTL\
-    \ event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </session_log>\n</yandex>\n"
-  01-clickhouse-15-zookeeper_log.xml: "<yandex>\n    <zookeeper_log replace=\"1\"\
-    >\n        <database>system</database>\n        <table>zookeeper_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 30 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </zookeeper_log>\n</yandex>\n"
-  01-clickhouse-16-processors_profile_log.xml: "<yandex>\n    <processors_profile_log\
-    \ replace=\"1\">\n        <database>system</database>\n        <table>processors_profile_log</table>\n\
-    \        <engine>Engine = MergeTree PARTITION BY event_date ORDER BY event_time\
-    \ TTL event_date + interval 7 day</engine>\n        <flush_interval_milliseconds>7500</flush_interval_milliseconds>\n\
-    \    </processors_profile_log>\n</yandex>\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: operator
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    clickhouse.altinity.com/chop: 0.21.2
-    helm.sh/chart: clickhouse-24.1.18
-  name: signoz-clickhouse-operator-etc-configd-files
-  namespace: signoz
----
-apiVersion: v1
-data:
-  config.yaml: "#\n# Template parameters available:\n#   WATCH_NAMESPACES=\n#   CH_USERNAME_PLAIN=\n\
-    #   CH_PASSWORD_PLAIN=\n#   CH_CREDENTIALS_SECRET_NAMESPACE=\n#   CH_CREDENTIALS_SECRET_NAME=clickhouse-operator\n\
-    \n################################################\n##\n## Watch Section\n##\n\
-    ################################################\nwatch:\n  # List of namespaces\
-    \ where clickhouse-operator watches for events.\n  # Concurrently running operators\
-    \ should watch on different namespaces.\n  #namespaces: [\"dev\", \"test\"]\n\
-    \  namespaces: []\n\nclickhouse:\n  configuration:\n    ################################################\n\
-    \    ##\n    ## Configuration Files Section\n    ##\n    ################################################\n\
-    \    file:\n      path:\n        # Path to the folder where ClickHouse configuration\
-    \ files common for all instances within a CHI are located.\n        common: config.d\n\
-    \        # Path to the folder where ClickHouse configuration files unique for\
-    \ each instance (host) within a CHI are located.\n        host: conf.d\n     \
-    \   # Path to the folder where ClickHouse configuration files with users' settings\
-    \ are located.\n        # Files are common for all instances within a CHI.\n \
-    \       user: users.d\n    ################################################\n\
-    \    ##\n    ## Configuration Users Section\n    ##\n    ################################################\n\
-    \    user:\n      # Default settings for user accounts, created by the operator.\n\
-    \      # NB. These are not access credentials or settings for 'default' user account,\n\
-    \      # it is a template for filling out missing fields for all user accounts\
-    \ to be created by the operator, except:\n      # 1. 'default' account, which\
-    \ DOES NOT use provided password, but uses all the rest of the fields\n      #\
-    \ Password for 'default' account as to be provided explicitly, if to be used\n\
-    \      # 2. CHOP account, which DOES NOT use profile, quota, password and regexp,\
-    \ but uses network IPs - extending them\n      # Password for CHOP account is\
-    \ used from `clickhouse.access.password` section\n      default:\n        # Default\
-    \ values for ClickHouse user configuration\n        # 1. user/profile - string\n\
-    \        # 2. user/quota - string\n        # 3. user/networks/ip - multiple strings\n\
-    \        # 4. user/password - string\n        profile: \"default\"\n        quota:\
-    \ \"default\"\n        networksIP:\n          - \"::1\"\n          - \"127.0.0.1\"\
-    \n        password: \"default\"\n    ################################################\n\
-    \    ##\n    ## Configuration Network Section\n    ##\n    ################################################\n\
-    \    network:\n      # Default host_regexp to limit network connectivity from\
-    \ outside\n      hostRegexpTemplate: \"(chi-{chi}-[^.]+\\\\d+-\\\\d+|clickhouse\\\
-    \\-{chi})\\\\.{namespace}\\\\.svc\\\\.cluster\\\\.local$\"\n\n  ################################################\n\
-    \  ##\n  ## Configuration Restart Policy Section\n  ## Configuration restart policy\
-    \ describes what configuration changes require ClickHouse restart\n  ##\n  ################################################\n\
-    \  configurationRestartPolicy:\n    rules:\n      - version: \"*\"\n        rules:\n\
-    \          - settings/*: \"yes\"\n          - settings/dictionaries_config: \"\
-    no\"\n          - settings/logger: \"no\"\n          - settings/macros/*: \"no\"\
-    \n          - settings/max_server_memory_*: \"no\"\n          - settings/max_*_to_drop:\
-    \ \"no\"\n          - settings/max_concurrent_queries: \"no\"\n          - settings/models_config:\
-    \ \"no\"\n          - settings/user_defined_executable_functions_config: \"no\"\
-    \n\n          - zookeeper/*: \"yes\"\n\n          - files/config.d/*.xml: \"yes\"\
-    \n          - files/config.d/*dict*.xml: \"no\"\n\n          - profiles/default/background_*_pool_size:\
-    \ \"yes\"\n          - profiles/default/max_*_for_server: \"yes\"\n      - version:\
-    \ \"21.*\"\n        rules:\n          - settings/logger: \"yes\"\n\n  #################################################\n\
-    \  ##\n  ## Access to ClickHouse instances\n  ##\n  ################################################\n\
-    \  access:\n    # Possible values for `scheme` are:\n    # 1. http\n    # 2. https\n\
-    \    scheme: \"\"\n    # ClickHouse credentials (username, password and port)\
-    \ to be used by the operator to connect to ClickHouse instances.\n    # Used for:\n\
-    \    # 1. Metrics requests\n    # 2. Schema maintenance\n    # 3. DROP DNS CACHE\n\
-    \    # User with these credentials can be specified in additional ClickHouse .xml\
-    \ config files,\n    # located in `clickhouse.configuration.file.path.user` folder\n\
-    \    username: \"\"\n    password: \"\"\n    rootCA: \"\"\n\n    # Location of\
-    \ the k8s Secret with username and password to be used by the operator to connect\
-    \ to ClickHouse instances.\n    # Can be used instead of explicitly specified\
-    \ username and password which are:\n    # clickhouse.access.username\n    # clickhouse.access.password\n\
-    \    # Secret should have two keys:\n    # 1. username\n    # 2. password\n  \
-    \  secret:\n      # Empty `namespace` means that k8s secret would be looked in\
-    \ the same namespace where operator's pod is running.\n      namespace: \"\"\n\
-    \      # Empty `name` means no k8s Secret would be looked for\n      name: \"\
-    signoz-clickhouse-operator\"\n    # Port where to connect to ClickHouse instances\
-    \ to\n    port: 8123\n\n    # Timeouts used to limit connection and queries from\
-    \ the operator to ClickHouse instances\n    # Specified in seconds.\n    timeouts:\n\
-    \      connect: 2\n      query: 5\n\n  metrics:\n    timeouts:\n      collect:\
-    \ 9\n\n################################################\n##\n## Templates Section\n\
-    ##\n################################################\ntemplate:\n  chi:\n    #\
-    \ Path to the folder where ClickHouseInstallation .yaml manifests are located.\n\
-    \    # Manifests are applied in sorted alpha-numeric order.\n    path: templates.d\n\
-    \n################################################\n##\n## Reconcile Section\n\
-    ##\n################################################\nreconcile:\n  runtime:\n\
-    \    # Max number of concurrent CHI reconciles in progress\n    reconcileCHIsThreadsNumber:\
-    \ 10\n    # Max number of concurrent shard reconciles in progress\n    reconcileShardsThreadsNumber:\
-    \ 1\n    # The maximum percentage of cluster shards that may be reconciled in\
-    \ parallel\n    reconcileShardsMaxConcurrencyPercent: 50\n\n  statefulSet:\n \
-    \   create:\n      # What to do in case created StatefulSet is not in 'Ready'\
-    \ after `reconcile.statefulSet.update.timeout` seconds\n      # Possible options:\n\
-    \      # 1. abort - do nothing, just break the process and wait for an admin to\
-    \ assist\n      # 2. delete - delete newly created problematic StatefulSet\n \
-    \     # 3. ignore - ignore an error, pretend nothing happened and move on to the\
-    \ next StatefulSet\n      onFailure: ignore\n\n    update:\n      # How many seconds\
-    \ to wait for created/updated StatefulSet to be 'Ready'\n      timeout: 900\n\
-    \      # How many seconds to wait between checks/polls for created/updated StatefulSet\
-    \ status\n      pollInterval: 5\n      # What to do in case updated StatefulSet\
-    \ is not in 'Ready' after `reconcile.statefulSet.update.timeout` seconds\n   \
-    \   # Possible options:\n      # 1. abort - do nothing, just break the process\
-    \ and wait for an admin to assist\n      # 2. rollback - delete Pod and rollback\
-    \ StatefulSet to previous Generation.\n      # Pod would be recreated by StatefulSet\
-    \ based on rollback-ed configuration\n      # 3. ignore - ignore an error, pretend\
-    \ nothing happened and move on to the next StatefulSet\n      onFailure: abort\n\
-    \n  host:\n    # Whether reconciler should wait for a host:\n    # - to be excluded\
-    \ from a cluster\n    # OR\n    # - to be included into a cluster\n    # respectfully\n\
-    \    wait:\n      exclude: true\n      include: false\n\n################################################\n\
-    ##\n## Annotations management\n##\n################################################\n\
-    annotation:\n  # Applied when:\n  #  1. Propagating annotations from the CHI's\
-    \ `metadata.annotations` to child objects' `metadata.annotations`,\n  #  2. Propagating\
-    \ annotations from the CHI Template's `metadata.annotations` to CHI's `metadata.annotations`,\n\
-    \  # Include annotations from the following list:\n  # Applied only when not empty.\
-    \ Empty list means \"include all, no selection\"\n  include: []\n  # Exclude annotations\
-    \ from the following list:\n  exclude: []\n\n################################################\n\
-    ##\n## Labels management\n##\n################################################\n\
-    label:\n  # Applied when:\n  #  1. Propagating labels from the CHI's `metadata.labels`\
-    \ to child objects' `metadata.labels`,\n  #  2. Propagating labels from the CHI\
-    \ Template's `metadata.labels` to CHI's `metadata.labels`,\n  # Include labels\
-    \ from the following list:\n  # Applied only when not empty. Empty list means\
-    \ \"include all, no selection\"\n  include: []\n  # Exclude labels from the following\
-    \ list:\n  # Applied only when not empty. Empty list means \"nothing to exclude,\
-    \ no selection\"\n  exclude: []\n  # Whether to append *Scope* labels to StatefulSet\
-    \ and Pod.\n  # Full list of available *scope* labels check in 'labeler.go'\n\
-    \  #  LabelShardScopeIndex\n  #  LabelReplicaScopeIndex\n  #  LabelCHIScopeIndex\n\
-    \  #  LabelCHIScopeCycleSize\n  #  LabelCHIScopeCycleIndex\n  #  LabelCHIScopeCycleOffset\n\
-    \  #  LabelClusterScopeIndex\n  #  LabelClusterScopeCycleSize\n  #  LabelClusterScopeCycleIndex\n\
-    \  #  LabelClusterScopeCycleOffset\n  appendScope: \"no\"\n\n################################################\n\
-    ##\n## StatefulSet management\n##\n################################################\n\
-    statefulSet:\n  revisionHistoryLimit: 0\n\n################################################\n\
-    ##\n## Pod management\n##\n################################################\n\
-    pod:\n  # Grace period for Pod termination.\n  # How many seconds to wait between\
-    \ sending\n  # SIGTERM and SIGKILL during Pod termination process.\n  # Increase\
-    \ this number is case of slow shutdown.\n  terminationGracePeriod: 30\n\n################################################\n\
-    ##\n## Log parameters\n##\n################################################\n\
-    logger:\n  logtostderr: \"true\"\n  alsologtostderr: \"false\"\n  v: \"1\"\n \
-    \ stderrthreshold: \"\"\n  vmodule: \"\"\n  log_backtrace_at: \"\"\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: operator
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    clickhouse.altinity.com/chop: 0.21.2
-    helm.sh/chart: clickhouse-24.1.18
-  name: signoz-clickhouse-operator-etc-files
-  namespace: signoz
----
-apiVersion: v1
-data:
-  001-templates.json.example: "{\n  \"apiVersion\": \"clickhouse.altinity.com/v1\"\
-    ,\n  \"kind\": \"ClickHouseInstallationTemplate\",\n  \"metadata\": {\n    \"\
-    name\": \"01-default-volumeclaimtemplate\"\n  },\n  \"spec\": {\n    \"templates\"\
-    : {\n      \"volumeClaimTemplates\": [\n        {\n          \"name\": \"chi-default-volume-claim-template\"\
-    ,\n          \"spec\": {\n            \"accessModes\": [\n              \"ReadWriteOnce\"\
-    \n            ],\n            \"resources\": {\n              \"requests\": {\n\
-    \                \"storage\": \"2Gi\"\n              }\n            }\n      \
-    \    }\n        }\n      ],\n      \"podTemplates\": [\n        {\n          \"\
-    name\": \"chi-default-oneperhost-pod-template\",\n          \"distribution\":\
-    \ \"OnePerHost\",\n          \"spec\": {\n            \"containers\" : [\n   \
-    \           {\n                \"name\": \"clickhouse\",\n                \"image\"\
-    : \"clickhouse/clickhouse-server:22.3\",\n                \"ports\": [\n     \
-    \             {\n                    \"name\": \"http\",\n                   \
-    \ \"containerPort\": 8123\n                  },\n                  {\n       \
-    \             \"name\": \"client\",\n                    \"containerPort\": 9000\n\
-    \                  },\n                  {\n                    \"name\": \"interserver\"\
-    ,\n                    \"containerPort\": 9009\n                  }\n        \
-    \        ]\n              }\n            ]\n          }\n        }\n      ]\n\
-    \    }\n  }\n}\n"
-  default-pod-template.yaml.example: "apiVersion: \"clickhouse.altinity.com/v1\"\n\
-    kind: \"ClickHouseInstallationTemplate\"\nmetadata:\n  name: \"default-oneperhost-pod-template\"\
-    \nspec:\n  templates:\n    podTemplates:\n      - name: default-oneperhost-pod-template\n\
-    \        distribution: \"OnePerHost\"\n"
-  default-storage-template.yaml.example: "apiVersion: \"clickhouse.altinity.com/v1\"\
-    \nkind: \"ClickHouseInstallationTemplate\"\nmetadata:\n  name: \"default-storage-template-2Gi\"\
-    \nspec:\n  templates:\n    volumeClaimTemplates:\n      - name: default-storage-template-2Gi\n\
-    \        spec:\n          accessModes:\n            - ReadWriteOnce\n        \
-    \  resources:\n            requests:\n              storage: 2Gi\n"
-  readme: Templates in this folder are packaged with an operator and available via
-    'useTemplate'
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: operator
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    clickhouse.altinity.com/chop: 0.21.2
-    helm.sh/chart: clickhouse-24.1.18
-  name: signoz-clickhouse-operator-etc-templatesd-files
-  namespace: signoz
----
-apiVersion: v1
-data:
-  01-clickhouse-user.xml: "<yandex>\n    <users>\n        <clickhouse_operator>\n\
-    \            <networks>\n                <ip>127.0.0.1</ip>\n            </networks>\n\
-    \            <password_sha256_hex>716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448</password_sha256_hex>\n\
-    \            <profile>clickhouse_operator</profile>\n            <quota>default</quota>\n\
-    \        </clickhouse_operator>\n    </users>\n    <profiles>\n        <clickhouse_operator>\n\
-    \            <log_queries>0</log_queries>\n            <skip_unavailable_shards>1</skip_unavailable_shards>\n\
-    \            <http_connection_timeout>10</http_connection_timeout>\n        </clickhouse_operator>\n\
-    \    </profiles>\n</yandex>\n"
-  02-clickhouse-default-profile.xml: "<yandex>\n  <profiles>\n    <default>\n    \
-    \  <log_queries>1</log_queries>\n      <connect_timeout_with_failover_ms>1000</connect_timeout_with_failover_ms>\n\
-    \      <distributed_aggregation_memory_efficient>1</distributed_aggregation_memory_efficient>\n\
-    \      <parallel_view_processing>1</parallel_view_processing>\n    </default>\n\
-    \  </profiles>\n</yandex>\n"
-  03-database-ordinary.xml: "<yandex>\n    <profiles>\n        <default>\n       \
-    \     <default_database_engine>Ordinary</default_database_engine>\n        </default>\n\
-    \    </profiles>\n</yandex>\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: operator
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    clickhouse.altinity.com/chop: 0.21.2
-    helm.sh/chart: clickhouse-24.1.18
-  name: signoz-clickhouse-operator-etc-usersd-files
-  namespace: signoz
----
-apiVersion: v1
-data:
-  wait-until-ready.sh: "#!/bin/bash\n\n# Delay between attempts in seconds\nDELAY=10\n\
-    # Default host and port\nHOST=\"localhost\"\nPORT=\"8123\"\n\necho \"Waiting for\
-    \ Clickhouse to become ready...\"\n\nwhile true; do\n    response=$(wget --spider\
-    \ -S \"http://${HOST}:${PORT}/ping\" 2>&1)\n    exit_code=$?\n    \n    if [ $exit_code\
-    \ -eq 0 ]; then\n        echo \"Clickhouse is ready!\"\n        exit 0\n    else\n\
-    \        echo \"Clickhouse is not ready yet. Retrying in ${DELAY} seconds...\"\
-    \n        sleep $DELAY\n    fi\ndone\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: clickhouse
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: clickhouse
-    app.kubernetes.io/version: 24.1.2
-    helm.sh/chart: clickhouse-24.1.18
-  name: signoz-clickhouse-scripts
-  namespace: signoz
----
-apiVersion: v1
-data:
-  otel-collector-config.yaml: "extensions:\n  health_check:\n    endpoint: 0.0.0.0:13133\n\
-    \nreceivers:\n  otlp:\n    protocols:\n      grpc:\n        endpoint: 0.0.0.0:4317\n\
-    \      http:\n        endpoint: 0.0.0.0:4318\n  jaeger:\n    protocols:\n    \
-    \  grpc:\n        endpoint: 0.0.0.0:14250\n      thrift_http:\n        endpoint:\
-    \ 0.0.0.0:14268\n\nexporters:\n  clickhousetraces:\n    datasource: tcp://signoz-clickhouse:9000/?database=signoz_traces&username=admin&password=27ff0399-0d3a-4bd8-919d-17c2181e6fb9&max_execution_time=120&dial_timeout=30s\n\
-    \    timeout: 120s\n  signozclickhousemetrics:\n    dsn: tcp://signoz-clickhouse:9000/?database=signoz_metrics&username=admin&password=27ff0399-0d3a-4bd8-919d-17c2181e6fb9&max_execution_time=120&dial_timeout=30s\n\
-    \    timeout: 120s\n  clickhouselogsexporter:\n    dsn: tcp://signoz-clickhouse:9000/?database=signoz_logs&username=admin&password=27ff0399-0d3a-4bd8-919d-17c2181e6fb9&max_execution_time=120&dial_timeout=30s\n\
-    \    timeout: 120s\n\nprocessors:\n  batch:\n    send_batch_size: 500\n    send_batch_max_size:\
-    \ 1000\n    timeout: 10s\n\nservice:\n  extensions: [health_check]\n  pipelines:\n\
-    \    traces:\n      receivers: [otlp, jaeger]\n      processors: [batch]\n   \
-    \   exporters: [clickhousetraces]\n    metrics:\n      receivers: [otlp]\n   \
-    \   processors: [batch]\n      exporters: [signozclickhousemetrics]\n    logs:\n\
-    \      receivers: [otlp]\n      processors: [batch]\n      exporters: [clickhouselogsexporter]\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  name: signoz-otel-collector
-  namespace: signoz
----
-apiVersion: v1
-data:
-  init-certs.sh: '#!/bin/bash'
-  setup.sh: "#!/bin/bash\n\n# Execute entrypoint as usual after obtaining ZOO_SERVER_ID\n\
-    # check ZOO_SERVER_ID in persistent volume via myid\n# if not present, set based\
-    \ on POD hostname\nif [[ -f \"/bitnami/zookeeper/data/myid\" ]]; then\n    export\
-    \ ZOO_SERVER_ID=\"$(cat /bitnami/zookeeper/data/myid)\"\nelse\n    HOSTNAME=\"\
-    $(hostname -s)\"\n    if [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]]; then\n        ORD=${BASH_REMATCH[2]}\n\
-    \        export ZOO_SERVER_ID=\"$((ORD + 1 ))\"\n    else\n        echo \"Failed\
-    \ to get index from hostname $HOSTNAME\"\n        exit 1\n    fi\nfi\nexec /entrypoint.sh\
-    \ /run.sh"
-kind: ConfigMap
-metadata:
-  annotations:
-    meta.helm.sh/release-name: signoz
-    meta.helm.sh/release-namespace: signoz
-  labels:
-    app.kubernetes.io/component: zookeeper
-    app.kubernetes.io/instance: signoz
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: zookeeper
-    helm.sh/chart: zookeeper-0.0.1
-  name: signoz-zookeeper-scripts
-  namespace: signoz
+  resourceVersion: ""

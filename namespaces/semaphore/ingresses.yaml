@@ -1,22 +1,27 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: v1
+items:
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":80,"protocol":"HTTP","serviceName":"semaphore:semaphore","ingressName":"semaphore:semaphore","hostname":"semaphore.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+        nginx.ingress.kubernetes.io/configuration-snippet: if ($request_uri = "/auth/login") { return 302 /api/auth/oidc/dex/login; }
+        nginx.ingress.kubernetes.io/proxy-body-size: 10m
+      name: semaphore
+      namespace: semaphore
+    spec:
+      ingressClassName: nginx
+      rules:
+        - host: semaphore.35.241.255.137.nip.io
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: semaphore
+                    port:
+                      number: 80
+                path: /
+                pathType: Prefix
+kind: List
 metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: if ($request_uri = "/auth/login")
-      { return 302 /api/auth/oidc/dex/login; }
-    nginx.ingress.kubernetes.io/proxy-body-size: 10m
-  name: semaphore
-  namespace: semaphore
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: semaphore.35.241.255.137.nip.io
-    http:
-      paths:
-      - backend:
-          service:
-            name: semaphore
-            port:
-              number: 80
-        path: /
-        pathType: Prefix
+  resourceVersion: ""

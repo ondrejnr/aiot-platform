@@ -1,0 +1,88 @@
+apiVersion: v1
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: imperative-api-extension
+      namespace: cattle-system
+    spec:
+      clusterIP: 10.107.37.150
+      clusterIPs:
+        - 10.107.37.150
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - port: 6666
+          protocol: TCP
+          targetPort: 6666
+      selector:
+        app: rancher
+      sessionAffinity: None
+      type: ClusterIP
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: rancher
+        meta.helm.sh/release-namespace: cattle-system
+      labels:
+        app: rancher
+        app.kubernetes.io/managed-by: Helm
+        chart: rancher-2.13.3
+        heritage: Helm
+        release: rancher
+      name: rancher
+      namespace: cattle-system
+    spec:
+      clusterIP: 10.108.226.249
+      clusterIPs:
+        - 10.108.226.249
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 80
+        - name: https-internal
+          port: 443
+          protocol: TCP
+          targetPort: 444
+      selector:
+        app: rancher
+      sessionAffinity: None
+      type: ClusterIP
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: rancher-webhook
+        meta.helm.sh/release-namespace: cattle-system
+      labels:
+        app.kubernetes.io/managed-by: Helm
+      name: rancher-webhook
+      namespace: cattle-system
+    spec:
+      clusterIP: 10.103.73.11
+      clusterIPs:
+        - 10.103.73.11
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - name: https
+          port: 443
+          protocol: TCP
+          targetPort: 9443
+      selector:
+        app: rancher-webhook
+      sessionAffinity: None
+      type: ClusterIP
+kind: List
+metadata:
+  resourceVersion: ""

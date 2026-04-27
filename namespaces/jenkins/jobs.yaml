@@ -1,0 +1,399 @@
+apiVersion: v1
+items:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      labels:
+        k8up.io/owned-by: check_aiot-check-qt2hn
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: check
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: check-aiot-check-qt2hn
+      namespace: jenkins
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Check
+          name: aiot-check-qt2hn
+          uid: fa2c2b0f-51f6-4332-817b-f1f76d1c56ed
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 18115b81-9eb5-4c02-a6d0-586de969ebb2
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 18115b81-9eb5-4c02-a6d0-586de969ebb2
+            batch.kubernetes.io/job-name: check-aiot-check-qt2hn
+            controller-uid: 18115b81-9eb5-4c02-a6d0-586de969ebb2
+            job-name: check-aiot-check-qt2hn
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -check
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: CLUSTER_NAME
+                  value: default
+                - name: HOSTNAME
+                  value: jenkins
+                - name: STATS_URL
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: check
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      labels:
+        k8up.io/owned-by: prune_aiot-prune-8644f
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-8644f
+      namespace: jenkins
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-8644f
+          uid: 2534f568-4c53-4932-b712-010a8790f478
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: c45cb939-23b8-416f-ba48-bbeae7e2221c
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: c45cb939-23b8-416f-ba48-bbeae7e2221c
+            batch.kubernetes.io/job-name: prune-aiot-prune-8644f
+            controller-uid: c45cb939-23b8-416f-ba48-bbeae7e2221c
+            job-name: prune-aiot-prune-8644f
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: HOSTNAME
+                  value: jenkins
+                - name: STATS_URL
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      labels:
+        k8up.io/owned-by: prune_aiot-prune-ff8qn
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-ff8qn
+      namespace: jenkins
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-ff8qn
+          uid: da7b9923-b0e4-42f1-b886-b31dc6ec4efd
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: f9fa3912-b9d6-40f0-88bf-99bfe94344c2
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: f9fa3912-b9d6-40f0-88bf-99bfe94344c2
+            batch.kubernetes.io/job-name: prune-aiot-prune-ff8qn
+            controller-uid: f9fa3912-b9d6-40f0-88bf-99bfe94344c2
+            job-name: prune-aiot-prune-ff8qn
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: HOSTNAME
+                  value: jenkins
+                - name: STATS_URL
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      labels:
+        k8up.io/owned-by: prune_aiot-prune-gcjc6
+        k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+        k8up.io/type: prune
+        k8upjob: "true"
+        k8upjob/exclusive: "true"
+      name: prune-aiot-prune-gcjc6
+      namespace: jenkins
+      ownerReferences:
+        - apiVersion: k8up.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Prune
+          name: aiot-prune-gcjc6
+          uid: 9cbe9176-12bf-42be-af96-d0eed8a97f36
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 27c0b3ef-8de0-4205-a074-b6fcf6f3eeba
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 27c0b3ef-8de0-4205-a074-b6fcf6f3eeba
+            batch.kubernetes.io/job-name: prune-aiot-prune-gcjc6
+            controller-uid: 27c0b3ef-8de0-4205-a074-b6fcf6f3eeba
+            job-name: prune-aiot-prune-gcjc6
+            k8upjob: "true"
+        spec:
+          containers:
+            - args:
+                - -varDir
+                - /k8up
+                - -prune
+              command:
+                - /usr/local/bin/k8up
+                - restic
+              env:
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: secret_key
+                      name: r2-creds
+                - name: PROM_URL
+                  value: http://127.0.0.1/
+                - name: STATS_URL
+                - name: HOSTNAME
+                  value: jenkins
+                - name: KEEP_DAILY
+                  value: "2"
+                - name: RESTIC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: password
+                      name: k8up-repo
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: access_key
+                      name: r2-creds
+                - name: RESTIC_REPOSITORY
+                  value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+              image: ghcr.io/k8up-io/k8up:v2.15.0
+              imagePullPolicy: IfNotPresent
+              name: prune
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /k8up
+                  name: k8up-dir
+                - mountPath: /tmp
+                  name: restic-tmp-dir
+                - mountPath: /.cache
+                  name: restic-cache-dir
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: pod-executor
+          serviceAccountName: pod-executor
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: k8up-dir
+            - emptyDir: {}
+              name: restic-tmp-dir
+            - emptyDir: {}
+              name: restic-cache-dir
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,223 @@
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"cattle-system:rancher","ingressName":"cattle-system:rancher","hostname":"rancher.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      labels:
+        app: rancher
+        chart: rancher-2.13.3
+        heritage: Helm
+        release: rancher
+      name: rancher
+      namespace: cattle-system
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: rancher
+      strategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/restartedAt: "2026-04-20T12:28:15Z"
+          creationTimestamp: null
+          labels:
+            app: rancher
+            release: rancher
+        spec:
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - preference:
+                    matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: In
+                        values:
+                          - oci-e5-node1
+                  weight: 100
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/os
+                        operator: NotIn
+                        values:
+                          - windows
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app
+                          operator: In
+                          values:
+                            - rancher
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+          containers:
+            - args:
+                - --no-cacerts
+                - --http-listen-port=80
+                - --https-listen-port=443
+                - --add-local=true
+              env:
+                - name: CATTLE_NAMESPACE
+                  value: cattle-system
+                - name: CATTLE_PEER_SERVICE
+                  value: rancher
+                - name: CATTLE_BOOTSTRAP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: bootstrapPassword
+                      name: bootstrap-secret
+                - name: IMPERATIVE_API_DIRECT
+                  value: "true"
+                - name: IMPERATIVE_API_APP_SELECTOR
+                  value: rancher
+              image: rancher/rancher:v2.13.3
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 5
+                httpGet:
+                  path: /healthz
+                  port: 80
+                  scheme: HTTP
+                periodSeconds: 30
+                successThreshold: 1
+                timeoutSeconds: 5
+              name: rancher
+              ports:
+                - containerPort: 80
+                  protocol: TCP
+                - containerPort: 6666
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 5
+                httpGet:
+                  path: /healthz
+                  port: 80
+                  scheme: HTTP
+                periodSeconds: 30
+                successThreshold: 1
+                timeoutSeconds: 5
+              resources:
+                limits:
+                  memory: 2Gi
+                requests:
+                  cpu: 500m
+                  memory: 512Mi
+              startupProbe:
+                failureThreshold: 60
+                httpGet:
+                  path: /healthz
+                  port: 80
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            workload-zone: build
+          priorityClassName: rancher-critical
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: rancher
+          serviceAccountName: rancher
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: cattle.io/os
+              operator: Equal
+              value: linux
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations: {}
+      name: rancher-webhook
+      namespace: cattle-system
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: rancher-webhook
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: rancher-webhook
+        spec:
+          containers:
+            - env:
+                - name: STAMP
+                - name: ENABLE_MCM
+                  value: "true"
+                - name: CATTLE_PORT
+                  value: "9443"
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.namespace
+              image: rancher/rancher-webhook:v0.9.3
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: https
+                  scheme: HTTPS
+                periodSeconds: 5
+                successThreshold: 1
+                timeoutSeconds: 1
+              name: rancher-webhook
+              ports:
+                - containerPort: 9443
+                  name: https
+                  protocol: TCP
+              resources: {}
+              startupProbe:
+                failureThreshold: 60
+                httpGet:
+                  path: /healthz
+                  port: https
+                  scheme: HTTPS
+                periodSeconds: 5
+                successThreshold: 1
+                timeoutSeconds: 1
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            kubernetes.io/os: linux
+          priorityClassName: rancher-critical
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: rancher-webhook
+          serviceAccountName: rancher-webhook
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: cattle.io/os
+              operator: Equal
+              value: linux
+kind: List
+metadata:
+  resourceVersion: ""

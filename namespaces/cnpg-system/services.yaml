@@ -1,21 +1,26 @@
 apiVersion: v1
-kind: Service
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: cnpg-webhook-service
+      namespace: cnpg-system
+    spec:
+      clusterIP: 10.98.10.189
+      clusterIPs:
+        - 10.98.10.189
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - port: 443
+          protocol: TCP
+          targetPort: 9443
+      selector:
+        app.kubernetes.io/name: cloudnative-pg
+      sessionAffinity: None
+      type: ClusterIP
+kind: List
 metadata:
-  name: cnpg-webhook-service
-  namespace: cnpg-system
-spec:
-  clusterIP: 10.102.221.92
-  clusterIPs:
-  - 10.102.221.92
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-  - port: 443
-    protocol: TCP
-    targetPort: 9443
-  selector:
-    app.kubernetes.io/name: cloudnative-pg
-  sessionAffinity: None
-  type: ClusterIP
+  resourceVersion: ""

@@ -1,0 +1,76 @@
+apiVersion: v1
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        konflux.konflux-ci.dev/component: ui
+        konflux.konflux-ci.dev/owner: konflux-ui
+      name: dex
+      namespace: konflux-ui
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxUI
+          name: konflux-ui
+          uid: 4100e984-9ed5-4a39-a25b-169927bdac04
+    spec:
+      clusterIP: 10.101.217.218
+      clusterIPs:
+        - 10.101.217.218
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - name: dex
+          port: 9443
+          protocol: TCP
+          targetPort: 9443
+      selector:
+        app: dex
+      sessionAffinity: None
+      type: ClusterIP
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        field.cattle.io/publicEndpoints: "null"
+      labels:
+        app: proxy
+        konflux.konflux-ci.dev/component: ui
+        konflux.konflux-ci.dev/owner: konflux-ui
+      name: proxy
+      namespace: konflux-ui
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxUI
+          name: konflux-ui
+          uid: 4100e984-9ed5-4a39-a25b-169927bdac04
+    spec:
+      clusterIP: 10.101.88.229
+      clusterIPs:
+        - 10.101.88.229
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - name: web
+          port: 8888
+          protocol: TCP
+          targetPort: web
+        - name: web-tls
+          port: 9443
+          protocol: TCP
+          targetPort: web-tls
+      selector:
+        app: proxy
+      sessionAffinity: None
+      type: ClusterIP
+kind: List
+metadata:
+  resourceVersion: ""

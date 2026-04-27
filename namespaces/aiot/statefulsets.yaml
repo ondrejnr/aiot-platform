@@ -1,45 +1,52 @@
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: redis
-  namespace: aiot
-spec:
-  persistentVolumeClaimRetentionPolicy:
-    whenDeleted: Retain
-    whenScaled: Retain
-  podManagementPolicy: OrderedReady
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app: redis
-  serviceName: redis-master
-  template:
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: StatefulSet
     metadata:
-      labels:
-        app: redis
+      annotations: {}
+      name: redis
+      namespace: aiot
     spec:
-      containers:
-      - image: redis:7-alpine
-        imagePullPolicy: IfNotPresent
-        name: redis
-        ports:
-        - containerPort: 6379
-          protocol: TCP
-        resources:
-          requests:
-            cpu: 50m
-            memory: 64Mi
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      nodeSelector:
-        node-role.kubernetes.io/worker: ''
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-  updateStrategy:
-    rollingUpdate:
-      partition: 0
-    type: RollingUpdate
+      persistentVolumeClaimRetentionPolicy:
+        whenDeleted: Retain
+        whenScaled: Retain
+      podManagementPolicy: OrderedReady
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: redis
+      serviceName: redis-master
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: redis
+        spec:
+          containers:
+            - image: redis:7-alpine
+              imagePullPolicy: IfNotPresent
+              name: redis
+              ports:
+                - containerPort: 6379
+                  protocol: TCP
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            node-role.kubernetes.io/worker: ""
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+      updateStrategy:
+        rollingUpdate:
+          partition: 0
+        type: RollingUpdate
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,89 +1,57 @@
 apiVersion: v1
 items:
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:19Z"
-    generation: 1
-    labels:
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/name: grafana
-      app.kubernetes.io/version: 12.4.2
-      helm.sh/chart: grafana-11.6.0
-    name: tls-grafana
-    namespace: monitoring
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: prometheus-grafana
-      uid: 9821c60d-2593-40b9-a4fc-197e63ff9415
-    resourceVersion: "275417"
-    uid: eaa10440-5839-4764-9a4f-47f6564df9f8
-  spec:
-    dnsNames:
-    - grafana.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-grafana
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:52:45Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:54:12Z"
-    notBefore: "2026-04-14T08:54:13Z"
-    renewalTime: "2026-06-13T08:54:12Z"
-    revision: 1
-- apiVersion: cert-manager.io/v1
-  kind: Certificate
-  metadata:
-    creationTimestamp: "2026-04-14T09:51:20Z"
-    generation: 1
-    name: tls-prometheus
-    namespace: monitoring
-    ownerReferences:
-    - apiVersion: networking.k8s.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Ingress
-      name: prometheus
-      uid: 55fec54b-8461-409a-8c5b-6d9e71620da9
-    resourceVersion: "275348"
-    uid: 378a7cd9-8a27-4d50-821d-72b82961fffd
-  spec:
-    dnsNames:
-    - prometheus.35.241.255.137.nip.io
-    issuerRef:
-      group: cert-manager.io
-      kind: ClusterIssuer
-      name: letsencrypt-prod
-    secretName: tls-prometheus
-    usages:
-    - digital signature
-    - key encipherment
-  status:
-    conditions:
-    - lastTransitionTime: "2026-04-14T09:52:40Z"
-      message: Certificate is up to date and has not expired
-      observedGeneration: 1
-      reason: Ready
-      status: "True"
-      type: Ready
-    notAfter: "2026-07-13T08:54:07Z"
-    notBefore: "2026-04-14T08:54:08Z"
-    renewalTime: "2026-06-13T08:54:07Z"
-    revision: 1
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      labels:
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: grafana
+        app.kubernetes.io/version: 12.4.2
+        helm.sh/chart: grafana-11.6.0
+      name: tls-grafana
+      namespace: monitoring
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: prometheus-grafana
+          uid: 9821c60d-2593-40b9-a4fc-197e63ff9415
+    spec:
+      dnsNames:
+        - grafana.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-grafana
+      usages:
+        - digital signature
+        - key encipherment
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: tls-prometheus
+      namespace: monitoring
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: prometheus
+          uid: 55fec54b-8461-409a-8c5b-6d9e71620da9
+    spec:
+      dnsNames:
+        - prometheus.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: tls-prometheus
+      usages:
+        - digital signature
+        - key encipherment
 kind: List
 metadata:
   resourceVersion: ""

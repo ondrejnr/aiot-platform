@@ -1,30 +1,34 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: v1
+items:
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"istio-system:istio-ingressgateway","ingressName":"istio-system:kubeflow-ingress","hostname":"kubeflow.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+        nginx.ingress.kubernetes.io/configuration-snippet: proxy_set_header X-Forwarded-Proto https;
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+      name: kubeflow-ingress
+      namespace: istio-system
+    spec:
+      ingressClassName: nginx
+      rules:
+        - host: kubeflow.35.241.255.137.nip.io
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: istio-ingressgateway
+                    port:
+                      number: 80
+                path: /
+                pathType: Prefix
+      tls:
+        - hosts:
+            - kubeflow.35.241.255.137.nip.io
+          secretName: tls-kubeflow
+kind: List
 metadata:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"istio-system:istio-ingressgateway","ingressName":"istio-system:kubeflow-ingress","hostname":"kubeflow.35.241.255.137.nip.io","path":"/","allNodes":false}]'
-    nginx.ingress.kubernetes.io/configuration-snippet: proxy_set_header X-Forwarded-Proto
-      https;
-    nginx.ingress.kubernetes.io/proxy-body-size: '0'
-    nginx.ingress.kubernetes.io/proxy-read-timeout: '300'
-    nginx.ingress.kubernetes.io/proxy-send-timeout: '300'
-  name: kubeflow-ingress
-  namespace: istio-system
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: kubeflow.35.241.255.137.nip.io
-    http:
-      paths:
-      - backend:
-          service:
-            name: istio-ingressgateway
-            port:
-              number: 80
-        path: /
-        pathType: Prefix
-  tls:
-  - hosts:
-    - kubeflow.35.241.255.137.nip.io
-    secretName: tls-kubeflow
+  resourceVersion: ""

@@ -1,22 +1,25 @@
 apiVersion: v1
-kind: PersistentVolumeClaim
+items:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+        volume.kubernetes.io/selected-node: aiot-worker-01
+        volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      finalizers:
+        - kubernetes.io/pvc-protection
+      name: gitea-data-piraeus
+      namespace: gitea
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: piraeus-r2
+      volumeMode: Filesystem
+      volumeName: pvc-27976678-7d15-4989-99f4-0b94c9ec069c
+kind: List
 metadata:
-  annotations:
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: aiot-worker-01
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  name: gitea-data
-  namespace: gitea
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-be8bd906-274d-4eb8-ba0f-05f1c8bb5956
+  resourceVersion: ""

@@ -1,0 +1,47 @@
+apiVersion: v1
+items:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: robusta
+        meta.helm.sh/release-namespace: robusta
+      labels:
+        app.kubernetes.io/managed-by: Helm
+        argocd.argoproj.io/instance: robusta
+        release: robusta
+      name: robusta-forwarder-service-monitor
+      namespace: robusta
+    spec:
+      endpoints:
+        - path: /metrics
+          port: forwarder-metrics
+      selector:
+        matchLabels:
+          app: robusta-forwarder
+      targetLabels:
+        - target
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: robusta
+        meta.helm.sh/release-namespace: robusta
+      labels:
+        app.kubernetes.io/managed-by: Helm
+        argocd.argoproj.io/instance: robusta
+        release: robusta
+      name: robusta-runner-service-monitor
+      namespace: robusta
+    spec:
+      endpoints:
+        - path: /metrics
+          port: http
+      selector:
+        matchLabels:
+          app: robusta-runner
+      targetLabels:
+        - target
+kind: List
+metadata:
+  resourceVersion: ""

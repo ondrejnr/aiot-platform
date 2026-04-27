@@ -1,0 +1,69 @@
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/name: konflux-operator
+      name: konflux-operator-leader-election-role
+      namespace: konflux-operator
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - events
+        verbs:
+          - create
+          - patch
+kind: List
+metadata:
+  resourceVersion: ""
+---
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/managed-by: kustomize
+        app.kubernetes.io/name: konflux-operator
+      name: konflux-operator-leader-election-rolebinding
+      namespace: konflux-operator
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: konflux-operator-leader-election-role
+    subjects:
+      - kind: ServiceAccount
+        name: konflux-operator-controller-manager
+        namespace: konflux-operator
+kind: List
+metadata:
+  resourceVersion: ""

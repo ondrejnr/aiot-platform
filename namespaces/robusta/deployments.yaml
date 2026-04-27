@@ -1,0 +1,276 @@
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations: {}
+      labels:
+        app: mm-relay
+      name: mm-relay
+      namespace: robusta
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: mm-relay
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/restartedAt: "2026-04-22T16:58:11Z"
+          creationTimestamp: null
+          labels:
+            app: mm-relay
+        spec:
+          containers:
+            - args:
+                - |
+                  pip install --no-cache-dir fastapi uvicorn requests >/dev/null
+                  exec python /code/relay.py
+              command:
+                - /bin/sh
+                - -c
+              env:
+                - name: MM_URL
+                  valueFrom:
+                    secretKeyRef:
+                      key: url
+                      name: mm-webhook
+                - name: MM_CHANNEL
+                  value: k8s
+                - name: MM_USERNAME
+                  value: robusta
+              image: python:3.11-slim
+              imagePullPolicy: IfNotPresent
+              name: relay
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 15
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+                requests:
+                  cpu: 20m
+                  memory: 64Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /code
+                  name: code
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: mm-relay-code
+              name: code
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: robusta
+        meta.helm.sh/release-namespace: robusta
+      labels:
+        app.kubernetes.io/managed-by: Helm
+        argocd.argoproj.io/instance: robusta
+        robusta: forwarder
+      name: robusta-forwarder
+      namespace: robusta
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: robusta-forwarder
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            checksum/config: ccef035b401896ffb6c28711036c0474d0b52adff77e636b0f8ecc6130795c9d
+          creationTimestamp: null
+          labels:
+            app: robusta-forwarder
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - env:
+                - name: KW_CONFIG
+                  value: /config
+                - name: ENABLE_PPROF
+                  value: "true"
+                - name: ADVANCED_FILTERS
+                  value: "true"
+              image: robustadev/kubewatch:v2.13.0
+              imagePullPolicy: IfNotPresent
+              name: kubewatch
+              resources:
+                limits:
+                  memory: 512Mi
+                requests:
+                  cpu: 10m
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities: {}
+                privileged: false
+                readOnlyRootFilesystem: false
+                runAsUser: 1000
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /config
+                  name: robusta-kubewatch-config
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: robusta-forwarder-service-account
+          serviceAccountName: robusta-forwarder-service-account
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: robusta-kubewatch-config
+              name: robusta-kubewatch-config
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: robusta
+        meta.helm.sh/release-namespace: robusta
+      labels:
+        app: robusta-runner
+        app.kubernetes.io/managed-by: Helm
+        argocd.argoproj.io/instance: robusta
+        robusta: runner
+      name: robusta-runner
+      namespace: robusta
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: robusta-runner
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/restartedAt: "2026-04-24T08:59:18Z"
+          creationTimestamp: null
+          labels:
+            app: robusta-runner
+            robustaComponent: runner
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - env:
+                - name: PLAYBOOKS_CONFIG_FILE_PATH
+                  value: /etc/robusta/config/active_playbooks.yaml
+                - name: RELEASE_NAME
+                  value: robusta
+                - name: PROMETHEUS_ENABLED
+                  value: "false"
+                - name: MANAGED_CONFIGURATION_ENABLED
+                  value: "false"
+                - name: SEND_ADDITIONAL_TELEMETRY
+                  value: "false"
+                - name: LOG_LEVEL
+                  value: INFO
+                - name: INSTALLATION_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.namespace
+                - name: RUNNER_VERSION
+                  value: 0.35.0
+                - name: CERTIFICATE
+                - name: IMAGE_REGISTRY
+                  value: robustadev
+                - name: CLUSTER_DOMAIN
+                  value: cluster.local
+                - name: SET_KRR_SECURITY_CONTEXT
+                  value: "false"
+              envFrom:
+                - secretRef:
+                    name: robusta-runner-secret
+                    optional: true
+              image: robustadev/robusta-runner:0.35.0
+              imagePullPolicy: IfNotPresent
+              lifecycle:
+                preStop:
+                  exec:
+                    command:
+                      - bash
+                      - -c
+                      - kill -SIGINT 1
+              name: runner
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities: {}
+                privileged: false
+                readOnlyRootFilesystem: false
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/robusta/auth
+                  name: auth-config-secret
+                - mountPath: /etc/robusta/config
+                  name: playbooks-config-secret
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: robusta-runner-service-account
+          serviceAccountName: robusta-runner-service-account
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: playbooks-config-secret
+              secret:
+                defaultMode: 420
+                optional: true
+                secretName: robusta-playbooks-config-secret
+            - name: auth-config-secret
+              secret:
+                defaultMode: 420
+                optional: true
+                secretName: robusta-auth-config-secret
+kind: List
+metadata:
+  resourceVersion: ""

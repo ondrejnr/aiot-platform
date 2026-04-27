@@ -1,0 +1,321 @@
+apiVersion: v1
+items:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T16:45:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: b62eb0e7-d114-4bbb-bfed-587ee6289a09
+        batch.kubernetes.io/job-name: descheduler-29620365
+        controller-uid: b62eb0e7-d114-4bbb-bfed-587ee6289a09
+        job-name: descheduler-29620365
+      name: descheduler-29620365
+      namespace: descheduler
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: descheduler
+          uid: ff594b4c-d1a3-48fb-8012-bc4384b72651
+    spec:
+      backoffLimit: 0
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: b62eb0e7-d114-4bbb-bfed-587ee6289a09
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: b62eb0e7-d114-4bbb-bfed-587ee6289a09
+            batch.kubernetes.io/job-name: descheduler-29620365
+            controller-uid: b62eb0e7-d114-4bbb-bfed-587ee6289a09
+            job-name: descheduler-29620365
+        spec:
+          containers:
+            - args:
+                - --policy-config-file=/policy/policy.yaml
+                - --v=3
+              command:
+                - /bin/descheduler
+              image: registry.k8s.io/descheduler/descheduler:v0.32.0
+              imagePullPolicy: IfNotPresent
+              name: descheduler
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /policy
+                  name: policy
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            workload-zone: control
+          priorityClassName: system-cluster-critical
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: descheduler
+          serviceAccountName: descheduler
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/control-plane
+              operator: Exists
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: descheduler-policy
+              name: policy
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T17:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: a395c13a-8003-4bfe-9865-f167cb733c4e
+        batch.kubernetes.io/job-name: descheduler-29620380
+        controller-uid: a395c13a-8003-4bfe-9865-f167cb733c4e
+        job-name: descheduler-29620380
+      name: descheduler-29620380
+      namespace: descheduler
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: descheduler
+          uid: ff594b4c-d1a3-48fb-8012-bc4384b72651
+    spec:
+      backoffLimit: 0
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: a395c13a-8003-4bfe-9865-f167cb733c4e
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: a395c13a-8003-4bfe-9865-f167cb733c4e
+            batch.kubernetes.io/job-name: descheduler-29620380
+            controller-uid: a395c13a-8003-4bfe-9865-f167cb733c4e
+            job-name: descheduler-29620380
+        spec:
+          containers:
+            - args:
+                - --policy-config-file=/policy/policy.yaml
+                - --v=3
+              command:
+                - /bin/descheduler
+              image: registry.k8s.io/descheduler/descheduler:v0.32.0
+              imagePullPolicy: IfNotPresent
+              name: descheduler
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /policy
+                  name: policy
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            workload-zone: control
+          priorityClassName: system-cluster-critical
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: descheduler
+          serviceAccountName: descheduler
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/control-plane
+              operator: Exists
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: descheduler-policy
+              name: policy
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T17:15:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 28145328-c9ca-4093-8530-a8856056254e
+        batch.kubernetes.io/job-name: descheduler-29620395
+        controller-uid: 28145328-c9ca-4093-8530-a8856056254e
+        job-name: descheduler-29620395
+      name: descheduler-29620395
+      namespace: descheduler
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: descheduler
+          uid: ff594b4c-d1a3-48fb-8012-bc4384b72651
+    spec:
+      backoffLimit: 0
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 28145328-c9ca-4093-8530-a8856056254e
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 28145328-c9ca-4093-8530-a8856056254e
+            batch.kubernetes.io/job-name: descheduler-29620395
+            controller-uid: 28145328-c9ca-4093-8530-a8856056254e
+            job-name: descheduler-29620395
+        spec:
+          containers:
+            - args:
+                - --policy-config-file=/policy/policy.yaml
+                - --v=3
+              command:
+                - /bin/descheduler
+              image: registry.k8s.io/descheduler/descheduler:v0.32.0
+              imagePullPolicy: IfNotPresent
+              name: descheduler
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /policy
+                  name: policy
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            workload-zone: control
+          priorityClassName: system-cluster-critical
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: descheduler
+          serviceAccountName: descheduler
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/control-plane
+              operator: Exists
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: descheduler-policy
+              name: policy
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T05:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 277fdf15-d0c9-4031-9f26-84b1ed03c078
+        batch.kubernetes.io/job-name: descheduler-29621100
+        controller-uid: 277fdf15-d0c9-4031-9f26-84b1ed03c078
+        job-name: descheduler-29621100
+      name: descheduler-29621100
+      namespace: descheduler
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: descheduler
+          uid: ff594b4c-d1a3-48fb-8012-bc4384b72651
+    spec:
+      backoffLimit: 0
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 277fdf15-d0c9-4031-9f26-84b1ed03c078
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 277fdf15-d0c9-4031-9f26-84b1ed03c078
+            batch.kubernetes.io/job-name: descheduler-29621100
+            controller-uid: 277fdf15-d0c9-4031-9f26-84b1ed03c078
+            job-name: descheduler-29621100
+        spec:
+          containers:
+            - args:
+                - --policy-config-file=/policy/policy.yaml
+                - --v=3
+              command:
+                - /bin/descheduler
+              image: registry.k8s.io/descheduler/descheduler:v0.32.0
+              imagePullPolicy: IfNotPresent
+              name: descheduler
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /policy
+                  name: policy
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            workload-zone: control
+          priorityClassName: system-cluster-critical
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: descheduler
+          serviceAccountName: descheduler
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/control-plane
+              operator: Exists
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: descheduler-policy
+              name: policy
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,12 @@
+agentTLSMode: strict
+apiServerCA: ""
+apiServerURL: https://rancher.35.241.255.137.nip.io
+bootstrap:
+  agentNamespace: cattle-fleet-local-system
+  enabled: false
+gitops:
+  enabled: true
+global:
+  cattle:
+    systemDefaultRegistry: ""
+priorityClassName: rancher-critical

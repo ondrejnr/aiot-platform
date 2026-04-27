@@ -1,10 +1,28 @@
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
+apiVersion: v1
+items:
+  - apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+      name: local-path
+    provisioner: rancher.io/local-path
+    reclaimPolicy: Delete
+    volumeBindingMode: WaitForFirstConsumer
+  - allowVolumeExpansion: true
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      annotations: {}
+      name: piraeus-r2
+    parameters:
+      csi.storage.k8s.io/fstype: ext4
+      linstor.csi.linbit.com/allowRemoteVolumeAccess: "true"
+      linstor.csi.linbit.com/placementCount: "2"
+      linstor.csi.linbit.com/storagePool: lvm-thin
+    provisioner: linstor.csi.linbit.com
+    reclaimPolicy: Retain
+    volumeBindingMode: WaitForFirstConsumer
+kind: List
 metadata:
-  annotations:
-    kubesphere.io/pvc-count: '22'
-    storageclass.kubernetes.io/is-default-class: 'true'
-  name: local-path
-provisioner: rancher.io/local-path
-reclaimPolicy: Delete
-volumeBindingMode: WaitForFirstConsumer
+  resourceVersion: ""

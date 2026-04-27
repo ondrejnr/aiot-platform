@@ -1,0 +1,196 @@
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-controller-role
+      namespace: pipelines-as-code
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - get
+          - list
+          - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-info
+      namespace: pipelines-as-code
+    rules:
+      - apiGroups:
+          - ""
+        resourceNames:
+          - pipelines-as-code-info
+        resources:
+          - configmaps
+        verbs:
+          - get
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-watcher-role
+      namespace: pipelines-as-code
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - list
+          - create
+          - update
+          - delete
+          - patch
+          - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-webhook-role
+      namespace: pipelines-as-code
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - get
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resourceNames:
+          - pipelines-as-code-webhook-certs
+        resources:
+          - secrets
+        verbs:
+          - get
+          - update
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - list
+          - create
+          - update
+          - delete
+          - patch
+          - watch
+kind: List
+metadata:
+  resourceVersion: ""
+---
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-controller-binding
+      namespace: pipelines-as-code
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: pipelines-as-code-controller-role
+    subjects:
+      - kind: ServiceAccount
+        name: pipelines-as-code-controller
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-info
+      namespace: pipelines-as-code
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: pipelines-as-code-info
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:authenticated
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-watcher-binding
+      namespace: pipelines-as-code
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: pipelines-as-code-watcher-role
+    subjects:
+      - kind: ServiceAccount
+        name: pipelines-as-code-watcher
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-webhook-binding
+      namespace: pipelines-as-code
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: pipelines-as-code-webhook-role
+    subjects:
+      - kind: ServiceAccount
+        name: pipelines-as-code-webhook
+kind: List
+metadata:
+  resourceVersion: ""

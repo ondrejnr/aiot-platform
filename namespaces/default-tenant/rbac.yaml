@@ -1,0 +1,175 @@
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations: {}
+      name: release-pipeline-snapshot-reader
+      namespace: default-tenant
+    rules:
+      - apiGroups:
+          - appstudio.redhat.com
+        resources:
+          - snapshots
+        verbs:
+          - get
+          - list
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations: {}
+      name: release-service-account
+      namespace: default-tenant
+    rules:
+      - apiGroups:
+          - appstudio.redhat.com
+        resources:
+          - '*'
+        verbs:
+          - get
+          - list
+          - watch
+          - patch
+          - update
+      - apiGroups:
+          - tekton.dev
+        resources:
+          - pipelineruns
+          - taskruns
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+          - configmaps
+          - serviceaccounts
+        verbs:
+          - get
+          - list
+          - watch
+kind: List
+metadata:
+  resourceVersion: ""
+---
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        konflux.konflux-ci.dev/component: default-tenant
+        konflux.konflux-ci.dev/owner: konflux-default-tenant
+      name: authenticated-konflux-maintainer
+      namespace: default-tenant
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxDefaultTenant
+          name: konflux-default-tenant
+          uid: 1e03ce3a-2e33-4edb-9f44-c0cff3f95cbf
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: konflux-maintainer-user-actions
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:authenticated
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        konflux.konflux-ci.dev/component: default-tenant
+        konflux.konflux-ci.dev/owner: konflux-default-tenant
+      name: konflux-integration-runner
+      namespace: default-tenant
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxDefaultTenant
+          name: konflux-default-tenant
+          uid: 1e03ce3a-2e33-4edb-9f44-c0cff3f95cbf
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: konflux-integration-runner
+    subjects:
+      - kind: ServiceAccount
+        name: konflux-integration-runner
+        namespace: default-tenant
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: kyverno
+        generate.kyverno.io/policy-name: init-ns-integration
+        generate.kyverno.io/policy-namespace: ""
+        generate.kyverno.io/rule-name: create-konflux-integration-runner-rolebinding
+        generate.kyverno.io/trigger-group: ""
+        generate.kyverno.io/trigger-kind: Namespace
+        generate.kyverno.io/trigger-namespace: ""
+        generate.kyverno.io/trigger-uid: baf1c291-ce4a-4558-85b2-ff1b769f7022
+        generate.kyverno.io/trigger-version: v1
+      name: konflux-integration-runner-rolebinding
+      namespace: default-tenant
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: konflux-integration-runner
+    subjects:
+      - kind: ServiceAccount
+        name: konflux-integration-runner
+        namespace: default-tenant
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: konflux-pipelines-runner-bindings
+      namespace: default-tenant
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: appstudio-pipelines-runner
+    subjects:
+      - kind: ServiceAccount
+        name: build-pipeline-hello-aiot
+        namespace: default-tenant
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations: {}
+      name: release-pipeline-snapshot-reader
+      namespace: default-tenant
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: release-pipeline-snapshot-reader
+    subjects:
+      - kind: ServiceAccount
+        name: release-service-account
+        namespace: default-tenant
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations: {}
+      name: release-service-account
+      namespace: default-tenant
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: release-service-account
+    subjects:
+      - kind: ServiceAccount
+        name: release-service-account
+        namespace: default-tenant
+kind: List
+metadata:
+  resourceVersion: ""

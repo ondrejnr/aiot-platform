@@ -23,7 +23,7 @@ spec:
     - --initial-cluster=aiot-master=https://10.132.0.2:2380
     - --key-file=/etc/kubernetes/pki/etcd/server.key
     - --listen-client-urls=https://127.0.0.1:2379,https://10.132.0.2:2379
-    - --listen-metrics-urls=http://127.0.0.1:2381
+    - --listen-metrics-urls=http://0.0.0.0:2381
     - --listen-peer-urls=https://10.132.0.2:2380
     - --name=aiot-master
     - --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt

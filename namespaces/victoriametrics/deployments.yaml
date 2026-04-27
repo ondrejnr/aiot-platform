@@ -1,60 +1,67 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: victoriametrics
-  namespace: victoriametrics
-spec:
-  progressDeadlineSeconds: 600
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      app: victoriametrics
-  strategy:
-    type: Recreate
-  template:
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
     metadata:
-      labels:
-        app: victoriametrics
+      annotations: {}
+      name: victoriametrics
+      namespace: victoriametrics
     spec:
-      containers:
-      - args:
-        - -storageDataPath=/data
-        - -retentionPeriod=30d
-        image: victoriametrics/victoria-metrics:v1.113.0
-        imagePullPolicy: IfNotPresent
-        name: vm
-        ports:
-        - containerPort: 8428
-          protocol: TCP
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /data
-          name: data
-      dnsConfig:
-        nameservers:
-        - 10.96.0.10
-        options:
-        - name: ndots
-          value: '2'
-        searches:
-        - victoriametrics.svc.cluster.local
-        - svc.cluster.local
-        - cluster.local
-      dnsPolicy: None
-      nodeSelector:
-        kubernetes.io/hostname: oci-e5-node1
-        node-role.kubernetes.io/worker: ''
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: victoriametrics-data
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: victoriametrics
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: victoriametrics
+        spec:
+          containers:
+            - args:
+                - -storageDataPath=/data
+                - -retentionPeriod=30d
+              image: victoriametrics/victoria-metrics:v1.113.0
+              imagePullPolicy: IfNotPresent
+              name: vm
+              ports:
+                - containerPort: 8428
+                  protocol: TCP
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /data
+                  name: data
+          dnsConfig:
+            nameservers:
+              - 10.96.0.10
+            options:
+              - name: ndots
+                value: "2"
+            searches:
+              - victoriametrics.svc.cluster.local
+              - svc.cluster.local
+              - cluster.local
+          dnsPolicy: None
+          nodeSelector:
+            kubernetes.io/hostname: oci-e5-node1
+            node-role.kubernetes.io/worker: ""
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: victoriametrics-data
+kind: List
+metadata:
+  resourceVersion: ""

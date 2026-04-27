@@ -1,0 +1,31 @@
+apiVersion: v1
+items:
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      labels:
+        app.kubernetes.io/component: certificate
+        app.kubernetes.io/instance: serving-cert
+        app.kubernetes.io/name: certificate
+        konflux.konflux-ci.dev/component: integration
+        konflux.konflux-ci.dev/owner: konflux-integration-service
+      name: serving-cert
+      namespace: integration-service
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxIntegrationService
+          name: konflux-integration-service
+          uid: 9d9ad16b-1e8b-4d51-bef5-3253a210a783
+    spec:
+      dnsNames:
+        - integration-service-webhook-service.integration-service.svc
+        - integration-service-webhook-service.integration-service.svc.cluster.local
+      issuerRef:
+        kind: Issuer
+        name: selfsigned-issuer
+      secretName: webhook-server-cert
+kind: List
+metadata:
+  resourceVersion: ""

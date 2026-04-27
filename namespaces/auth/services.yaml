@@ -1,22 +1,28 @@
 apiVersion: v1
-kind: Service
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations: {}
+      name: dex
+      namespace: auth
+    spec:
+      clusterIP: 10.102.44.119
+      clusterIPs:
+        - 10.102.44.119
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - name: dex
+          port: 5556
+          protocol: TCP
+          targetPort: 5556
+      selector:
+        app: dex
+      sessionAffinity: None
+      type: ClusterIP
+kind: List
 metadata:
-  name: dex
-  namespace: auth
-spec:
-  clusterIP: 10.102.44.119
-  clusterIPs:
-  - 10.102.44.119
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-  - name: dex
-    port: 5556
-    protocol: TCP
-    targetPort: 5556
-  selector:
-    app: dex
-  sessionAffinity: None
-  type: ClusterIP
+  resourceVersion: ""

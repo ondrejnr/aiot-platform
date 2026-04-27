@@ -1,0 +1,104 @@
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        konflux.konflux-ci.dev/component: release
+        konflux.konflux-ci.dev/owner: konflux-release-service
+      name: release-service-leader-election-role
+      namespace: release-service
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxReleaseService
+          name: konflux-release-service
+          uid: 4b064250-17e5-46bc-b604-28beb73fb209
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+      - apiGroups:
+          - ""
+        resources:
+          - events
+        verbs:
+          - create
+          - patch
+kind: List
+metadata:
+  resourceVersion: ""
+---
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        konflux.konflux-ci.dev/component: release
+        konflux.konflux-ci.dev/owner: konflux-release-service
+      name: release-service-leader-election-rolebinding
+      namespace: release-service
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxReleaseService
+          name: konflux-release-service
+          uid: 4b064250-17e5-46bc-b604-28beb73fb209
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: release-service-leader-election-role
+    subjects:
+      - kind: ServiceAccount
+        name: release-service-controller-manager
+        namespace: release-service
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        konflux.konflux-ci.dev/component: release
+        konflux.konflux-ci.dev/owner: konflux-release-service
+      name: releaseserviceconfigs-rolebinding
+      namespace: release-service
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxReleaseService
+          name: konflux-release-service
+          uid: 4b064250-17e5-46bc-b604-28beb73fb209
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: releaseserviceconfig-role
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:serviceaccounts
+kind: List
+metadata:
+  resourceVersion: ""

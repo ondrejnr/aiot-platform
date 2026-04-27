@@ -1,25 +1,30 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: v1
+items:
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"signoz:signoz","ingressName":"signoz:signoz","hostname":"signoz.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      name: signoz
+      namespace: signoz
+    spec:
+      ingressClassName: nginx
+      rules:
+        - host: signoz.35.241.255.137.nip.io
+          http:
+            paths:
+              - backend:
+                  service:
+                    name: signoz
+                    port:
+                      number: 8080
+                path: /
+                pathType: Prefix
+      tls:
+        - hosts:
+            - signoz.35.241.255.137.nip.io
+          secretName: tls-signoz
+kind: List
 metadata:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":443,"protocol":"HTTPS","serviceName":"signoz:signoz","ingressName":"signoz:signoz","hostname":"signoz.35.241.255.137.nip.io","path":"/","allNodes":false}]'
-  name: signoz
-  namespace: signoz
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: signoz.35.241.255.137.nip.io
-    http:
-      paths:
-      - backend:
-          service:
-            name: signoz
-            port:
-              number: 8080
-        path: /
-        pathType: Prefix
-  tls:
-  - hosts:
-    - signoz.35.241.255.137.nip.io
-    secretName: tls-signoz
+  resourceVersion: ""

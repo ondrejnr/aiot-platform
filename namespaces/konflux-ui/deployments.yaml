@@ -1,0 +1,436 @@
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations: {}
+      labels:
+        app: dex
+        konflux.konflux-ci.dev/component: ui
+        konflux.konflux-ci.dev/owner: konflux-ui
+      name: dex
+      namespace: konflux-ui
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxUI
+          name: konflux-ui
+          uid: 4100e984-9ed5-4a39-a25b-169927bdac04
+    spec:
+      progressDeadlineSeconds: 2147483647
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: dex
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/restartedAt: "2026-04-22T12:20:01Z"
+          creationTimestamp: null
+          labels:
+            app: dex
+        spec:
+          containers:
+            - command:
+                - /usr/local/bin/dex
+                - serve
+                - /etc/dex/cfg/config.yaml
+              env:
+                - name: CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      key: client-secret
+                      name: oauth2-proxy-client-secret
+              image: quay.io/konflux-ci/dex@sha256:a75c16d89938dc150ad17bbd286a8a554baecde26e34d7a81af2939baf401a96
+              imagePullPolicy: IfNotPresent
+              name: dex
+              ports:
+                - containerPort: 9443
+                  name: https
+                  protocol: TCP
+                - containerPort: 5558
+                  name: telemetry
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz/ready
+                  port: telemetry
+                  scheme: HTTP
+                periodSeconds: 15
+                successThreshold: 1
+                timeoutSeconds: 3
+              resources:
+                limits:
+                  cpu: 50m
+                  memory: 128Mi
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              startupProbe:
+                failureThreshold: 12
+                httpGet:
+                  path: /healthz/ready
+                  port: telemetry
+                  scheme: HTTP
+                initialDelaySeconds: 10
+                periodSeconds: 5
+                successThreshold: 1
+                timeoutSeconds: 3
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/dex/cfg
+                  name: dex
+                - mountPath: /etc/dex/tls
+                  name: tls
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: dex
+          serviceAccountName: dex
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - configMap:
+                defaultMode: 420
+                items:
+                  - key: config.yaml
+                    path: config.yaml
+                name: dex-7b40dd2274
+              name: dex
+            - name: tls
+              secret:
+                defaultMode: 420
+                secretName: dex-cert
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        ignore-check.kube-linter.io/no-anti-affinity: Using topologySpreadConstraints
+      labels:
+        app: proxy
+        konflux.konflux-ci.dev/component: ui
+        konflux.konflux-ci.dev/owner: konflux-ui
+      name: proxy
+      namespace: konflux-ui
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxUI
+          name: konflux-ui
+          uid: 4100e984-9ed5-4a39-a25b-169927bdac04
+    spec:
+      minReadySeconds: 30
+      progressDeadlineSeconds: 2147483647
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: proxy
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 0
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/restartedAt: "2026-04-22T12:15:21Z"
+          creationTimestamp: null
+          labels:
+            app: proxy
+        spec:
+          containers:
+            - command:
+                - nginx
+                - -g
+                - daemon off;
+                - -c
+                - /etc/nginx/nginx.conf
+              image: registry.access.redhat.com/ubi9/nginx-124@sha256:b60dbaf28a767ede611ff98127e0f5a8db8b1afb0c531074fe29c9aef3e0e44a
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: 9443
+                  scheme: HTTPS
+                initialDelaySeconds: 30
+                periodSeconds: 60
+                successThreshold: 1
+                timeoutSeconds: 1
+              name: nginx
+              ports:
+                - containerPort: 8080
+                  name: web
+                  protocol: TCP
+                - containerPort: 9443
+                  name: web-tls
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /health
+                  port: 9443
+                  scheme: HTTPS
+                initialDelaySeconds: 30
+                periodSeconds: 30
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 256Mi
+                requests:
+                  cpu: 30m
+                  memory: 128Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/nginx/nginx.conf
+                  name: proxy
+                  readOnly: true
+                  subPath: nginx.conf
+                - mountPath: /var/log/nginx
+                  name: logs
+                - mountPath: /var/lib/nginx/tmp
+                  name: nginx-tmp
+                - mountPath: /run
+                  name: run
+                - mountPath: /mnt
+                  name: serving-cert
+                - mountPath: /mnt/nginx-generated-config
+                  name: nginx-generated-config
+                - mountPath: /mnt/nginx-generated-location-config
+                  name: nginx-generated-location-config
+                - mountPath: /opt/app-root/src/static-content
+                  name: static-content
+                - mountPath: /opt/app-root/src/segment
+                  name: segment-bridge-config
+            - env:
+                - name: OAUTH2_PROXY_PROVIDER
+                  value: oidc
+                - name: OAUTH2_PROXY_PROVIDER_DISPLAY_NAME
+                  value: Dex OIDC
+                - name: OAUTH2_PROXY_CLIENT_ID
+                  value: oauth2-proxy
+                - name: OAUTH2_PROXY_HTTP_ADDRESS
+                  value: 127.0.0.1:6000
+                - name: OAUTH2_PROXY_SKIP_PROVIDER_BUTTON
+                  value: "true"
+                - name: OAUTH2_PROXY_PROMPT
+                  value: login
+                - name: OAUTH2_PROXY_REDIRECT_URL
+                  value: https://konflux.35.241.255.137.nip.io/oauth2/callback
+                - name: OAUTH2_PROXY_OIDC_ISSUER_URL
+                  value: https://konflux.35.241.255.137.nip.io/idp/
+                - name: OAUTH2_PROXY_LOGIN_URL
+                  value: https://konflux.35.241.255.137.nip.io/idp/auth
+                - name: OAUTH2_PROXY_SKIP_OIDC_DISCOVERY
+                  value: "true"
+                - name: OAUTH2_PROXY_REDEEM_URL
+                  value: https://dex.konflux-ui.svc.cluster.local:9443/idp/token
+                - name: OAUTH2_PROXY_OIDC_JWKS_URL
+                  value: https://dex.konflux-ui.svc.cluster.local:9443/idp/keys
+                - name: OAUTH2_PROXY_COOKIE_SECURE
+                  value: "true"
+                - name: OAUTH2_PROXY_COOKIE_NAME
+                  value: __Host-konflux-ci-cookie
+                - name: OAUTH2_PROXY_EMAIL_DOMAINS
+                  value: '*'
+                - name: OAUTH2_PROXY_SET_XAUTHREQUEST
+                  value: "true"
+                - name: OAUTH2_PROXY_SKIP_JWT_BEARER_TOKENS
+                  value: "true"
+                - name: OAUTH2_PROXY_PROVIDER_CA_FILES
+                  value: /etc/ssl/certs/ca-bundle.crt
+                - name: OAUTH2_PROXY_WHITELIST_DOMAINS
+                  value: konflux.35.241.255.137.nip.io
+                - name: OAUTH2_PROXY_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      key: client-secret
+                      name: oauth2-proxy-client-secret
+                - name: OAUTH2_PROXY_COOKIE_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      key: cookie-secret
+                      name: oauth2-proxy-cookie-secret
+              image: quay.io/konflux-ci/oauth2-proxy@sha256:1f4a37529de4f750099af18e113556bd995fe6922030c614b7d6d23eaa0bd318
+              imagePullPolicy: IfNotPresent
+              name: oauth2-proxy
+              ports:
+                - containerPort: 6000
+                  name: web
+                  protocol: TCP
+              resources:
+                limits:
+                  cpu: 300m
+                  memory: 256Mi
+                requests:
+                  cpu: 30m
+                  memory: 128Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/ssl/certs
+                  name: ca-bundle
+                  readOnly: true
+          dnsPolicy: ClusterFirst
+          initContainers:
+            - command:
+                - cp
+                - -R
+                - /opt/app-root/src/.
+                - /mnt/static-content/
+              image: quay.io/konflux-ci/konflux-ui@sha256:ae1280c728f8753ff60583dbc62f1d3964271d5f2e2c4e68974e79f039ea2d36
+              imagePullPolicy: IfNotPresent
+              name: copy-static-content
+              resources:
+                limits:
+                  cpu: 50m
+                  memory: 128Mi
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /mnt/static-content
+                  name: static-content
+            - command:
+                - sh
+                - -c
+                - |
+                  set -e
+
+                  # Copy the auth.conf template and replace the bearer token
+                  token=$(cat /mnt/api-token/token)
+                  sed "s/__BEARER_TOKEN__/$token/" /mnt/nginx-templates/auth.conf > /mnt/nginx-generated-config/auth.conf
+                  chmod 640 /mnt/nginx-generated-config/auth.conf
+
+                  # Resolve tekton-results hostname
+                  results_hostname_k8s=tekton-results-api-service.tekton-pipelines.svc.cluster.local
+                  results_hostname_openshift=tekton-results-api-service.openshift-pipelines.svc.cluster.local
+                  if nslookup $results_hostname_k8s > /dev/null 2>&1; then
+                    results_hostname=$results_hostname_k8s
+                  elif nslookup $results_hostname_openshift > /dev/null 2>&1; then
+                    results_hostname=$results_hostname_openshift
+                  else
+                    echo "Error: Could not resolve tekton-results hostname"
+                    exit 1
+                  fi
+                  sed "s/__TEKTON_RESULTS_HOSTNAME__/$results_hostname/" /mnt/nginx-templates/tekton-results.conf > /mnt/nginx-generated-location-config/tekton-results.conf
+                  chmod 640 /mnt/nginx-generated-location-config/tekton-results.conf
+              image: quay.io/konflux-ci/konflux-ui@sha256:ae1280c728f8753ff60583dbc62f1d3964271d5f2e2c4e68974e79f039ea2d36
+              imagePullPolicy: IfNotPresent
+              name: generate-nginx-configs
+              resources:
+                limits:
+                  cpu: 50m
+                  memory: 128Mi
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /mnt/nginx-generated-config
+                  name: nginx-generated-config
+                - mountPath: /mnt/nginx-templates
+                  name: nginx-templates
+                - mountPath: /mnt/api-token
+                  name: api-token
+                - mountPath: /mnt/nginx-generated-location-config
+                  name: nginx-generated-location-config
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: proxy
+          serviceAccountName: proxy
+          terminationGracePeriodSeconds: 30
+          topologySpreadConstraints:
+            - labelSelector:
+                matchLabels:
+                  app: proxy
+              maxSkew: 1
+              topologyKey: topology.kubernetes.io/zone
+              whenUnsatisfiable: ScheduleAnyway
+          volumes:
+            - name: ca-bundle
+              projected:
+                defaultMode: 420
+                sources:
+                  - secret:
+                      items:
+                        - key: ca.crt
+                          path: ca-bundle.crt
+                      name: oauth2-proxy-cert
+            - configMap:
+                defaultMode: 420
+                items:
+                  - key: nginx.conf
+                    path: nginx.conf
+                name: proxy-5f87fc6759
+              name: proxy
+            - configMap:
+                defaultMode: 420
+                name: proxy-nginx-templates-dt292585th
+              name: nginx-templates
+            - emptyDir: {}
+              name: logs
+            - emptyDir: {}
+              name: nginx-tmp
+            - emptyDir: {}
+              name: run
+            - name: serving-cert
+              secret:
+                defaultMode: 420
+                secretName: serving-cert
+            - emptyDir: {}
+              name: nginx-generated-config
+            - emptyDir: {}
+              name: nginx-generated-location-config
+            - name: api-token
+              secret:
+                defaultMode: 420
+                secretName: proxy
+            - emptyDir: {}
+              name: static-content
+            - name: segment-bridge-config
+              secret:
+                defaultMode: 420
+                items:
+                  - key: key
+                    path: key
+                  - key: url
+                    path: url
+                optional: true
+                secretName: segment-bridge-config
+kind: List
+metadata:
+  resourceVersion: ""

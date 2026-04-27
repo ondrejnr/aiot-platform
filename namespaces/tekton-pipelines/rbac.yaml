@@ -1,0 +1,877 @@
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+        argocd.argoproj.io/sync-wave: "0"
+      name: chains-secret-admin
+      namespace: tekton-pipelines
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - list
+          - create
+          - get
+          - update
+          - patch
+          - delete
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: ba3db42dbf32d0226e3ee1519b85687e11e0ec6ae785adc44c9be561428f098b
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-chains
+        operator.tekton.dev/operand-name: tektoncd-chains
+      name: tekton-chains-info
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: chain-hjlhx
+          uid: cbbd8078-c69e-419d-a29f-2acde07b6f1c
+    rules:
+      - apiGroups:
+          - ""
+        resourceNames:
+          - chains-info
+        resources:
+          - configmaps
+        verbs:
+          - get
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: b0ebdd4ab15788eb71819f74855bfbe9b2e6e1f77b441423d3ad03c4633e2172
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-chains
+        operator.tekton.dev/operand-name: tektoncd-chains
+      name: tekton-chains-leader-election
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: chain-hjlhx
+          uid: cbbd8078-c69e-419d-a29f-2acde07b6f1c
+    rules:
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - list
+          - create
+          - update
+          - delete
+          - patch
+          - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 2ca1bf6cb85bad0f5bd240209441ac81e5b06c1358d826dbc57b1901d5dda0f3
+      labels:
+        operator.tekton.dev/operand-name: tektoncd-pipelines
+      name: tekton-operators-proxy-admin
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - get
+          - list
+          - create
+          - update
+          - delete
+          - patch
+          - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 4d1e7cc2317f0ca81079527ebd65acf079e918245075217017c4b351cb7eaf91
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+        operator.tekton.dev/operand-name: tektoncd-pipelines
+      name: tekton-pipelines-controller
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resourceNames:
+          - config-logging
+          - config-observability
+          - feature-flags
+          - config-leader-election-controller
+          - config-registry-cert
+        resources:
+          - configmaps
+        verbs:
+          - get
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: ae9a771a8cab3fe02b10a73983bb513db0082e196b16a35d4c24cc47682a62d3
+      labels:
+        app.kubernetes.io/component: events
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+        operator.tekton.dev/operand-name: tektoncd-pipelines
+      name: tekton-pipelines-events-controller
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resourceNames:
+          - config-logging
+          - config-observability
+          - feature-flags
+          - config-leader-election-events
+          - config-registry-cert
+        resources:
+          - configmaps
+        verbs:
+          - get
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 384985e03c227477c4f9b7d928f63c1423ed7f69779c0d92fc3d2bff705135cf
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+        operator.tekton.dev/operand-name: tektoncd-pipelines
+      name: tekton-pipelines-info
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    rules:
+      - apiGroups:
+          - ""
+        resourceNames:
+          - pipelines-info
+        resources:
+          - configmaps
+        verbs:
+          - get
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: d592a3ac43ee7f7c36a76c0e49177c421376d7fe09e27d5ee134cf32584c20db
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+        operator.tekton.dev/operand-name: tektoncd-pipelines
+      name: tekton-pipelines-leader-election
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    rules:
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - list
+          - create
+          - update
+          - delete
+          - patch
+          - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 7e11204f5837dc8fb6ff440293b9d599850cd29de6c748d10a77a92842d112f2
+      labels:
+        app.kubernetes.io/component: resolvers
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+        operator.tekton.dev/operand-name: tektoncd-pipelines
+      name: tekton-pipelines-resolvers-namespace-rbac
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+          - secrets
+        verbs:
+          - get
+          - list
+          - update
+          - watch
+      - apiGroups:
+          - coordination.k8s.io
+        resources:
+          - leases
+        verbs:
+          - get
+          - list
+          - create
+          - update
+          - delete
+          - patch
+          - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 4ceb8376abe86de2ce4511f95f80087d451aa76190aa3af1d137bc92e3d6c6d7
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+        operator.tekton.dev/operand-name: tektoncd-pipelines
+      name: tekton-pipelines-webhook
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resourceNames:
+          - config-logging
+          - config-observability
+          - config-leader-election-webhook
+          - feature-flags
+        resources:
+          - configmaps
+        verbs:
+          - get
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - list
+          - watch
+      - apiGroups:
+          - ""
+        resourceNames:
+          - webhook-certs
+        resources:
+          - secrets
+        verbs:
+          - get
+          - update
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 397580de687efeeb9db35e661f30cb09e81f21606c365c23a0d35139da67d3f8
+      labels:
+        app.kubernetes.io/name: tekton-results-info
+        app.kubernetes.io/part-of: tekton-results
+        app.kubernetes.io/version: v0.18.0
+        operator.tekton.dev/operand-name: tektoncd-results
+      name: tekton-results-info
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: result-4d4wx
+          uid: 1978b571-1741-44fd-9381-bed4e14a1ed1
+    rules:
+      - apiGroups:
+          - ""
+        resourceNames:
+          - tekton-results-info
+        resources:
+          - configmaps
+        verbs:
+          - get
+          - describe
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 1e53841d2b6726d9e32a96eb4d77fdf9feed7351c1eb2301249f278835fdc16b
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-triggers
+        operator.tekton.dev/operand-name: tektoncd-triggers
+      name: tekton-triggers-admin-webhook
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: trigger-main-static-65hpn
+          uid: b5f7f32a-0588-4a9a-ade6-31648757cdf9
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - get
+          - list
+          - create
+          - update
+          - delete
+          - patch
+          - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 8fdc5359aa4d740e5f42029a543772ff2968307ba2a85f9a68e4f316ee751dc9
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-triggers
+        operator.tekton.dev/operand-name: tektoncd-triggers
+      name: tekton-triggers-core-interceptors
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: trigger-main-static-65hpn
+          uid: b5f7f32a-0588-4a9a-ade6-31648757cdf9
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - configmaps
+        verbs:
+          - get
+          - list
+          - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: c7982a4fd70ea3af0dec97b60f3d6d5d8c0daaf82cfee7180ced051c238025cc
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-triggers
+        operator.tekton.dev/operand-name: tektoncd-triggers
+      name: tekton-triggers-info
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: trigger-main-static-65hpn
+          uid: b5f7f32a-0588-4a9a-ade6-31648757cdf9
+    rules:
+      - apiGroups:
+          - ""
+        resourceNames:
+          - triggers-info
+        resources:
+          - configmaps
+        verbs:
+          - get
+kind: List
+metadata:
+  resourceVersion: ""
+---
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+        argocd.argoproj.io/sync-wave: "0"
+      name: chains-secret-admin
+      namespace: tekton-pipelines
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: chains-secret-admin
+    subjects:
+      - kind: ServiceAccount
+        name: chains-secrets-admin
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 069af357316acba98e2c0b72b84ca05c45226d809f378fc10569a731a80ef450
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-chains
+      name: tekton-chains-controller-leaderelection
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: chain-hjlhx
+          uid: cbbd8078-c69e-419d-a29f-2acde07b6f1c
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-chains-leader-election
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-chains-controller
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 0cb69f4c43246e9bc42bfa0e059ce352cd83cc30836b4ccecdf44f22ed7450a2
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-chains
+      name: tekton-chains-info
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: chain-hjlhx
+          uid: cbbd8078-c69e-419d-a29f-2acde07b6f1c
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-chains-info
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:authenticated
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+        argocd.argoproj.io/sync-wave: "0"
+      name: tekton-chains-public-key-viewer
+      namespace: tekton-pipelines
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: tekton-chains-public-key-viewer
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:authenticated
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 020ade1553c26e7355d40d4526c4e1e1b4bea40321ab15342b12d9b9b24bfa9b
+      labels:
+        app.kubernetes.io/component: events
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+      name: tekton-events-controller-leaderelection
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-pipelines-leader-election
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-events-controller
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 1c747e77295de15ef0579fbf871b2def430ff388556799c07e69ebfa095ea8ed
+      name: tekton-operators-proxy-webhook-admin
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-operators-proxy-admin
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-operators-proxy-webhook
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 8b28c28798d5ab94a18482b3fa7ce531c9f2cd04b037e0575cb50778b03e9155
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+      name: tekton-pipelines-controller
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-pipelines-controller
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-pipelines-controller
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 0deb65e0c7cae598dd567df91dda1da79b33d9f994eb8711dcc589c691f68a0d
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+      name: tekton-pipelines-controller-leaderelection
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-pipelines-leader-election
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-pipelines-controller
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 7d485d8561b44fc0f837e7bc06acfa34eac5856d278f006ee1429dcf446e46e9
+      labels:
+        app.kubernetes.io/component: events
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+      name: tekton-pipelines-events-controller
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-pipelines-events-controller
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-events-controller
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 319195eb283cf5cefd6ea5501123a2640b015a421e486d35ae6abea46dcb6e13
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+      name: tekton-pipelines-info
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-pipelines-info
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:authenticated
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 6b0c7b4aeca8caf5808d15933c5ab2f7d8ddcb472f26028c703efb451172591f
+      labels:
+        app.kubernetes.io/component: resolvers
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+      name: tekton-pipelines-resolvers-namespace-rbac
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-pipelines-resolvers-namespace-rbac
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-pipelines-resolvers
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: e2bfd8088672c702b7affe496214e3ebb933a45d559949d7400a78496661dbdb
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+      name: tekton-pipelines-webhook
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-pipelines-webhook
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-pipelines-webhook
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: be39a4583a5a6e276ebe4d2a7f47e963d4325a41b7061e1965dddee948b1c5f6
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-pipelines
+      name: tekton-pipelines-webhook-leaderelection
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: pipeline-main-static-4h464
+          uid: 108c3d6b-0365-43b4-b40a-f3acea03765f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-pipelines-leader-election
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-pipelines-webhook
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 2dfae75ece0a6b1c5f8d3345e379237ccd23817a5071d7fb8573ef736914ea45
+      labels:
+        app.kubernetes.io/name: tekton-results-info
+        app.kubernetes.io/part-of: tekton-results
+        app.kubernetes.io/version: v0.18.0
+      name: tekton-results-info
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: result-4d4wx
+          uid: 1978b571-1741-44fd-9381-bed4e14a1ed1
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-results-info
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:authenticated
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: 3b9fe79da6c819823c60d20df0bd1d2d2c49ea51174fca165608b1601991f0c2
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-triggers
+      name: tekton-triggers-core-interceptors
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: trigger-main-static-65hpn
+          uid: b5f7f32a-0588-4a9a-ade6-31648757cdf9
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-triggers-core-interceptors
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-triggers-core-interceptors
+        namespace: tekton-pipelines
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: b1aede2beb063d20aae52f7938ddf98e35af4332a92d04166426ffffce68ff90
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-triggers
+      name: tekton-triggers-info
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: trigger-main-static-65hpn
+          uid: b5f7f32a-0588-4a9a-ade6-31648757cdf9
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-triggers-info
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:authenticated
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations:
+        operator.tekton.dev/last-applied-hash: cd1c8f244ca3eea656c836afd68d3b5de9d0cfba91422154d5b4a0e82c5c065b
+      labels:
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: tekton-triggers
+      name: tekton-triggers-webhook-admin
+      namespace: tekton-pipelines
+      ownerReferences:
+        - apiVersion: operator.tekton.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: TektonInstallerSet
+          name: trigger-main-static-65hpn
+          uid: b5f7f32a-0588-4a9a-ade6-31648757cdf9
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tekton-triggers-admin-webhook
+    subjects:
+      - kind: ServiceAccount
+        name: tekton-triggers-webhook
+        namespace: tekton-pipelines
+kind: List
+metadata:
+  resourceVersion: ""

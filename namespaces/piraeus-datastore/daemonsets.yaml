@@ -1,0 +1,1138 @@
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    metadata:
+      annotations:
+        deprecated.daemonset.template.generation: "2"
+      labels:
+        app.kubernetes.io/component: ha-controller
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: ha-controller
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    spec:
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: ha-controller
+          app.kubernetes.io/instance: linstorcluster
+          app.kubernetes.io/name: piraeus-datastore
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/restartedAt: "2026-04-27T04:03:34Z"
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/component: ha-controller
+            app.kubernetes.io/instance: linstorcluster
+            app.kubernetes.io/name: piraeus-datastore
+        spec:
+          containers:
+            - args:
+                - /agent
+                - --v=1
+              env:
+                - name: NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: spec.nodeName
+              image: quay.io/piraeusdatastore/piraeus-ha-controller:v1.3.2
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: 8000
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              name: ha-controller
+              resources: {}
+              securityContext:
+                privileged: true
+                readOnlyRootFilesystem: true
+              startupProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: 8000
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            piraeus.io/storage: "yes"
+          priorityClassName: system-cluster-critical
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: ha-controller
+          serviceAccountName: ha-controller
+          shareProcessNamespace: true
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: drbd.linbit.com/force-io-error
+              operator: Exists
+            - effect: NoSchedule
+              key: drbd.linbit.com/lost-quorum
+              operator: Exists
+      updateStrategy:
+        rollingUpdate:
+          maxSurge: 0
+          maxUnavailable: 1
+        type: RollingUpdate
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    metadata:
+      annotations:
+        deprecated.daemonset.template.generation: "2"
+      labels:
+        app.kubernetes.io/component: linstor-csi-nfs-server
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-csi-nfs-server
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    spec:
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: linstor-csi-nfs-server
+          app.kubernetes.io/instance: linstorcluster
+          app.kubernetes.io/name: piraeus-datastore
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/default-container: nfs-server
+            kubectl.kubernetes.io/restartedAt: "2026-04-27T04:03:35Z"
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/component: linstor-csi-nfs-server
+            app.kubernetes.io/instance: linstorcluster
+            app.kubernetes.io/name: piraeus-datastore
+        spec:
+          containers:
+            - env:
+                - name: container
+                  value: kubernetes
+                - name: SYSTEMD_LOG_TARGET
+                  value: console
+                - name: HOST_DEV_PREFIX
+                  value: /host
+                - name: REACTOR_CONFIG_MAP
+                  value: linstor-csi-nfs-server-reactor-config
+                - name: NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: spec.nodeName
+                - name: POD_IP
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: status.podIP
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.name
+                - name: POD_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.namespace
+                - name: POD_UID
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.uid
+              image: quay.io/piraeusdatastore/piraeus-csi-nfs-server:v1.10.6
+              imagePullPolicy: IfNotPresent
+              name: nfs-server
+              resources: {}
+              securityContext:
+                capabilities:
+                  drop:
+                    - '*'
+                privileged: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              tty: true
+              volumeMounts:
+                - mountPath: /etc/nfs-helper
+                  name: linstor-csi-nfs-server-templates
+                  readOnly: true
+                - mountPath: /etc/drbd-reactor.d
+                  name: reactor-config
+                - mountPath: /host/dev
+                  mountPropagation: HostToContainer
+                  name: dev
+                - mountPath: /sys
+                  mountPropagation: HostToContainer
+                  name: sys
+                  readOnly: true
+                - mountPath: /run
+                  name: run
+          dnsPolicy: ClusterFirst
+          enableServiceLinks: false
+          initContainers:
+            - command:
+                - /linstor-wait-until
+                - satellite-online
+                - $(NODE_NAME)
+              env:
+                - name: LS_CONTROLLERS
+                  value: http://linstor-controller:3370
+                - name: NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: spec.nodeName
+              image: quay.io/piraeusdatastore/piraeus-csi:v1.10.6
+              imagePullPolicy: IfNotPresent
+              name: linstor-wait-node-online
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          nodeSelector:
+            piraeus.io/storage: "yes"
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: linstor-csi-nfs-server
+          serviceAccountName: linstor-csi-nfs-server
+          shareProcessNamespace: false
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: drbd.linbit.com/force-io-error
+              operator: Exists
+            - effect: NoSchedule
+              key: drbd.linbit.com/lost-quorum
+              operator: Exists
+          volumes:
+            - emptyDir: {}
+              name: run
+            - emptyDir: {}
+              name: reactor-config
+            - hostPath:
+                path: /dev
+                type: Directory
+              name: dev
+            - hostPath:
+                path: /sys
+                type: Directory
+              name: sys
+            - configMap:
+                defaultMode: 420
+                name: linstor-csi-nfs-server-templates
+              name: linstor-csi-nfs-server-templates
+      updateStrategy:
+        rollingUpdate:
+          maxSurge: 0
+          maxUnavailable: 1
+        type: RollingUpdate
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    metadata:
+      annotations:
+        deprecated.daemonset.template.generation: "1"
+      labels:
+        app.kubernetes.io/component: linstor-csi-node
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+      name: linstor-csi-node
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorCluster
+          name: linstorcluster
+          uid: 1a1b8eb8-8e2e-4612-bcc2-435e4fead530
+    spec:
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: linstor-csi-node
+          app.kubernetes.io/instance: linstorcluster
+          app.kubernetes.io/name: piraeus-datastore
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/default-container: linstor-csi
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/component: linstor-csi-node
+            app.kubernetes.io/instance: linstorcluster
+            app.kubernetes.io/name: piraeus-datastore
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - --csi-endpoint=unix:///csi/csi.sock
+                - --node=$(KUBE_NODE_NAME)
+                - --property-namespace=Aux/topology
+                - --label-by-storage-pool=false
+              env:
+                - name: LS_CONTROLLERS
+                  value: http://linstor-controller:3370
+                - name: KUBE_NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: spec.nodeName
+              image: quay.io/piraeusdatastore/piraeus-csi:v1.10.6
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: healthz
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              name: linstor-csi
+              ports:
+                - containerPort: 9808
+                  name: healthz
+                  protocol: TCP
+              resources: {}
+              securityContext:
+                capabilities:
+                  add:
+                    - SYS_ADMIN
+                  drop:
+                    - ALL
+                privileged: true
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /csi
+                  name: plugin-dir
+                - mountPath: /var/lib/kubelet
+                  mountPropagation: Bidirectional
+                  name: publish-dir
+                - mountPath: /dev
+                  name: device-dir
+                - mountPath: /run/mount
+                  name: run-mount
+                - mountPath: /run/fsck
+                  name: run-fsck
+                - mountPath: /etc/selinux
+                  name: etc-selinux
+                  readOnly: true
+                - mountPath: /sys
+                  name: sys
+                  readOnly: true
+            - args:
+                - --v=5
+                - --csi-address=/csi/csi.sock
+                - --kubelet-registration-path=/var/lib/kubelet/plugins/linstor.csi.linbit.com/csi.sock
+                - --health-port=9809
+              image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.16.0
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: reg-healthz
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              name: csi-node-driver-registrar
+              ports:
+                - containerPort: 9809
+                  name: reg-healthz
+                  protocol: TCP
+              resources: {}
+              securityContext:
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /csi
+                  name: plugin-dir
+                - mountPath: /registration
+                  name: registration-dir
+            - args:
+                - --csi-address=/csi/csi.sock
+              image: registry.k8s.io/sig-storage/livenessprobe:v2.18.0
+              imagePullPolicy: IfNotPresent
+              name: csi-livenessprobe
+              resources: {}
+              securityContext:
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /csi
+                  name: plugin-dir
+          dnsPolicy: ClusterFirstWithHostNet
+          enableServiceLinks: false
+          hostNetwork: true
+          initContainers:
+            - command:
+                - /linstor-wait-until
+                - satellite-online
+                - $(KUBE_NODE_NAME)
+              env:
+                - name: LS_CONTROLLERS
+                  value: http://linstor-controller:3370
+                - name: KUBE_NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: spec.nodeName
+              image: quay.io/piraeusdatastore/piraeus-csi:v1.10.6
+              imagePullPolicy: IfNotPresent
+              name: linstor-wait-node-online
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          nodeSelector:
+            piraeus.io/storage: "yes"
+          priorityClassName: system-node-critical
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: linstor-csi-node
+          serviceAccountName: linstor-csi-node
+          shareProcessNamespace: true
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: drbd.linbit.com/force-io-error
+              operator: Exists
+            - effect: NoSchedule
+              key: drbd.linbit.com/lost-quorum
+              operator: Exists
+          volumes:
+            - hostPath:
+                path: /dev
+                type: Directory
+              name: device-dir
+            - hostPath:
+                path: /var/lib/kubelet
+                type: Directory
+              name: publish-dir
+            - hostPath:
+                path: /etc/selinux
+                type: DirectoryOrCreate
+              name: etc-selinux
+            - hostPath:
+                path: /sys
+                type: Directory
+              name: sys
+            - hostPath:
+                path: /var/lib/kubelet/plugins_registry
+                type: Directory
+              name: registration-dir
+            - hostPath:
+                path: /var/lib/kubelet/plugins/linstor.csi.linbit.com
+                type: DirectoryOrCreate
+              name: plugin-dir
+            - hostPath:
+                path: /run/mount
+                type: Directory
+              name: run-mount
+            - emptyDir: {}
+              name: run-fsck
+      updateStrategy:
+        rollingUpdate:
+          maxSurge: 0
+          maxUnavailable: 1
+        type: RollingUpdate
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    metadata:
+      annotations:
+        deprecated.daemonset.template.generation: "4"
+      labels:
+        app.kubernetes.io/component: linstor-satellite
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+        piraeus.io/linstor-satellite: 221c3e35-7b2b-41b6-8c62-0572befb8566
+      name: linstor-satellite.aiot-worker-01
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorSatellite
+          name: aiot-worker-01
+          uid: 221c3e35-7b2b-41b6-8c62-0572befb8566
+    spec:
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: linstor-satellite
+          app.kubernetes.io/instance: linstorcluster
+          app.kubernetes.io/name: piraeus-datastore
+          piraeus.io/linstor-satellite: 221c3e35-7b2b-41b6-8c62-0572befb8566
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/default-container: linstor-satellite
+            kubectl.kubernetes.io/restartedAt: "2026-04-26T11:43:15Z"
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/component: linstor-satellite
+            app.kubernetes.io/instance: linstorcluster
+            app.kubernetes.io/name: piraeus-datastore
+            piraeus.io/linstor-satellite: 221c3e35-7b2b-41b6-8c62-0572befb8566
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchFields:
+                      - key: metadata.name
+                        operator: In
+                        values:
+                          - aiot-worker-01
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - startSatellite
+              env:
+                - name: JAVA_OPTS
+                  value: -Djdk.tls.acknowledgeCloseNotify=true
+                - name: LB_FORCE_NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: spec.nodeName
+              image: quay.io/piraeusdatastore/piraeus-server:v1.33.1
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                periodSeconds: 10
+                successThreshold: 1
+                tcpSocket:
+                  port: linstor
+                timeoutSeconds: 1
+              name: linstor-satellite
+              ports:
+                - containerPort: 3366
+                  name: linstor
+                  protocol: TCP
+              resources: {}
+              securityContext:
+                capabilities:
+                  add:
+                    - NET_ADMIN
+                    - SYS_ADMIN
+                  drop:
+                    - ALL
+                privileged: true
+                readOnlyRootFilesystem: true
+              startupProbe:
+                failureThreshold: 30
+                periodSeconds: 10
+                successThreshold: 1
+                tcpSocket:
+                  port: linstor
+                timeoutSeconds: 3
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/linstor
+                  name: satellite-config
+                  readOnly: true
+                - mountPath: /dev
+                  name: dev
+                - mountPath: /var/log/linstor-satellite
+                  name: var-log-linstor-satellite
+                - mountPath: /var/lib/drbd
+                  name: var-lib-drbd
+                - mountPath: /var/lib/linstor.d
+                  name: var-lib-linstor-d
+                - mountPath: /etc/lvm
+                  name: container-etc-lvm
+                - mountPath: /etc/lvm/archive
+                  name: etc-lvm-archive
+                - mountPath: /etc/lvm/backup
+                  name: etc-lvm-backup
+                - mountPath: /run
+                  name: run
+                - mountPath: /tmp
+                  name: tmp
+                - mountPath: /run/lock/lvm
+                  name: run-lock-lvm
+                - mountPath: /run/lvm
+                  name: run-lvm
+                - mountPath: /run/udev
+                  name: run-udev
+                  readOnly: true
+            - image: quay.io/piraeusdatastore/drbd-reactor:v1.11.0
+              imagePullPolicy: IfNotPresent
+              name: drbd-reactor
+              ports:
+                - containerPort: 9942
+                  name: prometheus
+                  protocol: TCP
+              resources: {}
+              securityContext:
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/drbd-reactor.d
+                  name: reactor-config
+                  readOnly: true
+          dnsPolicy: ClusterFirst
+          enableServiceLinks: false
+          hostIPC: true
+          hostNetwork: true
+          initContainers:
+            - env:
+                - name: LB_FAIL_IF_USERMODE_HELPER_NOT_DISABLED
+                  value: "yes"
+                - name: LB_DRBD_MIN_LOADED_VERSION
+                  value: "9"
+                - name: LB_SELINUX_AS
+                  value: modules_object_t
+              image: quay.io/piraeusdatastore/drbd9-noble:v9.3.1
+              imagePullPolicy: IfNotPresent
+              name: drbd-module-loader
+              resources: {}
+              securityContext:
+                capabilities:
+                  add:
+                    - SYS_MODULE
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                seLinuxOptions:
+                  level: s0
+                  type: spc_t
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /lib/modules
+                  name: lib-modules
+                  readOnly: true
+                - mountPath: /usr/src
+                  name: usr-src
+                  readOnly: true
+                - mountPath: /tmp
+                  name: tmp
+            - image: quay.io/piraeusdatastore/drbd-shutdown-guard:v1.1.2
+              imagePullPolicy: IfNotPresent
+              name: drbd-shutdown-guard
+              resources: {}
+              securityContext:
+                privileged: true
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /run/systemd/system/
+                  name: run-systemd-system
+                - mountPath: /run/drbd-shutdown-guard
+                  name: run-drbd-shutdown-guard
+                - mountPath: /run/dbus/system_bus_socket
+                  name: systemd-bus-socket
+            - command:
+                - sh
+                - -exc
+                - |
+                  if [ -e /host/etc/lvm/lvm.conf ]; then
+                    # Looks like the host has LVM configured:
+                    # * disable monitoring via dmeventd
+                    # * do not look at DRBD devices
+                    lvmconfig --type current --mergedconfig --config 'activation { monitoring = 0 } devices { global_filter = [ "r|^/dev/drbd|" ] }' > /etc/lvm/lvm.conf
+                  else
+                    # Most likely, no LVM installed, which also means no udev rules
+                    # * disable udev sync and rules
+                    # * do not look at udev for device lists
+                    # * disable monitoring via dmeventd
+                    # * do not look at DRBD devices
+                    lvmconfig --type current --mergedconfig --config 'activation { udev_sync = 0 udev_rules = 0 monitoring = 0 } devices { global_filter = [ "r|^/dev/drbd|" ] obtain_device_list_from_udev = 0}' > /etc/lvm/lvm.conf
+                  fi
+              image: quay.io/piraeusdatastore/piraeus-server:v1.33.1
+              imagePullPolicy: IfNotPresent
+              name: setup-lvm-configuration
+              resources: {}
+              securityContext:
+                privileged: true
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /host/etc/lvm
+                  name: etc-lvm
+                  readOnly: true
+                - mountPath: /etc/lvm
+                  name: container-etc-lvm
+                - mountPath: /run/udev
+                  name: run-udev
+          priorityClassName: system-node-critical
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: satellite
+          serviceAccountName: satellite
+          shareProcessNamespace: true
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: drbd.linbit.com/force-io-error
+              operator: Exists
+            - effect: NoSchedule
+              key: drbd.linbit.com/lost-quorum
+              operator: Exists
+            - effect: NoSchedule
+              operator: Exists
+          volumes:
+            - hostPath:
+                path: /lib/modules
+                type: Directory
+              name: lib-modules
+            - hostPath:
+                path: /usr/src
+                type: Directory
+              name: usr-src
+            - hostPath:
+                path: /dev
+                type: Directory
+              name: dev
+            - hostPath:
+                path: /etc/lvm/archive
+                type: DirectoryOrCreate
+              name: etc-lvm-archive
+            - hostPath:
+                path: /etc/lvm
+                type: DirectoryOrCreate
+              name: etc-lvm
+            - hostPath:
+                path: /etc/lvm/backup
+                type: DirectoryOrCreate
+              name: etc-lvm-backup
+            - hostPath:
+                path: /var/lib/linstor.d
+                type: DirectoryOrCreate
+              name: var-lib-linstor-d
+            - hostPath:
+                path: /var/lib/drbd
+                type: DirectoryOrCreate
+              name: var-lib-drbd
+            - hostPath:
+                path: /run/systemd/system/
+                type: Directory
+              name: run-systemd-system
+            - hostPath:
+                path: /run/drbd-shutdown-guard
+                type: DirectoryOrCreate
+              name: run-drbd-shutdown-guard
+            - hostPath:
+                path: /run/dbus/system_bus_socket
+                type: Socket
+              name: systemd-bus-socket
+            - hostPath:
+                path: /run/lock/lvm
+                type: DirectoryOrCreate
+              name: run-lock-lvm
+            - hostPath:
+                path: /run/lvm
+                type: DirectoryOrCreate
+              name: run-lvm
+            - hostPath:
+                path: /run/udev
+                type: Directory
+              name: run-udev
+            - hostPath:
+                path: /var/log/linstor-satellite
+                type: DirectoryOrCreate
+              name: var-log-linstor-satellite
+            - configMap:
+                defaultMode: 288
+                name: satellite-config.aiot-worker-01
+              name: satellite-config
+            - configMap:
+                defaultMode: 288
+                name: reactor-config.aiot-worker-01
+              name: reactor-config
+            - emptyDir: {}
+              name: container-etc-lvm
+            - emptyDir: {}
+              name: tmp
+            - emptyDir: {}
+              name: run
+      updateStrategy:
+        rollingUpdate:
+          maxSurge: 0
+          maxUnavailable: 1
+        type: RollingUpdate
+  - apiVersion: apps/v1
+    kind: DaemonSet
+    metadata:
+      annotations:
+        deprecated.daemonset.template.generation: "3"
+      labels:
+        app.kubernetes.io/component: linstor-satellite
+        app.kubernetes.io/instance: linstorcluster
+        app.kubernetes.io/managed-by: piraeus-operator
+        app.kubernetes.io/name: piraeus-datastore
+        app.kubernetes.io/version: v2.10.5-22c84566f3c5373a9406952727499328c8741681
+        piraeus.io/linstor-satellite: b0fbbbae-44da-465f-957f-ad67caf2f2e5
+      name: linstor-satellite.aiot-worker-02
+      namespace: piraeus-datastore
+      ownerReferences:
+        - apiVersion: piraeus.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: LinstorSatellite
+          name: aiot-worker-02
+          uid: b0fbbbae-44da-465f-957f-ad67caf2f2e5
+    spec:
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: linstor-satellite
+          app.kubernetes.io/instance: linstorcluster
+          app.kubernetes.io/name: piraeus-datastore
+          piraeus.io/linstor-satellite: b0fbbbae-44da-465f-957f-ad67caf2f2e5
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/default-container: linstor-satellite
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/component: linstor-satellite
+            app.kubernetes.io/instance: linstorcluster
+            app.kubernetes.io/name: piraeus-datastore
+            piraeus.io/linstor-satellite: b0fbbbae-44da-465f-957f-ad67caf2f2e5
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchFields:
+                      - key: metadata.name
+                        operator: In
+                        values:
+                          - aiot-worker-02
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - startSatellite
+              env:
+                - name: JAVA_OPTS
+                  value: -Djdk.tls.acknowledgeCloseNotify=true
+                - name: LB_FORCE_NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: spec.nodeName
+              image: quay.io/piraeusdatastore/piraeus-server:v1.33.1
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                periodSeconds: 10
+                successThreshold: 1
+                tcpSocket:
+                  port: linstor
+                timeoutSeconds: 1
+              name: linstor-satellite
+              ports:
+                - containerPort: 3366
+                  name: linstor
+                  protocol: TCP
+              resources: {}
+              securityContext:
+                capabilities:
+                  add:
+                    - NET_ADMIN
+                    - SYS_ADMIN
+                  drop:
+                    - ALL
+                privileged: true
+                readOnlyRootFilesystem: true
+              startupProbe:
+                failureThreshold: 30
+                periodSeconds: 10
+                successThreshold: 1
+                tcpSocket:
+                  port: linstor
+                timeoutSeconds: 3
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/linstor
+                  name: satellite-config
+                  readOnly: true
+                - mountPath: /dev
+                  name: dev
+                - mountPath: /var/log/linstor-satellite
+                  name: var-log-linstor-satellite
+                - mountPath: /var/lib/drbd
+                  name: var-lib-drbd
+                - mountPath: /var/lib/linstor.d
+                  name: var-lib-linstor-d
+                - mountPath: /etc/lvm
+                  name: container-etc-lvm
+                - mountPath: /etc/lvm/archive
+                  name: etc-lvm-archive
+                - mountPath: /etc/lvm/backup
+                  name: etc-lvm-backup
+                - mountPath: /run
+                  name: run
+                - mountPath: /tmp
+                  name: tmp
+                - mountPath: /run/lock/lvm
+                  name: run-lock-lvm
+                - mountPath: /run/lvm
+                  name: run-lvm
+                - mountPath: /run/udev
+                  name: run-udev
+                  readOnly: true
+            - image: quay.io/piraeusdatastore/drbd-reactor:v1.11.0
+              imagePullPolicy: IfNotPresent
+              name: drbd-reactor
+              ports:
+                - containerPort: 9942
+                  name: prometheus
+                  protocol: TCP
+              resources: {}
+              securityContext:
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/drbd-reactor.d
+                  name: reactor-config
+                  readOnly: true
+          dnsPolicy: ClusterFirst
+          enableServiceLinks: false
+          hostIPC: true
+          hostNetwork: true
+          initContainers:
+            - env:
+                - name: LB_FAIL_IF_USERMODE_HELPER_NOT_DISABLED
+                  value: "yes"
+                - name: LB_DRBD_MIN_LOADED_VERSION
+                  value: "9"
+                - name: LB_SELINUX_AS
+                  value: modules_object_t
+              image: quay.io/piraeusdatastore/drbd9-noble:v9.3.1
+              imagePullPolicy: IfNotPresent
+              name: drbd-module-loader
+              resources: {}
+              securityContext:
+                capabilities:
+                  add:
+                    - SYS_MODULE
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                seLinuxOptions:
+                  level: s0
+                  type: spc_t
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /lib/modules
+                  name: lib-modules
+                  readOnly: true
+                - mountPath: /usr/src
+                  name: usr-src
+                  readOnly: true
+                - mountPath: /tmp
+                  name: tmp
+            - image: quay.io/piraeusdatastore/drbd-shutdown-guard:v1.1.2
+              imagePullPolicy: IfNotPresent
+              name: drbd-shutdown-guard
+              resources: {}
+              securityContext:
+                privileged: true
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /run/systemd/system/
+                  name: run-systemd-system
+                - mountPath: /run/drbd-shutdown-guard
+                  name: run-drbd-shutdown-guard
+                - mountPath: /run/dbus/system_bus_socket
+                  name: systemd-bus-socket
+            - command:
+                - sh
+                - -exc
+                - |
+                  if [ -e /host/etc/lvm/lvm.conf ]; then
+                    # Looks like the host has LVM configured:
+                    # * disable monitoring via dmeventd
+                    # * do not look at DRBD devices
+                    lvmconfig --type current --mergedconfig --config 'activation { monitoring = 0 } devices { global_filter = [ "r|^/dev/drbd|" ] }' > /etc/lvm/lvm.conf
+                  else
+                    # Most likely, no LVM installed, which also means no udev rules
+                    # * disable udev sync and rules
+                    # * do not look at udev for device lists
+                    # * disable monitoring via dmeventd
+                    # * do not look at DRBD devices
+                    lvmconfig --type current --mergedconfig --config 'activation { udev_sync = 0 udev_rules = 0 monitoring = 0 } devices { global_filter = [ "r|^/dev/drbd|" ] obtain_device_list_from_udev = 0}' > /etc/lvm/lvm.conf
+                  fi
+              image: quay.io/piraeusdatastore/piraeus-server:v1.33.1
+              imagePullPolicy: IfNotPresent
+              name: setup-lvm-configuration
+              resources: {}
+              securityContext:
+                privileged: true
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /host/etc/lvm
+                  name: etc-lvm
+                  readOnly: true
+                - mountPath: /etc/lvm
+                  name: container-etc-lvm
+                - mountPath: /run/udev
+                  name: run-udev
+          priorityClassName: system-node-critical
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: satellite
+          serviceAccountName: satellite
+          shareProcessNamespace: true
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - effect: NoSchedule
+              key: drbd.linbit.com/force-io-error
+              operator: Exists
+            - effect: NoSchedule
+              key: drbd.linbit.com/lost-quorum
+              operator: Exists
+            - effect: NoSchedule
+              operator: Exists
+          volumes:
+            - hostPath:
+                path: /lib/modules
+                type: Directory
+              name: lib-modules
+            - hostPath:
+                path: /usr/src
+                type: Directory
+              name: usr-src
+            - hostPath:
+                path: /dev
+                type: Directory
+              name: dev
+            - hostPath:
+                path: /etc/lvm/archive
+                type: DirectoryOrCreate
+              name: etc-lvm-archive
+            - hostPath:
+                path: /etc/lvm
+                type: DirectoryOrCreate
+              name: etc-lvm
+            - hostPath:
+                path: /etc/lvm/backup
+                type: DirectoryOrCreate
+              name: etc-lvm-backup
+            - hostPath:
+                path: /var/lib/linstor.d
+                type: DirectoryOrCreate
+              name: var-lib-linstor-d
+            - hostPath:
+                path: /var/lib/drbd
+                type: DirectoryOrCreate
+              name: var-lib-drbd
+            - hostPath:
+                path: /run/systemd/system/
+                type: Directory
+              name: run-systemd-system
+            - hostPath:
+                path: /run/drbd-shutdown-guard
+                type: DirectoryOrCreate
+              name: run-drbd-shutdown-guard
+            - hostPath:
+                path: /run/dbus/system_bus_socket
+                type: Socket
+              name: systemd-bus-socket
+            - hostPath:
+                path: /run/lock/lvm
+                type: DirectoryOrCreate
+              name: run-lock-lvm
+            - hostPath:
+                path: /run/lvm
+                type: DirectoryOrCreate
+              name: run-lvm
+            - hostPath:
+                path: /run/udev
+                type: Directory
+              name: run-udev
+            - hostPath:
+                path: /var/log/linstor-satellite
+                type: DirectoryOrCreate
+              name: var-log-linstor-satellite
+            - configMap:
+                defaultMode: 288
+                name: satellite-config.aiot-worker-02
+              name: satellite-config
+            - configMap:
+                defaultMode: 288
+                name: reactor-config.aiot-worker-02
+              name: reactor-config
+            - emptyDir: {}
+              name: container-etc-lvm
+            - emptyDir: {}
+              name: tmp
+            - emptyDir: {}
+              name: run
+      updateStrategy:
+        rollingUpdate:
+          maxSurge: 0
+          maxUnavailable: 1
+        type: RollingUpdate
+kind: List
+metadata:
+  resourceVersion: ""

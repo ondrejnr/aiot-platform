@@ -1,549 +1,497 @@
 apiVersion: v1
 items:
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/name: grafana
-      app.kubernetes.io/version: 12.4.2
-      helm.sh/chart: grafana-11.6.0
-      release: prometheus
-    name: prometheus-grafana
-    namespace: monitoring
-    resourceVersion: "2356"
-    uid: 59191270-61f6-40a7-a8c6-1faf4f371925
-  spec:
-    endpoints:
-    - honorLabels: true
-      path: /metrics
-      port: http-web
-      scheme: http
-      scrapeTimeout: 30s
-    jobLabel: prometheus
-    namespaceSelector:
-      matchNames:
-      - monitoring
-    selector:
-      matchLabels:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
         app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: grafana
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-alertmanager
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-alertmanager
-    namespace: monitoring
-    resourceVersion: "2360"
-    uid: 322864ec-316e-40d4-8b42-52fc8a2365fc
-  spec:
-    endpoints:
-    - enableHttp2: true
-      path: /metrics
-      port: http-web
-    - path: /metrics
-      port: reloader-web
-    namespaceSelector:
-      matchNames:
-      - monitoring
-    selector:
-      matchLabels:
+        app.kubernetes.io/version: 12.4.2
+        helm.sh/chart: grafana-11.6.0
+        release: prometheus
+      name: prometheus-grafana
+      namespace: monitoring
+    spec:
+      endpoints:
+        - honorLabels: true
+          path: /metrics
+          port: http-web
+          scheme: http
+          scrapeTimeout: 30s
+      jobLabel: prometheus
+      namespaceSelector:
+        matchNames:
+          - monitoring
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: prometheus
+          app.kubernetes.io/name: grafana
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
         app: kube-prometheus-stack-alertmanager
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
         release: prometheus
-        self-monitor: "true"
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-apiserver
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-apiserver
-    namespace: monitoring
-    resourceVersion: "2362"
-    uid: fada5fae-a055-4571-bf1f-c69a40bc1d00
-  spec:
-    endpoints:
-    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-      metricRelabelings:
-      - action: drop
-        regex: (etcd_request|apiserver_request_slo|apiserver_request_sli|apiserver_request)_duration_seconds_bucket;(0\.15|0\.2|0\.3|0\.35|0\.4|0\.45|0\.6|0\.7|0\.8|0\.9|1\.25|1\.5|1\.75|2|3|3\.5|4|4\.5|6|7|8|9|15|20|40|45|50)(\.0)?
-        sourceLabels:
-        - __name__
-        - le
-      port: https
-      scheme: https
-      tlsConfig:
-        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecureSkipVerify: false
-        serverName: kubernetes
-    jobLabel: component
-    namespaceSelector:
-      matchNames:
-      - default
-    selector:
-      matchLabels:
-        component: apiserver
-        provider: kubernetes
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-coredns
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-coredns
-    namespace: monitoring
-    resourceVersion: "2361"
-    uid: 29104403-907f-41ea-b477-0364969159fb
-  spec:
-    endpoints:
-    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-      port: http-metrics
-    jobLabel: jobLabel
-    namespaceSelector:
-      matchNames:
-      - kube-system
-    selector:
-      matchLabels:
+      name: prometheus-kube-prometheus-alertmanager
+      namespace: monitoring
+    spec:
+      endpoints:
+        - enableHttp2: true
+          path: /metrics
+          port: http-web
+        - path: /metrics
+          port: reloader-web
+      namespaceSelector:
+        matchNames:
+          - monitoring
+      selector:
+        matchLabels:
+          app: kube-prometheus-stack-alertmanager
+          release: prometheus
+          self-monitor: "true"
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
+        app: kube-prometheus-stack-apiserver
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
+        release: prometheus
+      name: prometheus-kube-prometheus-apiserver
+      namespace: monitoring
+    spec:
+      endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          metricRelabelings:
+            - action: drop
+              regex: (etcd_request|apiserver_request_slo|apiserver_request_sli|apiserver_request)_duration_seconds_bucket;(0\.15|0\.2|0\.3|0\.35|0\.4|0\.45|0\.6|0\.7|0\.8|0\.9|1\.25|1\.5|1\.75|2|3|3\.5|4|4\.5|6|7|8|9|15|20|40|45|50)(\.0)?
+              sourceLabels:
+                - __name__
+                - le
+          port: https
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            insecureSkipVerify: false
+            serverName: kubernetes
+      jobLabel: component
+      namespaceSelector:
+        matchNames:
+          - default
+      selector:
+        matchLabels:
+          component: apiserver
+          provider: kubernetes
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
         app: kube-prometheus-stack-coredns
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
         release: prometheus
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-kube-controller-manager
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-kube-controller-manager
-    namespace: monitoring
-    resourceVersion: "2367"
-    uid: ecf3007b-d021-4d4d-a51b-9e80c8c98457
-  spec:
-    endpoints:
-    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-      port: http-metrics
-      scheme: https
-      tlsConfig:
-        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecureSkipVerify: true
-    jobLabel: jobLabel
-    namespaceSelector:
-      matchNames:
-      - kube-system
-    selector:
-      matchLabels:
+      name: prometheus-kube-prometheus-coredns
+      namespace: monitoring
+    spec:
+      endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+      jobLabel: jobLabel
+      namespaceSelector:
+        matchNames:
+          - kube-system
+      selector:
+        matchLabels:
+          app: kube-prometheus-stack-coredns
+          release: prometheus
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
         app: kube-prometheus-stack-kube-controller-manager
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
         release: prometheus
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-kube-etcd
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-kube-etcd
-    namespace: monitoring
-    resourceVersion: "2359"
-    uid: 7b397486-91df-414a-baf2-db8163573e68
-  spec:
-    endpoints:
-    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-      port: http-metrics
-    jobLabel: jobLabel
-    namespaceSelector:
-      matchNames:
-      - kube-system
-    selector:
-      matchLabels:
+      name: prometheus-kube-prometheus-kube-controller-manager
+      namespace: monitoring
+    spec:
+      endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            insecureSkipVerify: true
+      jobLabel: jobLabel
+      namespaceSelector:
+        matchNames:
+          - kube-system
+      selector:
+        matchLabels:
+          app: kube-prometheus-stack-kube-controller-manager
+          release: prometheus
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
         app: kube-prometheus-stack-kube-etcd
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
         release: prometheus
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-kube-proxy
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-kube-proxy
-    namespace: monitoring
-    resourceVersion: "2363"
-    uid: 004a7184-4683-4596-9cd8-67d03df65102
-  spec:
-    endpoints:
-    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-      port: http-metrics
-    jobLabel: jobLabel
-    namespaceSelector:
-      matchNames:
-      - kube-system
-    selector:
-      matchLabels:
+      name: prometheus-kube-prometheus-kube-etcd
+      namespace: monitoring
+    spec:
+      endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+      jobLabel: jobLabel
+      namespaceSelector:
+        matchNames:
+          - kube-system
+      selector:
+        matchLabels:
+          app: kube-prometheus-stack-kube-etcd
+          release: prometheus
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
         app: kube-prometheus-stack-kube-proxy
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
         release: prometheus
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-kube-scheduler
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-kube-scheduler
-    namespace: monitoring
-    resourceVersion: "2365"
-    uid: f00bdf9c-b92a-4b3e-a64d-94622e03ba3d
-  spec:
-    endpoints:
-    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-      port: http-metrics
-      scheme: https
-      tlsConfig:
-        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecureSkipVerify: true
-    jobLabel: jobLabel
-    namespaceSelector:
-      matchNames:
-      - kube-system
-    selector:
-      matchLabels:
+      name: prometheus-kube-prometheus-kube-proxy
+      namespace: monitoring
+    spec:
+      endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+      jobLabel: jobLabel
+      namespaceSelector:
+        matchNames:
+          - kube-system
+      selector:
+        matchLabels:
+          app: kube-prometheus-stack-kube-proxy
+          release: prometheus
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
         app: kube-prometheus-stack-kube-scheduler
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
         release: prometheus
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-kubelet
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-kubelet
-    namespace: monitoring
-    resourceVersion: "2364"
-    uid: fe412c3d-4f0f-46f5-89e0-724a1909adc1
-  spec:
-    attachMetadata:
-      node: false
-    endpoints:
-    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-      honorLabels: true
-      honorTimestamps: true
-      metricRelabelings:
-      - action: drop
-        regex: (csi_operations|storage_operation_duration)_seconds_bucket;(0.25|2.5|15|25|120|600)(\.0)?
-        sourceLabels:
-        - __name__
-        - le
-      port: https-metrics
-      relabelings:
-      - action: replace
-        sourceLabels:
-        - __metrics_path__
-        targetLabel: metrics_path
-      scheme: https
-      tlsConfig:
-        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecureSkipVerify: true
-    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-      honorLabels: true
-      honorTimestamps: true
-      interval: 10s
-      metricRelabelings:
-      - action: drop
-        regex: container_cpu_(cfs_throttled_seconds_total|load_average_10s|system_seconds_total|user_seconds_total)
-        sourceLabels:
-        - __name__
-      - action: drop
-        regex: container_fs_(io_current|io_time_seconds_total|io_time_weighted_seconds_total|reads_merged_total|sector_reads_total|sector_writes_total|writes_merged_total)
-        sourceLabels:
-        - __name__
-      - action: drop
-        regex: container_memory_(mapped_file|swap)
-        sourceLabels:
-        - __name__
-      - action: drop
-        regex: container_(file_descriptors|tasks_state|threads_max)
-        sourceLabels:
-        - __name__
-      - action: drop
-        regex: container_memory_failures_total;hierarchy
-        sourceLabels:
-        - __name__
-        - scope
-      - action: drop
-        regex: container_network_.*;(cali|cilium|cni|lxc|nodelocaldns|tunl).*
-        sourceLabels:
-        - __name__
-        - interface
-      - action: drop
-        regex: container_spec.*
-        sourceLabels:
-        - __name__
-      - action: drop
-        regex: .+;
-        sourceLabels:
-        - id
-        - pod
-      path: /metrics/cadvisor
-      port: https-metrics
-      relabelings:
-      - action: replace
-        sourceLabels:
-        - __metrics_path__
-        targetLabel: metrics_path
-      scheme: https
-      tlsConfig:
-        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecureSkipVerify: true
-      trackTimestampsStaleness: true
-    - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-      honorLabels: true
-      honorTimestamps: true
-      path: /metrics/probes
-      port: https-metrics
-      relabelings:
-      - action: replace
-        sourceLabels:
-        - __metrics_path__
-        targetLabel: metrics_path
-      scheme: https
-      tlsConfig:
-        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecureSkipVerify: true
-    jobLabel: k8s-app
-    namespaceSelector:
-      matchNames:
-      - kube-system
-    selector:
-      matchLabels:
-        app.kubernetes.io/name: kubelet
-        k8s-app: kubelet
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-operator
-      app.kubernetes.io/component: prometheus-operator
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-operator
-    namespace: monitoring
-    resourceVersion: "2368"
-    uid: 53f4ee99-0748-46e8-b3b7-da4b98876591
-  spec:
-    endpoints:
-    - honorLabels: true
-      port: https
-      scheme: https
-      tlsConfig:
-        ca:
-          secret:
-            key: ca
-            name: prometheus-kube-prometheus-admission
-            optional: false
-        serverName: prometheus-kube-prometheus-operator
-    namespaceSelector:
-      matchNames:
-      - monitoring
-    selector:
-      matchLabels:
+      name: prometheus-kube-prometheus-kube-scheduler
+      namespace: monitoring
+    spec:
+      endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          port: http-metrics
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            insecureSkipVerify: true
+      jobLabel: jobLabel
+      namespaceSelector:
+        matchNames:
+          - kube-system
+      selector:
+        matchLabels:
+          app: kube-prometheus-stack-kube-scheduler
+          release: prometheus
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
+        app: kube-prometheus-stack-kubelet
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
+        release: prometheus
+      name: prometheus-kube-prometheus-kubelet
+      namespace: monitoring
+    spec:
+      attachMetadata:
+        node: false
+      endpoints:
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          honorLabels: true
+          honorTimestamps: true
+          metricRelabelings:
+            - action: drop
+              regex: (csi_operations|storage_operation_duration)_seconds_bucket;(0.25|2.5|15|25|120|600)(\.0)?
+              sourceLabels:
+                - __name__
+                - le
+          port: https-metrics
+          relabelings:
+            - action: replace
+              sourceLabels:
+                - __metrics_path__
+              targetLabel: metrics_path
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            insecureSkipVerify: true
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          honorLabels: true
+          honorTimestamps: true
+          interval: 10s
+          metricRelabelings:
+            - action: drop
+              regex: container_cpu_(cfs_throttled_seconds_total|load_average_10s|system_seconds_total|user_seconds_total)
+              sourceLabels:
+                - __name__
+            - action: drop
+              regex: container_fs_(io_current|io_time_seconds_total|io_time_weighted_seconds_total|reads_merged_total|sector_reads_total|sector_writes_total|writes_merged_total)
+              sourceLabels:
+                - __name__
+            - action: drop
+              regex: container_memory_(mapped_file|swap)
+              sourceLabels:
+                - __name__
+            - action: drop
+              regex: container_(file_descriptors|tasks_state|threads_max)
+              sourceLabels:
+                - __name__
+            - action: drop
+              regex: container_memory_failures_total;hierarchy
+              sourceLabels:
+                - __name__
+                - scope
+            - action: drop
+              regex: container_network_.*;(cali|cilium|cni|lxc|nodelocaldns|tunl).*
+              sourceLabels:
+                - __name__
+                - interface
+            - action: drop
+              regex: container_spec.*
+              sourceLabels:
+                - __name__
+            - action: drop
+              regex: .+;
+              sourceLabels:
+                - id
+                - pod
+          path: /metrics/cadvisor
+          port: https-metrics
+          relabelings:
+            - action: replace
+              sourceLabels:
+                - __metrics_path__
+              targetLabel: metrics_path
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            insecureSkipVerify: true
+          trackTimestampsStaleness: true
+        - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+          honorLabels: true
+          honorTimestamps: true
+          path: /metrics/probes
+          port: https-metrics
+          relabelings:
+            - action: replace
+              sourceLabels:
+                - __metrics_path__
+              targetLabel: metrics_path
+          scheme: https
+          tlsConfig:
+            caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            insecureSkipVerify: true
+      jobLabel: k8s-app
+      namespaceSelector:
+        matchNames:
+          - kube-system
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: kubelet
+          k8s-app: kubelet
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
         app: kube-prometheus-stack-operator
+        app.kubernetes.io/component: prometheus-operator
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
         release: prometheus
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app: kube-prometheus-stack-prometheus
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/part-of: kube-prometheus-stack
-      app.kubernetes.io/version: 83.4.1
-      chart: kube-prometheus-stack-83.4.1
-      heritage: Helm
-      release: prometheus
-    name: prometheus-kube-prometheus-prometheus
-    namespace: monitoring
-    resourceVersion: "2357"
-    uid: 6e0452a0-bfc3-4fc3-a203-54492b41325a
-  spec:
-    endpoints:
-    - path: /metrics
-      port: http-web
-    - path: /metrics
-      port: reloader-web
-    namespaceSelector:
-      matchNames:
-      - monitoring
-    selector:
-      matchLabels:
+      name: prometheus-kube-prometheus-operator
+      namespace: monitoring
+    spec:
+      endpoints:
+        - honorLabels: true
+          port: https
+          scheme: https
+          tlsConfig:
+            ca:
+              secret:
+                key: ca
+                name: prometheus-kube-prometheus-admission
+                optional: false
+            serverName: prometheus-kube-prometheus-operator
+      namespaceSelector:
+        matchNames:
+          - monitoring
+      selector:
+        matchLabels:
+          app: kube-prometheus-stack-operator
+          release: prometheus
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
         app: kube-prometheus-stack-prometheus
+        app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/part-of: kube-prometheus-stack
+        app.kubernetes.io/version: 83.4.1
+        chart: kube-prometheus-stack-83.4.1
+        heritage: Helm
         release: prometheus
-        self-monitor: "true"
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app.kubernetes.io/component: metrics
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/name: kube-state-metrics
-      app.kubernetes.io/part-of: kube-state-metrics
-      app.kubernetes.io/version: 2.18.0
-      helm.sh/chart: kube-state-metrics-7.2.2
-      release: prometheus
-    name: prometheus-kube-state-metrics
-    namespace: monitoring
-    resourceVersion: "2358"
-    uid: 232f96c2-48d6-468f-b0c4-9456e8851907
-  spec:
-    endpoints:
-    - honorLabels: true
-      port: http
-    jobLabel: app.kubernetes.io/name
-    selector:
-      matchLabels:
+      name: prometheus-kube-prometheus-prometheus
+      namespace: monitoring
+    spec:
+      endpoints:
+        - path: /metrics
+          port: http-web
+        - path: /metrics
+          port: reloader-web
+      namespaceSelector:
+        matchNames:
+          - monitoring
+      selector:
+        matchLabels:
+          app: kube-prometheus-stack-prometheus
+          release: prometheus
+          self-monitor: "true"
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
+        app.kubernetes.io/component: metrics
         app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: kube-state-metrics
-- apiVersion: monitoring.coreos.com/v1
-  kind: ServiceMonitor
-  metadata:
-    annotations:
-      meta.helm.sh/release-name: prometheus
-      meta.helm.sh/release-namespace: monitoring
-    creationTimestamp: "2026-04-14T01:27:51Z"
-    generation: 1
-    labels:
-      app.kubernetes.io/component: metrics
-      app.kubernetes.io/instance: prometheus
-      app.kubernetes.io/managed-by: Helm
-      app.kubernetes.io/name: prometheus-node-exporter
-      app.kubernetes.io/part-of: prometheus-node-exporter
-      app.kubernetes.io/version: 1.11.1
-      helm.sh/chart: prometheus-node-exporter-4.53.1
-      release: prometheus
-    name: prometheus-prometheus-node-exporter
-    namespace: monitoring
-    resourceVersion: "2366"
-    uid: 2f6e3426-801e-4728-911d-73f1f4da8713
-  spec:
-    attachMetadata:
-      node: false
-    endpoints:
-    - port: http-metrics
-      scheme: http
-    jobLabel: jobLabel
-    selector:
-      matchLabels:
+        app.kubernetes.io/part-of: kube-state-metrics
+        app.kubernetes.io/version: 2.18.0
+        helm.sh/chart: kube-state-metrics-7.2.2
+        release: prometheus
+      name: prometheus-kube-state-metrics
+      namespace: monitoring
+    spec:
+      endpoints:
+        - honorLabels: true
+          port: http
+      jobLabel: app.kubernetes.io/name
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: prometheus
+          app.kubernetes.io/name: kube-state-metrics
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: prometheus
+        meta.helm.sh/release-namespace: monitoring
+      labels:
+        app.kubernetes.io/component: metrics
         app.kubernetes.io/instance: prometheus
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: prometheus-node-exporter
+        app.kubernetes.io/part-of: prometheus-node-exporter
+        app.kubernetes.io/version: 1.11.1
+        helm.sh/chart: prometheus-node-exporter-4.53.1
+        release: prometheus
+      name: prometheus-prometheus-node-exporter
+      namespace: monitoring
+    spec:
+      attachMetadata:
+        node: false
+      endpoints:
+        - port: http-metrics
+          scheme: http
+      jobLabel: jobLabel
+      selector:
+        matchLabels:
+          app.kubernetes.io/instance: prometheus
+          app.kubernetes.io/name: prometheus-node-exporter
 kind: List
 metadata:
   resourceVersion: ""

@@ -1,13 +1,33 @@
 apiVersion: v1
 data:
-  ClusterConfiguration: "apiServer:\n  certSANs:\n  - 35.241.255.137\napiVersion:\
-    \ kubeadm.k8s.io/v1beta4\ncaCertificateValidityPeriod: 87600h0m0s\ncertificateValidityPeriod:\
-    \ 8760h0m0s\ncertificatesDir: /etc/kubernetes/pki\nclusterName: kubernetes\ncontrollerManager:\
-    \ {}\ndns: {}\nencryptionAlgorithm: RSA-2048\netcd:\n  local:\n    dataDir: /var/lib/etcd\n\
-    imageRepository: registry.k8s.io\nkind: ClusterConfiguration\nkubernetesVersion:\
-    \ v1.32.13\nnetworking:\n  dnsDomain: cluster.local\n  podSubnet: 10.244.0.0/16\n\
-    \  serviceSubnet: 10.96.0.0/12\nproxy: {}\nscheduler: {}\n"
+  ClusterConfiguration: |
+    apiServer:
+      certSANs:
+      - 35.241.255.137
+    apiVersion: kubeadm.k8s.io/v1beta4
+    caCertificateValidityPeriod: 87600h0m0s
+    certificateValidityPeriod: 8760h0m0s
+    certificatesDir: /etc/kubernetes/pki
+    clusterName: kubernetes
+    controllerManager: {}
+    dns: {}
+    encryptionAlgorithm: RSA-2048
+    etcd:
+      local:
+        dataDir: /var/lib/etcd
+    imageRepository: registry.k8s.io
+    kind: ClusterConfiguration
+    kubernetesVersion: v1.32.13
+    networking:
+      dnsDomain: cluster.local
+      podSubnet: 10.244.0.0/16
+      serviceSubnet: 10.96.0.0/12
+    proxy: {}
+    scheduler: {}
 kind: ConfigMap
 metadata:
+  creationTimestamp: "2026-04-14T01:17:51Z"
   name: kubeadm-config
   namespace: kube-system
+  resourceVersion: "201"
+  uid: 1b35a292-9554-4a8e-a132-55d01e9af03e

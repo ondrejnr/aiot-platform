@@ -1,0 +1,24 @@
+apiVersion: v1
+items:
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      annotations:
+        objectset.rio.cattle.io/applied: H4sIAAAAAAAA/3yOvW7rMAyF34Vz5JurxH/aO3RutyIDLdGJClo0LBaFYfjdC8FdumQRdPh9ODgbTKQYUBHcBpiSKGqUlEuU4ZO8ZtJqiVJ5VGWqovyLARyMTKQG75TUDCKadcHZHJI5IItHNnnNShPsJ2AciJ82PzA/wMGlsWd7GdvaUjv+77s+dENTWzrbfgjWN3WH1PrrtZQmnAgcBBrxi9Ugs3yXFw6UZ/SFPx2WZ/JlFt0Xyhncx7bfThDTnzhLeCMmr7KA2/Zy4OjX93Wm4sDrr36Cl+Nz2/efAAAA//9HYnBDXwEAAA
+        objectset.rio.cattle.io/id: fleet-agent-bootstrap-cattle-fleet-local-system
+      labels:
+        objectset.rio.cattle.io/hash: 362023f752e7f1989d8b652e029bd2c658ae7c44
+      name: default-allow-all
+      namespace: cattle-fleet-local-system
+    spec:
+      egress:
+        - {}
+      ingress:
+        - {}
+      podSelector: {}
+      policyTypes:
+        - Ingress
+        - Egress
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,190 +1,181 @@
 apiVersion: v1
-kind: PersistentVolumeClaim
+items:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+        volume.kubernetes.io/selected-node: aiot-worker-02
+        volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      finalizers:
+        - kubernetes.io/pvc-protection
+      name: cloudbeaver-data-lp-piraeus
+      namespace: aiot
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+      storageClassName: piraeus-r2
+      volumeMode: Filesystem
+      volumeName: pvc-61a22797-a355-4f74-a517-bfe2c6257d14
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+        volume.kubernetes.io/selected-node: aiot-worker-01
+        volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      finalizers:
+        - kubernetes.io/pvc-protection
+      name: open-webui-data-lp-piraeus
+      namespace: aiot
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: piraeus-r2
+      volumeMode: Filesystem
+      volumeName: pvc-fc2d6ee5-7b9e-4673-a88e-7079b254bb40
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        cnpg.io/nodeSerial: "2"
+        cnpg.io/operatorVersion: 1.28.0
+        cnpg.io/pvcStatus: ready
+        volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+        volume.kubernetes.io/selected-node: aiot-worker-02
+        volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      finalizers:
+        - kubernetes.io/pvc-protection
+      labels:
+        app.kubernetes.io/component: database
+        app.kubernetes.io/managed-by: cloudnative-pg
+        app.kubernetes.io/name: postgresql
+        cnpg.io/cluster: pg-ha
+        cnpg.io/instanceName: pg-ha-2
+        cnpg.io/instanceRole: primary
+        cnpg.io/pvcRole: PG_DATA
+        role: primary
+      name: pg-ha-2
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: postgresql.cnpg.io/v1
+          controller: true
+          kind: Cluster
+          name: pg-ha
+          uid: 98d362e4-90ce-428f-aa6a-31475bcbf415
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: piraeus-r2
+      volumeMode: Filesystem
+      volumeName: pvc-72715972-98c4-4f7c-b8eb-79d33f741d9f
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        cnpg.io/nodeSerial: "3"
+        cnpg.io/operatorVersion: 1.28.0
+        cnpg.io/pvcStatus: ready
+        volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+        volume.kubernetes.io/selected-node: aiot-worker-02
+        volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      finalizers:
+        - kubernetes.io/pvc-protection
+      labels:
+        app.kubernetes.io/component: database
+        app.kubernetes.io/managed-by: cloudnative-pg
+        app.kubernetes.io/name: postgresql
+        cnpg.io/cluster: pg-ha
+        cnpg.io/instanceName: pg-ha-3
+        cnpg.io/instanceRole: replica
+        cnpg.io/pvcRole: PG_DATA
+        role: replica
+      name: pg-ha-3
+      namespace: aiot
+      ownerReferences:
+        - apiVersion: postgresql.cnpg.io/v1
+          controller: true
+          kind: Cluster
+          name: pg-ha
+          uid: 98d362e4-90ce-428f-aa6a-31475bcbf415
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: piraeus-r2
+      volumeMode: Filesystem
+      volumeName: pvc-f5d0ea69-fa37-4271-aff3-657fa38ec9a5
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+        volume.kubernetes.io/selected-node: aiot-worker-02
+        volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      finalizers:
+        - kubernetes.io/pvc-protection
+      name: pgadmin-data-piraeus
+      namespace: aiot
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: piraeus-r2
+      volumeMode: Filesystem
+      volumeName: pvc-13780103-955c-4b47-9417-e7c91ada2649
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+        volume.kubernetes.io/selected-node: aiot-worker-01
+        volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      finalizers:
+        - kubernetes.io/pvc-protection
+      name: postgres-backup-data-piraeus
+      namespace: aiot
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
+      storageClassName: piraeus-r2
+      volumeMode: Filesystem
+      volumeName: pvc-17d30d0e-224f-42ef-bc00-70349e931e33
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+        volume.kubernetes.io/selected-node: aiot-worker-01
+        volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      finalizers:
+        - kubernetes.io/pvc-protection
+      name: qdrant-pvc-piraeus
+      namespace: aiot
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      storageClassName: piraeus-r2
+      volumeMode: Filesystem
+      volumeName: pvc-3ffcf658-4dfc-4976-8b3c-8d1329648895
+kind: List
 metadata:
-  annotations:
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: aiot-worker-02
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  name: cloudbeaver-data-lp
-  namespace: aiot
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-de93f6ca-add8-47c4-92ba-a5337cbb1ee1
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: aiot-worker-01
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  name: open-webui-data-lp
-  namespace: aiot
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-83ddb755-d88a-4459-ad5c-06c8c4b53d5c
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    cnpg.io/nodeSerial: '2'
-    cnpg.io/operatorVersion: 1.25.1
-    cnpg.io/pvcStatus: ready
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: aiot-worker-02
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  labels:
-    cnpg.io/cluster: pg-ha
-    cnpg.io/instanceName: pg-ha-2
-    cnpg.io/instanceRole: replica
-    cnpg.io/pvcRole: PG_DATA
-    role: replica
-  name: pg-ha-2
-  namespace: aiot
-  ownerReferences:
-  - apiVersion: postgresql.cnpg.io/v1
-    controller: true
-    kind: Cluster
-    name: pg-ha
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-82882042-6e5b-4e14-b308-ee4c42242f52
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    cnpg.io/nodeSerial: '3'
-    cnpg.io/operatorVersion: 1.25.1
-    cnpg.io/pvcStatus: ready
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: oci-e5-node2
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  labels:
-    cnpg.io/cluster: pg-ha
-    cnpg.io/instanceName: pg-ha-3
-    cnpg.io/instanceRole: primary
-    cnpg.io/pvcRole: PG_DATA
-    role: primary
-  name: pg-ha-3
-  namespace: aiot
-  ownerReferences:
-  - apiVersion: postgresql.cnpg.io/v1
-    controller: true
-    kind: Cluster
-    name: pg-ha
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-c9d136eb-b0b3-48f7-97d0-8a5663c926bf
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: aiot-worker-02
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  name: pgadmin-data
-  namespace: aiot
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-ec883884-7c18-44f3-a9df-ecad836c3567
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: aiot-worker-01
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  name: postgres-backup-data
-  namespace: aiot
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 20Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-96e7b2be-c663-4d21-8a8d-62fe88d4afae
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    pv.kubernetes.io/bind-completed: 'yes'
-    pv.kubernetes.io/bound-by-controller: 'yes'
-    volume.beta.kubernetes.io/storage-provisioner: rancher.io/local-path
-    volume.kubernetes.io/selected-node: aiot-worker-01
-    volume.kubernetes.io/storage-provisioner: rancher.io/local-path
-  finalizers:
-  - kubernetes.io/pvc-protection
-  labels:
-    velero.io/exclude-from-backup: 'true'
-  name: qdrant-pvc
-  namespace: aiot
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 8Gi
-  storageClassName: local-path
-  volumeMode: Filesystem
-  volumeName: pvc-cb4a40e3-99ec-49df-92a3-6ce03b0d7cd7
+  resourceVersion: ""

@@ -1,0 +1,320 @@
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        field.cattle.io/publicEndpoints: '[{"port":30012,"protocol":"TCP","serviceName":"pipelines-as-code:pipelines-as-code-controller","allNodes":true},{"port":30252,"protocol":"TCP","serviceName":"pipelines-as-code:pipelines-as-code-controller","allNodes":true}]'
+        ignore-check.kube-linter.io/env-var-secret: This is the name of the secret rather than the secret
+      labels:
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-controller
+      namespace: pipelines-as-code
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: controller
+          app.kubernetes.io/instance: default
+          app.kubernetes.io/name: controller
+          app.kubernetes.io/part-of: pipelines-as-code
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/restartedAt: "2026-04-23T07:17:22Z"
+          creationTimestamp: null
+          labels:
+            app: pipelines-as-code-controller
+            app.kubernetes.io/component: controller
+            app.kubernetes.io/instance: default
+            app.kubernetes.io/name: controller
+            app.kubernetes.io/part-of: pipelines-as-code
+            app.kubernetes.io/version: v0.42.0
+        spec:
+          containers:
+            - env:
+                - name: CONFIG_LOGGING_NAME
+                  value: pac-config-logging
+                - name: TLS_KEY
+                  value: key
+                - name: TLS_CERT
+                  value: cert
+                - name: TLS_SECRET_NAME
+                  value: pipelines-as-code-tls-secret
+                - name: SYSTEM_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.namespace
+                - name: K_METRICS_CONFIG
+                  value: '{"Domain":"pipelinesascode.tekton.dev/controller","Component":"pac_controller","PrometheusPort":9090,"ConfigMap":{"name":"pipelines-as-code-config-observability"}}'
+                - name: K_TRACING_CONFIG
+                  value: '{"backend":"prometheus","debug":"false","sample-rate":"0"}'
+                - name: K_SINK_TIMEOUT
+                  value: "30"
+                - name: PAC_CONTROLLER_LABEL
+                  value: default
+                - name: PAC_CONTROLLER_SECRET
+                  value: pipelines-as-code-secret
+                - name: PAC_CONTROLLER_CONFIGMAP
+                  value: pipelines-as-code
+                - name: KUBERNETES_MIN_VERSION
+                  value: v1.28.0
+              image: ghcr.io/openshift-pipelines/pipelines-as-code/pipelines-as-code-controller:v0.42.0
+              imagePullPolicy: Always
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /live
+                  port: api
+                  scheme: HTTP
+                periodSeconds: 15
+                successThreshold: 1
+                timeoutSeconds: 1
+              name: pac-controller
+              ports:
+                - containerPort: 8082
+                  name: api
+                  protocol: TCP
+                - containerPort: 9090
+                  name: metrics
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /live
+                  port: api
+                  scheme: HTTP
+                periodSeconds: 15
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
+                requests:
+                  cpu: 50m
+                  memory: 50Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/pipelines-as-code/tls
+                  name: tls
+                  readOnly: true
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          serviceAccount: pipelines-as-code-controller
+          serviceAccountName: pipelines-as-code-controller
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: tls
+              secret:
+                defaultMode: 420
+                optional: true
+                secretName: pipelines-as-code-tls-secret
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-watcher
+      namespace: pipelines-as-code
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: watcher
+          app.kubernetes.io/instance: default
+          app.kubernetes.io/name: watcher
+          app.kubernetes.io/part-of: pipelines-as-code
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: pipelines-as-code-watcher
+            app.kubernetes.io/component: watcher
+            app.kubernetes.io/instance: default
+            app.kubernetes.io/name: watcher
+            app.kubernetes.io/part-of: pipelines-as-code
+            app.kubernetes.io/version: v0.42.0
+        spec:
+          containers:
+            - env:
+                - name: CONFIG_LOGGING_NAME
+                  value: pac-config-logging
+                - name: SYSTEM_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.namespace
+                - name: METRICS_DOMAIN
+                  value: tekton.dev/pipelinesascode
+                - name: CONFIG_OBSERVABILITY_NAME
+                  value: pipelines-as-code-config-observability
+                - name: CONFIG_LEADERELECTION_NAME
+                  value: pac-watcher-config-leader-election
+                - name: KUBERNETES_MIN_VERSION
+                  value: v1.28.0
+              image: ghcr.io/openshift-pipelines/pipelines-as-code/pipelines-as-code-watcher:v0.42.0
+              imagePullPolicy: Always
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /live
+                  port: probes
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              name: pac-watcher
+              ports:
+                - containerPort: 8080
+                  name: probes
+                  protocol: TCP
+                - containerPort: 9090
+                  name: metrics
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /live
+                  port: probes
+                  scheme: HTTP
+                initialDelaySeconds: 5
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
+                requests:
+                  cpu: 50m
+                  memory: 50Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          serviceAccount: pipelines-as-code-watcher
+          serviceAccountName: pipelines-as-code-watcher
+          terminationGracePeriodSeconds: 30
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        ignore-check.kube-linter.io/env-var-secret: This is the name of the secret rather than the secret
+      labels:
+        app.kubernetes.io/part-of: pipelines-as-code
+        app.kubernetes.io/version: v0.42.0
+      name: pipelines-as-code-webhook
+      namespace: pipelines-as-code
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app.kubernetes.io/component: webhook
+          app.kubernetes.io/instance: default
+          app.kubernetes.io/name: webhook
+          app.kubernetes.io/part-of: pipelines-as-code
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/component: webhook
+            app.kubernetes.io/instance: default
+            app.kubernetes.io/name: webhook
+            app.kubernetes.io/part-of: pipelines-as-code
+            app.kubernetes.io/version: v0.42.0
+        spec:
+          containers:
+            - env:
+                - name: CONFIG_LOGGING_NAME
+                  value: pac-config-logging
+                - name: SYSTEM_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.namespace
+                - name: WEBHOOK_SERVICE_NAME
+                  value: pipelines-as-code-webhook
+                - name: WEBHOOK_SECRET_NAME
+                  value: pipelines-as-code-webhook-certs
+                - name: METRICS_DOMAIN
+                  value: tekton.dev/pipelinesascode
+                - name: CONFIG_LEADERELECTION_NAME
+                  value: pac-webhook-config-leader-election
+                - name: KUBERNETES_MIN_VERSION
+                  value: v1.28.0
+              image: ghcr.io/openshift-pipelines/pipelines-as-code/pipelines-as-code-webhook:v0.42.0
+              imagePullPolicy: IfNotPresent
+              name: pac-webhook
+              ports:
+                - containerPort: 8443
+                  name: https-webhook
+                  protocol: TCP
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
+                requests:
+                  cpu: 50m
+                  memory: 50Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          serviceAccount: pipelines-as-code-webhook
+          serviceAccountName: pipelines-as-code-webhook
+          terminationGracePeriodSeconds: 30
+kind: List
+metadata:
+  resourceVersion: ""

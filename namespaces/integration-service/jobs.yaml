@@ -1,0 +1,206 @@
+apiVersion: v1
+items:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T12:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 32919005-ad64-4971-b371-a512a2c3af80
+        batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620080
+        controller-uid: 32919005-ad64-4971-b371-a512a2c3af80
+        job-name: integration-service-snapshot-garbage-collector-29620080
+      name: integration-service-snapshot-garbage-collector-29620080
+      namespace: integration-service
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: integration-service-snapshot-garbage-collector
+          uid: 2ea9e34a-0399-4a53-abaa-df190f218107
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 32919005-ad64-4971-b371-a512a2c3af80
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 32919005-ad64-4971-b371-a512a2c3af80
+            batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620080
+            controller-uid: 32919005-ad64-4971-b371-a512a2c3af80
+            job-name: integration-service-snapshot-garbage-collector-29620080
+        spec:
+          containers:
+            - command:
+                - /snapshotgc
+                - --zap-log-level=debug
+                - --pr-snapshots-to-keep=70
+                - --non-pr-snapshots-to-keep=640
+              image: quay.io/konflux-ci/integration-service:ef2610ecd344292fb85e01321f7b613c7e621ec5
+              imagePullPolicy: Always
+              name: test-gc
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: 2000Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: integration-service-snapshot-garbage-collector
+          serviceAccountName: integration-service-snapshot-garbage-collector
+          terminationGracePeriodSeconds: 30
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T18:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 2a504b02-cc0a-4ec9-aad9-7f70961482c0
+        batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620440
+        controller-uid: 2a504b02-cc0a-4ec9-aad9-7f70961482c0
+        job-name: integration-service-snapshot-garbage-collector-29620440
+      name: integration-service-snapshot-garbage-collector-29620440
+      namespace: integration-service
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: integration-service-snapshot-garbage-collector
+          uid: 2ea9e34a-0399-4a53-abaa-df190f218107
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 2a504b02-cc0a-4ec9-aad9-7f70961482c0
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 2a504b02-cc0a-4ec9-aad9-7f70961482c0
+            batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620440
+            controller-uid: 2a504b02-cc0a-4ec9-aad9-7f70961482c0
+            job-name: integration-service-snapshot-garbage-collector-29620440
+        spec:
+          containers:
+            - command:
+                - /snapshotgc
+                - --zap-log-level=debug
+                - --pr-snapshots-to-keep=70
+                - --non-pr-snapshots-to-keep=640
+              image: quay.io/konflux-ci/integration-service:ef2610ecd344292fb85e01321f7b613c7e621ec5
+              imagePullPolicy: Always
+              name: test-gc
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: 2000Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: integration-service-snapshot-garbage-collector
+          serviceAccountName: integration-service-snapshot-garbage-collector
+          terminationGracePeriodSeconds: 30
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      annotations:
+        batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T00:00:00Z"
+      labels:
+        batch.kubernetes.io/controller-uid: 28b02ce7-c55b-4aaa-87ce-b6ddc696adb6
+        batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620800
+        controller-uid: 28b02ce7-c55b-4aaa-87ce-b6ddc696adb6
+        job-name: integration-service-snapshot-garbage-collector-29620800
+      name: integration-service-snapshot-garbage-collector-29620800
+      namespace: integration-service
+      ownerReferences:
+        - apiVersion: batch/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: CronJob
+          name: integration-service-snapshot-garbage-collector
+          uid: 2ea9e34a-0399-4a53-abaa-df190f218107
+    spec:
+      backoffLimit: 6
+      completionMode: NonIndexed
+      completions: 1
+      manualSelector: false
+      parallelism: 1
+      podReplacementPolicy: TerminatingOrFailed
+      selector:
+        matchLabels:
+          batch.kubernetes.io/controller-uid: 28b02ce7-c55b-4aaa-87ce-b6ddc696adb6
+      suspend: false
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            batch.kubernetes.io/controller-uid: 28b02ce7-c55b-4aaa-87ce-b6ddc696adb6
+            batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620800
+            controller-uid: 28b02ce7-c55b-4aaa-87ce-b6ddc696adb6
+            job-name: integration-service-snapshot-garbage-collector-29620800
+        spec:
+          containers:
+            - command:
+                - /snapshotgc
+                - --zap-log-level=debug
+                - --pr-snapshots-to-keep=70
+                - --non-pr-snapshots-to-keep=640
+              image: quay.io/konflux-ci/integration-service:ef2610ecd344292fb85e01321f7b613c7e621ec5
+              imagePullPolicy: Always
+              name: test-gc
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: 2000Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              securityContext:
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: Never
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: integration-service-snapshot-garbage-collector
+          serviceAccountName: integration-service-snapshot-garbage-collector
+          terminationGracePeriodSeconds: 30
+kind: List
+metadata:
+  resourceVersion: ""

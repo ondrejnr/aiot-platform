@@ -1,0 +1,56 @@
+apiVersion: v1
+items:
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      annotations: {}
+      labels:
+        konflux.konflux-ci.dev/component: cert-manager
+        konflux.konflux-ci.dev/owner: konflux-cert-manager
+      name: selfsigned-ca
+      namespace: cert-manager
+      ownerReferences:
+        - apiVersion: konflux.konflux-ci.dev/v1alpha1
+          blockOwnerDeletion: true
+          controller: true
+          kind: KonfluxCertManager
+          name: konflux-cert-manager
+          uid: 85aaf2c6-bdf3-46c0-855d-91d280ce3625
+    spec:
+      commonName: selfsigned-ca
+      isCA: true
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: self-signed-cluster-issuer
+      privateKey:
+        algorithm: ECDSA
+        size: 256
+      secretName: root-secret
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      annotations: {}
+      labels:
+        app.kubernetes.io/instance: trust-manager
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: trust-manager
+        app.kubernetes.io/version: v0.21.0
+        helm.sh/chart: trust-manager-v0.21.0
+      name: trust-manager
+      namespace: cert-manager
+    spec:
+      commonName: trust-manager.cert-manager.svc
+      dnsNames:
+        - trust-manager.cert-manager.svc
+      issuerRef:
+        group: cert-manager.io
+        kind: Issuer
+        name: trust-manager
+      privateKey:
+        rotationPolicy: Always
+      revisionHistoryLimit: 1
+      secretName: trust-manager-tls
+kind: List
+metadata:
+  resourceVersion: ""

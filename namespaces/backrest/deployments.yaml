@@ -1,0 +1,84 @@
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        field.cattle.io/publicEndpoints: '[{"addresses":["35.241.255.137"],"port":80,"protocol":"HTTP","serviceName":"backrest:backrest","ingressName":"backrest:backrest","hostname":"backrest.35.241.255.137.nip.io","path":"/","allNodes":false}]'
+      labels:
+        app: backrest
+      name: backrest
+      namespace: backrest
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          app: backrest
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/restartedAt: "2026-04-22T06:21:31Z"
+          creationTimestamp: null
+          labels:
+            app: backrest
+        spec:
+          containers:
+            - env:
+                - name: BACKREST_PORT
+                  value: 0.0.0.0:9898
+                - name: BACKREST_DATA
+                  value: /data
+                - name: BACKREST_CONFIG
+                  value: /config/config.json
+                - name: XDG_CACHE_HOME
+                  value: /cache
+                - name: TMPDIR
+                  value: /tmp
+                - name: TZ
+                  value: Europe/Bratislava
+              image: docker.io/garethgeorge/backrest:v1.10.1
+              imagePullPolicy: IfNotPresent
+              name: backrest
+              ports:
+                - containerPort: 9898
+                  name: http
+                  protocol: TCP
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /data
+                  name: store
+                  subPath: data
+                - mountPath: /config
+                  name: store
+                  subPath: config
+                - mountPath: /cache
+                  name: store
+                  subPath: cache
+                - mountPath: /tmp
+                  name: store
+                  subPath: tmp
+          dnsPolicy: ClusterFirst
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext:
+            fsGroup: 0
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - name: store
+              persistentVolumeClaim:
+                claimName: backrest-data
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,22 @@
+apiVersion: v1
+items:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: PodMonitor
+    metadata:
+      annotations: {}
+      labels:
+        release: prometheus
+      name: cnpg-pg-ha
+      namespace: aiot
+    spec:
+      podMetricsEndpoints:
+        - interval: 30s
+          port: metrics
+          scrapeTimeout: 10s
+      selector:
+        matchLabels:
+          cnpg.io/cluster: pg-ha
+          cnpg.io/podRole: instance
+kind: List
+metadata:
+  resourceVersion: ""

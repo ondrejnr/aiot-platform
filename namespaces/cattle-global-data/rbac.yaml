@@ -1,0 +1,72 @@
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        authz.management.cattle.io/gr-owner: clusters-create
+        cattle.io/creator: norman
+      name: clusters-create-cattle-global-data
+      namespace: cattle-global-data
+      ownerReferences:
+        - apiVersion: management.cattle.io/v3
+          kind: GlobalRole
+          name: clusters-create
+          uid: 9711851c-6d7c-4d8b-9b14-78c348cccb9f
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - create
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        authz.management.cattle.io/gr-owner: user
+        cattle.io/creator: norman
+      name: user-cattle-global-data
+      namespace: cattle-global-data
+      ownerReferences:
+        - apiVersion: management.cattle.io/v3
+          kind: GlobalRole
+          name: user
+          uid: 80f3fcd3-ffc3-4d9a-8d2e-9cf863dec3dd
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+        verbs:
+          - create
+kind: List
+metadata:
+  resourceVersion: ""
+---
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        authz.management.cattle.io/grb-owner: grb-7dw9c
+        cattle.io/creator: norman
+      name: grb-7dw9c-cattle-global-data
+      namespace: cattle-global-data
+      ownerReferences:
+        - apiVersion: management.cattle.io/v3
+          kind: GlobalRoleBinding
+          name: grb-7dw9c
+          uid: 2ca37161-ed5a-4542-8deb-ffefc0bf7f5f
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: user-cattle-global-data
+    subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: User
+        name: u-b4qkhsnliz
+kind: List
+metadata:
+  resourceVersion: ""

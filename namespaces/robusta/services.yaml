@@ -1,0 +1,86 @@
+apiVersion: v1
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations: {}
+      name: mm-relay
+      namespace: robusta
+    spec:
+      clusterIP: 10.109.199.131
+      clusterIPs:
+        - 10.109.199.131
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - port: 80
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app: mm-relay
+      sessionAffinity: None
+      type: ClusterIP
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: robusta
+        meta.helm.sh/release-namespace: robusta
+      labels:
+        app: robusta-forwarder
+        app.kubernetes.io/managed-by: Helm
+        argocd.argoproj.io/instance: robusta
+      name: robusta-forwarder
+      namespace: robusta
+    spec:
+      clusterIP: 10.102.203.184
+      clusterIPs:
+        - 10.102.203.184
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - name: forwarder-metrics
+          port: 80
+          protocol: TCP
+          targetPort: 2112
+      selector:
+        app: robusta-forwarder
+      sessionAffinity: None
+      type: ClusterIP
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: robusta
+        meta.helm.sh/release-namespace: robusta
+      labels:
+        app: robusta-runner
+        app.kubernetes.io/managed-by: Helm
+        argocd.argoproj.io/instance: robusta
+        target: robusta-runner
+      name: robusta-runner
+      namespace: robusta
+    spec:
+      clusterIP: 10.106.64.45
+      clusterIPs:
+        - 10.106.64.45
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 5000
+      selector:
+        app: robusta-runner
+      sessionAffinity: None
+      type: ClusterIP
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,20 @@
+apiVersion: v1
+items:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      annotations: {}
+      labels:
+        release: prometheus
+      name: event-exporter
+      namespace: event-exporter
+    spec:
+      endpoints:
+        - interval: 30s
+          port: metrics
+      selector:
+        matchLabels:
+          app: event-exporter
+kind: List
+metadata:
+  resourceVersion: ""

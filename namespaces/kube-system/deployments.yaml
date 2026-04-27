@@ -1,217 +1,584 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    k8s-app: kube-dns
-  name: coredns
-  namespace: kube-system
-spec:
-  progressDeadlineSeconds: 600
-  replicas: 2
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      k8s-app: kube-dns
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
+apiVersion: v1
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
     metadata:
+      annotations:
+        field.cattle.io/publicEndpoints: '[{"nodeName":":aiot-master","addresses":["10.132.0.2"],"port":9963,"protocol":"TCP","podName":"kube-system:cilium-operator-67b88f98ff-svgxx","allNodes":false},{"nodeName":":aiot-worker-01","addresses":["10.132.0.3"],"port":9963,"protocol":"TCP","podName":"kube-system:cilium-operator-67b88f98ff-msbhl","allNodes":false}]'
+        meta.helm.sh/release-name: cilium
+        meta.helm.sh/release-namespace: kube-system
+      labels:
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: cilium-operator
+        app.kubernetes.io/part-of: cilium
+        io.cilium/app: operator
+        name: cilium-operator
+      name: cilium-operator
+      namespace: kube-system
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 2
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          io.cilium/app: operator
+          name: cilium-operator
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 50%
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            prometheus.io/port: "9963"
+            prometheus.io/scrape: "true"
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/name: cilium-operator
+            app.kubernetes.io/part-of: cilium
+            io.cilium/app: operator
+            name: cilium-operator
+        spec:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      io.cilium/app: operator
+                  topologyKey: kubernetes.io/hostname
+          automountServiceAccountToken: true
+          containers:
+            - args:
+                - --config-dir=/tmp/cilium/config-map
+                - --debug=$(CILIUM_DEBUG)
+              command:
+                - cilium-operator-generic
+              env:
+                - name: K8S_NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: spec.nodeName
+                - name: CILIUM_K8S_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.namespace
+                - name: CILIUM_DEBUG
+                  valueFrom:
+                    configMapKeyRef:
+                      key: debug
+                      name: cilium-config
+                      optional: true
+                - name: KUBERNETES_SERVICE_HOST
+                  value: 10.132.0.2
+                - name: KUBERNETES_SERVICE_PORT
+                  value: "6443"
+              image: quay.io/cilium/operator-generic:v1.16.6@sha256:13d32071d5a52c069fb7c35959a56009c6914439adc73e99e098917646d154fc
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  host: 127.0.0.1
+                  path: /healthz
+                  port: 9234
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 3
+              name: cilium-operator
+              ports:
+                - containerPort: 9963
+                  hostPort: 9963
+                  name: prometheus
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 5
+                httpGet:
+                  host: 127.0.0.1
+                  path: /healthz
+                  port: 9234
+                  scheme: HTTP
+                periodSeconds: 5
+                successThreshold: 1
+                timeoutSeconds: 3
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: FallbackToLogsOnError
+              volumeMounts:
+                - mountPath: /tmp/cilium/config-map
+                  name: cilium-config-path
+                  readOnly: true
+          dnsPolicy: ClusterFirst
+          hostNetwork: true
+          nodeSelector:
+            kubernetes.io/os: linux
+          priorityClassName: system-cluster-critical
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: cilium-operator
+          serviceAccountName: cilium-operator
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - operator: Exists
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: cilium-config
+              name: cilium-config-path
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations: {}
       labels:
         k8s-app: kube-dns
+      name: coredns
+      namespace: kube-system
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: k8s-app
-                  operator: In
-                  values:
-                  - kube-dns
-              topologyKey: kubernetes.io/hostname
-            weight: 100
-      containers:
-      - args:
-        - -conf
-        - /etc/coredns/Corefile
-        image: registry.k8s.io/coredns/coredns:v1.11.3
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          failureThreshold: 5
-          httpGet:
-            path: /health
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        name: coredns
-        ports:
-        - containerPort: 53
-          name: dns
-          protocol: UDP
-        - containerPort: 53
-          name: dns-tcp
-          protocol: TCP
-        - containerPort: 9153
-          name: metrics
-          protocol: TCP
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /ready
-            port: 8181
-            scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        resources:
-          limits:
-            memory: 170Mi
-          requests:
-            cpu: 100m
-            memory: 70Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            add:
-            - NET_BIND_SERVICE
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /etc/coredns
-          name: config-volume
-          readOnly: true
-      dnsPolicy: Default
-      nodeSelector:
-        kubernetes.io/os: linux
-      priorityClassName: system-cluster-critical
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: coredns
-      serviceAccountName: coredns
-      terminationGracePeriodSeconds: 30
-      tolerations:
-      - key: CriticalAddonsOnly
-        operator: Exists
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/control-plane
-      volumes:
-      - configMap:
-          defaultMode: 420
-          items:
-          - key: Corefile
-            path: Corefile
-          name: coredns
-        name: config-volume
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    k8s-app: metrics-server
-  name: metrics-server
-  namespace: kube-system
-spec:
-  progressDeadlineSeconds: 600
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      k8s-app: metrics-server
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 0
-    type: RollingUpdate
-  template:
+      progressDeadlineSeconds: 600
+      replicas: 2
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          k8s-app: kube-dns
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 1
+        type: RollingUpdate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            k8s-app: kube-dns
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: k8s-app
+                          operator: In
+                          values:
+                            - kube-dns
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+          containers:
+            - args:
+                - -conf
+                - /etc/coredns/Corefile
+              image: registry.k8s.io/coredns/coredns:v1.11.3
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 5
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 5
+              name: coredns
+              ports:
+                - containerPort: 53
+                  name: dns
+                  protocol: UDP
+                - containerPort: 53
+                  name: dns-tcp
+                  protocol: TCP
+                - containerPort: 9153
+                  name: metrics
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /ready
+                  port: 8181
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                limits:
+                  memory: 170Mi
+                requests:
+                  cpu: 100m
+                  memory: 70Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  add:
+                    - NET_BIND_SERVICE
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /etc/coredns
+                  name: config-volume
+                  readOnly: true
+          dnsPolicy: Default
+          nodeSelector:
+            kubernetes.io/os: linux
+          priorityClassName: system-cluster-critical
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: coredns
+          serviceAccountName: coredns
+          terminationGracePeriodSeconds: 30
+          tolerations:
+            - key: CriticalAddonsOnly
+              operator: Exists
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/control-plane
+          volumes:
+            - configMap:
+                defaultMode: 420
+                items:
+                  - key: Corefile
+                    path: Corefile
+                name: coredns
+              name: config-volume
+  - apiVersion: apps/v1
+    kind: Deployment
     metadata:
+      annotations:
+        meta.helm.sh/release-name: cilium
+        meta.helm.sh/release-namespace: kube-system
+      labels:
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: hubble-relay
+        app.kubernetes.io/part-of: cilium
+        k8s-app: hubble-relay
+      name: hubble-relay
+      namespace: kube-system
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          k8s-app: hubble-relay
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 1
+        type: RollingUpdate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/name: hubble-relay
+            app.kubernetes.io/part-of: cilium
+            k8s-app: hubble-relay
+        spec:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      k8s-app: cilium
+                  topologyKey: kubernetes.io/hostname
+          automountServiceAccountToken: false
+          containers:
+            - args:
+                - serve
+              command:
+                - hubble-relay
+              image: quay.io/cilium/hubble-relay:v1.16.6@sha256:ca8dcaa5a81a37743b1397ba2221d16d5d63e4a47607584f1bf50a3b0882bf3b
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 12
+                grpc:
+                  port: 4222
+                  service: ""
+                initialDelaySeconds: 10
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 10
+              name: hubble-relay
+              ports:
+                - containerPort: 4245
+                  name: grpc
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                grpc:
+                  port: 4222
+                  service: ""
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 3
+              resources: {}
+              securityContext:
+                capabilities:
+                  drop:
+                    - ALL
+                runAsGroup: 65532
+                runAsNonRoot: true
+                runAsUser: 65532
+              startupProbe:
+                failureThreshold: 20
+                grpc:
+                  port: 4222
+                  service: ""
+                initialDelaySeconds: 10
+                periodSeconds: 3
+                successThreshold: 1
+                timeoutSeconds: 1
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: FallbackToLogsOnError
+              volumeMounts:
+                - mountPath: /etc/hubble-relay
+                  name: config
+                  readOnly: true
+                - mountPath: /var/lib/hubble-relay/tls
+                  name: tls
+                  readOnly: true
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            kubernetes.io/os: linux
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext:
+            fsGroup: 65532
+          serviceAccount: hubble-relay
+          serviceAccountName: hubble-relay
+          terminationGracePeriodSeconds: 1
+          volumes:
+            - configMap:
+                defaultMode: 420
+                items:
+                  - key: config.yaml
+                    path: config.yaml
+                name: hubble-relay-config
+              name: config
+            - name: tls
+              projected:
+                defaultMode: 256
+                sources:
+                  - secret:
+                      items:
+                        - key: tls.crt
+                          path: client.crt
+                        - key: tls.key
+                          path: client.key
+                        - key: ca.crt
+                          path: hubble-server-ca.crt
+                      name: hubble-relay-client-certs
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        meta.helm.sh/release-name: cilium
+        meta.helm.sh/release-namespace: kube-system
+      labels:
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: hubble-ui
+        app.kubernetes.io/part-of: cilium
+        k8s-app: hubble-ui
+      name: hubble-ui
+      namespace: kube-system
+    spec:
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          k8s-app: hubble-ui
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 1
+        type: RollingUpdate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app.kubernetes.io/name: hubble-ui
+            app.kubernetes.io/part-of: cilium
+            k8s-app: hubble-ui
+        spec:
+          automountServiceAccountToken: true
+          containers:
+            - image: quay.io/cilium/hubble-ui:v0.13.1@sha256:e2e9313eb7caf64b0061d9da0efbdad59c6c461f6ca1752768942bfeda0796c6
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /healthz
+                  port: 8081
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              name: frontend
+              ports:
+                - containerPort: 8081
+                  name: http
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /
+                  port: 8081
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: FallbackToLogsOnError
+              volumeMounts:
+                - mountPath: /etc/nginx/conf.d/default.conf
+                  name: hubble-ui-nginx-conf
+                  subPath: nginx.conf
+                - mountPath: /tmp
+                  name: tmp-dir
+            - env:
+                - name: EVENTS_SERVER_PORT
+                  value: "8090"
+                - name: FLOWS_API_ADDR
+                  value: hubble-relay:80
+              image: quay.io/cilium/hubble-ui-backend:v0.13.1@sha256:0e0eed917653441fded4e7cdb096b7be6a3bddded5a2dd10812a27b1fc6ed95b
+              imagePullPolicy: IfNotPresent
+              name: backend
+              ports:
+                - containerPort: 8090
+                  name: grpc
+                  protocol: TCP
+              resources: {}
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: FallbackToLogsOnError
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            kubernetes.io/os: linux
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext:
+            fsGroup: 1001
+            runAsGroup: 1001
+            runAsUser: 1001
+          serviceAccount: hubble-ui
+          serviceAccountName: hubble-ui
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - configMap:
+                defaultMode: 420
+                name: hubble-ui-nginx
+              name: hubble-ui-nginx-conf
+            - emptyDir: {}
+              name: tmp-dir
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations: {}
       labels:
         k8s-app: metrics-server
+      name: metrics-server
+      namespace: kube-system
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
-              matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: In
-                values:
-                - oci-e5-node1
-                - oci-e5-node2
-            weight: 100
-      containers:
-      - args:
-        - --cert-dir=/tmp
-        - --secure-port=10250
-        - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
-        - --kubelet-use-node-status-port
-        - --metric-resolution=15s
-        - --kubelet-insecure-tls
-        image: registry.k8s.io/metrics-server/metrics-server:v0.8.1
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /livez
-            port: https
-            scheme: HTTPS
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        name: metrics-server
-        ports:
-        - containerPort: 10250
-          name: https
-          protocol: TCP
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /readyz
-            port: https
-            scheme: HTTPS
-          initialDelaySeconds: 20
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-            - ALL
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
-          seccompProfile:
-            type: RuntimeDefault
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /tmp
-          name: tmp-dir
-      dnsPolicy: ClusterFirst
-      nodeSelector:
-        kubernetes.io/os: linux
-      priorityClassName: system-cluster-critical
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: metrics-server
-      serviceAccountName: metrics-server
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - emptyDir: {}
-        name: tmp-dir
+      progressDeadlineSeconds: 600
+      replicas: 1
+      revisionHistoryLimit: 10
+      selector:
+        matchLabels:
+          k8s-app: metrics-server
+      strategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 0
+        type: RollingUpdate
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            k8s-app: metrics-server
+        spec:
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - preference:
+                    matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: In
+                        values:
+                          - oci-e5-node1
+                          - oci-e5-node2
+                  weight: 100
+          containers:
+            - args:
+                - --cert-dir=/tmp
+                - --secure-port=10250
+                - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+                - --kubelet-use-node-status-port
+                - --metric-resolution=15s
+                - --kubelet-insecure-tls
+              image: registry.k8s.io/metrics-server/metrics-server:v0.8.1
+              imagePullPolicy: IfNotPresent
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /livez
+                  port: https
+                  scheme: HTTPS
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              name: metrics-server
+              ports:
+                - containerPort: 10250
+                  name: https
+                  protocol: TCP
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /readyz
+                  port: https
+                  scheme: HTTPS
+                initialDelaySeconds: 20
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 200Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 1000
+                seccompProfile:
+                  type: RuntimeDefault
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              volumeMounts:
+                - mountPath: /tmp
+                  name: tmp-dir
+          dnsPolicy: ClusterFirst
+          nodeSelector:
+            kubernetes.io/os: linux
+          priorityClassName: system-cluster-critical
+          restartPolicy: Always
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: metrics-server
+          serviceAccountName: metrics-server
+          terminationGracePeriodSeconds: 30
+          volumes:
+            - emptyDir: {}
+              name: tmp-dir
+kind: List
+metadata:
+  resourceVersion: ""

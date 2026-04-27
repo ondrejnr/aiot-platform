@@ -1,0 +1,43 @@
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      annotations: {}
+      labels:
+        argocd.argoproj.io/instance: karpor
+      name: karpor-generate-cert
+      namespace: karpor
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - secrets
+          - configmaps
+        verbs:
+          - '*'
+kind: List
+metadata:
+  resourceVersion: ""
+---
+apiVersion: v1
+items:
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      annotations: {}
+      labels:
+        argocd.argoproj.io/instance: karpor
+      name: karpor-generate-cert
+      namespace: karpor
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: karpor-generate-cert
+    subjects:
+      - kind: ServiceAccount
+        name: default
+        namespace: karpor
+kind: List
+metadata:
+  resourceVersion: ""

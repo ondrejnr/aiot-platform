@@ -1,0 +1,28 @@
+apiVersion: v1
+items:
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: zabbix-tls
+      namespace: zabbix
+      ownerReferences:
+        - apiVersion: networking.k8s.io/v1
+          blockOwnerDeletion: true
+          controller: true
+          kind: Ingress
+          name: zabbix-web
+          uid: ddcf977b-7b19-4051-807b-301997e9a46b
+    spec:
+      dnsNames:
+        - zabbix.35.241.255.137.nip.io
+      issuerRef:
+        group: cert-manager.io
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      secretName: zabbix-tls
+      usages:
+        - digital signature
+        - key encipherment
+kind: List
+metadata:
+  resourceVersion: ""

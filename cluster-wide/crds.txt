@@ -1,129 +1,358 @@
-alertmanagerconfigs.monitoring.coreos.com                  monitoring.coreos.com              v1alpha1
-alertmanagers.monitoring.coreos.com                        monitoring.coreos.com              v1
-authcodes.dex.coreos.com                                   dex.coreos.com                     v1
-authorizationpolicies.security.istio.io                    security.istio.io                  v1
-authrequests.dex.coreos.com                                dex.coreos.com                     v1
-backuprepositories.velero.io                               velero.io                          v1
-backups.postgresql.cnpg.io                                 postgresql.cnpg.io                 v1
-backupstoragelocations.velero.io                           velero.io                          v1
-backups.velero.io                                          velero.io                          v1
-certificaterequests.cert-manager.io                        cert-manager.io                    v1
-certificates.cert-manager.io                               cert-manager.io                    v1
-certificates.networking.internal.knative.dev               networking.internal.knative.dev    v1alpha1
-challenges.acme.cert-manager.io                            acme.cert-manager.io               v1
-clickhouseinstallations.clickhouse.altinity.com            clickhouse.altinity.com            v1
-clickhouseinstallationtemplates.clickhouse.altinity.com    clickhouse.altinity.com            v1
-clickhouseoperatorconfigurations.clickhouse.altinity.com   clickhouse.altinity.com            v1
-clusterdomainclaims.networking.internal.knative.dev        networking.internal.knative.dev    v1alpha1
-clusterimagecatalogs.postgresql.cnpg.io                    postgresql.cnpg.io                 v1
-clusterissuers.cert-manager.io                             cert-manager.io                    v1
-clusterpolicyreports.wgpolicyk8s.io                        wgpolicyk8s.io                     v1alpha2
-clusterservingruntimes.serving.kserve.io                   serving.kserve.io                  v1alpha1
-clusters.management.cattle.io                              management.cattle.io               v3
-clusters.postgresql.cnpg.io                                postgresql.cnpg.io                 v1
-clusterstoragecontainers.serving.kserve.io                 serving.kserve.io                  v1alpha1
-clusterworkflowtemplates.argoproj.io                       argoproj.io                        v1alpha1
-compositecontrollers.metacontroller.k8s.io                 metacontroller.k8s.io              v1alpha1
-configurations.serving.knative.dev                         serving.knative.dev                v1
-connectors.dex.coreos.com                                  dex.coreos.com                     v1
-controllerrevisions.metacontroller.k8s.io                  metacontroller.k8s.io              v1alpha1
-cronworkflows.argoproj.io                                  argoproj.io                        v1alpha1
-databases.postgresql.cnpg.io                               postgresql.cnpg.io                 v1
-datadownloads.velero.io                                    velero.io                          v2alpha1
-datauploads.velero.io                                      velero.io                          v2alpha1
-decoratorcontrollers.metacontroller.k8s.io                 metacontroller.k8s.io              v1alpha1
-deletebackuprequests.velero.io                             velero.io                          v1
-destinationrules.networking.istio.io                       networking.istio.io                v1
-devicerequests.dex.coreos.com                              dex.coreos.com                     v1
-devicetokens.dex.coreos.com                                dex.coreos.com                     v1
-domainmappings.serving.knative.dev                         serving.knative.dev                v1beta1
-downloadrequests.velero.io                                 velero.io                          v1
-envoyfilters.networking.istio.io                           networking.istio.io                v1alpha3
-experiments.kubeflow.org                                   kubeflow.org                       v1beta1
-gateways.networking.istio.io                               networking.istio.io                v1
-globalrolebindings.management.cattle.io                    management.cattle.io               v3
-globalroles.management.cattle.io                           management.cattle.io               v3
-healthchecks.holmesgpt.dev                                 holmesgpt.dev                      v1alpha1
-imagecatalogs.postgresql.cnpg.io                           postgresql.cnpg.io                 v1
-images.caching.internal.knative.dev                        caching.internal.knative.dev       v1alpha1
-inferencegraphs.serving.kserve.io                          serving.kserve.io                  v1alpha1
-inferenceservices.serving.kserve.io                        serving.kserve.io                  v1beta1
-ingresses.networking.internal.knative.dev                  networking.internal.knative.dev    v1alpha1
-instrumentations.opentelemetry.io                          opentelemetry.io                   v1alpha1
-issuers.cert-manager.io                                    cert-manager.io                    v1
-k8sgpts.core.k8sgpt.ai                                     core.k8sgpt.ai                     v1alpha1
-kontainerdrivers.management.cattle.io                      management.cattle.io               v3
-metrics.autoscaling.internal.knative.dev                   autoscaling.internal.knative.dev   v1alpha1
-mpijobs.kubeflow.org                                       kubeflow.org                       v1
-mutations.core.k8sgpt.ai                                   core.k8sgpt.ai                     v1alpha1
-mxjobs.kubeflow.org                                        kubeflow.org                       v1
-NAME                                                       GROUP                              VERSION
-nodedrivers.management.cattle.io                           management.cattle.io               v3
-notebooks.kubeflow.org                                     kubeflow.org                       v1
-oauth2clients.dex.coreos.com                               dex.coreos.com                     v1
-offlinesessionses.dex.coreos.com                           dex.coreos.com                     v1
-opampbridges.opentelemetry.io                              opentelemetry.io                   v1alpha1
-opentelemetrycollectors.opentelemetry.io                   opentelemetry.io                   v1alpha1
-orders.acme.cert-manager.io                                acme.cert-manager.io               v1
-paddlejobs.kubeflow.org                                    kubeflow.org                       v1
-passwords.dex.coreos.com                                   dex.coreos.com                     v1
-peerauthentications.security.istio.io                      security.istio.io                  v1
-podautoscalers.autoscaling.internal.knative.dev            autoscaling.internal.knative.dev   v1alpha1
-poddefaults.kubeflow.org                                   kubeflow.org                       v1alpha1
-podmonitors.monitoring.coreos.com                          monitoring.coreos.com              v1
-podvolumebackups.velero.io                                 velero.io                          v1
-podvolumerestores.velero.io                                velero.io                          v1
-policyreports.wgpolicyk8s.io                               wgpolicyk8s.io                     v1alpha2
-poolers.postgresql.cnpg.io                                 postgresql.cnpg.io                 v1
-probes.monitoring.coreos.com                               monitoring.coreos.com              v1
-profiles.kubeflow.org                                      kubeflow.org                       v1
-prometheusagents.monitoring.coreos.com                     monitoring.coreos.com              v1alpha1
-prometheuses.monitoring.coreos.com                         monitoring.coreos.com              v1
-prometheusrules.monitoring.coreos.com                      monitoring.coreos.com              v1
-proxyconfigs.networking.istio.io                           networking.istio.io                v1beta1
-publications.postgresql.cnpg.io                            postgresql.cnpg.io                 v1
-pvcviewers.kubeflow.org                                    kubeflow.org                       v1alpha1
-pytorchjobs.kubeflow.org                                   kubeflow.org                       v1
-refreshtokens.dex.coreos.com                               dex.coreos.com                     v1
-requestauthentications.security.istio.io                   security.istio.io                  v1
-restores.velero.io                                         velero.io                          v1
-results.core.k8sgpt.ai                                     core.k8sgpt.ai                     v1alpha1
-revisions.serving.knative.dev                              serving.knative.dev                v1
-roletemplates.management.cattle.io                         management.cattle.io               v3
-routes.serving.knative.dev                                 serving.knative.dev                v1
-scheduledbackups.postgresql.cnpg.io                        postgresql.cnpg.io                 v1
-scheduledhealthchecks.holmesgpt.dev                        holmesgpt.dev                      v1alpha1
-scheduledworkflows.kubeflow.org                            kubeflow.org                       v1beta1
-schedules.velero.io                                        velero.io                          v1
-scrapeconfigs.monitoring.coreos.com                        monitoring.coreos.com              v1alpha1
-serverlessservices.networking.internal.knative.dev         networking.internal.knative.dev    v1alpha1
-serverstatusrequests.velero.io                             velero.io                          v1
-serviceentries.networking.istio.io                         networking.istio.io                v1
-servicemonitors.monitoring.coreos.com                      monitoring.coreos.com              v1
-services.serving.knative.dev                               serving.knative.dev                v1
-servingruntimes.serving.kserve.io                          serving.kserve.io                  v1alpha1
-sidecars.networking.istio.io                               networking.istio.io                v1
-signingkeies.dex.coreos.com                                dex.coreos.com                     v1
-subscriptions.postgresql.cnpg.io                           postgresql.cnpg.io                 v1
-suggestions.kubeflow.org                                   kubeflow.org                       v1beta1
-targetallocators.opentelemetry.io                          opentelemetry.io                   v1alpha1
-telemetries.telemetry.istio.io                             telemetry.istio.io                 v1
-tensorboards.tensorboard.kubeflow.org                      tensorboard.kubeflow.org           v1alpha1
-tfjobs.kubeflow.org                                        kubeflow.org                       v1
-thanosrulers.monitoring.coreos.com                         monitoring.coreos.com              v1
-trainedmodels.serving.kserve.io                            serving.kserve.io                  v1alpha1
-trials.kubeflow.org                                        kubeflow.org                       v1beta1
-users.management.cattle.io                                 management.cattle.io               v3
-viewers.kubeflow.org                                       kubeflow.org                       v1beta1
-virtualservices.networking.istio.io                        networking.istio.io                v1
-volumesnapshotlocations.velero.io                          velero.io                          v1
-wasmplugins.extensions.istio.io                            extensions.istio.io                v1alpha1
-workflowartifactgctasks.argoproj.io                        argoproj.io                        v1alpha1
-workfloweventbindings.argoproj.io                          argoproj.io                        v1alpha1
-workflows.argoproj.io                                      argoproj.io                        v1alpha1
-workflowtaskresults.argoproj.io                            argoproj.io                        v1alpha1
-workflowtasksets.argoproj.io                               argoproj.io                        v1alpha1
-workflowtemplates.argoproj.io                              argoproj.io                        v1alpha1
-workloadentries.networking.istio.io                        networking.istio.io                v1
-workloadgroups.networking.istio.io                         networking.istio.io                v1
-xgboostjobs.kubeflow.org                                   kubeflow.org                       v1
+customresourcedefinition.apiextensions.k8s.io/alertmanagerconfigs.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/alertmanagers.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/amazonec2configs.rke-machine-config.cattle.io
+customresourcedefinition.apiextensions.k8s.io/amazonec2machines.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/amazonec2machinetemplates.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/apiservices.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/applications.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/applications.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/applicationsets.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/appprojects.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/apps.catalog.cattle.io
+customresourcedefinition.apiextensions.k8s.io/archives.k8up.io
+customresourcedefinition.apiextensions.k8s.io/auditpolicies.auditlog.cattle.io
+customresourcedefinition.apiextensions.k8s.io/authcodes.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/authconfigs.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/authorizationpolicies.security.istio.io
+customresourcedefinition.apiextensions.k8s.io/authrequests.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/azureconfigs.rke-machine-config.cattle.io
+customresourcedefinition.apiextensions.k8s.io/azuremachines.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/azuremachinetemplates.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/backups.k8up.io
+customresourcedefinition.apiextensions.k8s.io/backups.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/bundledeployments.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/bundlenamespacemappings.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/bundles.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/bundles.trust.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/capiproviders.turtles-capi.cattle.io
+customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/certificates.networking.internal.knative.dev
+customresourcedefinition.apiextensions.k8s.io/challenges.acme.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/checks.k8up.io
+customresourcedefinition.apiextensions.k8s.io/ciliumcidrgroups.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliumclusterwidenetworkpolicies.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliumendpoints.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliumexternalworkloads.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliumidentities.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliuml2announcementpolicies.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliumloadbalancerippools.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliumnetworkpolicies.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliumnodeconfigs.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliumnodes.cilium.io
+customresourcedefinition.apiextensions.k8s.io/ciliumpodippools.cilium.io
+customresourcedefinition.apiextensions.k8s.io/cleanuppolicies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/clickhouseinstallations.clickhouse.altinity.com
+customresourcedefinition.apiextensions.k8s.io/clickhouseinstallationtemplates.clickhouse.altinity.com
+customresourcedefinition.apiextensions.k8s.io/clickhouseoperatorconfigurations.clickhouse.altinity.com
+customresourcedefinition.apiextensions.k8s.io/clusterclasses.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/clustercleanuppolicies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/clusterctlconfigs.turtles-capi.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusterdomainclaims.networking.internal.knative.dev
+customresourcedefinition.apiextensions.k8s.io/clusterephemeralreports.reports.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/clustergroups.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusterimagecatalogs.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/clusterinterceptors.triggers.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/clusterissuers.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/clusterpolicies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/clusterpolicyreports.wgpolicyk8s.io
+customresourcedefinition.apiextensions.k8s.io/clusterproxyconfigs.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusterregistrations.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusterregistrationtokens.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusterregistrationtokens.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusterrepos.catalog.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusterresourcesetbindings.addons.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/clusterresourcesets.addons.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/clusterroletemplatebindings.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusters.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/clusterservingruntimes.serving.kserve.io
+customresourcedefinition.apiextensions.k8s.io/clusters.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusters.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusters.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/clusters.provisioning.cattle.io
+customresourcedefinition.apiextensions.k8s.io/clusterstoragecontainers.serving.kserve.io
+customresourcedefinition.apiextensions.k8s.io/clustertriggerbindings.triggers.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/clusterworkflowtemplates.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/componentdetectionqueries.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/componentgroups.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/components.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/composeconfigs.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/compositecontrollers.metacontroller.k8s.io
+customresourcedefinition.apiextensions.k8s.io/configurations.serving.knative.dev
+customresourcedefinition.apiextensions.k8s.io/connectors.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/contents.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/controllerrevisions.metacontroller.k8s.io
+customresourcedefinition.apiextensions.k8s.io/cronworkflows.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/custommachines.rke.cattle.io
+customresourcedefinition.apiextensions.k8s.io/customruns.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/databases.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/decoratorcontrollers.metacontroller.k8s.io
+customresourcedefinition.apiextensions.k8s.io/deletingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/deploymenttargetclaims.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/deploymenttargetclasses.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/deploymenttargets.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/destinationrules.networking.istio.io
+customresourcedefinition.apiextensions.k8s.io/devicerequests.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/devicetokens.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/digitaloceanconfigs.rke-machine-config.cattle.io
+customresourcedefinition.apiextensions.k8s.io/digitaloceanmachines.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/digitaloceanmachinetemplates.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/domainmappings.serving.knative.dev
+customresourcedefinition.apiextensions.k8s.io/dynamicschemas.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/ebsremotes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/enterprisecontractpolicies.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/environments.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/envoyfilters.networking.istio.io
+customresourcedefinition.apiextensions.k8s.io/ephemeralreports.reports.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/etcdsnapshots.rke.cattle.io
+customresourcedefinition.apiextensions.k8s.io/eventlisteners.triggers.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/experiments.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/extensionconfigs.runtime.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/failoverquorums.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/features.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/files.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/fleetworkspaces.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/gateways.networking.istio.io
+customresourcedefinition.apiextensions.k8s.io/generatingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/gitreporestrictions.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/gitrepos.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/globalcontextentries.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/globalrolebindings.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/globalroles.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/groupmembers.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/groups.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/harvesterconfigs.rke-machine-config.cattle.io
+customresourcedefinition.apiextensions.k8s.io/harvestermachines.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/harvestermachinetemplates.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/healthchecks.holmesgpt.dev
+customresourcedefinition.apiextensions.k8s.io/helmops.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/imagecatalogs.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/images.caching.internal.knative.dev
+customresourcedefinition.apiextensions.k8s.io/imagescans.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/imagevalidatingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/inferencegraphs.serving.kserve.io
+customresourcedefinition.apiextensions.k8s.io/inferenceservices.serving.kserve.io
+customresourcedefinition.apiextensions.k8s.io/ingresses.networking.internal.knative.dev
+customresourcedefinition.apiextensions.k8s.io/instrumentations.opentelemetry.io
+customresourcedefinition.apiextensions.k8s.io/integrationtestscenarios.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/interceptors.triggers.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/internalrequests.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/internalservicesconfigs.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/ipaddressclaims.ipam.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/ipaddresses.ipam.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/issuers.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/k8sgpts.core.k8sgpt.ai
+customresourcedefinition.apiextensions.k8s.io/keyvaluestore.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/konfluxapplicationapis.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxbuildservices.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxcertmanagers.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxclis.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxdefaulttenants.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxenterprisecontracts.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxes.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluximagecontrollers.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxinfoes.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxintegrationservices.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxinternalregistries.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxnamespacelisters.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxrbacs.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxreleaseservices.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxsegmentbridges.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/konfluxuis.konflux.konflux-ci.dev
+customresourcedefinition.apiextensions.k8s.io/kontainerdrivers.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/layerbcachevolumes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/layercachevolumes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/layerdrbdresourcedefinitions.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/layerdrbdresources.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/layerdrbdvolumedefinitions.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/layerdrbdvolumes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/layerluksvolumes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/layerresourceids.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/layerstoragevolumes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/layerwritecachevolumes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/linodeconfigs.rke-machine-config.cattle.io
+customresourcedefinition.apiextensions.k8s.io/linodemachines.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/linodemachinetemplates.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/linstorclusters.piraeus.io
+customresourcedefinition.apiextensions.k8s.io/linstornodeconnections.piraeus.io
+customresourcedefinition.apiextensions.k8s.io/linstorremotes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/linstorsatelliteconfigurations.piraeus.io
+customresourcedefinition.apiextensions.k8s.io/linstorsatellites.piraeus.io
+customresourcedefinition.apiextensions.k8s.io/linstorversion.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/machinedeployments.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/machinedrainrules.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/machinehealthchecks.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/machinepools.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/machines.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/machinesets.cluster.x-k8s.io
+customresourcedefinition.apiextensions.k8s.io/managedcharts.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/manualapprovalgates.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/metrics.autoscaling.internal.knative.dev
+customresourcedefinition.apiextensions.k8s.io/mpijobs.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/mutatingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/mutations.core.k8sgpt.ai
+customresourcedefinition.apiextensions.k8s.io/mxjobs.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/namespaceddeletingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/namespacedgeneratingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/namespacedimagevalidatingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/namespacedmutatingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/namespacedvalidatingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/navlinks.ui.cattle.io
+customresourcedefinition.apiextensions.k8s.io/nodeconnections.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/nodedrivers.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/nodenetinterfaces.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/nodepools.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/nodes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/nodes.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/nodestorpool.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/notebooks.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/oauth2clients.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/offlinesessionses.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/opampbridges.opentelemetry.io
+customresourcedefinition.apiextensions.k8s.io/opentelemetrycollectors.opentelemetry.io
+customresourcedefinition.apiextensions.k8s.io/operations.catalog.cattle.io
+customresourcedefinition.apiextensions.k8s.io/orders.acme.cert-manager.io
+customresourcedefinition.apiextensions.k8s.io/paddlejobs.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/passwords.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/peerauthentications.security.istio.io
+customresourcedefinition.apiextensions.k8s.io/pipelineruns.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/pipelines.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/plans.upgrade.cattle.io
+customresourcedefinition.apiextensions.k8s.io/podautoscalers.autoscaling.internal.knative.dev
+customresourcedefinition.apiextensions.k8s.io/podconfigs.k8up.io
+customresourcedefinition.apiextensions.k8s.io/poddefaults.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/podmonitors.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/podsecurityadmissionconfigurationtemplates.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/policyexceptions.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/policyexceptions.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/policyreports.wgpolicyk8s.io
+customresourcedefinition.apiextensions.k8s.io/poolers.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/prebackuppods.k8up.io
+customresourcedefinition.apiextensions.k8s.io/preferences.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/probes.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/profiles.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/projectnetworkpolicies.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/projectroletemplatebindings.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/projects.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/prometheusagents.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/prometheuses.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/prometheusrules.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/promotionruns.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/propscontainers.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/proxyconfigs.networking.istio.io
+customresourcedefinition.apiextensions.k8s.io/prunes.k8up.io
+customresourcedefinition.apiextensions.k8s.io/publications.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/pvcviewers.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/pytorchjobs.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/rancherusernotifications.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/refreshtokens.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/releaseplanadmissions.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/releaseplans.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/releases.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/releaseserviceconfigs.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/repositories.pipelinesascode.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/requestauthentications.security.istio.io
+customresourcedefinition.apiextensions.k8s.io/resolutionrequests.resolution.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/resourceconnections.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/resourcedefinitions.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/resourcegroups.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/resources.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/restores.k8up.io
+customresourcedefinition.apiextensions.k8s.io/results.core.k8sgpt.ai
+customresourcedefinition.apiextensions.k8s.io/revisions.serving.knative.dev
+customresourcedefinition.apiextensions.k8s.io/rkebootstraps.rke.cattle.io
+customresourcedefinition.apiextensions.k8s.io/rkebootstraptemplates.rke.cattle.io
+customresourcedefinition.apiextensions.k8s.io/rkeclusters.rke.cattle.io
+customresourcedefinition.apiextensions.k8s.io/rkecontrolplanes.rke.cattle.io
+customresourcedefinition.apiextensions.k8s.io/roletemplates.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/rollback.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/routes.serving.knative.dev
+customresourcedefinition.apiextensions.k8s.io/s3remotes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/samltokens.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/satellitescapacity.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/scheduledbackups.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/scheduledhealthchecks.holmesgpt.dev
+customresourcedefinition.apiextensions.k8s.io/scheduledworkflows.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/schedules.fleet.cattle.io
+customresourcedefinition.apiextensions.k8s.io/schedules.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/schedules.k8up.io
+customresourcedefinition.apiextensions.k8s.io/scrapeconfigs.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/secaccesstypes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/secaclmap.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/secconfiguration.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/secdfltroles.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/secidentities.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/secidrolemap.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/secobjectprotection.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/secretrequests.telemetry.cattle.io
+customresourcedefinition.apiextensions.k8s.io/secroles.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/sectyperules.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/sectypes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/serverlessservices.networking.internal.knative.dev
+customresourcedefinition.apiextensions.k8s.io/serviceentries.networking.istio.io
+customresourcedefinition.apiextensions.k8s.io/servicemonitors.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/services.serving.knative.dev
+customresourcedefinition.apiextensions.k8s.io/servingruntimes.serving.kserve.io
+customresourcedefinition.apiextensions.k8s.io/settings.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/sidecars.networking.istio.io
+customresourcedefinition.apiextensions.k8s.io/signingkeies.dex.coreos.com
+customresourcedefinition.apiextensions.k8s.io/snapshotenvironmentbindings.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/snapshots.appstudio.redhat.com
+customresourcedefinition.apiextensions.k8s.io/snapshots.k8up.io
+customresourcedefinition.apiextensions.k8s.io/spacehistory.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/stepactions.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/storpooldefinitions.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/subscriptions.postgresql.cnpg.io
+customresourcedefinition.apiextensions.k8s.io/suggestions.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/syncerservices.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/targetallocators.opentelemetry.io
+customresourcedefinition.apiextensions.k8s.io/taskruns.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tasks.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektonchains.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektonconfigs.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektondashboards.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektonhubs.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektoninstallersets.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektonmulticlusterproxyaaes.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektonpipelines.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektonpruners.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektonresults.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektonschedulers.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/tektontriggers.operator.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/telemetries.telemetry.istio.io
+customresourcedefinition.apiextensions.k8s.io/tensorboards.tensorboard.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/tfjobs.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/thanosrulers.monitoring.coreos.com
+customresourcedefinition.apiextensions.k8s.io/tokens.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/trackingdate.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/trainedmodels.serving.kserve.io
+customresourcedefinition.apiextensions.k8s.io/trials.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/triggerbindings.triggers.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/triggers.triggers.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/triggertemplates.triggers.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/uiplugins.catalog.cattle.io
+customresourcedefinition.apiextensions.k8s.io/updaterequests.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/userattributes.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/users.management.cattle.io
+customresourcedefinition.apiextensions.k8s.io/validatingpolicies.policies.kyverno.io
+customresourcedefinition.apiextensions.k8s.io/verificationpolicies.tekton.dev
+customresourcedefinition.apiextensions.k8s.io/viewers.kubeflow.org
+customresourcedefinition.apiextensions.k8s.io/virtualservices.networking.istio.io
+customresourcedefinition.apiextensions.k8s.io/vmwarevsphereconfigs.rke-machine-config.cattle.io
+customresourcedefinition.apiextensions.k8s.io/vmwarevspheremachines.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/vmwarevspheremachinetemplates.rke-machine.cattle.io
+customresourcedefinition.apiextensions.k8s.io/volumeconnections.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/volumedefinitions.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/volumegroups.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/volumes.internal.linstor.linbit.com
+customresourcedefinition.apiextensions.k8s.io/wasmplugins.extensions.istio.io
+customresourcedefinition.apiextensions.k8s.io/workflowartifactgctasks.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/workfloweventbindings.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/workflows.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/workflowtaskresults.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/workflowtasksets.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/workflowtemplates.argoproj.io
+customresourcedefinition.apiextensions.k8s.io/workloadentries.networking.istio.io
+customresourcedefinition.apiextensions.k8s.io/workloadgroups.networking.istio.io
+customresourcedefinition.apiextensions.k8s.io/xgboostjobs.kubeflow.org
