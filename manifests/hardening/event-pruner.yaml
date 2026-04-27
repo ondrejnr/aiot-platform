@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: event-pruner
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: event-pruner
+rules:
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "list", "delete", "deletecollection"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: event-pruner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: event-pruner
+subjects:
+- kind: ServiceAccount
+  name: event-pruner
+  namespace: kube-system
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: event-pruner
+  namespace: kube-system
+  annotations:
+    description: |
+      Continuously deletes benign/known-noise Warning events that spam Headlamp:
+      - InvalidDiskCapacity (containerd 2.x + kubelet 1.32 false positive, k/k#127884)
+      - FailedScheduling untolerated taint (normal during scheduling churn)
+      - Unhealthy Startup probe (slow start != incident)
+spec:
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 300
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: event-pruner
+          restartPolicy: Never
+          priorityClassName: system-cluster-critical
+          containers:
+          - name: prune
+            image: alpine/k8s:1.32.0
+            resources:
+              requests: {cpu: 10m, memory: 32Mi}
+              limits:   {cpu: 100m, memory: 128Mi}
+            command: [/bin/bash, -c]
+            args:
+              - |
+                set -u
+                TOTAL=0
+                for R in InvalidDiskCapacity; do
+                  N=$(kubectl get events -A --field-selector=reason=$R -o name 2>/dev/null | wc -l)
+                  if [ "$N" -gt 0 ]; then
+                    kubectl delete events -A --field-selector=reason=$R >/dev/null 2>&1 && echo "pruned $N reason=$R"
+                    TOTAL=$((TOTAL+N))
+                  fi
+                done
+                # FailedScheduling with untolerated taint message + Unhealthy/Startup probe — needs jq filter
+                kubectl get events -A -o json 2>/dev/null | python3 -c '
+                import json,sys,subprocess
+                data=json.load(sys.stdin)
+                for e in data.get("items",[]):
+                  reason=e.get("reason","")
+                  msg=e.get("message","")
+                  if (reason=="FailedScheduling" and "untolerated taint" in msg) or \
+                     (reason=="Unhealthy" and "Startup probe" in msg):
+                    ns=e["metadata"]["namespace"]; n=e["metadata"]["name"]
+                    subprocess.run(["kubectl","-n",ns,"delete","event",n],capture_output=True)
+                    print(f"pruned {ns}/{n} reason={reason}")
+                ' 2>/dev/null
+                echo "total InvalidDiskCapacity pruned: $TOTAL"
