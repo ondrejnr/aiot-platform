@@ -240,7 +240,6 @@ items:
                   readOnly: true
                   subPath: web-config.yaml
           nodeSelector:
-            kubernetes.io/hostname: oci-e5-node1
             node-role.kubernetes.io/worker: ""
           restartPolicy: Always
           schedulerName: default-scheduler
@@ -526,7 +525,6 @@ items:
                 - mountPath: /etc/prometheus/rules/prometheus-prometheus-kube-prometheus-prometheus-rulefiles-2
                   name: prometheus-prometheus-kube-prometheus-prometheus-rulefiles-2
           nodeSelector:
-            kubernetes.io/hostname: oci-e5-node1
             node-role.kubernetes.io/worker: ""
           restartPolicy: Always
           schedulerName: default-scheduler

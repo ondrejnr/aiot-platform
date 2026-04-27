@@ -52,7 +52,6 @@ items:
               - cluster.local
           dnsPolicy: None
           nodeSelector:
-            kubernetes.io/hostname: oci-e5-node1
             node-role.kubernetes.io/worker: ""
           restartPolicy: Always
           schedulerName: default-scheduler

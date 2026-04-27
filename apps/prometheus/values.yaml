@@ -1,34 +1,87 @@
-# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
-# Upstream chart key: kube-prometheus-stack
-kube-prometheus-stack:
-  alertmanager:
-    alertmanagerSpec:
-      nodeSelector:
-        node-role.kubernetes.io/worker: ""
-  grafana:
-    adminPassword: admin123
-    grafana.ini:
-      auth:
-        disable_login_form: true
-      auth.anonymous:
-        enabled: true
-        org_name: Main Org.
-        org_role: Admin
-    ingress:
-      enabled: true
-      hosts:
-      - grafana.35.241.255.137.nip.io
-      ingressClassName: nginx
-    nodeSelector:
-      node-role.kubernetes.io/worker: ""
-  prometheus:
-    prometheusSpec:
-      nodeSelector:
-        node-role.kubernetes.io/worker: ""
-  prometheusOperator:
-    nodeSelector:
-      node-role.kubernetes.io/worker: ""
+# Helm values for kube-prometheus-stack chart
+# Hardened 2026-04-27: resource limits + nodeSelector to workers only
 
-  # Cilium replaces kube-proxy → no kube-proxy service exists, ServiceMonitor would be empty
-  kubeProxy:
-    enabled: false
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
+
+grafana:
+  adminPassword: admin123
+  grafana.ini:
+    auth:
+      disable_login_form: true
+    auth.anonymous:
+      enabled: true
+      org_name: Main Org.
+      org_role: Admin
+  ingress:
+    enabled: true
+    hosts:
+    - grafana.35.241.255.137.nip.io
+    ingressClassName: nginx
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+    # Hard memory cap prevents runaway scrape buffers from killing the node
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        memory: 1500Mi
+    retention: 10d
+    retentionSize: 4GB
+    topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: prometheus
+
+prometheusOperator:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
+  resources:
+    requests:
+      cpu: 20m
+      memory: 64Mi
+    limits:
+      memory: 256Mi
+
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 20m
+      memory: 32Mi
+    limits:
+      memory: 256Mi
+
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: 20m
+      memory: 24Mi
+    limits:
+      memory: 128Mi
+
+# Cilium replaces kube-proxy → no kube-proxy service exists, ServiceMonitor would be empty
+kubeProxy:
+  enabled: false
