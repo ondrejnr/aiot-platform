@@ -19,7 +19,7 @@ Industrial data is useless unless it becomes a **decision**. AIoT is designed ar
 
 1. **Collect** — MQTT ingestion from sensors and PLCs, retained in a time-series–friendly Postgres (CloudNativePG)
 2. **Enrich** — digital-twin service aligns raw telemetry with asset metadata; embeddings stored in Qdrant for semantic retrieval
-3. **Learn** — Kubeflow Pipelines train forward-looking models (predictive maintenance v2) on a weekly schedule; MLflow versions every experiment
+3. **Learn** — Kubeflow Pipelines train forward-looking models (predictive maintenance v2) on a weekly schedule
 4. **Serve** — the best model is promoted and served by KServe/Knative with zero-downtime rollout
 5. **Ask** — operators and engineers interact with the whole system through an LLM chat (Open-WebUI) that uses RAG over platform data and can call the inference service as a tool
 
@@ -94,7 +94,6 @@ flowchart LR
 
     subgraph AI["🧠 AI / ML"]
         KF[["Kubeflow Pipelines<br/>aiot-forward-maintenance-v2"]]
-        ML[("MLflow<br/>registry")]
         KS[["KServe<br/>InferenceService"]]
     end
 
@@ -210,19 +209,18 @@ The AIoT workflow moves sensor data from the edge all the way to trained, versio
 
 ### 2. Storage — `aiot`, `cnpg-system`
 
-- **CloudNativePG cluster** `pg-ha` (3 replicas in `aiot`) — single source of truth for all tabular/relational data (sensor readings, MLflow metadata, n8n workflows, Mattermost, SigNoz metadata, …)
+- **CloudNativePG cluster** `pg-ha` (3 replicas in `aiot`) — single source of truth for all tabular/relational data (sensor readings, n8n workflows, Mattermost, SigNoz metadata, …)
 - Partitioning and cleanup handled by CronJobs: `pg-partition-mgr`, `pg-sensor-cleanup`, `sensor-data-retention`, `postgres-backup`
 - Secondary index/feature store: **Qdrant** (namespace `aiot`) for vector embeddings used by RAG
 
-### 3. AI / ML — `kubeflow`, `kubeflow-user-example-com`, `mlflow`, `inference`
+### 3. AI / ML — `kubeflow`, `kubeflow-user-example-com` `inference`
 
 - **Kubeflow** (full install: Pipelines v2, Katib, Training Operator, Notebooks, KServe, Central Dashboard, Profiles)
 - **Profiles / multi-tenancy**: `kubeflow-user-example-com` namespace hosts the default user, with per-user namespaces (`p-sqf5p`, `p-wpbsz`, `user-5wxc8`) managed by the Profiles controller
 - **Training pipeline** `aiot-forward-maintenance-v2` — Argo-based pipeline for predictive maintenance on sensor data, chained with:
   - `aiot-retrain-weekly` CronJob — triggers a new pipeline run every week with fresh data
-  - `aiot-register-best` — promotes the best-scoring model run to MLflow Registry
+  - `aiot-register-best` — promotes the best-scoring model run
   - `aiot-rollout-model` — updates the served `InferenceService` with the new model URI
-- **MLflow** (namespace `mlflow`) — experiment tracking, model registry; backed by `mlflow` DB on `pg-ha`; artifact store currently on a local PVC backed up by k8up (migrating to MinIO-on-GCP-disk is planned)
 - **KServe** — `maintenance-predictor` `InferenceService` under `kubeflow-user-example-com`, exposed through Knative + Istio on `inference.35.241.255.137.nip.io`
 - **Qdrant + rag-worker + Open-WebUI** (in `aiot`) — vector DB + RAG ingestion worker + chat UI, with LLM backends reachable from the cluster
 
@@ -389,7 +387,6 @@ All services are published under `*.35.241.255.137.nip.io` with Let's Encrypt ce
 | Config mgmt       | `pe.*`, `chef.*`, `webhook.*`                  | host / `chef-webhook` | Puppet Enterprise, Chef Automate  |
 | Automation UI     | `semaphore.*`                                  | `semaphore`       | Ansible via Semaphore                  |
 | DB / data         | `pgadmin.*`, `cloudbeaver.*`, `emqx.*`         | `aiot`, `emqx`    |                                        |
-| Experiments       | `mlflow.*`                                     | `mlflow`          |                                        |
 | Observability     | `grafana.*`, `prometheus.*`, `vm.*`, `signoz.*`| `monitoring`, `victoriametrics`, `signoz` |                         |
 | Ops               | `headlamp.*`, `mm.*`, `n8n.*`                  | `headlamp`, `mattermost`, `n8n` |                              |
 
