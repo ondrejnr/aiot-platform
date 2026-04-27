@@ -1,0 +1,10 @@
+apiVersion: v2
+name: dex-overlay
+description: Dex IdP for aiot-platform
+type: application
+version: 1.0.0
+appVersion: "2.41.1"
+dependencies:
+  - name: dex
+    version: "0.20.0"
+    repository: https://charts.dexidp.io

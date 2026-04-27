@@ -1,0 +1,10 @@
+apiVersion: v2
+name: tekton-operator-overlay
+description: aiot-platform overlay for tekton-operator
+type: application
+version: 1.0.0
+appVersion: "0.74.0"
+dependencies:
+  - name: tekton-operator
+    version: "0.74.0"
+    repository: https://cdfoundation.github.io/tekton-helm-chart

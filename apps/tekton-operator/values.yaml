@@ -1,0 +1,7 @@
+# tekton-operator deploys TektonConfig which provisions tekton-pipelines,
+# tekton-triggers, tekton-chains, tekton-results in their respective namespaces.
+tekton-operator:
+  controller:
+    image:
+      repository: ghcr.io/tektoncd/operator/operator
+      tag: v0.74.0

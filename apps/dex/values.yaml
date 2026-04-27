@@ -1,0 +1,14 @@
+dex:
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: dex.35.241.255.137.nip.io
+        paths: [{ path: /, pathType: Prefix }]
+  config:
+    issuer: https://dex.35.241.255.137.nip.io
+    storage:
+      type: kubernetes
+      config: { inCluster: true }
+    enablePasswordDB: true
+    staticPasswords: []   # populate via secrets/auth/dex-passwords.yaml (sops)

@@ -102,3 +102,78 @@ sudo kubeadm join <CP_IP>:6443 --token <T> --discovery-token-ca-cert-hash sha256
 | Bump a chart version | Edit `apps/<name>/Chart.yaml` `dependencies[0].version` |
 | Override per-cluster | Add `valueFiles: [values.yaml, ../../clusters/<env>/values.yaml]` to the Application |
 | Disaster recovery | k8up restic restores from R2 (see top-level `README.md` Backup section) |
+
+---
+
+## Post-install manual steps
+
+After all ArgoCD Applications reach `Synced/Healthy`, the following items
+require human intervention (cannot be in git):
+
+### 1. Required Secrets (encrypt with sops + commit, OR provide manually)
+
+| Path | Purpose | How to get it |
+|---|---|---|
+| `secrets/k8up-system/r2-creds.yaml` | k8up backup target (Cloudflare R2) | Cloudflare dashboard → R2 → Manage API tokens |
+| `secrets/etcd-backup/r2-credentials.yaml` | etcd snapshot CronJob | Same R2 token, namespaced |
+| `secrets/argocd/repo-creds.yaml` | ArgoCD private git repo access (if private) | GitHub PAT or SSH deploy key |
+| `secrets/cattle-system/bootstrap.yaml` | Rancher initial admin password | Pre-set OR read from `kubectl get secret bootstrap-secret -n cattle-system` after first start |
+| `secrets/jenkins/admin.yaml` | Jenkins admin user override | Generate (default chart auto-generates) |
+| `secrets/gitea/admin.yaml` | Gitea admin user override | Pre-decided values |
+| `secrets/aiot/groq-api-key.yaml` | Groq LLM proxy | https://console.groq.com/keys |
+| `secrets/k8sgpt/llm-keys.yaml` | k8sgpt providers (OpenAI/Groq/etc.) | Provider dashboards |
+| `secrets/auth/dex-passwords.yaml` | Dex static users | bcrypt-hash chosen passwords |
+
+Encrypt:
+```bash
+age-keygen -o age.key
+# Copy public key (age1...) into secrets/.sops.yaml
+sops --encrypt --in-place secrets/<ns>/<file>.yaml
+```
+
+### 2. Cluster-specific config to verify
+
+- `clusters/aiot2-prod/values.yaml` — domain, storageClass, R2 endpoint
+- `infra/kubeadm-config.yaml` — `certSANs` list (your IPs/hostnames)
+- `apps/cilium/values.yaml` — `cluster.name`, `cluster.id` if doing ClusterMesh
+- `apps/rancher/values.yaml` — `hostname`, `bootstrapPassword`
+- `apps/cert-manager/values.yaml` — add ClusterIssuer email for Let's Encrypt
+- `apps/dex/values.yaml` — `issuer` URL, static users via secret reference
+
+### 3. Snapshot replay caveats
+
+The ApplicationSet `_namespaces-appset.yaml` re-applies snapshot manifests for
+54 namespaces (ai-enricher, aiot, chef, emqx, konflux-*, tekton-pipelines,
+istio-system, knative-serving, kubeflow, registry, ...). These were captured
+from the live cluster and may contain:
+- Image tags pinned to specific versions (update via PR if needed)
+- Service account tokens that won't resolve on a fresh cluster (apps will
+  recreate them on first start)
+- `nodeSelector`/`affinity` rules referencing old node names — review and
+  adjust per cluster
+
+### 4. External integrations to re-establish
+
+- **Cloudflare R2** — bucket `aiot-velero` (or create new), provide creds via secrets above
+- **GitHub repo deploy key** — if cloning private images
+- **DNS A records** — point `*.<your-domain>` at the cluster's external IP
+  (or use nip.io for testing)
+- **Mattermost webhook** — Jenkins notifications (`mattermost-webhook` cred)
+- **Gitea webhooks** — for Jenkins multibranch + Konflux PaC
+
+### 5. Things this repo does NOT install
+
+- HCP Terraform workspaces (separate `aiot-infra` repo)
+- Habitat builder (separate `chef`/`habitat` repos)
+- VPN/WireGuard — manage outside cluster
+- Cluster registration in Rancher UI — done manually after Rancher starts
+
+### 6. Verify install
+
+```bash
+kubectl get application -n argocd
+kubectl get applicationset -n argocd
+helm ls -A
+kubectl get pv,pvc -A | grep -v Bound | grep -v 'STATUS\|CAPACITY' || echo "all PVs bound"
+```
+
