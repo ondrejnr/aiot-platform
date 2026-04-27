@@ -87,6 +87,18 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: ResourceDefinitions
   metadata:
+    name: 524451fbde34a5370a71c3099c665ba26181e98a29bf1be539577f81d904c29a
+  spec:
+    layer_stack: '["DRBD","STORAGE"]'
+    resource_dsp_name: pvc-0311865a-09d7-4a59-aab5-c5d19a2f333c
+    resource_flags: 0
+    resource_group_name: SC-3BA5B71F-7C6D-50FB-AB0A-19062E56B1A8
+    resource_name: PVC-0311865A-09D7-4A59-AAB5-C5D19A2F333C
+    snapshot_dsp_name: ""
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: ResourceDefinitions
+  metadata:
     name: 597ecfadbc375f647c2a80743c8aef675d2a5048415ea44973a0d11cebbd255a
   spec:
     layer_stack: '["DRBD","STORAGE"]'

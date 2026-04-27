@@ -5,6 +5,59 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"piraeus.io/v1","kind":"LinstorSatelliteConfiguration","metadata":{"annotations":{},"name":"host-network"},"spec":{"podTemplate":{"spec":{"hostNetwork":true}}}}
+    name: host-network
+  spec:
+    podTemplate:
+      spec:
+        hostNetwork: true
+  status:
+    appliedTo:
+    - aiot-worker-01
+    - aiot-worker-02
+    conditions:
+    - lastTransitionTime: "2026-04-26T18:45:32Z"
+      message: ""
+      observedGeneration: 1
+      reason: AsExpected
+      status: "True"
+      type: Applied
+    matched: 2
+- apiVersion: piraeus.io/v1
+  kind: LinstorSatelliteConfiguration
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"piraeus.io/v1","kind":"LinstorSatelliteConfiguration","metadata":{"annotations":{},"name":"increase-startup-probe"},"spec":{"podTemplate":{"spec":{"containers":[{"name":"linstor-satellite","startupProbe":{"failureThreshold":30,"periodSeconds":10,"tcpSocket":{"port":"linstor"},"timeoutSeconds":3}}]}}}}
+    name: increase-startup-probe
+  spec:
+    podTemplate:
+      spec:
+        containers:
+        - name: linstor-satellite
+          startupProbe:
+            failureThreshold: 30
+            periodSeconds: 10
+            tcpSocket:
+              port: linstor
+            timeoutSeconds: 3
+  status:
+    appliedTo:
+    - aiot-worker-01
+    - aiot-worker-02
+    conditions:
+    - lastTransitionTime: "2026-04-26T11:39:54Z"
+      message: ""
+      observedGeneration: 1
+      reason: AsExpected
+      status: "True"
+      type: Applied
+    matched: 2
+- apiVersion: piraeus.io/v1
+  kind: LinstorSatelliteConfiguration
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"piraeus.io/v1","kind":"LinstorSatelliteConfiguration","metadata":{"annotations":{},"name":"storage-pool-lvm"},"spec":{"nodeSelector":{"piraeus.io/storage":"yes"},"storagePools":[{"lvmThinPool":{"thinPool":"thinpool","volumeGroup":"linstor_vg"},"name":"lvm-thin"}]}}
     name: storage-pool-lvm
   spec:

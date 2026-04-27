@@ -36,7 +36,7 @@ items:
       reason: ReadyForNewScale
       status: "True"
       type: AbleToScale
-    - lastTransitionTime: "2026-04-24T06:04:02Z"
+    - lastTransitionTime: "2026-04-26T19:32:50Z"
       message: the HPA was able to successfully calculate a replica count from cpu
         resource utilization (percentage of request)
       reason: ValidMetricFound
@@ -56,7 +56,7 @@ items:
       type: Resource
     currentReplicas: 1
     desiredReplicas: 1
-    lastScaleTime: "2026-04-17T20:05:45Z"
+    lastScaleTime: "2026-04-26T12:07:14Z"
 - apiVersion: autoscaling/v2
   kind: HorizontalPodAutoscaler
   metadata:
@@ -92,7 +92,7 @@ items:
       reason: ReadyForNewScale
       status: "True"
       type: AbleToScale
-    - lastTransitionTime: "2026-04-24T06:04:02Z"
+    - lastTransitionTime: "2026-04-26T18:26:15Z"
       message: the HPA was able to successfully calculate a replica count from cpu
         resource utilization (percentage of request)
       reason: ValidMetricFound
@@ -107,7 +107,7 @@ items:
     - resource:
         current:
           averageUtilization: 1
-          averageValue: 3m
+          averageValue: 2m
         name: cpu
       type: Resource
     currentReplicas: 1

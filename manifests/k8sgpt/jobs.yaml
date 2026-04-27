@@ -4,11 +4,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T01:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T11:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: k8sgpt-mm-reporter-29619420
-      job-name: k8sgpt-mm-reporter-29619420
-    name: k8sgpt-mm-reporter-29619420
+      batch.kubernetes.io/job-name: k8sgpt-mm-reporter-29620020
+      job-name: k8sgpt-mm-reporter-29620020
+    name: k8sgpt-mm-reporter-29620020
     namespace: k8sgpt
     ownerReferences:
     - apiVersion: batch/v1
@@ -29,8 +29,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: k8sgpt-mm-reporter-29619420
-          job-name: k8sgpt-mm-reporter-29619420
+          batch.kubernetes.io/job-name: k8sgpt-mm-reporter-29620020
+          job-name: k8sgpt-mm-reporter-29620020
       spec:
         containers:
         - command:
@@ -64,22 +64,186 @@ items:
             name: k8sgpt-mm-script
           name: script
   status:
-    completionTime: "2026-04-26T01:00:04Z"
     conditions:
-    - lastProbeTime: "2026-04-26T01:00:04Z"
-      lastTransitionTime: "2026-04-26T01:00:04Z"
+    - lastProbeTime: "2026-04-26T11:14:17Z"
+      lastTransitionTime: "2026-04-26T11:14:17Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: FailureTarget
+    - lastProbeTime: "2026-04-26T11:14:38Z"
+      lastTransitionTime: "2026-04-26T11:14:38Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: Failed
+    failed: 1
+    ready: 0
+    startTime: "2026-04-26T11:00:00Z"
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T17:00:00Z"
+    labels:
+      batch.kubernetes.io/job-name: k8sgpt-mm-reporter-29620380
+      job-name: k8sgpt-mm-reporter-29620380
+    name: k8sgpt-mm-reporter-29620380
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: k8sgpt-mm-reporter
+  spec:
+    backoffLimit: 6
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: k8sgpt-mm-reporter-29620380
+          job-name: k8sgpt-mm-reporter-29620380
+      spec:
+        containers:
+        - command:
+          - /bin/sh
+          - /scripts/report.sh
+          env:
+          - name: MM_URL
+            valueFrom:
+              secretKeyRef:
+                key: url
+                name: mm-webhook
+          image: alpine/k8s:1.31.2
+          imagePullPolicy: IfNotPresent
+          name: reporter
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /scripts
+            name: script
+        dnsPolicy: ClusterFirst
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: k8sgpt-mm-reporter
+        serviceAccountName: k8sgpt-mm-reporter
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 493
+            name: k8sgpt-mm-script
+          name: script
+  status:
+    conditions:
+    - lastProbeTime: "2026-04-26T17:08:00Z"
+      lastTransitionTime: "2026-04-26T17:08:00Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: FailureTarget
+    - lastProbeTime: "2026-04-26T17:08:20Z"
+      lastTransitionTime: "2026-04-26T17:08:20Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: Failed
+    failed: 1
+    ready: 0
+    startTime: "2026-04-26T17:00:00Z"
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T01:00:00Z"
+    labels:
+      batch.kubernetes.io/job-name: k8sgpt-mm-reporter-29620860
+      job-name: k8sgpt-mm-reporter-29620860
+    name: k8sgpt-mm-reporter-29620860
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: k8sgpt-mm-reporter
+  spec:
+    backoffLimit: 6
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: k8sgpt-mm-reporter-29620860
+          job-name: k8sgpt-mm-reporter-29620860
+      spec:
+        containers:
+        - command:
+          - /bin/sh
+          - /scripts/report.sh
+          env:
+          - name: MM_URL
+            valueFrom:
+              secretKeyRef:
+                key: url
+                name: mm-webhook
+          image: alpine/k8s:1.31.2
+          imagePullPolicy: IfNotPresent
+          name: reporter
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /scripts
+            name: script
+        dnsPolicy: ClusterFirst
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: k8sgpt-mm-reporter
+        serviceAccountName: k8sgpt-mm-reporter
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 493
+            name: k8sgpt-mm-script
+          name: script
+  status:
+    completionTime: "2026-04-27T01:00:05Z"
+    conditions:
+    - lastProbeTime: "2026-04-27T01:00:05Z"
+      lastTransitionTime: "2026-04-27T01:00:05Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-26T01:00:04Z"
-      lastTransitionTime: "2026-04-26T01:00:04Z"
+    - lastProbeTime: "2026-04-27T01:00:05Z"
+      lastTransitionTime: "2026-04-27T01:00:05Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-26T01:00:00Z"
+    startTime: "2026-04-27T01:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

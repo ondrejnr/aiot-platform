@@ -11,6 +11,7 @@ items:
       app.kubernetes.io/managed-by: Helm
       app.kubernetes.io/name: zabbix
       app.kubernetes.io/version: 7.0.16
+      argocd.argoproj.io/instance: zabbix
       helm.sh/chart: zabbix-7.0.12
     name: zabbix-nodesclean
     namespace: zabbix
@@ -71,7 +72,7 @@ items:
     successfulJobsHistoryLimit: 3
     suspend: false
   status:
-    lastScheduleTime: "2026-04-26T01:00:00Z"
-    lastSuccessfulTime: "2026-04-26T01:00:04Z"
+    lastScheduleTime: "2026-04-27T01:00:00Z"
+    lastSuccessfulTime: "2026-04-27T01:00:04Z"
 kind: List
 metadata:

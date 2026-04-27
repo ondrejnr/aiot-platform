@@ -56,7 +56,9 @@ items:
     schedule: 0 7 * * *
     successfulJobsHistoryLimit: 3
     suspend: false
-  status: {}
+  status:
+    lastScheduleTime: "2026-04-26T07:00:00Z"
+    lastSuccessfulTime: "2026-04-26T07:00:12Z"
 - apiVersion: batch/v1
   kind: CronJob
   metadata:
@@ -106,7 +108,7 @@ items:
     successfulJobsHistoryLimit: 1
     suspend: false
   status:
-    lastScheduleTime: "2026-04-26T01:00:00Z"
-    lastSuccessfulTime: "2026-04-26T01:00:04Z"
+    lastScheduleTime: "2026-04-27T01:00:00Z"
+    lastSuccessfulTime: "2026-04-27T01:00:05Z"
 kind: List
 metadata:

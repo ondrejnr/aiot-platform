@@ -1,0 +1,219 @@
+apiVersion: v1
+items:
+- apiVersion: cilium.io/v2
+  kind: CiliumNode
+  metadata:
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: aiot-master
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/control-plane: ""
+      node.kubernetes.io/exclude-from-external-load-balancers: ""
+      workload-zone: control
+    name: aiot-master
+    ownerReferences:
+    - apiVersion: v1
+      kind: Node
+      name: aiot-master
+  spec:
+    addresses:
+    - ip: 10.132.0.2
+      type: InternalIP
+    - ip: 10.245.4.68
+      type: CiliumInternalIP
+    alibaba-cloud: {}
+    azure: {}
+    bootid: 0459e522-15a5-412b-bf78-045e057f9253
+    encryption: {}
+    eni: {}
+    health:
+      ipv4: 10.245.4.220
+    ingress: {}
+    ipam:
+      podCIDRs:
+      - 10.245.4.0/24
+      pools: {}
+  status:
+    alibaba-cloud: {}
+    azure: {}
+    eni: {}
+    ipam:
+      operator-status: {}
+- apiVersion: cilium.io/v2
+  kind: CiliumNode
+  metadata:
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      io.cilium.migration/cilium-default: "true"
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: aiot-worker-01
+      kubernetes.io/os: linux
+      linbit.com/hostname: aiot-worker-01
+      node-role.kubernetes.io/worker: ""
+      piraeus.io/storage: "yes"
+      workload-zone: data
+    name: aiot-worker-01
+    ownerReferences:
+    - apiVersion: v1
+      kind: Node
+      name: aiot-worker-01
+  spec:
+    addresses:
+    - ip: 10.132.0.3
+      type: InternalIP
+    - ip: 10.245.3.126
+      type: CiliumInternalIP
+    alibaba-cloud: {}
+    azure: {}
+    bootid: e4f78675-10ed-4752-a91f-937bb4f7eff3
+    encryption: {}
+    eni: {}
+    health:
+      ipv4: 10.245.3.37
+    ingress: {}
+    ipam:
+      podCIDRs:
+      - 10.245.3.0/24
+      pools: {}
+  status:
+    alibaba-cloud: {}
+    azure: {}
+    eni: {}
+    ipam:
+      operator-status: {}
+- apiVersion: cilium.io/v2
+  kind: CiliumNode
+  metadata:
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      io.cilium.migration/cilium-default: "true"
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: aiot-worker-02
+      kubernetes.io/os: linux
+      linbit.com/hostname: aiot-worker-02
+      node-role.kubernetes.io/worker: ""
+      piraeus.io/storage: "yes"
+      workload-zone: data
+    name: aiot-worker-02
+    ownerReferences:
+    - apiVersion: v1
+      kind: Node
+      name: aiot-worker-02
+  spec:
+    addresses:
+    - ip: 10.132.0.4
+      type: InternalIP
+    - ip: 10.245.2.114
+      type: CiliumInternalIP
+    alibaba-cloud: {}
+    azure: {}
+    bootid: 1e27e676-75e0-4e9a-9ecc-235dcfceb0aa
+    encryption: {}
+    eni: {}
+    health:
+      ipv4: 10.245.2.51
+    ingress: {}
+    ipam:
+      podCIDRs:
+      - 10.245.2.0/24
+      pools: {}
+  status:
+    alibaba-cloud: {}
+    azure: {}
+    eni: {}
+    ipam:
+      operator-status: {}
+- apiVersion: cilium.io/v2
+  kind: CiliumNode
+  metadata:
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      cloud: oci
+      io.cilium.migration/cilium-default: "true"
+      konflux.ci/role: build
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: oci-e5-node1
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+      topology.kubernetes.io/zone: oci-frankfurt
+      workload-zone: build
+    name: oci-e5-node1
+    ownerReferences:
+    - apiVersion: v1
+      kind: Node
+      name: oci-e5-node1
+  spec:
+    addresses:
+    - ip: 172.16.200.10
+      type: InternalIP
+    - ip: 10.245.0.89
+      type: CiliumInternalIP
+    alibaba-cloud: {}
+    azure: {}
+    bootid: 686ccc61-99d1-4a78-b29b-df835d6d3a19
+    encryption: {}
+    eni: {}
+    health:
+      ipv4: 10.245.0.90
+    ingress: {}
+    ipam:
+      podCIDRs:
+      - 10.245.0.0/24
+      pools: {}
+  status:
+    alibaba-cloud: {}
+    azure: {}
+    eni: {}
+    ipam:
+      operator-status: {}
+- apiVersion: cilium.io/v2
+  kind: CiliumNode
+  metadata:
+    labels:
+      beta.kubernetes.io/arch: amd64
+      beta.kubernetes.io/os: linux
+      cloud: oci
+      io.cilium.migration/cilium-default: "true"
+      konflux.ci/role: build
+      kubernetes.io/arch: amd64
+      kubernetes.io/hostname: oci-e5-node2
+      kubernetes.io/os: linux
+      node-role.kubernetes.io/worker: ""
+      topology.kubernetes.io/zone: oci-frankfurt
+      workload-zone: build
+    name: oci-e5-node2
+    ownerReferences:
+    - apiVersion: v1
+      kind: Node
+      name: oci-e5-node2
+  spec:
+    addresses:
+    - ip: 172.16.200.11
+      type: InternalIP
+    - ip: 10.245.1.115
+      type: CiliumInternalIP
+    alibaba-cloud: {}
+    azure: {}
+    bootid: 1e94e63c-c318-43b7-bd35-91b04086a91f
+    encryption: {}
+    eni: {}
+    health:
+      ipv4: 10.245.1.45
+    ingress: {}
+    ipam:
+      podCIDRs:
+      - 10.245.1.0/24
+      pools: {}
+  status:
+    alibaba-cloud: {}
+    azure: {}
+    eni: {}
+    ipam:
+      operator-status: {}
+kind: List
+metadata:

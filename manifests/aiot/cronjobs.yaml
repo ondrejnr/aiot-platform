@@ -79,8 +79,8 @@ items:
     successfulJobsHistoryLimit: 3
     suspend: false
   status:
-    lastScheduleTime: "2026-04-26T01:05:00Z"
-    lastSuccessfulTime: "2026-04-26T01:05:04Z"
+    lastScheduleTime: "2026-04-27T01:05:00Z"
+    lastSuccessfulTime: "2026-04-27T01:05:04Z"
 - apiVersion: batch/v1
   kind: CronJob
   metadata:
@@ -107,7 +107,7 @@ items:
               - |
                 set -e
                 H="postgres.aiot.svc.cluster.local"
-                U="postgres"
+                U="aiot_admin"
                 D="aiot"
                 echo "Deleting sensor_data older than 10 days..."
                 psql -h "$H" -U "$U" -d "$D" -c "DELETE FROM sensor_data WHERE ts < NOW() - INTERVAL '10 days';"
@@ -135,8 +135,8 @@ items:
     successfulJobsHistoryLimit: 2
     suspend: false
   status:
-    lastScheduleTime: "2026-04-26T00:00:00Z"
-    lastSuccessfulTime: "2026-04-26T00:00:06Z"
+    lastScheduleTime: "2026-04-27T00:00:00Z"
+    lastSuccessfulTime: "2026-04-26T08:00:04Z"
 - apiVersion: batch/v1
   kind: CronJob
   metadata:
@@ -217,12 +217,12 @@ items:
             volumes:
             - name: backups
               persistentVolumeClaim:
-                claimName: postgres-backup-data
+                claimName: postgres-backup-data-piraeus
     schedule: 0 3 * * *
     successfulJobsHistoryLimit: 3
     suspend: false
   status:
-    lastScheduleTime: "2026-04-25T03:00:00Z"
+    lastScheduleTime: "2026-04-26T03:00:00Z"
     lastSuccessfulTime: "2026-04-25T03:00:43Z"
 - apiVersion: batch/v1
   kind: CronJob
@@ -250,7 +250,7 @@ items:
                                          password=os.environ['PG_PASS'], dbname='aiot')
                 conn.autocommit = True
                 cur = conn.cursor()
-                for t in ['sensor_data','predictions']:
+                for t in ['sensor_data']:
                     cur.execute(f"DELETE FROM {t} WHERE ts < NOW() - INTERVAL '14 days'")
                     print(f"Cleaned {t}: {cur.rowcount} rows")
                 cur.close(); conn.close()
@@ -258,7 +258,7 @@ items:
               - name: PG_HOST
                 value: postgres.aiot.svc.cluster.local
               - name: PG_USER
-                value: postgres
+                value: aiot_admin
               - name: PG_PASS
                 valueFrom:
                   secretKeyRef:
@@ -279,6 +279,7 @@ items:
     successfulJobsHistoryLimit: 2
     suspend: false
   status:
-    lastScheduleTime: "2026-04-26T00:00:00Z"
+    lastScheduleTime: "2026-04-27T00:00:00Z"
+    lastSuccessfulTime: "2026-04-26T06:00:03Z"
 kind: List
 metadata:

@@ -142,6 +142,19 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: LayerResourceIds
   metadata:
+    name: 35135aaa6cc23891b40cb3f378c53a17a1127210ce60e125ccf03efcfdaec458
+  spec:
+    layer_resource_id: 29
+    layer_resource_kind: STORAGE
+    layer_resource_parent_id: 28
+    layer_resource_suffix: ""
+    layer_resource_suspended: false
+    node_name: AIOT-WORKER-02
+    resource_name: PVC-0311865A-09D7-4A59-AAB5-C5D19A2F333C
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerResourceIds
+  metadata:
     name: 3d914f9348c9cc0ff8a79716700b9fcd4d2f3e711608004eb8f138bcba7f14d9
   spec:
     layer_resource_id: 41
@@ -281,6 +294,18 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: LayerResourceIds
   metadata:
+    name: 59e19706d51d39f66711c2653cd7eb1291c94d9b55eb14bda74ce4dc636d015a
+  spec:
+    layer_resource_id: 28
+    layer_resource_kind: DRBD
+    layer_resource_suffix: ""
+    layer_resource_suspended: false
+    node_name: AIOT-WORKER-02
+    resource_name: PVC-0311865A-09D7-4A59-AAB5-C5D19A2F333C
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerResourceIds
+  metadata:
     name: 5f9c4ab08cac7457e9111a30e4664920607ea2c115a1433d7be98e97e64244ca
   spec:
     layer_resource_id: 26
@@ -301,6 +326,18 @@ items:
     layer_resource_suspended: false
     node_name: AIOT-WORKER-01
     resource_name: PVC-0C6AD1C4-EA10-4B24-95C5-12F0F48EF8AB
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerResourceIds
+  metadata:
+    name: 624b60c58c9d8bfb6ff1886c2fd605d2adeb6ea4da576068201b6c6958ce93f4
+  spec:
+    layer_resource_id: 30
+    layer_resource_kind: DRBD
+    layer_resource_suffix: ""
+    layer_resource_suspended: false
+    node_name: AIOT-WORKER-01
+    resource_name: PVC-0311865A-09D7-4A59-AAB5-C5D19A2F333C
     snapshot_name: ""
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: LayerResourceIds
@@ -574,6 +611,19 @@ items:
     layer_resource_suspended: false
     node_name: AIOT-WORKER-02
     resource_name: PVC-27976678-7D15-4989-99F4-0B94C9EC069C
+    snapshot_name: ""
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerResourceIds
+  metadata:
+    name: eb1e33e8a81b697b75855af6bfcdbcbf7cbbde9f94962ceaec1ed8af21f5a50f
+  spec:
+    layer_resource_id: 31
+    layer_resource_kind: STORAGE
+    layer_resource_parent_id: 30
+    layer_resource_suffix: ""
+    layer_resource_suspended: false
+    node_name: AIOT-WORKER-01
+    resource_name: PVC-0311865A-09D7-4A59-AAB5-C5D19A2F333C
     snapshot_name: ""
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: LayerResourceIds

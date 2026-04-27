@@ -4,7 +4,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "3"
+      deployment.kubernetes.io/revision: "4"
     labels:
       app: k8sgpt
     name: k8sgpt
@@ -82,6 +82,13 @@ items:
         serviceAccount: k8sgpt-k8sgpt
         serviceAccountName: k8sgpt-k8sgpt
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app: k8sgpt
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - emptyDir: {}
           name: k8sgpt-vol
@@ -89,18 +96,18 @@ items:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-19T21:42:58Z"
-      lastUpdateTime: "2026-04-19T23:46:47Z"
-      message: ReplicaSet "k8sgpt-68967c757c" has successfully progressed.
+      lastUpdateTime: "2026-04-26T17:22:31Z"
+      message: ReplicaSet "k8sgpt-7d779d65dc" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:17:43Z"
-      lastUpdateTime: "2026-04-22T14:17:43Z"
+    - lastTransitionTime: "2026-04-26T18:26:34Z"
+      lastUpdateTime: "2026-04-26T18:26:34Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 7
+    observedGeneration: 8
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -178,18 +185,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-25T07:37:35Z"
-      lastUpdateTime: "2026-04-25T07:37:35Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-25T07:37:31Z"
       lastUpdateTime: "2026-04-25T07:37:35Z"
       message: ReplicaSet "k8sgpt-anomaly-detector-8698569b4c" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-26T20:00:21Z"
+      lastUpdateTime: "2026-04-26T20:00:21Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 1
     readyReplicas: 1
     replicas: 1
@@ -333,8 +340,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-25T22:31:03Z"
-      lastUpdateTime: "2026-04-25T22:31:03Z"
+    - lastTransitionTime: "2026-04-26T20:01:26Z"
+      lastUpdateTime: "2026-04-26T20:01:26Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -499,8 +506,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:20:39Z"
-      lastUpdateTime: "2026-04-24T10:20:39Z"
+    - lastTransitionTime: "2026-04-26T20:00:35Z"
+      lastUpdateTime: "2026-04-26T20:00:35Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -613,18 +620,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-25T07:38:42Z"
-      lastUpdateTime: "2026-04-25T07:38:42Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-25T07:37:32Z"
       lastUpdateTime: "2026-04-25T07:38:42Z"
       message: ReplicaSet "k8sgpt-robusta-bridge-685db97fcc" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-26T19:32:38Z"
+      lastUpdateTime: "2026-04-26T19:32:38Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 1
     readyReplicas: 1
     replicas: 1

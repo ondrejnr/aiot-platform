@@ -45,7 +45,7 @@ items:
   status:
     autogen: {}
     conditions:
-    - lastTransitionTime: "2026-04-22T17:18:28Z"
+    - lastTransitionTime: "2026-04-26T17:21:13Z"
       message: Ready
       reason: Succeeded
       status: "True"
@@ -128,7 +128,7 @@ items:
   status:
     autogen: {}
     conditions:
-    - lastTransitionTime: "2026-04-22T17:18:28Z"
+    - lastTransitionTime: "2026-04-26T17:21:13Z"
       message: Ready
       reason: Succeeded
       status: "True"
@@ -136,6 +136,95 @@ items:
     rulecount:
       generate: 2
       mutate: 0
+      validate: 0
+      verifyimages: 0
+    validatingadmissionpolicy:
+      generated: false
+      message: ""
+- apiVersion: kyverno.io/v1
+  kind: ClusterPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"kyverno.io/v1","kind":"ClusterPolicy","metadata":{"annotations":{"policies.kyverno.io/category":"Scheduling","policies.kyverno.io/description":"Adds a default per-hostname TopologySpreadConstraint with maxSkew=1 and ScheduleAnyway to Deployments and StatefulSets that don't define one. This makes the scheduler spread replicas across nodes by default, preventing the \"all replicas on one node\" failure pattern.","policies.kyverno.io/title":"Inject TopologySpreadConstraints"},"name":"inject-topology-spread"},"spec":{"background":false,"failurePolicy":"Ignore","rules":[{"exclude":{"any":[{"resources":{"namespaces":["kube-system","kyverno","cattle-system","cattle-fleet-system","cattle-fleet-local-system","cattle-impersonation-system","cattle-provisioning-capi-system","kube-node-lease","kube-public","cert-manager","argocd","velero","piraeus","tigera-operator","calico-system","calico-apiserver"]}},{"resources":{"selector":{"matchLabels":{"policy.kyverno.io/skip-topology-spread":"true"}}}}]},"match":{"any":[{"resources":{"kinds":["Deployment","StatefulSet"]}}]},"mutate":{"patchStrategicMerge":{"spec":{"template":{"spec":{"+(topologySpreadConstraints)":[{"labelSelector":{"matchLabels":"{{ request.object.spec.selector.matchLabels }}"},"maxSkew":1,"topologyKey":"kubernetes.io/hostname","whenUnsatisfiable":"ScheduleAnyway"}]}}}}},"name":"add-spread-deployments","preconditions":{"all":[{"key":"{{ request.operation || 'BACKGROUND' }}","operator":"AnyIn","value":["CREATE","UPDATE"]},{"key":"{{ request.object.spec.selector.matchLabels || '' | length(@) }}","operator":"GreaterThan","value":0}]}}]}}
+      policies.kyverno.io/category: Scheduling
+      policies.kyverno.io/description: Adds a default per-hostname TopologySpreadConstraint
+        with maxSkew=1 and ScheduleAnyway to Deployments and StatefulSets that don't
+        define one. This makes the scheduler spread replicas across nodes by default,
+        preventing the "all replicas on one node" failure pattern.
+      policies.kyverno.io/title: Inject TopologySpreadConstraints
+    name: inject-topology-spread
+  spec:
+    admission: true
+    background: false
+    emitWarning: false
+    failurePolicy: Ignore
+    rules:
+    - exclude:
+        any:
+        - resources:
+            namespaces:
+            - kube-system
+            - kyverno
+            - cattle-system
+            - cattle-fleet-system
+            - cattle-fleet-local-system
+            - cattle-impersonation-system
+            - cattle-provisioning-capi-system
+            - kube-node-lease
+            - kube-public
+            - cert-manager
+            - argocd
+            - velero
+            - piraeus
+            - tigera-operator
+            - calico-system
+            - calico-apiserver
+        - resources:
+            selector:
+              matchLabels:
+                policy.kyverno.io/skip-topology-spread: "true"
+      match:
+        any:
+        - resources:
+            kinds:
+            - Deployment
+            - StatefulSet
+      mutate:
+        patchStrategicMerge:
+          spec:
+            template:
+              spec:
+                +(topologySpreadConstraints):
+                - labelSelector:
+                    matchLabels: '{{ request.object.spec.selector.matchLabels }}'
+                  maxSkew: 1
+                  topologyKey: kubernetes.io/hostname
+                  whenUnsatisfiable: ScheduleAnyway
+      name: add-spread-deployments
+      preconditions:
+        all:
+        - key: '{{ request.operation || ''BACKGROUND'' }}'
+          operator: AnyIn
+          value:
+          - CREATE
+          - UPDATE
+        - key: '{{ request.object.spec.selector.matchLabels || '''' | length(@) }}'
+          operator: GreaterThan
+          value: 0
+      skipBackgroundRequests: true
+    validationFailureAction: Audit
+  status:
+    autogen: {}
+    conditions:
+    - lastTransitionTime: "2026-04-26T17:21:13Z"
+      message: Ready
+      reason: Succeeded
+      status: "True"
+      type: Ready
+    rulecount:
+      generate: 0
+      mutate: 1
       validate: 0
       verifyimages: 0
     validatingadmissionpolicy:
@@ -210,7 +299,7 @@ items:
   status:
     autogen: {}
     conditions:
-    - lastTransitionTime: "2026-04-22T17:18:28Z"
+    - lastTransitionTime: "2026-04-26T17:21:13Z"
       message: Ready
       reason: Succeeded
       status: "True"
@@ -223,6 +312,86 @@ items:
     validatingadmissionpolicy:
       generated: false
       message: ""
+- apiVersion: kyverno.io/v1
+  kind: ClusterPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"kyverno.io/v1","kind":"ClusterPolicy","metadata":{"annotations":{"policies.kyverno.io/category":"Resource Management","policies.kyverno.io/description":"Requires every container to declare both memory requests and memory limits. Pods without memory requests cause scheduler imbalance because the scheduler treats them as \"free\" and packs them onto the same node.","policies.kyverno.io/title":"Require Memory Requests and Limits"},"name":"require-memory-resources"},"spec":{"background":true,"rules":[{"exclude":{"any":[{"resources":{"namespaces":["kube-system","kyverno","cattle-system","cattle-fleet-system","cattle-fleet-local-system","cattle-impersonation-system","cattle-provisioning-capi-system","kube-node-lease","kube-public","velero","piraeus","tigera-operator","calico-system","calico-apiserver","linkerd"]}},{"resources":{"selector":{"matchLabels":{"policy.kyverno.io/skip-memory-validation":"true"}}}}]},"match":{"any":[{"resources":{"kinds":["Pod"]}}]},"name":"require-memory-requests-limits","validate":{"foreach":[{"list":"request.object.spec.containers","pattern":{"resources":{"limits":{"memory":"?*"},"requests":{"memory":"?*"}}}}],"message":"Every container must define spec.containers[].resources.requests.memory and spec.containers[].resources.limits.memory."}}],"validationFailureAction":"Audit","validationFailureActionOverrides":[{"action":"Audit","namespaces":["*"]}]}}
+      policies.kyverno.io/category: Resource Management
+      policies.kyverno.io/description: Requires every container to declare both memory
+        requests and memory limits. Pods without memory requests cause scheduler imbalance
+        because the scheduler treats them as "free" and packs them onto the same node.
+      policies.kyverno.io/title: Require Memory Requests and Limits
+    name: require-memory-resources
+  spec:
+    admission: true
+    background: true
+    emitWarning: false
+    rules:
+    - exclude:
+        any:
+        - resources:
+            namespaces:
+            - kube-system
+            - kyverno
+            - cattle-system
+            - cattle-fleet-system
+            - cattle-fleet-local-system
+            - cattle-impersonation-system
+            - cattle-provisioning-capi-system
+            - kube-node-lease
+            - kube-public
+            - velero
+            - piraeus
+            - tigera-operator
+            - calico-system
+            - calico-apiserver
+            - linkerd
+        - resources:
+            selector:
+              matchLabels:
+                policy.kyverno.io/skip-memory-validation: "true"
+      match:
+        any:
+        - resources:
+            kinds:
+            - Pod
+      name: require-memory-requests-limits
+      skipBackgroundRequests: true
+      validate:
+        allowExistingViolations: true
+        foreach:
+        - list: request.object.spec.containers
+          pattern:
+            resources:
+              limits:
+                memory: ?*
+              requests:
+                memory: ?*
+        message: Every container must define spec.containers[].resources.requests.memory
+          and spec.containers[].resources.limits.memory.
+    validationFailureAction: Audit
+    validationFailureActionOverrides:
+    - action: Audit
+      namespaces:
+      - '*'
+  status:
+    autogen: {}
+    conditions:
+    - lastTransitionTime: "2026-04-26T17:21:13Z"
+      message: Ready
+      reason: Succeeded
+      status: "True"
+      type: Ready
+    rulecount:
+      generate: 0
+      mutate: 0
+      validate: 1
+      verifyimages: 0
+    validatingadmissionpolicy:
+      generated: false
+      message: skip generating ValidatingAdmissionPolicy for non CEL rules.
 - apiVersion: kyverno.io/v1
   kind: ClusterPolicy
   metadata:
@@ -268,7 +437,7 @@ items:
   status:
     autogen: {}
     conditions:
-    - lastTransitionTime: "2026-04-22T17:18:28Z"
+    - lastTransitionTime: "2026-04-26T17:21:13Z"
       message: Ready
       reason: Succeeded
       status: "True"

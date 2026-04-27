@@ -4,11 +4,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T01:15:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T16:45:00Z"
     labels:
-      batch.kubernetes.io/job-name: descheduler-29619435
-      job-name: descheduler-29619435
-    name: descheduler-29619435
+      batch.kubernetes.io/job-name: descheduler-29620365
+      job-name: descheduler-29620365
+    name: descheduler-29620365
     namespace: descheduler
     ownerReferences:
     - apiVersion: batch/v1
@@ -29,8 +29,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: descheduler-29619435
-          job-name: descheduler-29619435
+          batch.kubernetes.io/job-name: descheduler-29620365
+          job-name: descheduler-29620365
       spec:
         containers:
         - args:
@@ -73,22 +73,295 @@ items:
             name: descheduler-policy
           name: policy
   status:
-    completionTime: "2026-04-26T01:15:05Z"
     conditions:
-    - lastProbeTime: "2026-04-26T01:15:05Z"
-      lastTransitionTime: "2026-04-26T01:15:05Z"
+    - lastProbeTime: "2026-04-26T16:51:15Z"
+      lastTransitionTime: "2026-04-26T16:51:15Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: FailureTarget
+    - lastProbeTime: "2026-04-26T16:51:15Z"
+      lastTransitionTime: "2026-04-26T16:51:15Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: Failed
+    failed: 1
+    ready: 0
+    startTime: "2026-04-26T16:45:00Z"
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T17:00:00Z"
+    labels:
+      batch.kubernetes.io/job-name: descheduler-29620380
+      job-name: descheduler-29620380
+    name: descheduler-29620380
+    namespace: descheduler
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: descheduler
+  spec:
+    backoffLimit: 0
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: descheduler-29620380
+          job-name: descheduler-29620380
+      spec:
+        containers:
+        - args:
+          - --policy-config-file=/policy/policy.yaml
+          - --v=3
+          command:
+          - /bin/descheduler
+          image: registry.k8s.io/descheduler/descheduler:v0.32.0
+          imagePullPolicy: IfNotPresent
+          name: descheduler
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /policy
+            name: policy
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          workload-zone: control
+        priorityClassName: system-cluster-critical
+        restartPolicy: Never
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: descheduler
+        serviceAccountName: descheduler
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: descheduler-policy
+          name: policy
+  status:
+    conditions:
+    - lastProbeTime: "2026-04-26T17:00:11Z"
+      lastTransitionTime: "2026-04-26T17:00:11Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: FailureTarget
+    - lastProbeTime: "2026-04-26T17:00:11Z"
+      lastTransitionTime: "2026-04-26T17:00:11Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: Failed
+    failed: 1
+    ready: 0
+    startTime: "2026-04-26T17:00:00Z"
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T17:15:00Z"
+    labels:
+      batch.kubernetes.io/job-name: descheduler-29620395
+      job-name: descheduler-29620395
+    name: descheduler-29620395
+    namespace: descheduler
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: descheduler
+  spec:
+    backoffLimit: 0
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: descheduler-29620395
+          job-name: descheduler-29620395
+      spec:
+        containers:
+        - args:
+          - --policy-config-file=/policy/policy.yaml
+          - --v=3
+          command:
+          - /bin/descheduler
+          image: registry.k8s.io/descheduler/descheduler:v0.32.0
+          imagePullPolicy: IfNotPresent
+          name: descheduler
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /policy
+            name: policy
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          workload-zone: control
+        priorityClassName: system-cluster-critical
+        restartPolicy: Never
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: descheduler
+        serviceAccountName: descheduler
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: descheduler-policy
+          name: policy
+  status:
+    conditions:
+    - lastProbeTime: "2026-04-26T17:15:10Z"
+      lastTransitionTime: "2026-04-26T17:15:10Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: FailureTarget
+    - lastProbeTime: "2026-04-26T17:15:10Z"
+      lastTransitionTime: "2026-04-26T17:15:10Z"
+      message: Job has reached the specified backoff limit
+      reason: BackoffLimitExceeded
+      status: "True"
+      type: Failed
+    failed: 1
+    ready: 0
+    startTime: "2026-04-26T17:15:00Z"
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T01:15:00Z"
+    labels:
+      batch.kubernetes.io/job-name: descheduler-29620875
+      job-name: descheduler-29620875
+    name: descheduler-29620875
+    namespace: descheduler
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: descheduler
+  spec:
+    backoffLimit: 0
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: descheduler-29620875
+          job-name: descheduler-29620875
+      spec:
+        containers:
+        - args:
+          - --policy-config-file=/policy/policy.yaml
+          - --v=3
+          command:
+          - /bin/descheduler
+          image: registry.k8s.io/descheduler/descheduler:v0.32.0
+          imagePullPolicy: IfNotPresent
+          name: descheduler
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /policy
+            name: policy
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          workload-zone: control
+        priorityClassName: system-cluster-critical
+        restartPolicy: Never
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: descheduler
+        serviceAccountName: descheduler
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: descheduler-policy
+          name: policy
+  status:
+    completionTime: "2026-04-27T01:15:04Z"
+    conditions:
+    - lastProbeTime: "2026-04-27T01:15:04Z"
+      lastTransitionTime: "2026-04-27T01:15:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-26T01:15:05Z"
-      lastTransitionTime: "2026-04-26T01:15:05Z"
+    - lastProbeTime: "2026-04-27T01:15:04Z"
+      lastTransitionTime: "2026-04-27T01:15:04Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-26T01:15:00Z"
+    startTime: "2026-04-27T01:15:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

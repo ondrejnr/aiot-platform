@@ -523,6 +523,7 @@ items:
       metadata:
         annotations:
           kubectl.kubernetes.io/default-container: linstor-satellite
+          kubectl.kubernetes.io/restartedAt: "2026-04-26T11:43:15Z"
         labels:
           app.kubernetes.io/component: linstor-satellite
           app.kubernetes.io/instance: linstorcluster
@@ -575,12 +576,12 @@ items:
             privileged: true
             readOnlyRootFilesystem: true
           startupProbe:
-            failureThreshold: 3
+            failureThreshold: 30
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:
               port: linstor
-            timeoutSeconds: 1
+            timeoutSeconds: 3
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
@@ -634,6 +635,7 @@ items:
         dnsPolicy: ClusterFirst
         enableServiceLinks: false
         hostIPC: true
+        hostNetwork: true
         initContainers:
         - env:
           - name: LB_FAIL_IF_USERMODE_HELPER_NOT_DISABLED
@@ -820,7 +822,7 @@ items:
     numberAvailable: 1
     numberMisscheduled: 0
     numberReady: 1
-    observedGeneration: 1
+    observedGeneration: 4
     updatedNumberScheduled: 1
 - apiVersion: apps/v1
   kind: DaemonSet
@@ -905,12 +907,12 @@ items:
             privileged: true
             readOnlyRootFilesystem: true
           startupProbe:
-            failureThreshold: 3
+            failureThreshold: 30
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:
               port: linstor
-            timeoutSeconds: 1
+            timeoutSeconds: 3
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
@@ -964,6 +966,7 @@ items:
         dnsPolicy: ClusterFirst
         enableServiceLinks: false
         hostIPC: true
+        hostNetwork: true
         initContainers:
         - env:
           - name: LB_FAIL_IF_USERMODE_HELPER_NOT_DISABLED
@@ -1150,7 +1153,7 @@ items:
     numberAvailable: 1
     numberMisscheduled: 0
     numberReady: 1
-    observedGeneration: 1
+    observedGeneration: 3
     updatedNumberScheduled: 1
 kind: List
 metadata:

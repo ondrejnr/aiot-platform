@@ -66,8 +66,8 @@ items:
     successfulJobsHistoryLimit: 2
     suspend: false
   status:
-    lastScheduleTime: "2026-04-25T01:30:00Z"
-    lastSuccessfulTime: "2026-04-25T01:30:10Z"
+    lastScheduleTime: "2026-04-26T01:30:00Z"
+    lastSuccessfulTime: "2026-04-26T01:30:10Z"
 - apiVersion: batch/v1
   kind: CronJob
   metadata:
@@ -134,9 +134,9 @@ items:
     active:
     - apiVersion: batch/v1
       kind: Job
-      name: manifest-backup-29619435
+      name: manifest-backup-29620875
       namespace: dr-ops
-    lastScheduleTime: "2026-04-26T01:15:00Z"
-    lastSuccessfulTime: "2026-04-25T01:18:50Z"
+    lastScheduleTime: "2026-04-27T01:15:00Z"
+    lastSuccessfulTime: "2026-04-26T01:18:29Z"
 kind: List
 metadata:

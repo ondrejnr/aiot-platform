@@ -254,19 +254,19 @@ items:
   status:
     action: Update ConfigMap signoz/chi-signoz-clickhouse-common-usersd
     actions:
-    - '2026-04-24T10:19:31.789914376Z reconcile completed successfully, task id: 371219e3-2b08-4b58-af8d-420c334aeed3'
-    - '2026-04-24T10:16:16.305339705Z reconcile started, task id: 371219e3-2b08-4b58-af8d-420c334aeed3'
-    - '2026-04-23T05:02:11.823030005Z reconcile completed successfully, task id: a8b20189-85d5-4756-aeeb-59db15e4bafe'
-    - '2026-04-23T05:02:02.711524137Z reconcile started, task id: a8b20189-85d5-4756-aeeb-59db15e4bafe'
-    - '2026-04-22T14:18:26.700821578Z reconcile completed successfully, task id: b84bf9d3-7057-49ef-aec7-152047c6acf9'
-    - '2026-04-22T14:18:16.705806778Z reconcile started, task id: b84bf9d3-7057-49ef-aec7-152047c6acf9'
-    - '2026-04-22T13:22:33.206239375Z reconcile completed successfully, task id: ce3f4ee1-189f-48df-9728-340ebd54a819'
-    - '2026-04-22T13:21:24.511121429Z reconcile started, task id: ce3f4ee1-189f-48df-9728-340ebd54a819'
-    - '2026-04-22T10:38:58.133384642Z reconcile completed successfully, task id: cf9959c7-55ba-49c7-b9a6-c8801c773162'
-    - '2026-04-22T10:38:48.018755447Z reconcile started, task id: cf9959c7-55ba-49c7-b9a6-c8801c773162'
+    - '2026-04-26T18:26:31.55845907Z reconcile completed successfully, task id: 3ee1f836-6b9e-4db5-822f-0de6cad9180f'
+    - '2026-04-26T18:26:22.491847771Z reconcile started, task id: 3ee1f836-6b9e-4db5-822f-0de6cad9180f'
+    - '2026-04-26T18:25:51.700778743Z reconcile completed successfully, task id: 79b2ab9f-d222-4610-9435-8d44b4593bf4'
+    - '2026-04-26T18:25:42.595232027Z reconcile started, task id: 79b2ab9f-d222-4610-9435-8d44b4593bf4'
+    - '2026-04-26T16:07:45.551597489Z reconcile completed successfully, task id: 45709dc6-2bf6-41c8-bd7c-a2bdab006215'
+    - '2026-04-26T16:07:36.504737333Z reconcile started, task id: 45709dc6-2bf6-41c8-bd7c-a2bdab006215'
+    - '2026-04-26T16:05:21.010209965Z reconcile completed successfully, task id: 8ba2602d-60cd-4ef3-99ee-cb73d1004a39'
+    - '2026-04-26T16:05:09.997885053Z reconcile started, task id: 8ba2602d-60cd-4ef3-99ee-cb73d1004a39'
+    - '2026-04-26T16:00:51.961805221Z reconcile completed successfully, task id: 2d6229b3-14cc-448c-8bd6-dec5c116ba78'
+    - '2026-04-26T16:00:42.989774325Z reconcile started, task id: 2d6229b3-14cc-448c-8bd6-dec5c116ba78'
     chop-commit: 19d8376
     chop-date: 2023-06-29T12:45:30
-    chop-ip: 10.244.6.194
+    chop-ip: 10.245.1.103
     chop-version: 0.21.2
     clusters: 1
     endpoint: signoz-clickhouse.signoz.svc.cluster.local
@@ -430,14 +430,14 @@ items:
             admin/profile: default
             admin/quota: default
             clickhouse_operator/networks/ip:
-            - 10.244.6.194
+            - 10.245.1.103
             clickhouse_operator/password_sha256_hex: 716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448
             clickhouse_operator/profile: clickhouse_operator
             default/networks/host_regexp: (chi-signoz-clickhouse-[^.]+\d+-\d+|clickhouse\-signoz-clickhouse)\.signoz\.svc\.cluster\.local$
             default/networks/ip:
             - ::1
             - 127.0.0.1
-            - 10.244.2.109
+            - 10.245.2.116
             default/profile: default
             default/quota: default
           zookeeper:
@@ -466,7 +466,7 @@ items:
           configMapPropagationTimeout: 10
           policy: unspecified
         stop: "False"
-        taskID: 4a2e01a1-91ec-41c2-9aa4-c255ac1f50be
+        taskID: 81469eb9-3cd1-431a-b53b-b2b785fb27a7
         templates:
           PodTemplatesIndex: {}
           ServiceTemplatesIndex: {}
@@ -762,14 +762,14 @@ items:
             admin/profile: default
             admin/quota: default
             clickhouse_operator/networks/ip:
-            - 10.244.6.194
+            - 10.245.1.103
             clickhouse_operator/password_sha256_hex: 716b36073a90c6fe1d445ac1af85f4777c5b7a155cea359961826a030513e448
             clickhouse_operator/profile: clickhouse_operator
             default/networks/host_regexp: (chi-signoz-clickhouse-[^.]+\d+-\d+|clickhouse\-signoz-clickhouse)\.signoz\.svc\.cluster\.local$
             default/networks/ip:
             - ::1
             - 127.0.0.1
-            - 10.244.6.5
+            - 10.244.2.27
             default/profile: default
             default/quota: default
           zookeeper:
@@ -798,7 +798,7 @@ items:
           configMapPropagationTimeout: 10
           policy: unspecified
         stop: "False"
-        taskID: d6c936a0-08b9-4dd4-89ef-ed6471886ff7
+        taskID: 040c5ad4-9ddd-477a-8e56-96199ed258f2
         templates:
           PodTemplatesIndex: {}
           ServiceTemplatesIndex: {}
@@ -947,33 +947,33 @@ items:
           policy: manual
         troubleshoot: "False"
     pod-ips:
-    - 10.244.2.109
+    - 10.245.2.116
     pods:
     - chi-signoz-clickhouse-cluster-0-0-0
     shards: 1
     status: Completed
-    taskID: d6c936a0-08b9-4dd4-89ef-ed6471886ff7
+    taskID: 040c5ad4-9ddd-477a-8e56-96199ed258f2
     taskIDsCompleted:
-    - d6c936a0-08b9-4dd4-89ef-ed6471886ff7
-    - ab07595d-bc97-4704-914b-3af8d65be4ad
-    - 0ca8a1ba-2600-4ddd-acd3-cb80a77b60b9
-    - c434dd70-e6dd-4d73-93e3-2e55fe4b6bd3
-    - 1742a952-3f8b-40fc-aef5-9dc20f906b04
-    - ac05a11d-4ef6-4670-8cc9-add10389e13d
-    - ea8addc3-bb39-4636-b562-cfe0abfc9db2
-    - a798f8f8-e2c3-44de-bd32-c0cda4af3ea9
-    - 1a48e067-9158-42d7-b40d-a8c708514c6f
-    - b81cc4f6-8128-4c56-9a86-f84de7403bb2
+    - 040c5ad4-9ddd-477a-8e56-96199ed258f2
+    - ae048831-3a0a-478c-aa76-debdbea76a19
+    - d7e31e8d-9978-44ac-b603-f6a63004bd80
+    - 7beef1c3-96f7-44ab-af0b-4157639a2574
+    - 45fc3532-f01d-47f0-833e-6e4787084efc
+    - 7e42fde1-eb85-4a42-ac94-03ffdc0f8c35
+    - a652a474-441e-416e-9f84-ab13ef3496ed
+    - ca273725-01d2-4d13-b3ad-96c7817c2ded
+    - 020f7577-22d0-46fd-b459-260beb7afd5e
+    - 48b2c752-8eaa-445f-90a8-9c47978e0f0b
     taskIDsStarted:
-    - 371219e3-2b08-4b58-af8d-420c334aeed3
-    - a8b20189-85d5-4756-aeeb-59db15e4bafe
-    - b84bf9d3-7057-49ef-aec7-152047c6acf9
-    - ce3f4ee1-189f-48df-9728-340ebd54a819
-    - cf9959c7-55ba-49c7-b9a6-c8801c773162
-    - 07d48c1b-dd72-4d5b-8133-cc2814b24ba7
-    - b3ba8123-4ccc-4b74-84b8-b45dd3decfb0
-    - f4e325ad-9e7e-4209-9c59-b19c8d2ae08e
-    - 65fd3629-b94e-433f-ae79-15eadc4371e9
-    - 0ae6c3b6-9d97-44e4-a852-652a973790ab
+    - 3ee1f836-6b9e-4db5-822f-0de6cad9180f
+    - 79b2ab9f-d222-4610-9435-8d44b4593bf4
+    - 45709dc6-2bf6-41c8-bd7c-a2bdab006215
+    - 8ba2602d-60cd-4ef3-99ee-cb73d1004a39
+    - 2d6229b3-14cc-448c-8bd6-dec5c116ba78
+    - cae4e979-e43a-4eb4-bf53-40e3db23758b
+    - fb2bb6a4-8c3e-4091-95a7-81839ec7af63
+    - 8c706802-9337-43ee-af8e-b54ea49625e9
+    - 486a2106-7eef-4a4a-9663-cd160c9c01a8
+    - 2900b22a-6741-4d15-9a42-6623ec165427
 kind: List
 metadata:

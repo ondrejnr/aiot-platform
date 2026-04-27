@@ -4,11 +4,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-25T12:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T12:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29618640
-      job-name: integration-service-snapshot-garbage-collector-29618640
-    name: integration-service-snapshot-garbage-collector-29618640
+      batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620080
+      job-name: integration-service-snapshot-garbage-collector-29620080
+    name: integration-service-snapshot-garbage-collector-29620080
     namespace: integration-service
     ownerReferences:
     - apiVersion: batch/v1
@@ -29,8 +29,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29618640
-          job-name: integration-service-snapshot-garbage-collector-29618640
+          batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620080
+          job-name: integration-service-snapshot-garbage-collector-29620080
       spec:
         containers:
         - command:
@@ -61,22 +61,22 @@ items:
         serviceAccountName: integration-service-snapshot-garbage-collector
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-25T12:00:04Z"
+    completionTime: "2026-04-26T12:00:16Z"
     conditions:
-    - lastProbeTime: "2026-04-25T12:00:04Z"
-      lastTransitionTime: "2026-04-25T12:00:04Z"
+    - lastProbeTime: "2026-04-26T12:00:16Z"
+      lastTransitionTime: "2026-04-26T12:00:16Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-25T12:00:04Z"
-      lastTransitionTime: "2026-04-25T12:00:04Z"
+    - lastProbeTime: "2026-04-26T12:00:16Z"
+      lastTransitionTime: "2026-04-26T12:00:16Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-25T12:00:00Z"
+    startTime: "2026-04-26T12:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -84,11 +84,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-25T18:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T18:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29619000
-      job-name: integration-service-snapshot-garbage-collector-29619000
-    name: integration-service-snapshot-garbage-collector-29619000
+      batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620440
+      job-name: integration-service-snapshot-garbage-collector-29620440
+    name: integration-service-snapshot-garbage-collector-29620440
     namespace: integration-service
     ownerReferences:
     - apiVersion: batch/v1
@@ -109,8 +109,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29619000
-          job-name: integration-service-snapshot-garbage-collector-29619000
+          batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620440
+          job-name: integration-service-snapshot-garbage-collector-29620440
       spec:
         containers:
         - command:
@@ -141,22 +141,22 @@ items:
         serviceAccountName: integration-service-snapshot-garbage-collector
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-25T18:00:04Z"
+    completionTime: "2026-04-26T18:00:05Z"
     conditions:
-    - lastProbeTime: "2026-04-25T18:00:04Z"
-      lastTransitionTime: "2026-04-25T18:00:04Z"
+    - lastProbeTime: "2026-04-26T18:00:05Z"
+      lastTransitionTime: "2026-04-26T18:00:05Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-25T18:00:04Z"
-      lastTransitionTime: "2026-04-25T18:00:04Z"
+    - lastProbeTime: "2026-04-26T18:00:05Z"
+      lastTransitionTime: "2026-04-26T18:00:05Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-25T18:00:00Z"
+    startTime: "2026-04-26T18:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -164,11 +164,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T00:00:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T00:00:00Z"
     labels:
-      batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29619360
-      job-name: integration-service-snapshot-garbage-collector-29619360
-    name: integration-service-snapshot-garbage-collector-29619360
+      batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620800
+      job-name: integration-service-snapshot-garbage-collector-29620800
+    name: integration-service-snapshot-garbage-collector-29620800
     namespace: integration-service
     ownerReferences:
     - apiVersion: batch/v1
@@ -189,8 +189,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29619360
-          job-name: integration-service-snapshot-garbage-collector-29619360
+          batch.kubernetes.io/job-name: integration-service-snapshot-garbage-collector-29620800
+          job-name: integration-service-snapshot-garbage-collector-29620800
       spec:
         containers:
         - command:
@@ -221,22 +221,22 @@ items:
         serviceAccountName: integration-service-snapshot-garbage-collector
         terminationGracePeriodSeconds: 30
   status:
-    completionTime: "2026-04-26T00:00:07Z"
+    completionTime: "2026-04-27T00:00:06Z"
     conditions:
-    - lastProbeTime: "2026-04-26T00:00:07Z"
-      lastTransitionTime: "2026-04-26T00:00:07Z"
+    - lastProbeTime: "2026-04-27T00:00:06Z"
+      lastTransitionTime: "2026-04-27T00:00:06Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-26T00:00:07Z"
-      lastTransitionTime: "2026-04-26T00:00:07Z"
+    - lastProbeTime: "2026-04-27T00:00:06Z"
+      lastTransitionTime: "2026-04-27T00:00:06Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-26T00:00:00Z"
+    startTime: "2026-04-27T00:00:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

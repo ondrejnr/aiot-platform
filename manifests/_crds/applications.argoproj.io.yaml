@@ -1,0 +1,2372 @@
+apiVersion: v1
+items:
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"finalizers":["resources-finalizer.argocd.argoproj.io"],"labels":{"argocd.argoproj.io/instance":"root-apps"},"name":"helloweb","namespace":"argocd"},"spec":{"destination":{"namespace":"helloweb","server":"https://kubernetes.default.svc"},"project":"apps-safe","source":{"path":"apps/helloweb/manifests","repoURL":"https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git","targetRevision":"main"},"syncPolicy":{"syncOptions":["CreateNamespace=true","ServerSideApply=true","ApplyOutOfSyncOnly=true"]}}}
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    labels:
+      argocd.argoproj.io/instance: root-apps
+    name: helloweb
+    namespace: argocd
+  spec:
+    destination:
+      namespace: helloweb
+      server: https://kubernetes.default.svc
+    project: apps-safe
+    source:
+      path: apps/helloweb/manifests
+      repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+      targetRevision: main
+    syncPolicy:
+      syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  status:
+    controllerNamespace: argocd
+    health:
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-04-26T09:00:11Z"
+      deployedAt: "2026-04-26T09:00:15Z"
+      id: 0
+      initiatedBy:
+        username: admin
+      revision: 3057932eba79b3eb61ab267f38e3df1bba0d8c4a
+      source:
+        path: apps/helloweb/manifests
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-04-26T09:00:15Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          username: admin
+        retry: {}
+        sync:
+          revision: 3057932eba79b3eb61ab267f38e3df1bba0d8c4a
+          syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+          - ApplyOutOfSyncOnly=true
+          syncStrategy:
+            hook: {}
+      phase: Succeeded
+      startedAt: "2026-04-26T09:00:11Z"
+      syncResult:
+        resources:
+        - group: ""
+          hookPhase: Running
+          kind: Namespace
+          message: namespace/helloweb serverside-applied
+          name: helloweb
+          namespace: ""
+          status: Synced
+          syncPhase: PreSync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/helloweb serverside-applied
+          name: helloweb
+          namespace: helloweb
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: Deployment
+          message: deployment.apps/helloweb serverside-applied
+          name: helloweb
+          namespace: helloweb
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: 3057932eba79b3eb61ab267f38e3df1bba0d8c4a
+        source:
+          path: apps/helloweb/manifests
+          repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+          targetRevision: main
+    reconciledAt: "2026-04-27T01:14:07Z"
+    resources:
+    - health:
+        status: Healthy
+      kind: Service
+      name: helloweb
+      namespace: helloweb
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        status: Healthy
+      kind: Deployment
+      name: helloweb
+      namespace: helloweb
+      status: Synced
+      version: v1
+    sourceType: Directory
+    summary:
+      images:
+      - nginxdemos/hello:plain-text
+    sync:
+      comparedTo:
+        destination:
+          namespace: helloweb
+          server: https://kubernetes.default.svc
+        source:
+          path: apps/helloweb/manifests
+          repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+          targetRevision: main
+      revision: c522778e4d186e5b9086b9712de5ca43112e714a
+      status: Synced
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"finalizers":["resources-finalizer.argocd.argoproj.io"],"labels":{"argocd.argoproj.io/instance":"root-apps"},"name":"karpor","namespace":"argocd"},"spec":{"destination":{"namespace":"karpor","server":"https://kubernetes.default.svc"},"ignoreDifferences":[{"group":"apps","jsonPointers":["/spec/volumeClaimTemplates"],"kind":"StatefulSet","name":"etcd","namespace":"karpor"}],"project":"apps-safe","source":{"chart":"karpor","helm":{"releaseName":"karpor","values":"# Let Argo manage namespace via CreateNamespace=true\nnamespaceEnabled: false\nnamespace: karpor\n\nserver:\n  replicas: 1\n  serviceType: ClusterIP\n  resources:\n    requests:\n      cpu: 100m\n      memory: 256Mi\n      ephemeral-storage: 1Gi\n    limits:\n      cpu: 500m\n      memory: 1Gi\n      ephemeral-storage: 5Gi\n\nsyncer:\n  replicas: 1\n  resources:\n    requests:\n      cpu: 100m\n      memory: 256Mi\n      ephemeral-storage: 1Gi\n    limits:\n      cpu: 500m\n      memory: 1Gi\n      ephemeral-storage: 5Gi\n\nelasticsearch:\n  replicas: 1\n  resources:\n    requests:\n      cpu: 250m\n      memory: 1Gi\n      ephemeral-storage: 5Gi\n    limits:\n      cpu: \"1\"\n      memory: 2Gi\n      ephemeral-storage: 5Gi\n\netcd:\n  replicas: 1\n  persistence:\n    size: 5Gi\n    storageClass: piraeus-r2\n    accessModes:\n      - ReadWriteOnce\n"},"repoURL":"https://kusionstack.github.io/charts","targetRevision":"0.6.0"},"syncPolicy":{"syncOptions":["ServerSideApply=true","CreateNamespace=true"]}}}
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    labels:
+      argocd.argoproj.io/instance: root-apps
+    name: karpor
+    namespace: argocd
+  spec:
+    destination:
+      namespace: karpor
+      server: https://kubernetes.default.svc
+    ignoreDifferences:
+    - group: apps
+      jsonPointers:
+      - /spec/volumeClaimTemplates
+      kind: StatefulSet
+      name: etcd
+      namespace: karpor
+    project: apps-safe
+    source:
+      chart: karpor
+      helm:
+        releaseName: karpor
+        values: |
+          # Let Argo manage namespace via CreateNamespace=true
+          namespaceEnabled: false
+          namespace: karpor
+
+          server:
+            replicas: 1
+            serviceType: ClusterIP
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+                ephemeral-storage: 1Gi
+              limits:
+                cpu: 500m
+                memory: 1Gi
+                ephemeral-storage: 5Gi
+
+          syncer:
+            replicas: 1
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+                ephemeral-storage: 1Gi
+              limits:
+                cpu: 500m
+                memory: 1Gi
+                ephemeral-storage: 5Gi
+
+          elasticsearch:
+            replicas: 1
+            resources:
+              requests:
+                cpu: 250m
+                memory: 1Gi
+                ephemeral-storage: 5Gi
+              limits:
+                cpu: "1"
+                memory: 2Gi
+                ephemeral-storage: 5Gi
+
+          etcd:
+            replicas: 1
+            persistence:
+              size: 5Gi
+              storageClass: piraeus-r2
+              accessModes:
+                - ReadWriteOnce
+      repoURL: https://kusionstack.github.io/charts
+      targetRevision: 0.7.6
+    syncPolicy:
+      syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true
+  status:
+    controllerNamespace: argocd
+    health:
+      status: Missing
+    history:
+    - deployStartedAt: "2026-04-26T10:02:48Z"
+      deployedAt: "2026-04-26T10:02:51Z"
+      id: 0
+      initiatedBy:
+        username: admin
+      revision: 0.6.0
+      source:
+        chart: karpor
+        helm:
+          releaseName: karpor
+          values: |
+            # Let Argo manage namespace via CreateNamespace=true
+            namespaceEnabled: false
+            namespace: karpor
+
+            server:
+              replicas: 1
+              serviceType: ClusterIP
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                  ephemeral-storage: 1Gi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+                  ephemeral-storage: 5Gi
+
+            syncer:
+              replicas: 1
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                  ephemeral-storage: 1Gi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+                  ephemeral-storage: 5Gi
+
+            elasticsearch:
+              replicas: 1
+              resources:
+                requests:
+                  cpu: 250m
+                  memory: 1Gi
+                  ephemeral-storage: 5Gi
+                limits:
+                  cpu: "1"
+                  memory: 2Gi
+                  ephemeral-storage: 5Gi
+
+            etcd:
+              replicas: 1
+              persistence:
+                size: 5Gi
+                storageClass: piraeus-r2
+                accessModes:
+                  - ReadWriteOnce
+        repoURL: https://kusionstack.github.io/charts
+        targetRevision: 0.6.0
+    - deployStartedAt: "2026-04-26T10:11:08Z"
+      deployedAt: "2026-04-26T10:11:09Z"
+      id: 1
+      initiatedBy:
+        username: admin
+      revision: 0.6.0
+      source:
+        chart: karpor
+        helm:
+          releaseName: karpor
+          values: |
+            # Let Argo manage namespace via CreateNamespace=true
+            namespaceEnabled: false
+            namespace: karpor
+
+            server:
+              replicas: 1
+              serviceType: ClusterIP
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                  ephemeral-storage: 1Gi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+                  ephemeral-storage: 5Gi
+
+            syncer:
+              replicas: 1
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                  ephemeral-storage: 1Gi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+                  ephemeral-storage: 5Gi
+
+            elasticsearch:
+              replicas: 1
+              resources:
+                requests:
+                  cpu: 250m
+                  memory: 1Gi
+                  ephemeral-storage: 5Gi
+                limits:
+                  cpu: "1"
+                  memory: 2Gi
+                  ephemeral-storage: 5Gi
+
+            etcd:
+              replicas: 1
+              persistence:
+                size: 5Gi
+                storageClass: piraeus-r2
+                accessModes:
+                  - ReadWriteOnce
+        repoURL: https://kusionstack.github.io/charts
+        targetRevision: 0.6.0
+    - deployStartedAt: "2026-04-26T17:54:02Z"
+      deployedAt: "2026-04-26T17:54:04Z"
+      id: 2
+      initiatedBy: {}
+      revision: 0.7.6
+      source:
+        chart: karpor
+        helm:
+          releaseName: karpor
+          values: |
+            # Let Argo manage namespace via CreateNamespace=true
+            namespaceEnabled: false
+            namespace: karpor
+
+            server:
+              replicas: 1
+              serviceType: ClusterIP
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                  ephemeral-storage: 1Gi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+                  ephemeral-storage: 5Gi
+
+            syncer:
+              replicas: 1
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                  ephemeral-storage: 1Gi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+                  ephemeral-storage: 5Gi
+
+            elasticsearch:
+              replicas: 1
+              resources:
+                requests:
+                  cpu: 250m
+                  memory: 1Gi
+                  ephemeral-storage: 5Gi
+                limits:
+                  cpu: "1"
+                  memory: 2Gi
+                  ephemeral-storage: 5Gi
+
+            etcd:
+              replicas: 1
+              persistence:
+                size: 5Gi
+                storageClass: piraeus-r2
+                accessModes:
+                  - ReadWriteOnce
+        repoURL: https://kusionstack.github.io/charts
+        targetRevision: 0.7.6
+    operationState:
+      finishedAt: "2026-04-26T17:54:04Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          username: admin
+        retry: {}
+        sync:
+          prune: true
+          revision: 0.7.6
+          syncOptions:
+          - CreateNamespace=true
+          syncStrategy:
+            hook: {}
+      phase: Succeeded
+      startedAt: "2026-04-26T17:54:02Z"
+      syncResult:
+        resources:
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: Role
+          message: 'role.rbac.authorization.k8s.io/karpor-generate-cert reconciled.
+            role.rbac.authorization.k8s.io/karpor-generate-cert configured. Warning:
+            resource roles/karpor-generate-cert is missing the kubectl.kubernetes.io/last-applied-configuration
+            annotation which is required by  apply.  apply should only be used on
+            resources created declaratively by either  create --save-config or  apply.
+            The missing annotation will be patched automatically.'
+          name: karpor-generate-cert
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: RoleBinding
+          message: 'rolebinding.rbac.authorization.k8s.io/karpor-generate-cert reconciled.
+            rolebinding.rbac.authorization.k8s.io/karpor-generate-cert configured.
+            Warning: resource rolebindings/karpor-generate-cert is missing the kubectl.kubernetes.io/last-applied-configuration
+            annotation which is required by  apply.  apply should only be used on
+            resources created declaratively by either  create --save-config or  apply.
+            The missing annotation will be patched automatically.'
+          name: karpor-generate-cert
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: 'service/etcd configured. Warning: resource services/etcd is missing
+            the kubectl.kubernetes.io/last-applied-configuration annotation which
+            is required by  apply.  apply should only be used on resources created
+            declaratively by either  create --save-config or  apply. The missing annotation
+            will be patched automatically.'
+          name: etcd
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: 'service/karpor-server configured. Warning: resource services/karpor-server
+            is missing the kubectl.kubernetes.io/last-applied-configuration annotation
+            which is required by  apply.  apply should only be used on resources created
+            declaratively by either  create --save-config or  apply. The missing annotation
+            will be patched automatically.'
+          name: karpor-server
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: 'service/elasticsearch configured. Warning: resource services/elasticsearch
+            is missing the kubectl.kubernetes.io/last-applied-configuration annotation
+            which is required by  apply.  apply should only be used on resources created
+            declaratively by either  create --save-config or  apply. The missing annotation
+            will be patched automatically.'
+          name: elasticsearch
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: Deployment
+          message: 'deployment.apps/karpor-server configured. Warning: resource deployments/karpor-server
+            is missing the kubectl.kubernetes.io/last-applied-configuration annotation
+            which is required by  apply.  apply should only be used on resources created
+            declaratively by either  create --save-config or  apply. The missing annotation
+            will be patched automatically.'
+          name: karpor-server
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: Deployment
+          message: 'deployment.apps/elasticsearch configured. Warning: resource deployments/elasticsearch
+            is missing the kubectl.kubernetes.io/last-applied-configuration annotation
+            which is required by  apply.  apply should only be used on resources created
+            declaratively by either  create --save-config or  apply. The missing annotation
+            will be patched automatically.'
+          name: elasticsearch
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: Deployment
+          message: 'deployment.apps/karpor-syncer configured. Warning: resource deployments/karpor-syncer
+            is missing the kubectl.kubernetes.io/last-applied-configuration annotation
+            which is required by  apply.  apply should only be used on resources created
+            declaratively by either  create --save-config or  apply. The missing annotation
+            will be patched automatically.'
+          name: karpor-syncer
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: StatefulSet
+          message: statefulset.apps/etcd created
+          name: etcd
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: batch
+          hookPhase: Running
+          kind: Job
+          message: job.batch/karpor-generate-cert created
+          name: karpor-generate-cert
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: 0.7.6
+        source:
+          chart: karpor
+          helm:
+            releaseName: karpor
+            values: |
+              # Let Argo manage namespace via CreateNamespace=true
+              namespaceEnabled: false
+              namespace: karpor
+
+              server:
+                replicas: 1
+                serviceType: ClusterIP
+                resources:
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+                    ephemeral-storage: 1Gi
+                  limits:
+                    cpu: 500m
+                    memory: 1Gi
+                    ephemeral-storage: 5Gi
+
+              syncer:
+                replicas: 1
+                resources:
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+                    ephemeral-storage: 1Gi
+                  limits:
+                    cpu: 500m
+                    memory: 1Gi
+                    ephemeral-storage: 5Gi
+
+              elasticsearch:
+                replicas: 1
+                resources:
+                  requests:
+                    cpu: 250m
+                    memory: 1Gi
+                    ephemeral-storage: 5Gi
+                  limits:
+                    cpu: "1"
+                    memory: 2Gi
+                    ephemeral-storage: 5Gi
+
+              etcd:
+                replicas: 1
+                persistence:
+                  size: 5Gi
+                  storageClass: piraeus-r2
+                  accessModes:
+                    - ReadWriteOnce
+          repoURL: https://kusionstack.github.io/charts
+          targetRevision: 0.7.6
+    reconciledAt: "2026-04-27T01:14:07Z"
+    resources:
+    - health:
+        status: Healthy
+      kind: Service
+      name: elasticsearch
+      namespace: karpor
+      status: Synced
+      version: v1
+    - health:
+        status: Healthy
+      kind: Service
+      name: etcd
+      namespace: karpor
+      status: Synced
+      version: v1
+    - health:
+        status: Healthy
+      kind: Service
+      name: karpor-server
+      namespace: karpor
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        status: Healthy
+      kind: Deployment
+      name: elasticsearch
+      namespace: karpor
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        status: Healthy
+      kind: Deployment
+      name: karpor-server
+      namespace: karpor
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        status: Healthy
+      kind: Deployment
+      name: karpor-syncer
+      namespace: karpor
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        message: Waiting for 1 pods to be ready...
+        status: Progressing
+      kind: StatefulSet
+      name: etcd
+      namespace: karpor
+      status: Synced
+      version: v1
+    - group: batch
+      health:
+        status: Missing
+      kind: Job
+      name: karpor-generate-cert
+      namespace: karpor
+      status: OutOfSync
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: Role
+      name: karpor-generate-cert
+      namespace: karpor
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+      name: karpor-generate-cert
+      namespace: karpor
+      status: Synced
+      version: v1
+    sourceType: Helm
+    summary:
+      images:
+      - docker.elastic.co/elasticsearch/elasticsearch:8.6.2
+      - kusionstack/karpor:v0.6.4
+      - quay.io/coreos/etcd:v3.5.11
+    sync:
+      comparedTo:
+        destination:
+          namespace: karpor
+          server: https://kubernetes.default.svc
+        ignoreDifferences:
+        - group: apps
+          jsonPointers:
+          - /spec/volumeClaimTemplates
+          kind: StatefulSet
+          name: etcd
+          namespace: karpor
+        source:
+          chart: karpor
+          helm:
+            releaseName: karpor
+            values: |
+              # Let Argo manage namespace via CreateNamespace=true
+              namespaceEnabled: false
+              namespace: karpor
+
+              server:
+                replicas: 1
+                serviceType: ClusterIP
+                resources:
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+                    ephemeral-storage: 1Gi
+                  limits:
+                    cpu: 500m
+                    memory: 1Gi
+                    ephemeral-storage: 5Gi
+
+              syncer:
+                replicas: 1
+                resources:
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+                    ephemeral-storage: 1Gi
+                  limits:
+                    cpu: 500m
+                    memory: 1Gi
+                    ephemeral-storage: 5Gi
+
+              elasticsearch:
+                replicas: 1
+                resources:
+                  requests:
+                    cpu: 250m
+                    memory: 1Gi
+                    ephemeral-storage: 5Gi
+                  limits:
+                    cpu: "1"
+                    memory: 2Gi
+                    ephemeral-storage: 5Gi
+
+              etcd:
+                replicas: 1
+                persistence:
+                  size: 5Gi
+                  storageClass: piraeus-r2
+                  accessModes:
+                    - ReadWriteOnce
+          repoURL: https://kusionstack.github.io/charts
+          targetRevision: 0.7.6
+      revision: 0.7.6
+      status: OutOfSync
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"finalizers":["resources-finalizer.argocd.argoproj.io"],"labels":{"argocd.argoproj.io/instance":"root-apps"},"name":"karpor-ingress","namespace":"argocd"},"spec":{"destination":{"namespace":"karpor","server":"https://kubernetes.default.svc"},"ignoreDifferences":[{"group":"networking.k8s.io","jsonPointers":["/metadata/annotations/field.cattle.io~1publicEndpoints"],"kind":"Ingress"}],"project":"apps-safe","source":{"path":"apps/karpor-ingress/manifests","repoURL":"https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git","targetRevision":"main"},"syncPolicy":{"syncOptions":["ServerSideApply=true"]}}}
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    labels:
+      argocd.argoproj.io/instance: root-apps
+    name: karpor-ingress
+    namespace: argocd
+  spec:
+    destination:
+      namespace: karpor
+      server: https://kubernetes.default.svc
+    ignoreDifferences:
+    - group: networking.k8s.io
+      jsonPointers:
+      - /metadata/annotations
+      kind: Ingress
+      name: karpor
+      namespace: karpor
+    project: apps-safe
+    source:
+      path: apps/karpor-ingress/manifests
+      repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+      targetRevision: main
+    syncPolicy:
+      syncOptions:
+      - ServerSideApply=true
+  status:
+    controllerNamespace: argocd
+    health:
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-04-26T10:03:02Z"
+      deployedAt: "2026-04-26T10:03:03Z"
+      id: 0
+      initiatedBy:
+        username: admin
+      revision: 09f767906ff8f23823176726f4cc5f1d8b5a32fe
+      source:
+        path: apps/karpor-ingress/manifests
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-04-26T10:03:03Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          username: admin
+        retry: {}
+        sync:
+          revision: 09f767906ff8f23823176726f4cc5f1d8b5a32fe
+          syncOptions:
+          - ServerSideApply=true
+          syncStrategy:
+            hook: {}
+      phase: Succeeded
+      startedAt: "2026-04-26T10:03:02Z"
+      syncResult:
+        resources:
+        - group: networking.k8s.io
+          hookPhase: Running
+          kind: Ingress
+          message: ingress.networking.k8s.io/karpor serverside-applied
+          name: karpor
+          namespace: karpor
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: 09f767906ff8f23823176726f4cc5f1d8b5a32fe
+        source:
+          path: apps/karpor-ingress/manifests
+          repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+          targetRevision: main
+    reconciledAt: "2026-04-27T01:14:07Z"
+    resources:
+    - group: networking.k8s.io
+      health:
+        status: Healthy
+      kind: Ingress
+      name: karpor
+      namespace: karpor
+      status: Synced
+      version: v1
+    sourceType: Directory
+    summary:
+      externalURLs:
+      - https://karpor.35.241.255.137.nip.io/
+    sync:
+      comparedTo:
+        destination:
+          namespace: karpor
+          server: https://kubernetes.default.svc
+        ignoreDifferences:
+        - group: networking.k8s.io
+          jsonPointers:
+          - /metadata/annotations
+          kind: Ingress
+          name: karpor
+          namespace: karpor
+        source:
+          path: apps/karpor-ingress/manifests
+          repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+          targetRevision: main
+      revision: c522778e4d186e5b9086b9712de5ca43112e714a
+      status: Synced
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"finalizers":["resources-finalizer.argocd.argoproj.io"],"labels":{"argocd.argoproj.io/instance":"root-apps"},"name":"robusta","namespace":"argocd"},"spec":{"destination":{"namespace":"robusta","server":"https://kubernetes.default.svc"},"project":"apps-safe","source":{"chart":"robusta","helm":{"releaseName":"robusta","values":"clusterName: aiot-prod\ndisableCloudRouting: true\nenablePlatformPlaybooks: false\nenablePrometheusStack: false\nkube-prometheus-stack:\n  enabled: false\nglobalConfig:\n  account_id: aiot-selfhosted\n  cluster_name: aiot-prod\n  signing_key: ''\nrunner:\n  sendAdditionalTelemetry: false\n  resources:\n    limits:\n      cpu: 500m\n      memory: 512Mi\n    requests:\n      cpu: 100m\n      memory: 256Mi\ncustomPlaybooks:\n  - actions:\n      - logs_enricher: {}\n      - pod_events_enricher: {}\n    sinks:\n      - mm-k8s\n    triggers:\n      - on_pod_crash_loop:\n          rate_limit: 900\n  - actions:\n      - default_enricher: {}\n    sinks:\n      - mm-k8s\n    triggers:\n      - on_prometheus_alert:\n          alert_name: '*'\nsinksConfig:\n  - webhook_sink:\n      name: mm-k8s\n      scope:\n        include:\n          - source:\n              - prometheus\n      size_limit: 30000\n      url: http://mm-relay.robusta.svc.cluster.local/webhook\n"},"repoURL":"https://robusta-charts.storage.googleapis.com","targetRevision":"0.35.0"},"syncPolicy":{"syncOptions":["ServerSideApply=true","ApplyOutOfSyncOnly=true"]}}}
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    labels:
+      argocd.argoproj.io/instance: root-apps
+    name: robusta
+    namespace: argocd
+  spec:
+    destination:
+      namespace: robusta
+      server: https://kubernetes.default.svc
+    project: apps-safe
+    source:
+      chart: robusta
+      helm:
+        releaseName: robusta
+        values: |
+          clusterName: aiot-prod
+          disableCloudRouting: true
+          enablePlatformPlaybooks: false
+          enablePrometheusStack: false
+          kube-prometheus-stack:
+            enabled: false
+          globalConfig:
+            account_id: aiot-selfhosted
+            cluster_name: aiot-prod
+            signing_key: ''
+          runner:
+            sendAdditionalTelemetry: false
+            resources:
+              limits:
+                cpu: 500m
+                memory: 512Mi
+              requests:
+                cpu: 100m
+                memory: 256Mi
+          customPlaybooks:
+            - actions:
+                - logs_enricher: {}
+                - pod_events_enricher: {}
+              sinks:
+                - mm-k8s
+              triggers:
+                - on_pod_crash_loop:
+                    rate_limit: 900
+            - actions:
+                - default_enricher: {}
+              sinks:
+                - mm-k8s
+              triggers:
+                - on_prometheus_alert:
+                    alert_name: '*'
+          sinksConfig:
+            - webhook_sink:
+                name: mm-k8s
+                scope:
+                  include:
+                    - source:
+                        - prometheus
+                size_limit: 30000
+                url: http://mm-relay.robusta.svc.cluster.local/webhook
+      repoURL: https://robusta-charts.storage.googleapis.com
+      targetRevision: 0.35.0
+    syncPolicy:
+      syncOptions:
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  status:
+    controllerNamespace: argocd
+    health:
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-04-26T09:20:02Z"
+      deployedAt: "2026-04-26T09:20:04Z"
+      id: 0
+      initiatedBy:
+        username: admin
+      revision: 0.35.0
+      source:
+        chart: robusta
+        helm:
+          releaseName: robusta
+          values: |
+            clusterName: aiot-prod
+            disableCloudRouting: true
+            enablePlatformPlaybooks: false
+            enablePrometheusStack: false
+            kube-prometheus-stack:
+              enabled: false
+            globalConfig:
+              account_id: aiot-selfhosted
+              cluster_name: aiot-prod
+              signing_key: ''
+            runner:
+              sendAdditionalTelemetry: false
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+            customPlaybooks:
+              - actions:
+                  - logs_enricher: {}
+                  - pod_events_enricher: {}
+                sinks:
+                  - mm-k8s
+                triggers:
+                  - on_pod_crash_loop:
+                      rate_limit: 900
+              - actions:
+                  - default_enricher: {}
+                sinks:
+                  - mm-k8s
+                triggers:
+                  - on_prometheus_alert:
+                      alert_name: '*'
+            sinksConfig:
+              - webhook_sink:
+                  name: mm-k8s
+                  scope:
+                    include:
+                      - source:
+                          - prometheus
+                  size_limit: 30000
+                  url: http://mm-relay.robusta.svc.cluster.local/webhook
+        repoURL: https://robusta-charts.storage.googleapis.com
+        targetRevision: 0.35.0
+    operationState:
+      finishedAt: "2026-04-26T09:20:04Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          username: admin
+        retry: {}
+        sync:
+          revision: 0.35.0
+          syncOptions:
+          - ServerSideApply=true
+          - ApplyOutOfSyncOnly=true
+          syncStrategy:
+            hook: {}
+      phase: Succeeded
+      startedAt: "2026-04-26T09:20:02Z"
+      syncResult:
+        resources:
+        - group: ""
+          hookPhase: Running
+          kind: ServiceAccount
+          message: serviceaccount/robusta-forwarder-service-account serverside-applied
+          name: robusta-forwarder-service-account
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: ServiceAccount
+          message: serviceaccount/robusta-runner-service-account serverside-applied
+          name: robusta-runner-service-account
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Secret
+          message: secret/robusta-runner-secret serverside-applied
+          name: robusta-runner-secret
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Secret
+          message: secret/robusta-playbooks-config-secret serverside-applied
+          name: robusta-playbooks-config-secret
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: ConfigMap
+          message: configmap/robusta-kubewatch-config serverside-applied
+          name: robusta-kubewatch-config
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: ClusterRole
+          message: clusterrole.rbac.authorization.k8s.io/robusta-forwarder-cluster-role
+            reconciled. reconciliation required update. clusterrole.rbac.authorization.k8s.io/robusta-forwarder-cluster-role
+            serverside-applied
+          name: robusta-forwarder-cluster-role
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: ClusterRole
+          message: clusterrole.rbac.authorization.k8s.io/robusta-runner-cluster-role
+            reconciled. reconciliation required update. clusterrole.rbac.authorization.k8s.io/robusta-runner-cluster-role
+            serverside-applied
+          name: robusta-runner-cluster-role
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: ClusterRoleBinding
+          message: clusterrolebinding.rbac.authorization.k8s.io/robusta-runner-cluster-role-binding
+            reconciled. reconciliation required update. clusterrolebinding.rbac.authorization.k8s.io/robusta-runner-cluster-role-binding
+            serverside-applied
+          name: robusta-runner-cluster-role-binding
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: ClusterRoleBinding
+          message: clusterrolebinding.rbac.authorization.k8s.io/robusta-forwarder-cluster-role-binding
+            reconciled. reconciliation required update. clusterrolebinding.rbac.authorization.k8s.io/robusta-forwarder-cluster-role-binding
+            serverside-applied
+          name: robusta-forwarder-cluster-role-binding
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/robusta-forwarder serverside-applied
+          name: robusta-forwarder
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/robusta-runner serverside-applied
+          name: robusta-runner
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: Deployment
+          message: deployment.apps/robusta-runner serverside-applied
+          name: robusta-runner
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: Deployment
+          message: deployment.apps/robusta-forwarder serverside-applied
+          name: robusta-forwarder
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: ServiceMonitor
+          message: servicemonitor.monitoring.coreos.com/robusta-forwarder-service-monitor
+            serverside-applied
+          name: robusta-forwarder-service-monitor
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: monitoring.coreos.com
+          hookPhase: Running
+          kind: ServiceMonitor
+          message: servicemonitor.monitoring.coreos.com/robusta-runner-service-monitor
+            serverside-applied
+          name: robusta-runner-service-monitor
+          namespace: robusta
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: 0.35.0
+        source:
+          chart: robusta
+          helm:
+            releaseName: robusta
+            values: |
+              clusterName: aiot-prod
+              disableCloudRouting: true
+              enablePlatformPlaybooks: false
+              enablePrometheusStack: false
+              kube-prometheus-stack:
+                enabled: false
+              globalConfig:
+                account_id: aiot-selfhosted
+                cluster_name: aiot-prod
+                signing_key: ''
+              runner:
+                sendAdditionalTelemetry: false
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+              customPlaybooks:
+                - actions:
+                    - logs_enricher: {}
+                    - pod_events_enricher: {}
+                  sinks:
+                    - mm-k8s
+                  triggers:
+                    - on_pod_crash_loop:
+                        rate_limit: 900
+                - actions:
+                    - default_enricher: {}
+                  sinks:
+                    - mm-k8s
+                  triggers:
+                    - on_prometheus_alert:
+                        alert_name: '*'
+              sinksConfig:
+                - webhook_sink:
+                    name: mm-k8s
+                    scope:
+                      include:
+                        - source:
+                            - prometheus
+                    size_limit: 30000
+                    url: http://mm-relay.robusta.svc.cluster.local/webhook
+          repoURL: https://robusta-charts.storage.googleapis.com
+          targetRevision: 0.35.0
+    reconciledAt: "2026-04-27T01:14:07Z"
+    resources:
+    - kind: ConfigMap
+      name: robusta-kubewatch-config
+      namespace: robusta
+      status: Synced
+      version: v1
+    - kind: Secret
+      name: robusta-playbooks-config-secret
+      namespace: robusta
+      status: Synced
+      version: v1
+    - kind: Secret
+      name: robusta-runner-secret
+      namespace: robusta
+      status: Synced
+      version: v1
+    - health:
+        status: Healthy
+      kind: Service
+      name: robusta-forwarder
+      namespace: robusta
+      status: Synced
+      version: v1
+    - health:
+        status: Healthy
+      kind: Service
+      name: robusta-runner
+      namespace: robusta
+      status: Synced
+      version: v1
+    - kind: ServiceAccount
+      name: robusta-forwarder-service-account
+      namespace: robusta
+      status: Synced
+      version: v1
+    - kind: ServiceAccount
+      name: robusta-runner-service-account
+      namespace: robusta
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        status: Healthy
+      kind: Deployment
+      name: robusta-forwarder
+      namespace: robusta
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        status: Healthy
+      kind: Deployment
+      name: robusta-runner
+      namespace: robusta
+      status: Synced
+      version: v1
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
+      name: robusta-forwarder-service-monitor
+      namespace: robusta
+      status: Synced
+      version: v1
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
+      name: robusta-runner-service-monitor
+      namespace: robusta
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: robusta-forwarder-cluster-role
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: robusta-runner-cluster-role
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+      name: robusta-forwarder-cluster-role-binding
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+      name: robusta-runner-cluster-role-binding
+      status: Synced
+      version: v1
+    sourceType: Helm
+    summary:
+      images:
+      - robustadev/kubewatch:v2.13.0
+      - robustadev/robusta-runner:0.35.0
+    sync:
+      comparedTo:
+        destination:
+          namespace: robusta
+          server: https://kubernetes.default.svc
+        source:
+          chart: robusta
+          helm:
+            releaseName: robusta
+            values: |
+              clusterName: aiot-prod
+              disableCloudRouting: true
+              enablePlatformPlaybooks: false
+              enablePrometheusStack: false
+              kube-prometheus-stack:
+                enabled: false
+              globalConfig:
+                account_id: aiot-selfhosted
+                cluster_name: aiot-prod
+                signing_key: ''
+              runner:
+                sendAdditionalTelemetry: false
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+              customPlaybooks:
+                - actions:
+                    - logs_enricher: {}
+                    - pod_events_enricher: {}
+                  sinks:
+                    - mm-k8s
+                  triggers:
+                    - on_pod_crash_loop:
+                        rate_limit: 900
+                - actions:
+                    - default_enricher: {}
+                  sinks:
+                    - mm-k8s
+                  triggers:
+                    - on_prometheus_alert:
+                        alert_name: '*'
+              sinksConfig:
+                - webhook_sink:
+                    name: mm-k8s
+                    scope:
+                      include:
+                        - source:
+                            - prometheus
+                    size_limit: 30000
+                    url: http://mm-relay.robusta.svc.cluster.local/webhook
+          repoURL: https://robusta-charts.storage.googleapis.com
+          targetRevision: 0.35.0
+      revision: 0.35.0
+      status: Synced
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"name":"root-apps","namespace":"argocd"},"spec":{"destination":{"namespace":"argocd","server":"https://kubernetes.default.svc"},"project":"default","source":{"directory":{"include":"*/application.yaml","recurse":false},"path":"apps","repoURL":"https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git","targetRevision":"main"},"syncPolicy":{"automated":{"prune":false,"selfHeal":false},"syncOptions":["ApplyOutOfSyncOnly=true"]}}}
+    name: root-apps
+    namespace: argocd
+  spec:
+    destination:
+      namespace: argocd
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      directory:
+        include: '*/application.yaml'
+        jsonnet: {}
+        recurse: true
+      path: apps
+      repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+      targetRevision: main
+    syncPolicy:
+      automated: {}
+      syncOptions:
+      - ApplyOutOfSyncOnly=true
+  status:
+    controllerNamespace: argocd
+    health:
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-04-26T08:52:38Z"
+      deployedAt: "2026-04-26T08:52:38Z"
+      id: 0
+      initiatedBy:
+        automated: true
+      revision: a881acce734dc3f1903da555fb207de8625657c7
+      source:
+        directory:
+          include: '*/application.yaml'
+          jsonnet: {}
+          recurse: true
+        path: apps
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    - deployStartedAt: "2026-04-26T09:09:58Z"
+      deployedAt: "2026-04-26T09:09:59Z"
+      id: 1
+      initiatedBy:
+        automated: true
+      revision: d094f68ff9d104b30ae758d418b494244e779331
+      source:
+        directory:
+          include: '*/application.yaml'
+          jsonnet: {}
+          recurse: true
+        path: apps
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    - deployStartedAt: "2026-04-26T09:13:17Z"
+      deployedAt: "2026-04-26T09:13:17Z"
+      id: 2
+      initiatedBy:
+        automated: true
+      revision: af4828c3692165da5ddc6b85b6145791e3b14eee
+      source:
+        directory:
+          include: '*/application.yaml'
+          jsonnet: {}
+          recurse: true
+        path: apps
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    - deployStartedAt: "2026-04-26T09:18:37Z"
+      deployedAt: "2026-04-26T09:18:37Z"
+      id: 3
+      initiatedBy:
+        automated: true
+      revision: e0e6404a74bea6c537851dc68c512b46d1b6c775
+      source:
+        directory:
+          include: '*/application.yaml'
+          jsonnet: {}
+          recurse: true
+        path: apps
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    - deployStartedAt: "2026-04-26T09:47:33Z"
+      deployedAt: "2026-04-26T09:47:35Z"
+      id: 4
+      initiatedBy:
+        automated: true
+      revision: fcaa138c18e3f7752a56b9c8ce00e4dbf3bb623c
+      source:
+        directory:
+          include: '*/application.yaml'
+          jsonnet: {}
+          recurse: true
+        path: apps
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    - deployStartedAt: "2026-04-26T10:02:24Z"
+      deployedAt: "2026-04-26T10:02:25Z"
+      id: 5
+      initiatedBy:
+        automated: true
+      revision: 09f767906ff8f23823176726f4cc5f1d8b5a32fe
+      source:
+        directory:
+          include: '*/application.yaml'
+          jsonnet: {}
+          recurse: true
+        path: apps
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    - deployStartedAt: "2026-04-26T10:09:07Z"
+      deployedAt: "2026-04-26T10:09:09Z"
+      id: 6
+      initiatedBy:
+        automated: true
+      revision: 640bf7ee3e8805acfdb03c36c391900af1afdc17
+      source:
+        directory:
+          include: '*/application.yaml'
+          jsonnet: {}
+          recurse: true
+        path: apps
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    - deployStartedAt: "2026-04-26T10:11:00Z"
+      deployedAt: "2026-04-26T10:11:02Z"
+      id: 7
+      initiatedBy:
+        automated: true
+      revision: eb134ce7f9f3b52c907cb7775fc59a63e86a7e68
+      source:
+        directory:
+          include: '*/application.yaml'
+          jsonnet: {}
+          recurse: true
+        path: apps
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    - deployStartedAt: "2026-04-26T10:13:25Z"
+      deployedAt: "2026-04-26T10:13:27Z"
+      id: 8
+      initiatedBy:
+        automated: true
+      revision: c522778e4d186e5b9086b9712de5ca43112e714a
+      source:
+        directory:
+          include: '*/application.yaml'
+          jsonnet: {}
+          recurse: true
+        path: apps
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-04-26T10:13:27Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          automated: true
+        retry:
+          limit: 5
+        sync:
+          revision: c522778e4d186e5b9086b9712de5ca43112e714a
+          syncOptions:
+          - ApplyOutOfSyncOnly=true
+      phase: Succeeded
+      startedAt: "2026-04-26T10:13:25Z"
+      syncResult:
+        resources:
+        - group: argoproj.io
+          hookPhase: Running
+          kind: Application
+          message: application.argoproj.io/karpor configured
+          name: karpor
+          namespace: argocd
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        revision: c522778e4d186e5b9086b9712de5ca43112e714a
+        source:
+          directory:
+            include: '*/application.yaml'
+            jsonnet: {}
+            recurse: true
+          path: apps
+          repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+          targetRevision: main
+    reconciledAt: "2026-04-27T01:14:07Z"
+    resources:
+    - group: argoproj.io
+      kind: Application
+      name: helloweb
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: karpor
+      namespace: argocd
+      status: OutOfSync
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: karpor-ingress
+      namespace: argocd
+      status: OutOfSync
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: robusta
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: zabbix
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    - group: argoproj.io
+      kind: Application
+      name: zabbix-ingress
+      namespace: argocd
+      status: Synced
+      version: v1alpha1
+    sourceType: Directory
+    summary: {}
+    sync:
+      comparedTo:
+        destination:
+          namespace: argocd
+          server: https://kubernetes.default.svc
+        source:
+          directory:
+            include: '*/application.yaml'
+            jsonnet: {}
+            recurse: true
+          path: apps
+          repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+          targetRevision: main
+      revision: c522778e4d186e5b9086b9712de5ca43112e714a
+      status: OutOfSync
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"finalizers":["resources-finalizer.argocd.argoproj.io"],"labels":{"argocd.argoproj.io/instance":"root-apps"},"name":"zabbix","namespace":"argocd"},"spec":{"destination":{"namespace":"zabbix","server":"https://kubernetes.default.svc"},"project":"apps-safe","source":{"chart":"zabbix","helm":{"releaseName":"zabbix","values":"ingress:\n  enabled: false\npostgresAccess:\n  create_secret: true\n  database: zabbix\n  host: postgres.aiot.svc\n  password: aiot123\n  port: 5432\n  user: aiot\npostgresql:\n  enabled: false\nzabbixAgent:\n  enabled: true\n  resources:\n    limits:\n      memory: 128Mi\n    requests:\n      cpu: 20m\n      memory: 32Mi\nzabbixImageTag: ubuntu-7.0.25\nzabbixJavaGateway:\n  enabled: false\nzabbixProxy:\n  enabled: false\nzabbixServer:\n  ZBX_CACHESIZE: 256M\n  ZBX_HISTORYCACHESIZE: 128M\n  ZBX_HISTORYINDEXCACHESIZE: 64M\n  ZBX_HOUSEKEEPINGFREQUENCY: '1'\n  ZBX_MAXHOUSEKEEPERDELETE: '5000'\n  ZBX_STARTALERTERS: '1'\n  ZBX_STARTDISCOVERERS: '1'\n  ZBX_STARTESCALATORS: '1'\n  ZBX_STARTHISTORYPOLLERS: '1'\n  ZBX_STARTHTTPPOLLERS: '1'\n  ZBX_STARTPINGERS: '1'\n  ZBX_STARTPOLLERS: '5'\n  ZBX_STARTPOLLERSUNREACHABLE: '1'\n  ZBX_STARTPREPROCESSORS: '3'\n  ZBX_STARTTIMERS: '1'\n  ZBX_STARTTRAPPERS: '3'\n  ZBX_TRENDCACHESIZE: 64M\n  ZBX_VALUECACHESIZE: 256M\n  affinity:\n    nodeAffinity:\n      preferredDuringSchedulingIgnoredDuringExecution:\n        - preference:\n            matchExpressions:\n              - key: node-role.kubernetes.io/control-plane\n                operator: Exists\n          weight: 100\n  enabled: true\n  replicaCount: 1\n  resources:\n    limits:\n      cpu: '2'\n      memory: 6Gi\n    requests:\n      cpu: 200m\n      memory: 1Gi\n  tolerations:\n    - effect: NoSchedule\n      key: node-role.kubernetes.io/control-plane\n      operator: Exists\nzabbixSnmpTraps:\n  enabled: false\nzabbixWeb:\n  enabled: true\n  env:\n    - name: PHP_TZ\n      value: Europe/Bratislava\n    - name: ZBX_SERVER_NAME\n      value: AIOT Zabbix\n  replicaCount: 1\n  resources:\n    limits:\n      memory: 512Mi\n    requests:\n      cpu: 50m\n      memory: 128Mi\n  service:\n    port: 80\nzabbixWebService:\n  affinity:\n    nodeAffinity:\n      preferredDuringSchedulingIgnoredDuringExecution:\n        - preference:\n            matchExpressions:\n              - key: node-role.kubernetes.io/control-plane\n                operator: Exists\n          weight: 100\n  enabled: true\n  tolerations:\n    - effect: NoSchedule\n      key: node-role.kubernetes.io/control-plane\n      operator: Exists\n"},"repoURL":"https://zabbix-community.github.io/helm-zabbix","targetRevision":"7.0.12"},"syncPolicy":{"syncOptions":["ServerSideApply=true","ApplyOutOfSyncOnly=true"]}}}
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    labels:
+      argocd.argoproj.io/instance: root-apps
+    name: zabbix
+    namespace: argocd
+  spec:
+    destination:
+      namespace: zabbix
+      server: https://kubernetes.default.svc
+    project: apps-safe
+    source:
+      chart: zabbix
+      helm:
+        releaseName: zabbix
+        values: |
+          ingress:
+            enabled: false
+          postgresAccess:
+            create_secret: true
+            database: zabbix
+            host: postgres.aiot.svc
+            password: aiot123
+            port: 5432
+            user: aiot
+          postgresql:
+            enabled: false
+          zabbixAgent:
+            enabled: true
+            resources:
+              limits:
+                memory: 128Mi
+              requests:
+                cpu: 20m
+                memory: 32Mi
+          zabbixImageTag: ubuntu-7.0.25
+          zabbixJavaGateway:
+            enabled: false
+          zabbixProxy:
+            enabled: false
+          zabbixServer:
+            ZBX_CACHESIZE: 256M
+            ZBX_HISTORYCACHESIZE: 128M
+            ZBX_HISTORYINDEXCACHESIZE: 64M
+            ZBX_HOUSEKEEPINGFREQUENCY: '1'
+            ZBX_MAXHOUSEKEEPERDELETE: '5000'
+            ZBX_STARTALERTERS: '1'
+            ZBX_STARTDISCOVERERS: '1'
+            ZBX_STARTESCALATORS: '1'
+            ZBX_STARTHISTORYPOLLERS: '1'
+            ZBX_STARTHTTPPOLLERS: '1'
+            ZBX_STARTPINGERS: '1'
+            ZBX_STARTPOLLERS: '5'
+            ZBX_STARTPOLLERSUNREACHABLE: '1'
+            ZBX_STARTPREPROCESSORS: '3'
+            ZBX_STARTTIMERS: '1'
+            ZBX_STARTTRAPPERS: '3'
+            ZBX_TRENDCACHESIZE: 64M
+            ZBX_VALUECACHESIZE: 256M
+            affinity:
+              nodeAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - preference:
+                      matchExpressions:
+                        - key: node-role.kubernetes.io/control-plane
+                          operator: Exists
+                    weight: 100
+            enabled: true
+            replicaCount: 1
+            resources:
+              limits:
+                cpu: '2'
+                memory: 6Gi
+              requests:
+                cpu: 200m
+                memory: 1Gi
+            tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/control-plane
+                operator: Exists
+          zabbixSnmpTraps:
+            enabled: false
+          zabbixWeb:
+            enabled: true
+            env:
+              - name: PHP_TZ
+                value: Europe/Bratislava
+              - name: ZBX_SERVER_NAME
+                value: AIOT Zabbix
+            replicaCount: 1
+            resources:
+              limits:
+                memory: 512Mi
+              requests:
+                cpu: 50m
+                memory: 128Mi
+            service:
+              port: 80
+          zabbixWebService:
+            affinity:
+              nodeAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - preference:
+                      matchExpressions:
+                        - key: node-role.kubernetes.io/control-plane
+                          operator: Exists
+                    weight: 100
+            enabled: true
+            tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/control-plane
+                operator: Exists
+      repoURL: https://zabbix-community.github.io/helm-zabbix
+      targetRevision: 7.0.12
+    syncPolicy:
+      syncOptions:
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  status:
+    controllerNamespace: argocd
+    health:
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-04-26T09:16:29Z"
+      deployedAt: "2026-04-26T09:16:30Z"
+      id: 0
+      initiatedBy:
+        username: admin
+      revision: 7.0.12
+      source:
+        chart: zabbix
+        helm:
+          releaseName: zabbix
+          values: |
+            ingress:
+              enabled: false
+            postgresAccess:
+              create_secret: true
+              database: zabbix
+              host: postgres.aiot.svc
+              password: aiot123
+              port: 5432
+              user: aiot
+            postgresql:
+              enabled: false
+            zabbixAgent:
+              enabled: true
+              resources:
+                limits:
+                  memory: 128Mi
+                requests:
+                  cpu: 20m
+                  memory: 32Mi
+            zabbixImageTag: ubuntu-7.0.25
+            zabbixJavaGateway:
+              enabled: false
+            zabbixProxy:
+              enabled: false
+            zabbixServer:
+              ZBX_CACHESIZE: 256M
+              ZBX_HISTORYCACHESIZE: 128M
+              ZBX_HISTORYINDEXCACHESIZE: 64M
+              ZBX_HOUSEKEEPINGFREQUENCY: '1'
+              ZBX_MAXHOUSEKEEPERDELETE: '5000'
+              ZBX_STARTALERTERS: '1'
+              ZBX_STARTDISCOVERERS: '1'
+              ZBX_STARTESCALATORS: '1'
+              ZBX_STARTHISTORYPOLLERS: '1'
+              ZBX_STARTHTTPPOLLERS: '1'
+              ZBX_STARTPINGERS: '1'
+              ZBX_STARTPOLLERS: '5'
+              ZBX_STARTPOLLERSUNREACHABLE: '1'
+              ZBX_STARTPREPROCESSORS: '3'
+              ZBX_STARTTIMERS: '1'
+              ZBX_STARTTRAPPERS: '3'
+              ZBX_TRENDCACHESIZE: 64M
+              ZBX_VALUECACHESIZE: 256M
+              affinity:
+                nodeAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                    - preference:
+                        matchExpressions:
+                          - key: node-role.kubernetes.io/control-plane
+                            operator: Exists
+                      weight: 100
+              enabled: true
+              replicaCount: 1
+              resources:
+                limits:
+                  cpu: '2'
+                  memory: 6Gi
+                requests:
+                  cpu: 200m
+                  memory: 1Gi
+              tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/control-plane
+                  operator: Exists
+            zabbixSnmpTraps:
+              enabled: false
+            zabbixWeb:
+              enabled: true
+              env:
+                - name: PHP_TZ
+                  value: Europe/Bratislava
+                - name: ZBX_SERVER_NAME
+                  value: AIOT Zabbix
+              replicaCount: 1
+              resources:
+                limits:
+                  memory: 512Mi
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+              service:
+                port: 80
+            zabbixWebService:
+              affinity:
+                nodeAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                    - preference:
+                        matchExpressions:
+                          - key: node-role.kubernetes.io/control-plane
+                            operator: Exists
+                      weight: 100
+              enabled: true
+              tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/control-plane
+                  operator: Exists
+        repoURL: https://zabbix-community.github.io/helm-zabbix
+        targetRevision: 7.0.12
+    operationState:
+      finishedAt: "2026-04-26T09:16:30Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          username: admin
+        retry: {}
+        sync:
+          revision: 7.0.12
+          syncOptions:
+          - ServerSideApply=true
+          - ApplyOutOfSyncOnly=true
+          syncStrategy:
+            hook: {}
+      phase: Succeeded
+      startedAt: "2026-04-26T09:16:29Z"
+      syncResult:
+        resources:
+        - group: ""
+          hookPhase: Running
+          kind: ServiceAccount
+          message: serviceaccount/zabbix serverside-applied
+          name: zabbix
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Secret
+          message: secret/zabbix-db-access serverside-applied
+          name: zabbix-db-access
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: ClusterRole
+          message: clusterrole.rbac.authorization.k8s.io/zabbix reconciled. reconciliation
+            required update. clusterrole.rbac.authorization.k8s.io/zabbix serverside-applied
+          name: zabbix
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: rbac.authorization.k8s.io
+          hookPhase: Running
+          kind: ClusterRoleBinding
+          message: clusterrolebinding.rbac.authorization.k8s.io/zabbix reconciled.
+            reconciliation required update. clusterrolebinding.rbac.authorization.k8s.io/zabbix
+            serverside-applied
+          name: zabbix
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/zabbix-zabbix-webservice serverside-applied
+          name: zabbix-zabbix-webservice
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/zabbix-zabbix-server serverside-applied
+          name: zabbix-zabbix-server
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/zabbix-zabbix-web serverside-applied
+          name: zabbix-zabbix-web
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: Deployment
+          message: deployment.apps/zabbix-zabbix-web serverside-applied
+          name: zabbix-zabbix-web
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: Deployment
+          message: deployment.apps/zabbix-zabbix-webservice serverside-applied
+          name: zabbix-zabbix-webservice
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          kind: Deployment
+          message: deployment.apps/zabbix-zabbix-server serverside-applied
+          name: zabbix-zabbix-server
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: batch
+          hookPhase: Running
+          kind: CronJob
+          message: cronjob.batch/zabbix-nodesclean serverside-applied
+          name: zabbix-nodesclean
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: 7.0.12
+        source:
+          chart: zabbix
+          helm:
+            releaseName: zabbix
+            values: |
+              ingress:
+                enabled: false
+              postgresAccess:
+                create_secret: true
+                database: zabbix
+                host: postgres.aiot.svc
+                password: aiot123
+                port: 5432
+                user: aiot
+              postgresql:
+                enabled: false
+              zabbixAgent:
+                enabled: true
+                resources:
+                  limits:
+                    memory: 128Mi
+                  requests:
+                    cpu: 20m
+                    memory: 32Mi
+              zabbixImageTag: ubuntu-7.0.25
+              zabbixJavaGateway:
+                enabled: false
+              zabbixProxy:
+                enabled: false
+              zabbixServer:
+                ZBX_CACHESIZE: 256M
+                ZBX_HISTORYCACHESIZE: 128M
+                ZBX_HISTORYINDEXCACHESIZE: 64M
+                ZBX_HOUSEKEEPINGFREQUENCY: '1'
+                ZBX_MAXHOUSEKEEPERDELETE: '5000'
+                ZBX_STARTALERTERS: '1'
+                ZBX_STARTDISCOVERERS: '1'
+                ZBX_STARTESCALATORS: '1'
+                ZBX_STARTHISTORYPOLLERS: '1'
+                ZBX_STARTHTTPPOLLERS: '1'
+                ZBX_STARTPINGERS: '1'
+                ZBX_STARTPOLLERS: '5'
+                ZBX_STARTPOLLERSUNREACHABLE: '1'
+                ZBX_STARTPREPROCESSORS: '3'
+                ZBX_STARTTIMERS: '1'
+                ZBX_STARTTRAPPERS: '3'
+                ZBX_TRENDCACHESIZE: 64M
+                ZBX_VALUECACHESIZE: 256M
+                affinity:
+                  nodeAffinity:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      - preference:
+                          matchExpressions:
+                            - key: node-role.kubernetes.io/control-plane
+                              operator: Exists
+                        weight: 100
+                enabled: true
+                replicaCount: 1
+                resources:
+                  limits:
+                    cpu: '2'
+                    memory: 6Gi
+                  requests:
+                    cpu: 200m
+                    memory: 1Gi
+                tolerations:
+                  - effect: NoSchedule
+                    key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+              zabbixSnmpTraps:
+                enabled: false
+              zabbixWeb:
+                enabled: true
+                env:
+                  - name: PHP_TZ
+                    value: Europe/Bratislava
+                  - name: ZBX_SERVER_NAME
+                    value: AIOT Zabbix
+                replicaCount: 1
+                resources:
+                  limits:
+                    memory: 512Mi
+                  requests:
+                    cpu: 50m
+                    memory: 128Mi
+                service:
+                  port: 80
+              zabbixWebService:
+                affinity:
+                  nodeAffinity:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      - preference:
+                          matchExpressions:
+                            - key: node-role.kubernetes.io/control-plane
+                              operator: Exists
+                        weight: 100
+                enabled: true
+                tolerations:
+                  - effect: NoSchedule
+                    key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+          repoURL: https://zabbix-community.github.io/helm-zabbix
+          targetRevision: 7.0.12
+    reconciledAt: "2026-04-27T01:14:07Z"
+    resources:
+    - kind: Secret
+      name: zabbix-db-access
+      namespace: zabbix
+      status: Synced
+      version: v1
+    - health:
+        status: Healthy
+      kind: Service
+      name: zabbix-zabbix-server
+      namespace: zabbix
+      status: Synced
+      version: v1
+    - health:
+        status: Healthy
+      kind: Service
+      name: zabbix-zabbix-web
+      namespace: zabbix
+      status: Synced
+      version: v1
+    - health:
+        status: Healthy
+      kind: Service
+      name: zabbix-zabbix-webservice
+      namespace: zabbix
+      status: Synced
+      version: v1
+    - kind: ServiceAccount
+      name: zabbix
+      namespace: zabbix
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        status: Healthy
+      kind: Deployment
+      name: zabbix-zabbix-server
+      namespace: zabbix
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        status: Healthy
+      kind: Deployment
+      name: zabbix-zabbix-web
+      namespace: zabbix
+      status: Synced
+      version: v1
+    - group: apps
+      health:
+        status: Healthy
+      kind: Deployment
+      name: zabbix-zabbix-webservice
+      namespace: zabbix
+      status: Synced
+      version: v1
+    - group: batch
+      kind: CronJob
+      name: zabbix-nodesclean
+      namespace: zabbix
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: zabbix
+      status: Synced
+      version: v1
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+      name: zabbix
+      status: Synced
+      version: v1
+    sourceType: Helm
+    summary:
+      images:
+      - postgres:16
+      - zabbix/zabbix-agent2:ubuntu-7.0.25
+      - zabbix/zabbix-server-pgsql:ubuntu-7.0.25
+      - zabbix/zabbix-web-nginx-pgsql:ubuntu-7.0.25
+      - zabbix/zabbix-web-service:ubuntu-7.0.25
+    sync:
+      comparedTo:
+        destination:
+          namespace: zabbix
+          server: https://kubernetes.default.svc
+        source:
+          chart: zabbix
+          helm:
+            releaseName: zabbix
+            values: |
+              ingress:
+                enabled: false
+              postgresAccess:
+                create_secret: true
+                database: zabbix
+                host: postgres.aiot.svc
+                password: aiot123
+                port: 5432
+                user: aiot
+              postgresql:
+                enabled: false
+              zabbixAgent:
+                enabled: true
+                resources:
+                  limits:
+                    memory: 128Mi
+                  requests:
+                    cpu: 20m
+                    memory: 32Mi
+              zabbixImageTag: ubuntu-7.0.25
+              zabbixJavaGateway:
+                enabled: false
+              zabbixProxy:
+                enabled: false
+              zabbixServer:
+                ZBX_CACHESIZE: 256M
+                ZBX_HISTORYCACHESIZE: 128M
+                ZBX_HISTORYINDEXCACHESIZE: 64M
+                ZBX_HOUSEKEEPINGFREQUENCY: '1'
+                ZBX_MAXHOUSEKEEPERDELETE: '5000'
+                ZBX_STARTALERTERS: '1'
+                ZBX_STARTDISCOVERERS: '1'
+                ZBX_STARTESCALATORS: '1'
+                ZBX_STARTHISTORYPOLLERS: '1'
+                ZBX_STARTHTTPPOLLERS: '1'
+                ZBX_STARTPINGERS: '1'
+                ZBX_STARTPOLLERS: '5'
+                ZBX_STARTPOLLERSUNREACHABLE: '1'
+                ZBX_STARTPREPROCESSORS: '3'
+                ZBX_STARTTIMERS: '1'
+                ZBX_STARTTRAPPERS: '3'
+                ZBX_TRENDCACHESIZE: 64M
+                ZBX_VALUECACHESIZE: 256M
+                affinity:
+                  nodeAffinity:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      - preference:
+                          matchExpressions:
+                            - key: node-role.kubernetes.io/control-plane
+                              operator: Exists
+                        weight: 100
+                enabled: true
+                replicaCount: 1
+                resources:
+                  limits:
+                    cpu: '2'
+                    memory: 6Gi
+                  requests:
+                    cpu: 200m
+                    memory: 1Gi
+                tolerations:
+                  - effect: NoSchedule
+                    key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+              zabbixSnmpTraps:
+                enabled: false
+              zabbixWeb:
+                enabled: true
+                env:
+                  - name: PHP_TZ
+                    value: Europe/Bratislava
+                  - name: ZBX_SERVER_NAME
+                    value: AIOT Zabbix
+                replicaCount: 1
+                resources:
+                  limits:
+                    memory: 512Mi
+                  requests:
+                    cpu: 50m
+                    memory: 128Mi
+                service:
+                  port: 80
+              zabbixWebService:
+                affinity:
+                  nodeAffinity:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      - preference:
+                          matchExpressions:
+                            - key: node-role.kubernetes.io/control-plane
+                              operator: Exists
+                        weight: 100
+                enabled: true
+                tolerations:
+                  - effect: NoSchedule
+                    key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+          repoURL: https://zabbix-community.github.io/helm-zabbix
+          targetRevision: 7.0.12
+      revision: 7.0.12
+      status: Synced
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"argoproj.io/v1alpha1","kind":"Application","metadata":{"annotations":{},"finalizers":["resources-finalizer.argocd.argoproj.io"],"labels":{"argocd.argoproj.io/instance":"root-apps"},"name":"zabbix-ingress","namespace":"argocd"},"spec":{"destination":{"namespace":"zabbix","server":"https://kubernetes.default.svc"},"ignoreDifferences":[{"group":"networking.k8s.io","jsonPointers":["/metadata/annotations/field.cattle.io~1publicEndpoints"],"kind":"Ingress"}],"project":"apps-safe","source":{"path":"apps/zabbix-ingress/manifests","repoURL":"https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git","targetRevision":"main"},"syncPolicy":{"syncOptions":["ServerSideApply=true","ApplyOutOfSyncOnly=true"]}}}
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    labels:
+      argocd.argoproj.io/instance: root-apps
+    name: zabbix-ingress
+    namespace: argocd
+  spec:
+    destination:
+      namespace: zabbix
+      server: https://kubernetes.default.svc
+    ignoreDifferences:
+    - group: networking.k8s.io
+      jsonPointers:
+      - /metadata/annotations/field.cattle.io~1publicEndpoints
+      kind: Ingress
+    project: apps-safe
+    source:
+      path: apps/zabbix-ingress/manifests
+      repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+      targetRevision: main
+    syncPolicy:
+      syncOptions:
+      - ServerSideApply=true
+      - ApplyOutOfSyncOnly=true
+  status:
+    controllerNamespace: argocd
+    health:
+      status: Healthy
+    history:
+    - deployStartedAt: "2026-04-26T09:16:37Z"
+      deployedAt: "2026-04-26T09:16:37Z"
+      id: 0
+      initiatedBy:
+        username: admin
+      revision: 63338d3ff226b2fe4de6402a88f650ef66432df1
+      source:
+        path: apps/zabbix-ingress/manifests
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    - deployStartedAt: "2026-04-26T09:49:56Z"
+      deployedAt: "2026-04-26T09:49:56Z"
+      id: 1
+      initiatedBy:
+        username: admin
+      revision: fcaa138c18e3f7752a56b9c8ce00e4dbf3bb623c
+      source:
+        path: apps/zabbix-ingress/manifests
+        repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+        targetRevision: main
+    operationState:
+      finishedAt: "2026-04-26T09:49:57Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          username: admin
+        retry: {}
+        sync:
+          revision: fcaa138c18e3f7752a56b9c8ce00e4dbf3bb623c
+          syncOptions:
+          - ServerSideApply=true
+          - ApplyOutOfSyncOnly=true
+          syncStrategy:
+            hook: {}
+      phase: Succeeded
+      startedAt: "2026-04-26T09:49:56Z"
+      syncResult:
+        resources:
+        - group: networking.k8s.io
+          hookPhase: Running
+          kind: Ingress
+          message: ingress.networking.k8s.io/zabbix-web serverside-applied
+          name: zabbix-web
+          namespace: zabbix
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        revision: fcaa138c18e3f7752a56b9c8ce00e4dbf3bb623c
+        source:
+          path: apps/zabbix-ingress/manifests
+          repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+          targetRevision: main
+    reconciledAt: "2026-04-27T01:14:07Z"
+    resources:
+    - group: networking.k8s.io
+      health:
+        status: Healthy
+      kind: Ingress
+      name: zabbix-web
+      namespace: zabbix
+      status: OutOfSync
+      version: v1
+    sourceType: Directory
+    summary:
+      externalURLs:
+      - https://zabbix.35.241.255.137.nip.io/
+    sync:
+      comparedTo:
+        destination:
+          namespace: zabbix
+          server: https://kubernetes.default.svc
+        ignoreDifferences:
+        - group: networking.k8s.io
+          jsonPointers:
+          - /metadata/annotations/field.cattle.io~1publicEndpoints
+          kind: Ingress
+        source:
+          path: apps/zabbix-ingress/manifests
+          repoURL: https://gitea.35.241.255.137.nip.io/admin/aiot-apps.git
+          targetRevision: main
+      revision: c522778e4d186e5b9086b9712de5ca43112e714a
+      status: OutOfSync
+kind: List
+metadata:

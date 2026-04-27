@@ -4,7 +4,7 @@ items:
   kind: LinstorSatellite
   metadata:
     annotations:
-      piraeus.io/applied-configurations: storage-pool-lvm
+      piraeus.io/applied-configurations: host-network,increase-startup-probe,storage-pool-lvm
     finalizers:
     - piraeus.io/satellite-protection
     labels:
@@ -47,6 +47,18 @@ items:
       target:
         kind: DaemonSet
         name: linstor-satellite
+    - patch: '{"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"name":"linstor-satellite"},"spec":{"template":{"spec":{"hostNetwork":true}}}}'
+      target:
+        group: apps
+        kind: DaemonSet
+        name: linstor-satellite
+        version: v1
+    - patch: '{"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"name":"linstor-satellite"},"spec":{"template":{"spec":{"containers":[{"name":"linstor-satellite","startupProbe":{"failureThreshold":30,"periodSeconds":10,"tcpSocket":{"port":"linstor"},"timeoutSeconds":3}}]}}}}'
+      target:
+        group: apps
+        kind: DaemonSet
+        name: linstor-satellite
+        version: v1
     properties:
     - name: Aux/topology/linbit.com/hostname
       valueFrom:
@@ -70,23 +82,23 @@ items:
       name: lvm-thin
   status:
     availableCapacityBytes: 51539607552
-    capacity: 25/52GiB
+    capacity: 31/52GiB
     conditions:
     - lastTransitionTime: "2026-04-22T15:13:09Z"
       message: Resources applied
-      observedGeneration: 3
+      observedGeneration: 5
       reason: AsExpected
       status: "True"
       type: Applied
-    - lastTransitionTime: "2026-04-24T10:20:45Z"
+    - lastTransitionTime: "2026-04-26T19:55:58Z"
       message: ONLINE
-      observedGeneration: 3
+      observedGeneration: 5
       reason: AsExpected
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-24T10:20:45Z"
+    - lastTransitionTime: "2026-04-26T19:55:58Z"
       message: Pools configured
-      observedGeneration: 3
+      observedGeneration: 5
       reason: AsExpected
       status: "True"
       type: Configured
@@ -97,9 +109,9 @@ items:
     - NVME
     - STORAGE
     - WRITECACHE
-    freeCapacityBytes: 27269605376
+    freeCapacityBytes: 20574609408
     numberOfSnapshots: 0
-    numberOfVolumes: 12
+    numberOfVolumes: 13
     storageProviders:
     - DISKLESS
     - EBS_INIT
@@ -113,7 +125,7 @@ items:
   kind: LinstorSatellite
   metadata:
     annotations:
-      piraeus.io/applied-configurations: storage-pool-lvm
+      piraeus.io/applied-configurations: host-network,increase-startup-probe,storage-pool-lvm
     finalizers:
     - piraeus.io/satellite-protection
     labels:
@@ -156,6 +168,18 @@ items:
       target:
         kind: DaemonSet
         name: linstor-satellite
+    - patch: '{"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"name":"linstor-satellite"},"spec":{"template":{"spec":{"hostNetwork":true}}}}'
+      target:
+        group: apps
+        kind: DaemonSet
+        name: linstor-satellite
+        version: v1
+    - patch: '{"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"name":"linstor-satellite"},"spec":{"template":{"spec":{"containers":[{"name":"linstor-satellite","startupProbe":{"failureThreshold":30,"periodSeconds":10,"tcpSocket":{"port":"linstor"},"timeoutSeconds":3}}]}}}}'
+      target:
+        group: apps
+        kind: DaemonSet
+        name: linstor-satellite
+        version: v1
     properties:
     - name: Aux/topology/linbit.com/hostname
       valueFrom:
@@ -179,23 +203,23 @@ items:
       name: lvm-thin
   status:
     availableCapacityBytes: 51539607552
-    capacity: 25/52GiB
+    capacity: 32/52GiB
     conditions:
     - lastTransitionTime: "2026-04-22T13:49:55Z"
       message: Resources applied
-      observedGeneration: 3
+      observedGeneration: 5
       reason: AsExpected
       status: "True"
       type: Applied
-    - lastTransitionTime: "2026-04-24T07:30:41Z"
+    - lastTransitionTime: "2026-04-26T19:59:11Z"
       message: ONLINE
-      observedGeneration: 3
+      observedGeneration: 5
       reason: AsExpected
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-24T07:30:41Z"
+    - lastTransitionTime: "2026-04-26T19:59:11Z"
       message: Pools configured
-      observedGeneration: 3
+      observedGeneration: 5
       reason: AsExpected
       status: "True"
       type: Configured
@@ -206,9 +230,9 @@ items:
     - NVME
     - STORAGE
     - WRITECACHE
-    freeCapacityBytes: 26568667136
+    freeCapacityBytes: 19791209472
     numberOfSnapshots: 0
-    numberOfVolumes: 12
+    numberOfVolumes: 13
     storageProviders:
     - DISKLESS
     - EBS_INIT

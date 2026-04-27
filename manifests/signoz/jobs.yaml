@@ -232,19 +232,19 @@ items:
   kind: Job
   metadata:
     labels:
-      k8up.io/owned-by: prune_aiot-prune-m2f4d
+      k8up.io/owned-by: prune_aiot-prune-kpdtg
       k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
       k8up.io/type: prune
       k8upjob: "true"
       k8upjob/exclusive: "true"
-    name: prune-aiot-prune-m2f4d
+    name: prune-aiot-prune-kpdtg
     namespace: signoz
     ownerReferences:
     - apiVersion: k8up.io/v1
       blockOwnerDeletion: true
       controller: true
       kind: Prune
-      name: aiot-prune-m2f4d
+      name: aiot-prune-kpdtg
   spec:
     backoffLimit: 6
     completionMode: NonIndexed
@@ -258,8 +258,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: prune-aiot-prune-m2f4d
-          job-name: prune-aiot-prune-m2f4d
+          batch.kubernetes.io/job-name: prune-aiot-prune-kpdtg
+          job-name: prune-aiot-prune-kpdtg
           k8upjob: "true"
       spec:
         containers:
@@ -271,27 +271,27 @@ items:
           - /usr/local/bin/k8up
           - restic
           env:
-          - name: AWS_SECRET_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                key: secret_key
-                name: r2-creds
+          - name: PROM_URL
+            value: http://127.0.0.1/
+          - name: STATS_URL
+          - name: HOSTNAME
+            value: signoz
+          - name: KEEP_DAILY
+            value: "2"
           - name: RESTIC_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: password
                 name: k8up-repo
-          - name: PROM_URL
-            value: http://127.0.0.1/
-          - name: HOSTNAME
-            value: signoz
-          - name: STATS_URL
-          - name: KEEP_DAILY
-            value: "2"
           - name: AWS_ACCESS_KEY_ID
             valueFrom:
               secretKeyRef:
                 key: access_key
+                name: r2-creds
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                key: secret_key
                 name: r2-creds
           - name: RESTIC_REPOSITORY
             value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
@@ -323,22 +323,22 @@ items:
         - emptyDir: {}
           name: restic-cache-dir
   status:
-    completionTime: "2026-04-23T04:20:45Z"
+    completionTime: "2026-04-26T04:20:49Z"
     conditions:
-    - lastProbeTime: "2026-04-23T04:20:45Z"
-      lastTransitionTime: "2026-04-23T04:20:45Z"
+    - lastProbeTime: "2026-04-26T04:20:49Z"
+      lastTransitionTime: "2026-04-26T04:20:49Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-23T04:20:45Z"
-      lastTransitionTime: "2026-04-23T04:20:45Z"
+    - lastProbeTime: "2026-04-26T04:20:49Z"
+      lastTransitionTime: "2026-04-26T04:20:49Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-23T04:20:00Z"
+    startTime: "2026-04-26T04:20:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

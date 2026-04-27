@@ -91,6 +91,17 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: LayerDrbdResources
   metadata:
+    name: 59e19706d51d39f66711c2653cd7eb1291c94d9b55eb14bda74ce4dc636d015a
+  spec:
+    al_stripe_size: 32
+    al_stripes: 1
+    flags: 128
+    layer_resource_id: 28
+    node_id: 0
+    peer_slots: 7
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerDrbdResources
+  metadata:
     name: 5f9c4ab08cac7457e9111a30e4664920607ea2c115a1433d7be98e97e64244ca
   spec:
     al_stripe_size: 32
@@ -109,6 +120,17 @@ items:
     flags: 128
     layer_resource_id: 0
     node_id: 0
+    peer_slots: 7
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerDrbdResources
+  metadata:
+    name: 624b60c58c9d8bfb6ff1886c2fd605d2adeb6ea4da576068201b6c6958ce93f4
+  spec:
+    al_stripe_size: 32
+    al_stripes: 1
+    flags: 128
+    layer_resource_id: 30
+    node_id: 1
     peer_slots: 7
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: LayerDrbdResources

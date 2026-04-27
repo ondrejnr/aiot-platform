@@ -25,22 +25,22 @@ items:
 - apiVersion: k8up.io/v1
   kind: Snapshot
   metadata:
-    name: 5e972f0d
+    name: 2d580329
     namespace: aiot
   spec:
-    date: "2026-04-25T03:10:33Z"
-    id: 5e972f0d78bd4560bd309d26a7794f6e780780d1d5e2de5da5a4f7195063245f
+    date: "2026-04-26T03:10:33Z"
+    id: 2d580329d8d88792647fc1d0736c5f80f9b92f31736db99c65adc9911341202b
     paths:
     - /aiot-pg-ha-dump.sql
     repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
 - apiVersion: k8up.io/v1
   kind: Snapshot
   metadata:
-    name: 6abd1c40
+    name: 5e972f0d
     namespace: aiot
   spec:
-    date: "2026-04-24T03:10:33Z"
-    id: 6abd1c40ff04cd7fceeaf2f17937b1698ec76fd9431293cf6bbdd4d27f6e0fe0
+    date: "2026-04-25T03:10:33Z"
+    id: 5e972f0d78bd4560bd309d26a7794f6e780780d1d5e2de5da5a4f7195063245f
     paths:
     - /aiot-pg-ha-dump.sql
     repository: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero

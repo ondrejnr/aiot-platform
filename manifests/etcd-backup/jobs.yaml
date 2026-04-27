@@ -4,11 +4,11 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T02:30:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T02:30:00Z"
     labels:
-      batch.kubernetes.io/job-name: etcd-snapshot-29616630
-      job-name: etcd-snapshot-29616630
-    name: etcd-snapshot-29616630
+      batch.kubernetes.io/job-name: etcd-snapshot-29619510
+      job-name: etcd-snapshot-29619510
+    name: etcd-snapshot-29619510
     namespace: etcd-backup
     ownerReferences:
     - apiVersion: batch/v1
@@ -29,8 +29,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: etcd-snapshot-29616630
-          job-name: etcd-snapshot-29616630
+          batch.kubernetes.io/job-name: etcd-snapshot-29619510
+          job-name: etcd-snapshot-29619510
       spec:
         containers:
         - args:
@@ -105,22 +105,22 @@ items:
         - emptyDir: {}
           name: work
   status:
-    completionTime: "2026-04-24T02:30:18Z"
+    completionTime: "2026-04-26T02:30:19Z"
     conditions:
-    - lastProbeTime: "2026-04-24T02:30:18Z"
-      lastTransitionTime: "2026-04-24T02:30:18Z"
+    - lastProbeTime: "2026-04-26T02:30:19Z"
+      lastTransitionTime: "2026-04-26T02:30:19Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-24T02:30:18Z"
-      lastTransitionTime: "2026-04-24T02:30:18Z"
+    - lastProbeTime: "2026-04-26T02:30:19Z"
+      lastTransitionTime: "2026-04-26T02:30:19Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-24T02:30:00Z"
+    startTime: "2026-04-26T02:30:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -128,15 +128,14 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-25T02:30:00Z"
+      cronjob.kubernetes.io/instantiate: manual
     labels:
-      batch.kubernetes.io/job-name: etcd-snapshot-29618070
-      job-name: etcd-snapshot-29618070
-    name: etcd-snapshot-29618070
+      batch.kubernetes.io/job-name: pre-cilium-20260426-163217
+      job-name: pre-cilium-20260426-163217
+    name: pre-cilium-20260426-163217
     namespace: etcd-backup
     ownerReferences:
     - apiVersion: batch/v1
-      blockOwnerDeletion: true
       controller: true
       kind: CronJob
       name: etcd-snapshot
@@ -153,8 +152,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: etcd-snapshot-29618070
-          job-name: etcd-snapshot-29618070
+          batch.kubernetes.io/job-name: pre-cilium-20260426-163217
+          job-name: pre-cilium-20260426-163217
       spec:
         containers:
         - args:
@@ -229,22 +228,22 @@ items:
         - emptyDir: {}
           name: work
   status:
-    completionTime: "2026-04-25T02:30:17Z"
+    completionTime: "2026-04-26T16:32:36Z"
     conditions:
-    - lastProbeTime: "2026-04-25T02:30:17Z"
-      lastTransitionTime: "2026-04-25T02:30:17Z"
+    - lastProbeTime: "2026-04-26T16:32:36Z"
+      lastTransitionTime: "2026-04-26T16:32:36Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-25T02:30:17Z"
-      lastTransitionTime: "2026-04-25T02:30:17Z"
+    - lastProbeTime: "2026-04-26T16:32:36Z"
+      lastTransitionTime: "2026-04-26T16:32:36Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-25T02:30:00Z"
+    startTime: "2026-04-26T16:32:17Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

@@ -81,19 +81,19 @@ items:
   kind: Job
   metadata:
     labels:
-      k8up.io/owned-by: prune_aiot-prune-bmnv8
+      k8up.io/owned-by: prune_aiot-prune-8plf5
       k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
       k8up.io/type: prune
       k8upjob: "true"
       k8upjob/exclusive: "true"
-    name: prune-aiot-prune-bmnv8
+    name: prune-aiot-prune-8plf5
     namespace: gitea
     ownerReferences:
     - apiVersion: k8up.io/v1
       blockOwnerDeletion: true
       controller: true
       kind: Prune
-      name: aiot-prune-bmnv8
+      name: aiot-prune-8plf5
   spec:
     backoffLimit: 6
     completionMode: NonIndexed
@@ -107,8 +107,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: prune-aiot-prune-bmnv8
-          job-name: prune-aiot-prune-bmnv8
+          batch.kubernetes.io/job-name: prune-aiot-prune-8plf5
+          job-name: prune-aiot-prune-8plf5
           k8upjob: "true"
       spec:
         containers:
@@ -172,22 +172,22 @@ items:
         - emptyDir: {}
           name: restic-cache-dir
   status:
-    completionTime: "2026-04-23T04:20:07Z"
+    completionTime: "2026-04-26T04:20:13Z"
     conditions:
-    - lastProbeTime: "2026-04-23T04:20:07Z"
-      lastTransitionTime: "2026-04-23T04:20:07Z"
+    - lastProbeTime: "2026-04-26T04:20:13Z"
+      lastTransitionTime: "2026-04-26T04:20:13Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-23T04:20:07Z"
-      lastTransitionTime: "2026-04-23T04:20:07Z"
+    - lastProbeTime: "2026-04-26T04:20:13Z"
+      lastTransitionTime: "2026-04-26T04:20:13Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-23T04:20:00Z"
+    startTime: "2026-04-26T04:20:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

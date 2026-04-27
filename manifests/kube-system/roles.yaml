@@ -71,6 +71,26 @@ items:
   kind: Role
   metadata:
     annotations:
+      meta.helm.sh/release-name: cilium
+      meta.helm.sh/release-namespace: kube-system
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: cilium
+    name: cilium-config-agent
+    namespace: kube-system
+  rules:
+  - apiGroups:
+    - ""
+    resources:
+    - configmaps
+    verbs:
+    - get
+    - list
+    - watch
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: Role
+  metadata:
+    annotations:
       rbac.authorization.kubernetes.io/autoupdate: "true"
     labels:
       kubernetes.io/bootstrapping: rbac-defaults

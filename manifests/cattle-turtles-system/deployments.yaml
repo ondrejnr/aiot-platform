@@ -116,12 +116,6 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T21:40:43Z"
-      lastUpdateTime: "2026-04-19T21:40:43Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:40:30Z"
       lastUpdateTime: "2026-04-19T21:40:43Z"
       message: ReplicaSet "rancher-turtles-controller-manager-86bc6bbdb5" has successfully
@@ -129,6 +123,12 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-26T17:20:09Z"
+      lastUpdateTime: "2026-04-26T17:20:09Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 1
     readyReplicas: 1
     replicas: 1

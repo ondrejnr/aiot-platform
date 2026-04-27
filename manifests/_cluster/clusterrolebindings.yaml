@@ -41,6 +41,52 @@ items:
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
+    annotations:
+      meta.helm.sh/release-name: argocd
+      meta.helm.sh/release-namespace: argocd
+    labels:
+      app.kubernetes.io/component: application-controller
+      app.kubernetes.io/instance: argocd
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: argocd-application-controller
+      app.kubernetes.io/part-of: argocd
+      app.kubernetes.io/version: v2.13.2
+      helm.sh/chart: argo-cd-7.7.10
+    name: argocd-application-controller
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: argocd-application-controller
+  subjects:
+  - kind: ServiceAccount
+    name: argocd-application-controller
+    namespace: argocd
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: argocd
+      meta.helm.sh/release-namespace: argocd
+    labels:
+      app.kubernetes.io/component: server
+      app.kubernetes.io/instance: argocd
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: argocd-server
+      app.kubernetes.io/part-of: argocd
+      app.kubernetes.io/version: v2.13.2
+      helm.sh/chart: argo-cd-7.7.10
+    name: argocd-server
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: argocd-server
+  subjects:
+  - kind: ServiceAccount
+    name: argocd-server
+    namespace: argocd
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
     labels:
       konflux.konflux-ci.dev/component: build-service
       konflux.konflux-ci.dev/owner: konflux-build-service
@@ -483,6 +529,42 @@ items:
   kind: ClusterRoleBinding
   metadata:
     annotations:
+      meta.helm.sh/release-name: cilium
+      meta.helm.sh/release-namespace: kube-system
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: cilium
+    name: cilium
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cilium
+  subjects:
+  - kind: ServiceAccount
+    name: cilium
+    namespace: kube-system
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: cilium
+      meta.helm.sh/release-namespace: kube-system
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: cilium
+    name: cilium-operator
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cilium-operator
+  subjects:
+  - kind: ServiceAccount
+    name: cilium-operator
+    namespace: kube-system
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRoleBinding","metadata":{"annotations":{},"labels":{"clickhouse.altinity.com/chop":"0.21.2"},"name":"clickhouse-operator-kube-system"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"clickhouse-operator-kube-system"},"subjects":[{"kind":"ServiceAccount","name":"clickhouse-operator","namespace":"kube-system"}]}
     labels:
@@ -644,6 +726,21 @@ items:
   - kind: ServiceAccount
     name: dex
     namespace: konflux-ui
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRoleBinding","metadata":{"annotations":{},"name":"dex-auth-ns"},"roleRef":{"apiGroup":"rbac.authorization.k8s.io","kind":"ClusterRole","name":"dex"},"subjects":[{"kind":"ServiceAccount","name":"dex","namespace":"auth"}]}
+    name: dex-auth-ns
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: dex
+  subjects:
+  - kind: ServiceAccount
+    name: dex
+    namespace: auth
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
@@ -1244,6 +1341,18 @@ items:
   - kind: ServiceAccount
     name: k8up
     namespace: k8up-system
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: karpor-admin-binding
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cluster-admin
+  subjects:
+  - kind: ServiceAccount
+    name: karpor-admin
+    namespace: kube-system
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
@@ -2608,6 +2717,7 @@ items:
       meta.helm.sh/release-namespace: robusta
     labels:
       app.kubernetes.io/managed-by: Helm
+      argocd.argoproj.io/instance: robusta
     name: robusta-forwarder-cluster-role-binding
   roleRef:
     apiGroup: rbac.authorization.k8s.io
@@ -2642,6 +2752,7 @@ items:
       meta.helm.sh/release-namespace: robusta
     labels:
       app.kubernetes.io/managed-by: Helm
+      argocd.argoproj.io/instance: robusta
     name: robusta-runner-cluster-role-binding
   roleRef:
     apiGroup: rbac.authorization.k8s.io
@@ -3962,6 +4073,7 @@ items:
       app.kubernetes.io/managed-by: Helm
       app.kubernetes.io/name: zabbix
       app.kubernetes.io/version: 7.0.16
+      argocd.argoproj.io/instance: zabbix
       helm.sh/chart: zabbix-7.0.12
     name: zabbix
   roleRef:

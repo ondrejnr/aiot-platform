@@ -46,6 +46,43 @@ items:
     finalizers:
     - kubernetes.io/pv-protection
     - external-attacher/linstor-csi-linbit-com
+    name: pvc-0311865a-09d7-4a59-aab5-c5d19a2f333c
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 5Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: data-etcd-0
+      namespace: karpor
+    csi:
+      driver: linstor.csi.linbit.com
+      fsType: ext4
+      volumeAttributes:
+        linstor.csi.linbit.com/mount-options: ""
+        linstor.csi.linbit.com/post-mount-xfs-opts: ""
+        linstor.csi.linbit.com/remote-access-policy: "true"
+        linstor.csi.linbit.com/uses-volume-context: "true"
+        storage.kubernetes.io/csiProvisionerIdentity: 1777224044439-2599-linstor.csi.linbit.com
+      volumeHandle: pvc-0311865a-09d7-4a59-aab5-c5d19a2f333c
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: piraeus-r2
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2026-04-26T17:54:11Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      pv.kubernetes.io/provisioned-by: linstor.csi.linbit.com
+      volume.kubernetes.io/provisioner-deletion-secret-name: ""
+      volume.kubernetes.io/provisioner-deletion-secret-namespace: ""
+    finalizers:
+    - kubernetes.io/pv-protection
+    - external-attacher/linstor-csi-linbit-com
     name: pvc-0c6ad1c4-ea10-4b24-95c5-12f0f48ef8ab
   spec:
     accessModes:

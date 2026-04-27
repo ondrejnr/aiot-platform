@@ -1,0 +1,18 @@
+apiVersion: v1
+items:
+- apiVersion: cilium.io/v2
+  kind: CiliumNodeConfig
+  metadata:
+    name: cilium-default
+    namespace: kube-system
+  spec:
+    defaults:
+      cni-chaining-mode: none
+      cni-exclusive: "true"
+      custom-cni-conf: "false"
+      write-cni-conf-when-ready: /host/etc/cni/net.d/05-cilium.conflist
+    nodeSelector:
+      matchLabels:
+        io.cilium.migration/cilium-default: "true"
+kind: List
+metadata:

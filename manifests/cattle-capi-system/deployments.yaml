@@ -4,7 +4,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
     labels:
       cluster.x-k8s.io/provider: cluster-api
       clusterctl.cluster.x-k8s.io: ""
@@ -119,6 +119,14 @@ items:
           key: node-role.kubernetes.io/master
         - effect: NoSchedule
           key: node-role.kubernetes.io/control-plane
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              cluster.x-k8s.io/provider: cluster-api
+              control-plane: controller-manager
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - name: cert
           secret:
@@ -127,19 +135,19 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-19T21:40:53Z"
-      lastUpdateTime: "2026-04-19T21:40:53Z"
+    - lastTransitionTime: "2026-04-19T21:40:51Z"
+      lastUpdateTime: "2026-04-26T16:21:56Z"
+      message: ReplicaSet "capi-controller-manager-cbc84ff74" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-04-26T17:19:56Z"
+      lastUpdateTime: "2026-04-26T17:19:56Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    - lastTransitionTime: "2026-04-19T21:40:51Z"
-      lastUpdateTime: "2026-04-19T21:40:53Z"
-      message: ReplicaSet "capi-controller-manager-6f9cfbdb68" has successfully progressed.
-      reason: NewReplicaSetAvailable
-      status: "True"
-      type: Progressing
-    observedGeneration: 1
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1

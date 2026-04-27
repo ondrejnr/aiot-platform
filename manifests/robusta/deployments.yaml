@@ -95,8 +95,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:08Z"
-      lastUpdateTime: "2026-04-24T10:19:08Z"
+    - lastTransitionTime: "2026-04-26T19:57:58Z"
+      lastUpdateTime: "2026-04-26T19:57:58Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -114,6 +114,7 @@ items:
       meta.helm.sh/release-namespace: robusta
     labels:
       app.kubernetes.io/managed-by: Helm
+      argocd.argoproj.io/instance: robusta
       robusta: forwarder
     name: robusta-forwarder
     namespace: robusta
@@ -186,8 +187,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-26T01:00:04Z"
-      lastUpdateTime: "2026-04-26T01:00:04Z"
+    - lastTransitionTime: "2026-04-26T20:00:18Z"
+      lastUpdateTime: "2026-04-26T20:00:18Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -206,6 +207,7 @@ items:
     labels:
       app: robusta-runner
       app.kubernetes.io/managed-by: Helm
+      argocd.argoproj.io/instance: robusta
       robusta: runner
     name: robusta-runner
     namespace: robusta
@@ -318,8 +320,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-26T00:15:04Z"
-      lastUpdateTime: "2026-04-26T00:15:04Z"
+    - lastTransitionTime: "2026-04-26T18:52:49Z"
+      lastUpdateTime: "2026-04-26T18:52:49Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"

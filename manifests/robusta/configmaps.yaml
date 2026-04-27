@@ -181,6 +181,7 @@ items:
       meta.helm.sh/release-namespace: robusta
     labels:
       app.kubernetes.io/managed-by: Helm
+      argocd.argoproj.io/instance: robusta
     name: robusta-kubewatch-config
     namespace: robusta
 - apiVersion: v1

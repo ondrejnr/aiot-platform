@@ -1,0 +1,36 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+      volume.beta.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+      volume.kubernetes.io/selected-node: aiot-worker-02
+      volume.kubernetes.io/storage-provisioner: linstor.csi.linbit.com
+    finalizers:
+    - kubernetes.io/pvc-protection
+    labels:
+      app.kubernetes.io/component: etcd
+      app.kubernetes.io/instance: karpor
+      app.kubernetes.io/name: karpor
+    name: data-etcd-0
+    namespace: karpor
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+    storageClassName: piraeus-r2
+    volumeMode: Filesystem
+    volumeName: pvc-0311865a-09d7-4a59-aab5-c5d19a2f333c
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 5Gi
+    phase: Bound
+kind: List
+metadata:

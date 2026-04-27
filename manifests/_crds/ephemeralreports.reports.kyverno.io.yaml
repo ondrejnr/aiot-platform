@@ -1,0 +1,45 @@
+apiVersion: v1
+items:
+- apiVersion: reports.kyverno.io/v1
+  kind: EphemeralReport
+  metadata:
+    annotations:
+      audit.kyverno.io/resource.name: capi-controller-manager
+      audit.kyverno.io/resource.namespace: cattle-capi-system
+    generateName: 5f3cfc82-c50c-4c16-9678-f0338ff337a2-
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+      audit.kyverno.io/resource.group: apps
+      audit.kyverno.io/resource.gvr: deployments.v1.apps
+      audit.kyverno.io/resource.kind: Deployment
+      audit.kyverno.io/resource.version: v1
+      audit.kyverno.io/source: admission
+      cpol.kyverno.io/inject-topology-spread: "12490624"
+    name: 5f3cfc82-c50c-4c16-9678-f0338ff337a2-hhh4q
+    namespace: cattle-capi-system
+  spec:
+    owner:
+      apiVersion: ""
+      kind: ""
+      name: ""
+    results:
+    - category: Scheduling
+      message: no patches applied
+      policy: inject-topology-spread
+      properties:
+        process: admission review
+      result: skip
+      rule: add-spread-deployments
+      scored: true
+      source: kyverno
+      timestamp:
+        nanos: 0
+        seconds: 1777252645
+    summary:
+      error: 0
+      fail: 0
+      pass: 0
+      skip: 1
+      warn: 0
+kind: List
+metadata:

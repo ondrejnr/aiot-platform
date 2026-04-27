@@ -77,6 +77,14 @@ items:
           seccompProfile:
             type: RuntimeDefault
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: tekton-results-postgres
+              app.kubernetes.io/version: devel
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - emptyDir: {}
           name: tmp
@@ -108,11 +116,11 @@ items:
     availableReplicas: 1
     collisionCount: 0
     currentReplicas: 1
-    currentRevision: tekton-results-postgres-7b65c45cbf
-    observedGeneration: 1
+    currentRevision: tekton-results-postgres-b869f9488
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
-    updateRevision: tekton-results-postgres-7b65c45cbf
+    updateRevision: tekton-results-postgres-b869f9488
     updatedReplicas: 1
 kind: List
 metadata:

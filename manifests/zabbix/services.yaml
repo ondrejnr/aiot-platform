@@ -12,6 +12,7 @@ items:
       app.kubernetes.io/managed-by: Helm
       app.kubernetes.io/name: zabbix
       app.kubernetes.io/version: 7.0.16
+      argocd.argoproj.io/instance: zabbix
       helm.sh/chart: zabbix-7.0.12
     name: zabbix-zabbix-server
     namespace: zabbix
@@ -52,6 +53,7 @@ items:
       app.kubernetes.io/managed-by: Helm
       app.kubernetes.io/name: zabbix
       app.kubernetes.io/version: 7.0.16
+      argocd.argoproj.io/instance: zabbix
       helm.sh/chart: zabbix-7.0.12
     name: zabbix-zabbix-web
     namespace: zabbix
@@ -88,6 +90,7 @@ items:
       app.kubernetes.io/managed-by: Helm
       app.kubernetes.io/name: zabbix
       app.kubernetes.io/version: 7.0.16
+      argocd.argoproj.io/instance: zabbix
       helm.sh/chart: zabbix-7.0.12
     name: zabbix-zabbix-webservice
     namespace: zabbix

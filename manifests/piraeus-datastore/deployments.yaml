@@ -135,8 +135,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:17:44Z"
-      lastUpdateTime: "2026-04-22T14:17:44Z"
+    - lastTransitionTime: "2026-04-26T19:31:27Z"
+      lastUpdateTime: "2026-04-26T19:31:27Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -333,8 +333,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T07:30:31Z"
-      lastUpdateTime: "2026-04-24T07:30:31Z"
+    - lastTransitionTime: "2026-04-26T19:14:22Z"
+      lastUpdateTime: "2026-04-26T19:14:22Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -347,7 +347,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
     labels:
       app.kubernetes.io/component: linstor-csi-controller
       app.kubernetes.io/instance: linstorcluster
@@ -467,9 +467,9 @@ items:
               path: /healthz/leader-election
               port: 9809
               scheme: HTTP
-            periodSeconds: 10
+            periodSeconds: 20
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           name: csi-attacher
           resources: {}
           securityContext:
@@ -552,9 +552,9 @@ items:
               path: /healthz/leader-election
               port: 9810
               scheme: HTTP
-            periodSeconds: 10
+            periodSeconds: 20
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           name: csi-provisioner
           resources: {}
           securityContext:
@@ -605,9 +605,9 @@ items:
               path: /healthz/leader-election
               port: 9811
               scheme: HTTP
-            periodSeconds: 10
+            periodSeconds: 20
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           name: csi-snapshotter
           resources: {}
           securityContext:
@@ -657,9 +657,9 @@ items:
               path: /healthz/leader-election
               port: 9812
               scheme: HTTP
-            periodSeconds: 10
+            periodSeconds: 20
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           name: csi-resizer
           resources: {}
           securityContext:
@@ -706,9 +706,9 @@ items:
               path: /healthz/leader-election
               port: 9813
               scheme: HTTP
-            periodSeconds: 10
+            periodSeconds: 20
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           name: csi-health-monitor
           resources: {}
           securityContext:
@@ -765,18 +765,18 @@ items:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T08:46:37Z"
-      lastUpdateTime: "2026-04-22T08:50:27Z"
-      message: ReplicaSet "linstor-csi-controller-67d9b548d" has successfully progressed.
+      lastUpdateTime: "2026-04-26T04:54:23Z"
+      message: ReplicaSet "linstor-csi-controller-694bd7f4c5" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T17:20:28Z"
-      lastUpdateTime: "2026-04-22T17:20:28Z"
+    - lastTransitionTime: "2026-04-26T19:31:26Z"
+      lastUpdateTime: "2026-04-26T19:31:26Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -907,8 +907,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T07:29:43Z"
-      lastUpdateTime: "2026-04-24T07:29:43Z"
+    - lastTransitionTime: "2026-04-26T19:31:27Z"
+      lastUpdateTime: "2026-04-26T19:31:27Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -1030,8 +1030,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:18:31Z"
-      lastUpdateTime: "2026-04-22T14:18:31Z"
+    - lastTransitionTime: "2026-04-26T19:31:31Z"
+      lastUpdateTime: "2026-04-26T19:31:31Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"

@@ -213,6 +213,26 @@ items:
 - apiVersion: internal.linstor.linbit.com/v1-15-0
   kind: LayerStorageVolumes
   metadata:
+    name: c2dd7704fc23027b2923c8d0c57dd0690d1aba8f8091c1d27e1de46b7e3f6287
+  spec:
+    layer_resource_id: 29
+    node_name: AIOT-WORKER-02
+    provider_kind: LVM_THIN
+    stor_pool_name: LVM-THIN
+    vlm_nr: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerStorageVolumes
+  metadata:
+    name: c868fb573fe6f06eb9ca104172356874641964936cdccfae30900208d44494e1
+  spec:
+    layer_resource_id: 31
+    node_name: AIOT-WORKER-01
+    provider_kind: LVM_THIN
+    stor_pool_name: LVM-THIN
+    vlm_nr: 0
+- apiVersion: internal.linstor.linbit.com/v1-15-0
+  kind: LayerStorageVolumes
+  metadata:
     name: dfb3008225bed0947486fbb3bfba512c4e2d25e70bb6dd57169b522eec2bcddc
   spec:
     layer_resource_id: 9

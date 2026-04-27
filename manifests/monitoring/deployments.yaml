@@ -69,8 +69,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:14Z"
-      lastUpdateTime: "2026-04-24T10:19:14Z"
+    - lastTransitionTime: "2026-04-26T20:00:21Z"
+      lastUpdateTime: "2026-04-26T20:00:21Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -333,18 +333,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T17:18:37Z"
-      lastUpdateTime: "2026-04-22T17:18:37Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:43:19Z"
       lastUpdateTime: "2026-04-24T07:29:16Z"
       message: ReplicaSet "prometheus-grafana-6b896fb884" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-26T18:26:50Z"
+      lastUpdateTime: "2026-04-26T18:26:50Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 5
     readyReplicas: 1
     replicas: 1
@@ -483,12 +483,6 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-24T10:21:03Z"
-      lastUpdateTime: "2026-04-24T10:21:03Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:43:19Z"
       lastUpdateTime: "2026-04-25T13:58:00Z"
       message: ReplicaSet "prometheus-kube-prometheus-operator-69f48f846c" has successfully
@@ -496,6 +490,12 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-26T20:00:26Z"
+      lastUpdateTime: "2026-04-26T20:00:26Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 4
     readyReplicas: 1
     replicas: 1
@@ -607,12 +607,6 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-23T05:02:19Z"
-      lastUpdateTime: "2026-04-23T05:02:19Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-19T21:43:19Z"
       lastUpdateTime: "2026-04-23T05:03:34Z"
       message: ReplicaSet "prometheus-kube-state-metrics-756b89dbd9" has successfully
@@ -620,6 +614,12 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-26T18:25:53Z"
+      lastUpdateTime: "2026-04-26T18:25:53Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 3
     readyReplicas: 1
     replicas: 1

@@ -55,6 +55,21 @@ items:
   kind: Namespace
   metadata:
     annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-26T09:30:20Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-26T09:30:20Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: argocd
+      managed-by: terraform
+    name: argocd
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:38Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:39Z"}]}'
       kubectl.kubernetes.io/last-applied-configuration: |
         {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"name":"auth"}}
@@ -652,6 +667,20 @@ items:
   kind: Namespace
   metadata:
     annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-26T09:00:14Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-26T09:00:14Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: helloweb
+    name: helloweb
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
       cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:39Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-18T09:36:44Z"}]}'
       field.cattle.io/projectId: local:p-wpbsz
       kubectl.kubernetes.io/last-applied-configuration: |
@@ -776,6 +805,20 @@ items:
     labels:
       kubernetes.io/metadata.name: k8up-system
     name: k8up-system
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-26T10:02:49Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-26T10:02:50Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: karpor
+    name: karpor
   spec:
     finalizers:
     - kubernetes
@@ -946,6 +989,23 @@ items:
       kubernetes.io/metadata.name: kube-system
     name: kube-system
   spec: {}
+  status:
+    phase: Active
+- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-26T02:41:10Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-26T02:41:10Z"}]}'
+      lifecycle.cattle.io/create.namespace-auth: "true"
+    labels:
+      kubernetes.io/metadata.name: kubeflow
+      managed-by: terraform
+      owner: ml-team
+      tier: ml
+    name: kubeflow
+  spec:
+    finalizers:
+    - kubernetes
   status:
     phase: Active
 - apiVersion: v1
@@ -1169,7 +1229,7 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-25T11:15:54Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-25T11:15:54Z"}]}'
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-26T10:54:50Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-26T10:54:51Z"}]}'
       description: Platform catalog and metadata (read-only)
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
@@ -1322,7 +1382,7 @@ items:
   kind: Namespace
   metadata:
     annotations:
-      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-25T11:15:54Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-25T11:15:54Z"}]}'
+      cattle.io/status: '{"Conditions":[{"Type":"ResourceQuotaInit","Status":"True","Message":"","LastUpdateTime":"2026-04-26T10:54:50Z"},{"Type":"InitialRolesPopulated","Status":"True","Message":"","LastUpdateTime":"2026-04-26T10:54:50Z"}]}'
       lifecycle.cattle.io/create.namespace-auth: "true"
     labels:
       kubernetes.io/metadata.name: tf-demo

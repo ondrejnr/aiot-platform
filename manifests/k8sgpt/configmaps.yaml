@@ -538,128 +538,6 @@ items:
     history.json: |-
       [
         {
-          "ts": "2026-04-21T01:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T02:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T03:00:02Z",
-          "count": 1,
-          "items": [
-            {
-              "kind": "Service",
-              "name": "zabbix/zabbix",
-              "since": "2026-04-21T02:25:56Z"
-            }
-          ]
-        },
-        {
-          "ts": "2026-04-21T04:00:01Z",
-          "count": 1,
-          "items": [
-            {
-              "kind": "Service",
-              "name": "zabbix/zabbix",
-              "since": "2026-04-21T02:25:56Z"
-            }
-          ]
-        },
-        {
-          "ts": "2026-04-21T05:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T06:00:02Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T07:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T08:00:02Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T09:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T10:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T11:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T12:00:04Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T13:00:03Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T14:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T15:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T16:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T17:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T18:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T19:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T20:00:01Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T21:00:02Z",
-          "count": 0,
-          "items": []
-        },
-        {
-          "ts": "2026-04-21T22:00:02Z",
-          "count": 0,
-          "items": []
-        },
-        {
           "ts": "2026-04-21T23:00:01Z",
           "count": 0,
           "items": []
@@ -977,13 +855,1258 @@ items:
           "ts": "2026-04-26T01:00:00Z",
           "count": 0,
           "items": []
+        },
+        {
+          "ts": "2026-04-26T02:00:00Z",
+          "count": 0,
+          "items": []
+        },
+        {
+          "ts": "2026-04-26T03:00:01Z",
+          "count": 0,
+          "items": []
+        },
+        {
+          "ts": "2026-04-26T04:00:00Z",
+          "count": 2,
+          "items": [
+            {
+              "kind": "Pod",
+              "name": "aiot/postgres-backup-29619540-mzjqr",
+              "since": "2026-04-26T03:40:37Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "semaphore/backup-aiot-backup-dm5mk-0-k8cgk",
+              "since": "2026-04-26T03:40:37Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T05:00:00Z",
+          "count": 0,
+          "items": []
+        },
+        {
+          "ts": "2026-04-26T06:00:01Z",
+          "count": 0,
+          "items": []
+        },
+        {
+          "ts": "2026-04-26T07:00:01Z",
+          "count": 0,
+          "items": []
+        },
+        {
+          "ts": "2026-04-26T08:00:00Z",
+          "count": 0,
+          "items": []
+        },
+        {
+          "ts": "2026-04-26T09:00:00Z",
+          "count": 0,
+          "items": []
+        },
+        {
+          "ts": "2026-04-26T10:00:00Z",
+          "count": 1,
+          "items": [
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T12:00:11Z",
+          "count": 63,
+          "items": [
+            {
+              "kind": "Service",
+              "name": "ai-enricher/ai-enricher",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/hello-aiot",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "aiot/hello-aiot-6fc4c9f6b9-ph64t",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/ngrok-proxy",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "aiot/ngrok-proxy-bcc8c8b57-gr7b9",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/open-webui",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pgadmin",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-rw",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/postgres",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/qdrant",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "argocd/argocd-repo-server",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "argocd/argocd-repo-server-5f5dbd68cb-b96zd",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "argocd/argocd-repo-server-metrics",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "argocd/argocd-server",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "argocd/argocd-server-metrics",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "cattle-capi-system/capi-controller-manager-6f9cfbdb68-wdtqd",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "cattle-capi-system/capi-webhook-service",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "cattle-turtles-system/rancher-turtles-controller-manager-86bc6bbdb5-7rlcd",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "cert-manager/cert-manager-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "cnpg-system/cnpg-controller-manager-7d4d7f5854-gj5q2",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "cnpg-system/cnpg-webhook-service",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "gitea/gitea",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/cluster-local-gateway",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "ReplicaSet",
+              "name": "istio-system/cluster-local-gateway-5b86b4b569",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istiod",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "istio-system/istiod-5c47f5b7bb-2tl5g",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istio-ingressgateway",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "istio-system/istio-ingressgateway-6bbf5fdb6f-k4kdf",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/knative-local-gateway",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "k8sgpt/k8sgpt-robusta-bridge",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "knative-serving/webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "kube-system/coredns-668d6bf9bc-rxlds",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kube-system/kube-dns",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kube-system/prometheus-kube-prometheus-coredns",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kyverno/kyverno-svc",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kyverno/kyverno-svc-metrics",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "monitoring/prometheus-kube-prometheus-operator",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "opentelemetry-operator-system/opentelemetry-operator",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "opentelemetry-operator-system/opentelemetry-operator-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "pipelines-as-code/pipelines-as-code-controller",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "pipelines-as-code/pipelines-as-code-controller-5896d8998b-t4rms",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "pipelines-as-code/pipelines-as-code-watcher",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "pipelines-as-code/pipelines-as-code-watcher-7d557456b5-j4h62",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Deployment",
+              "name": "piraeus-datastore/piraeus-operator-controller-manager",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "ReplicaSet",
+              "name": "piraeus-datastore/piraeus-operator-controller-manager-55bf9797fd",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "piraeus-datastore/piraeus-operator-webhook-service",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/chi-signoz-clickhouse-cluster-0-0",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/k8s-infra-otel-agent",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "signoz/k8s-infra-otel-agent-gb76g",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-clickhouse",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-otel-collector",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-zookeeper",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-zookeeper-headless",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-zookeeper-metrics",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-events-controller",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-operator-proxy-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-pipelines-controller",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "tekton-pipelines/tekton-pipelines-controller-564cbddb6c-h7w8t",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-pipelines-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "zabbix/zabbix-zabbix-web",
+              "since": "2026-04-26T11:42:12Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T13:00:01Z",
+          "count": 45,
+          "items": [
+            {
+              "kind": "Pod",
+              "name": "aiot/hello-aiot-6fc4c9f6b9-ph64t",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "aiot/hello-aiot-6fc4c9f6b9-zz4jt",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/ngrok-proxy",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/redis-master",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "argocd/argocd-repo-server",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "argocd/argocd-repo-server-metrics",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "cert-manager/cert-manager-webhook-74b94cd64b-twgw9",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "cert-manager/trust-manager",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "cert-manager/trust-manager-5df668d777-dlbjg",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "cert-manager/trust-manager-metrics",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "cnpg-system/cnpg-webhook-service",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "emqx/emqx",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/cluster-local-gateway",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "ReplicaSet",
+              "name": "istio-system/cluster-local-gateway-5b86b4b569",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istiod",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istio-ingressgateway",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "k8sgpt/k8sgpt-llm-proxy-86f7c4749-pqrcz",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "karpor/karpor-server",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "karpor/karpor-server-5dfbf64b84-6d4qm",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "knative-serving/webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "konflux-ui/dex-7b5d5884b9-n4xsr",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kyverno/kyverno-background-controller-metrics",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kyverno/kyverno-cleanup-controller",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kyverno/kyverno-cleanup-controller-metrics",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kyverno/kyverno-reports-controller-metrics",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kyverno/kyverno-svc",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kyverno/kyverno-svc-metrics",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "monitoring/prometheus-kube-prometheus-operator-69f48f846c-p2hml",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "pipelines-as-code/pipelines-as-code-controller",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "pipelines-as-code/pipelines-as-code-watcher",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "release-service/release-service-controller-manager-metrics-service",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "release-service/release-service-webhook-service",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-clickhouse",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-otel-collector",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-zookeeper",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "signoz/signoz-zookeeper-0",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-zookeeper-metrics",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "tekton-pipelines/tekton-events-controller-6d8db65c96-sgzhp",
+              "since": "2026-04-26T12:04:10Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-operator-proxy-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "tekton-pipelines/tekton-pipelines-controller-564cbddb6c-h7w8t",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-pipelines-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "tekton-pipelines/tekton-triggers-core-interceptors-668cbbb8c6-tz9f9",
+              "since": "2026-04-26T12:04:10Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T14:00:01Z",
+          "count": 7,
+          "items": [
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istiod",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istio-ingressgateway",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "knative-serving/webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-clickhouse",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-operator-proxy-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-pipelines-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T15:00:04Z",
+          "count": 62,
+          "items": [
+            {
+              "kind": "Service",
+              "name": "ai-enricher/ai-enricher",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "ai-enricher/ai-enricher-6c57d5bc59-g99w2",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/cloudbeaver",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "aiot/cloudbeaver-6945f7d648-lcdg8",
+              "since": "2026-04-26T14:43:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/hello-aiot",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "aiot/hello-aiot-6fc4c9f6b9-5s2bc",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/open-webui",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "aiot/open-webui-cb875f77d-jx8l7",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pgadmin",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-r",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T14:43:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-rw",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "aiot/pg-sink-7787d755f7-ccvbf",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/postgres",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/qdrant",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/redis-master",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "aiot/sensor-simulator-6f9869bbbc-8wwjq",
+              "since": "2026-04-26T14:43:35Z"
+            },
+            {
+              "kind": "Node",
+              "name": "aiot-worker-01",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "argocd/argocd-application-controller-metrics",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "backrest/backrest",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "backrest/backrest-6cd94bbdb9-gncrw",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "default/ingress-nginx-controller-zzwbd",
+              "since": "2026-04-26T14:43:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "emqx/emqx",
+              "since": "2026-04-26T14:43:35Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "emqx/emqx-0",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "gitea/gitea",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "gitea/gitea-8598474664-2sb66",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istio-ingressgateway",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "jenkins/jenkins",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "jenkins/jenkins-agent",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "karpor/etcd",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "karpor/karpor-syncer-f8d6f8897-ck9wx",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "kube-system/prometheus-kube-prometheus-kube-proxy",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "monitoring/prometheus-prometheus-node-exporter",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "opentelemetry-operator-system/opentelemetry-operator",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "opentelemetry-operator-system/opentelemetry-operator-webhook",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "piraeus-datastore/linstor-affinity-controller-b6fd7f7b8-dnfrh",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "piraeus-datastore/linstor-controller",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "registry/internal-registry",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "registry/internal-registry-67d69779c4-dgbwv",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "registry/internal-registry-http",
+              "since": "2026-04-26T14:43:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "semaphore/semaphore",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "semaphore/semaphore-75b85ff97b-crdp6",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/k8s-infra-otel-agent",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-clickhouse",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-clickhouse-operator-metrics",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-otel-collector",
+              "since": "2026-04-26T14:01:47Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "signoz/signoz-otel-collector-6fff48485f-z5nk4",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-zookeeper",
+              "since": "2026-04-26T14:43:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-zookeeper-headless",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-zookeeper-metrics",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/postgres",
+              "since": "2026-04-26T14:43:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-events-controller",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "tekton-pipelines/tekton-events-controller-6d8db65c96-2dkcz",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-operator-proxy-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-pipelines-remote-resolvers",
+              "since": "2026-04-26T14:43:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-pipelines-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Pod",
+              "name": "tekton-pipelines/tekton-results-api-76f77d6cdf-gq559",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-results-api-service",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-results-postgres-service",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-results-watcher",
+              "since": "2026-04-26T14:43:36Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T16:00:01Z",
+          "count": 6,
+          "items": [
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istiod",
+              "since": "2026-04-26T15:50:11Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istio-ingressgateway",
+              "since": "2026-04-26T14:43:36Z"
+            },
+            {
+              "kind": "Service",
+              "name": "knative-serving/webhook",
+              "since": "2026-04-26T15:50:11Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-operator-proxy-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            },
+            {
+              "kind": "Service",
+              "name": "tekton-pipelines/tekton-pipelines-webhook",
+              "since": "2026-04-26T11:42:12Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T18:00:01Z",
+          "count": 1,
+          "items": [
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T19:01:06Z",
+          "count": 3,
+          "items": [
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T18:57:55Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istio-ingressgateway",
+              "since": "2026-04-26T18:31:17Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T20:00:01Z",
+          "count": 7,
+          "items": [
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T18:57:55Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "cnpg-system/cnpg-webhook-service",
+              "since": "2026-04-26T19:20:41Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istio-ingressgateway",
+              "since": "2026-04-26T18:31:17Z"
+            },
+            {
+              "kind": "Service",
+              "name": "karpor/etcd",
+              "since": "2026-04-26T19:20:41Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-clickhouse",
+              "since": "2026-04-26T19:20:41Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-otel-collector",
+              "since": "2026-04-26T19:20:41Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T21:00:01Z",
+          "count": 7,
+          "items": [
+            {
+              "kind": "Pod",
+              "name": "aiot/pg-ha-1",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-r",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T18:57:55Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "istio-system/istio-ingressgateway",
+              "since": "2026-04-26T18:31:17Z"
+            },
+            {
+              "kind": "Service",
+              "name": "karpor/etcd",
+              "since": "2026-04-26T19:20:41Z"
+            },
+            {
+              "kind": "Service",
+              "name": "signoz/signoz-clickhouse",
+              "since": "2026-04-26T19:20:41Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T22:00:01Z",
+          "count": 5,
+          "items": [
+            {
+              "kind": "Pod",
+              "name": "aiot/pg-ha-1",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-r",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T18:57:55Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "karpor/etcd",
+              "since": "2026-04-26T19:20:41Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-26T23:00:01Z",
+          "count": 5,
+          "items": [
+            {
+              "kind": "Pod",
+              "name": "aiot/pg-ha-1",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-r",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T18:57:55Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "karpor/etcd",
+              "since": "2026-04-26T19:20:41Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-27T00:00:01Z",
+          "count": 5,
+          "items": [
+            {
+              "kind": "Pod",
+              "name": "aiot/pg-ha-1",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-r",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T18:57:55Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "karpor/etcd",
+              "since": "2026-04-26T19:20:41Z"
+            }
+          ]
+        },
+        {
+          "ts": "2026-04-27T01:00:01Z",
+          "count": 5,
+          "items": [
+            {
+              "kind": "Pod",
+              "name": "aiot/pg-ha-1",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-r",
+              "since": "2026-04-26T20:03:29Z"
+            },
+            {
+              "kind": "Service",
+              "name": "aiot/pg-ha-ro",
+              "since": "2026-04-26T18:57:55Z"
+            },
+            {
+              "kind": "StatefulSet",
+              "name": "argocd/argocd-application-controller",
+              "since": "2026-04-26T09:27:35Z"
+            },
+            {
+              "kind": "Service",
+              "name": "karpor/etcd",
+              "since": "2026-04-26T19:20:41Z"
+            }
+          ]
         }
       ]
   kind: ConfigMap
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","data":{"history.json":"[\n  {\n    \"ts\": \"2026-04-21T01:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T02:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T03:00:02Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"zabbix/zabbix\",\n        \"since\": \"2026-04-21T02:25:56Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-21T04:00:01Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"zabbix/zabbix\",\n        \"since\": \"2026-04-21T02:25:56Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-21T05:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T06:00:02Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T07:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T08:00:02Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T09:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T10:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T11:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T12:00:04Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T13:00:03Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T14:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T15:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T16:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T17:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T18:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T19:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T20:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T21:00:02Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T22:00:02Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-21T23:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T00:00:03Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T01:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T02:00:01Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"zabbix/zabbix-nodesclean-29613660-z4zxt\",\n        \"since\": \"2026-04-22T01:36:34Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-22T03:00:01Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"zabbix/zabbix-nodesclean-29613660-z4zxt\",\n        \"since\": \"2026-04-22T01:36:34Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-22T04:00:01Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"zabbix/zabbix-nodesclean-29613660-z4zxt\",\n        \"since\": \"2026-04-22T01:36:34Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-22T05:00:02Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T06:00:03Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T07:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T08:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T08:00:27Z\",\n    \"count\": 3,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"build-service/build-service-controller-manager-metrics-service\",\n        \"since\": \"2026-04-22T18:19:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"konflux-operator/konflux-operator-controller-manager-metrics-service\",\n        \"since\": \"2026-04-22T18:19:23Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"tekton-pipelines/tekton-results-postgres\",\n        \"since\": \"2026-04-22T12:41:27Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T09:00:00Z\",\n    \"count\": 3,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"build-service/build-service-controller-manager-metrics-service\",\n        \"since\": \"2026-04-22T18:19:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"konflux-operator/konflux-operator-controller-manager-metrics-service\",\n        \"since\": \"2026-04-22T18:19:23Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"tekton-pipelines/tekton-results-postgres\",\n        \"since\": \"2026-04-22T12:41:27Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T10:00:41Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T11:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T12:00:01Z\",\n    \"count\": 8,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/cloudbeaver\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/cloudbeaver-575cf969c6-6qdfr\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/open-webui\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/open-webui-648d9c6678-552zd\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pgadmin\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pgadmin-6f5966bd49-7lmc9\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Deployment\",\n        \"name\": \"aiot/qdrant\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/qdrant-7cb86668c5-6fzbn\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T13:00:00Z\",\n    \"count\": 8,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/cloudbeaver\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/cloudbeaver-575cf969c6-6qdfr\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/open-webui\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/open-webui-648d9c6678-552zd\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pgadmin\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pgadmin-6f5966bd49-7lmc9\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Deployment\",\n        \"name\": \"aiot/qdrant\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/qdrant-7cb86668c5-6fzbn\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T14:00:00Z\",\n    \"count\": 8,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/cloudbeaver\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/cloudbeaver-575cf969c6-6qdfr\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/open-webui\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/open-webui-648d9c6678-552zd\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pgadmin\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pgadmin-6f5966bd49-7lmc9\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Deployment\",\n        \"name\": \"aiot/qdrant\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/qdrant-7cb86668c5-6fzbn\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T15:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T16:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T17:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T18:00:00Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-clickhouse\",\n        \"since\": \"2026-04-25T17:36:09Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T19:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T20:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T21:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T22:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T23:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T00:00:03Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T01:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  }\n]"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"k8sgpt-mm-history","namespace":"k8sgpt"}}
+        {"apiVersion":"v1","data":{"history.json":"[\n  {\n    \"ts\": \"2026-04-21T23:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T00:00:03Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T01:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T02:00:01Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"zabbix/zabbix-nodesclean-29613660-z4zxt\",\n        \"since\": \"2026-04-22T01:36:34Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-22T03:00:01Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"zabbix/zabbix-nodesclean-29613660-z4zxt\",\n        \"since\": \"2026-04-22T01:36:34Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-22T04:00:01Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"zabbix/zabbix-nodesclean-29613660-z4zxt\",\n        \"since\": \"2026-04-22T01:36:34Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-22T05:00:02Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T06:00:03Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T07:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-22T08:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T08:00:27Z\",\n    \"count\": 3,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"build-service/build-service-controller-manager-metrics-service\",\n        \"since\": \"2026-04-22T18:19:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"konflux-operator/konflux-operator-controller-manager-metrics-service\",\n        \"since\": \"2026-04-22T18:19:23Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"tekton-pipelines/tekton-results-postgres\",\n        \"since\": \"2026-04-22T12:41:27Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T09:00:00Z\",\n    \"count\": 3,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"build-service/build-service-controller-manager-metrics-service\",\n        \"since\": \"2026-04-22T18:19:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"konflux-operator/konflux-operator-controller-manager-metrics-service\",\n        \"since\": \"2026-04-22T18:19:23Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"tekton-pipelines/tekton-results-postgres\",\n        \"since\": \"2026-04-22T12:41:27Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T10:00:41Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T11:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T12:00:01Z\",\n    \"count\": 8,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/cloudbeaver\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/cloudbeaver-575cf969c6-6qdfr\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/open-webui\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/open-webui-648d9c6678-552zd\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pgadmin\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pgadmin-6f5966bd49-7lmc9\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Deployment\",\n        \"name\": \"aiot/qdrant\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/qdrant-7cb86668c5-6fzbn\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T13:00:00Z\",\n    \"count\": 8,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/cloudbeaver\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/cloudbeaver-575cf969c6-6qdfr\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/open-webui\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/open-webui-648d9c6678-552zd\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pgadmin\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pgadmin-6f5966bd49-7lmc9\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Deployment\",\n        \"name\": \"aiot/qdrant\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/qdrant-7cb86668c5-6fzbn\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T14:00:00Z\",\n    \"count\": 8,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/cloudbeaver\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/cloudbeaver-575cf969c6-6qdfr\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/open-webui\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/open-webui-648d9c6678-552zd\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pgadmin\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pgadmin-6f5966bd49-7lmc9\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Deployment\",\n        \"name\": \"aiot/qdrant\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/qdrant-7cb86668c5-6fzbn\",\n        \"since\": \"2026-04-25T11:33:23Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T15:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T16:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T17:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T18:00:00Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-clickhouse\",\n        \"since\": \"2026-04-25T17:36:09Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-25T19:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T20:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T21:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T22:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-25T23:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T00:00:03Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T01:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T02:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T03:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T04:00:00Z\",\n    \"count\": 2,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/postgres-backup-29619540-mzjqr\",\n        \"since\": \"2026-04-26T03:40:37Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"semaphore/backup-aiot-backup-dm5mk-0-k8cgk\",\n        \"since\": \"2026-04-26T03:40:37Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T05:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T06:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T07:00:01Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T08:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T09:00:00Z\",\n    \"count\": 0,\n    \"items\": []\n  },\n  {\n    \"ts\": \"2026-04-26T10:00:00Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T12:00:11Z\",\n    \"count\": 63,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"ai-enricher/ai-enricher\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/hello-aiot\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/hello-aiot-6fc4c9f6b9-ph64t\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/ngrok-proxy\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/ngrok-proxy-bcc8c8b57-gr7b9\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/open-webui\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pgadmin\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-rw\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/postgres\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/qdrant\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"argocd/argocd-repo-server\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"argocd/argocd-repo-server-5f5dbd68cb-b96zd\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"argocd/argocd-repo-server-metrics\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"argocd/argocd-server\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"argocd/argocd-server-metrics\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"cattle-capi-system/capi-controller-manager-6f9cfbdb68-wdtqd\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"cattle-capi-system/capi-webhook-service\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"cattle-turtles-system/rancher-turtles-controller-manager-86bc6bbdb5-7rlcd\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"cert-manager/cert-manager-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"cnpg-system/cnpg-controller-manager-7d4d7f5854-gj5q2\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"cnpg-system/cnpg-webhook-service\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"gitea/gitea\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/cluster-local-gateway\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"ReplicaSet\",\n        \"name\": \"istio-system/cluster-local-gateway-5b86b4b569\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istiod\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"istio-system/istiod-5c47f5b7bb-2tl5g\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istio-ingressgateway\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"istio-system/istio-ingressgateway-6bbf5fdb6f-k4kdf\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/knative-local-gateway\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"k8sgpt/k8sgpt-robusta-bridge\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"knative-serving/webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"kube-system/coredns-668d6bf9bc-rxlds\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kube-system/kube-dns\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kube-system/prometheus-kube-prometheus-coredns\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kyverno/kyverno-svc\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kyverno/kyverno-svc-metrics\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"monitoring/prometheus-kube-prometheus-operator\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"opentelemetry-operator-system/opentelemetry-operator\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"opentelemetry-operator-system/opentelemetry-operator-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"pipelines-as-code/pipelines-as-code-controller\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"pipelines-as-code/pipelines-as-code-controller-5896d8998b-t4rms\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"pipelines-as-code/pipelines-as-code-watcher\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"pipelines-as-code/pipelines-as-code-watcher-7d557456b5-j4h62\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Deployment\",\n        \"name\": \"piraeus-datastore/piraeus-operator-controller-manager\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"ReplicaSet\",\n        \"name\": \"piraeus-datastore/piraeus-operator-controller-manager-55bf9797fd\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"piraeus-datastore/piraeus-operator-webhook-service\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/chi-signoz-clickhouse-cluster-0-0\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/k8s-infra-otel-agent\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"signoz/k8s-infra-otel-agent-gb76g\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-clickhouse\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-otel-collector\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-zookeeper\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-zookeeper-headless\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-zookeeper-metrics\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-events-controller\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-operator-proxy-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-pipelines-controller\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"tekton-pipelines/tekton-pipelines-controller-564cbddb6c-h7w8t\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-pipelines-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"zabbix/zabbix-zabbix-web\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T13:00:01Z\",\n    \"count\": 45,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/hello-aiot-6fc4c9f6b9-ph64t\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/hello-aiot-6fc4c9f6b9-zz4jt\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/ngrok-proxy\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/redis-master\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"argocd/argocd-repo-server\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"argocd/argocd-repo-server-metrics\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"cert-manager/cert-manager-webhook-74b94cd64b-twgw9\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"cert-manager/trust-manager\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"cert-manager/trust-manager-5df668d777-dlbjg\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"cert-manager/trust-manager-metrics\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"cnpg-system/cnpg-webhook-service\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"emqx/emqx\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/cluster-local-gateway\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"ReplicaSet\",\n        \"name\": \"istio-system/cluster-local-gateway-5b86b4b569\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istiod\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istio-ingressgateway\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"k8sgpt/k8sgpt-llm-proxy-86f7c4749-pqrcz\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"karpor/karpor-server\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"karpor/karpor-server-5dfbf64b84-6d4qm\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"knative-serving/webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"konflux-ui/dex-7b5d5884b9-n4xsr\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kyverno/kyverno-background-controller-metrics\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kyverno/kyverno-cleanup-controller\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kyverno/kyverno-cleanup-controller-metrics\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kyverno/kyverno-reports-controller-metrics\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kyverno/kyverno-svc\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kyverno/kyverno-svc-metrics\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"monitoring/prometheus-kube-prometheus-operator-69f48f846c-p2hml\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"pipelines-as-code/pipelines-as-code-controller\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"pipelines-as-code/pipelines-as-code-watcher\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"release-service/release-service-controller-manager-metrics-service\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"release-service/release-service-webhook-service\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-clickhouse\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-otel-collector\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-zookeeper\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"signoz/signoz-zookeeper-0\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-zookeeper-metrics\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"tekton-pipelines/tekton-events-controller-6d8db65c96-sgzhp\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-operator-proxy-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"tekton-pipelines/tekton-pipelines-controller-564cbddb6c-h7w8t\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-pipelines-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"tekton-pipelines/tekton-triggers-core-interceptors-668cbbb8c6-tz9f9\",\n        \"since\": \"2026-04-26T12:04:10Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T14:00:01Z\",\n    \"count\": 7,\n    \"items\": [\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istiod\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istio-ingressgateway\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"knative-serving/webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-clickhouse\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-operator-proxy-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-pipelines-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T15:00:04Z\",\n    \"count\": 62,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"ai-enricher/ai-enricher\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"ai-enricher/ai-enricher-6c57d5bc59-g99w2\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/cloudbeaver\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/cloudbeaver-6945f7d648-lcdg8\",\n        \"since\": \"2026-04-26T14:43:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/hello-aiot\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/hello-aiot-6fc4c9f6b9-5s2bc\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/open-webui\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/open-webui-cb875f77d-jx8l7\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pgadmin\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-r\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T14:43:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-rw\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pg-sink-7787d755f7-ccvbf\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/postgres\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/qdrant\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/redis-master\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/sensor-simulator-6f9869bbbc-8wwjq\",\n        \"since\": \"2026-04-26T14:43:35Z\"\n      },\n      {\n        \"kind\": \"Node\",\n        \"name\": \"aiot-worker-01\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"argocd/argocd-application-controller-metrics\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"backrest/backrest\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"backrest/backrest-6cd94bbdb9-gncrw\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"default/ingress-nginx-controller-zzwbd\",\n        \"since\": \"2026-04-26T14:43:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"emqx/emqx\",\n        \"since\": \"2026-04-26T14:43:35Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"emqx/emqx-0\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"gitea/gitea\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"gitea/gitea-8598474664-2sb66\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istio-ingressgateway\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"jenkins/jenkins\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"jenkins/jenkins-agent\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"karpor/etcd\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"karpor/karpor-syncer-f8d6f8897-ck9wx\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"kube-system/prometheus-kube-prometheus-kube-proxy\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"monitoring/prometheus-prometheus-node-exporter\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"opentelemetry-operator-system/opentelemetry-operator\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"opentelemetry-operator-system/opentelemetry-operator-webhook\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"piraeus-datastore/linstor-affinity-controller-b6fd7f7b8-dnfrh\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"piraeus-datastore/linstor-controller\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"registry/internal-registry\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"registry/internal-registry-67d69779c4-dgbwv\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"registry/internal-registry-http\",\n        \"since\": \"2026-04-26T14:43:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"semaphore/semaphore\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"semaphore/semaphore-75b85ff97b-crdp6\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/k8s-infra-otel-agent\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-clickhouse\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-clickhouse-operator-metrics\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-otel-collector\",\n        \"since\": \"2026-04-26T14:01:47Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"signoz/signoz-otel-collector-6fff48485f-z5nk4\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-zookeeper\",\n        \"since\": \"2026-04-26T14:43:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-zookeeper-headless\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-zookeeper-metrics\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/postgres\",\n        \"since\": \"2026-04-26T14:43:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-events-controller\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"tekton-pipelines/tekton-events-controller-6d8db65c96-2dkcz\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-operator-proxy-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-pipelines-remote-resolvers\",\n        \"since\": \"2026-04-26T14:43:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-pipelines-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"tekton-pipelines/tekton-results-api-76f77d6cdf-gq559\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-results-api-service\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-results-postgres-service\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-results-watcher\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T16:00:01Z\",\n    \"count\": 6,\n    \"items\": [\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istiod\",\n        \"since\": \"2026-04-26T15:50:11Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istio-ingressgateway\",\n        \"since\": \"2026-04-26T14:43:36Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"knative-serving/webhook\",\n        \"since\": \"2026-04-26T15:50:11Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-operator-proxy-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"tekton-pipelines/tekton-pipelines-webhook\",\n        \"since\": \"2026-04-26T11:42:12Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T18:00:01Z\",\n    \"count\": 1,\n    \"items\": [\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T19:01:06Z\",\n    \"count\": 3,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T18:57:55Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istio-ingressgateway\",\n        \"since\": \"2026-04-26T18:31:17Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T20:00:01Z\",\n    \"count\": 7,\n    \"items\": [\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T18:57:55Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"cnpg-system/cnpg-webhook-service\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istio-ingressgateway\",\n        \"since\": \"2026-04-26T18:31:17Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"karpor/etcd\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-clickhouse\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-otel-collector\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T21:00:01Z\",\n    \"count\": 7,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pg-ha-1\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-r\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T18:57:55Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"istio-system/istio-ingressgateway\",\n        \"since\": \"2026-04-26T18:31:17Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"karpor/etcd\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"signoz/signoz-clickhouse\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T22:00:01Z\",\n    \"count\": 5,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pg-ha-1\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-r\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T18:57:55Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"karpor/etcd\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-26T23:00:01Z\",\n    \"count\": 5,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pg-ha-1\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-r\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T18:57:55Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"karpor/etcd\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-27T00:00:01Z\",\n    \"count\": 5,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pg-ha-1\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-r\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T18:57:55Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"karpor/etcd\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      }\n    ]\n  },\n  {\n    \"ts\": \"2026-04-27T01:00:01Z\",\n    \"count\": 5,\n    \"items\": [\n      {\n        \"kind\": \"Pod\",\n        \"name\": \"aiot/pg-ha-1\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-r\",\n        \"since\": \"2026-04-26T20:03:29Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"aiot/pg-ha-ro\",\n        \"since\": \"2026-04-26T18:57:55Z\"\n      },\n      {\n        \"kind\": \"StatefulSet\",\n        \"name\": \"argocd/argocd-application-controller\",\n        \"since\": \"2026-04-26T09:27:35Z\"\n      },\n      {\n        \"kind\": \"Service\",\n        \"name\": \"karpor/etcd\",\n        \"since\": \"2026-04-26T19:20:41Z\"\n      }\n    ]\n  }\n]"},"kind":"ConfigMap","metadata":{"annotations":{},"creationTimestamp":null,"name":"k8sgpt-mm-history","namespace":"k8sgpt"}}
     name: k8sgpt-mm-history
     namespace: k8sgpt
 - apiVersion: v1

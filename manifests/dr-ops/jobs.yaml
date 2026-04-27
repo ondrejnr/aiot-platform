@@ -4,102 +4,6 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T01:30:00Z"
-    labels:
-      batch.kubernetes.io/job-name: dns-backup-29616570
-      job-name: dns-backup-29616570
-    name: dns-backup-29616570
-    namespace: dr-ops
-    ownerReferences:
-    - apiVersion: batch/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: CronJob
-      name: dns-backup
-  spec:
-    backoffLimit: 1
-    completionMode: NonIndexed
-    completions: 1
-    manualSelector: false
-    parallelism: 1
-    podReplacementPolicy: TerminatingOrFailed
-    selector:
-      matchLabels:
-    suspend: false
-    template:
-      metadata:
-        labels:
-          batch.kubernetes.io/job-name: dns-backup-29616570
-          job-name: dns-backup-29616570
-      spec:
-        containers:
-        - command:
-          - /bin/sh
-          - /scripts/backup.sh
-          env:
-          - name: GITHUB_TOKEN
-            valueFrom:
-              secretKeyRef:
-                key: token
-                name: github-pat
-          - name: GITHUB_USERNAME
-            valueFrom:
-              secretKeyRef:
-                key: username
-                name: github-pat
-          - name: GITHUB_EMAIL
-            valueFrom:
-              secretKeyRef:
-                key: email
-                name: github-pat
-          - name: CF_TOKEN
-            valueFrom:
-              secretKeyRef:
-                key: token
-                name: cloudflare-api-token
-          image: alpine/k8s:1.32.3
-          imagePullPolicy: IfNotPresent
-          name: backup
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /scripts
-            name: scripts
-        dnsPolicy: ClusterFirst
-        restartPolicy: OnFailure
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-        volumes:
-        - configMap:
-            defaultMode: 493
-            name: dns-backup-script
-          name: scripts
-  status:
-    completionTime: "2026-04-24T01:30:10Z"
-    conditions:
-    - lastProbeTime: "2026-04-24T01:30:10Z"
-      lastTransitionTime: "2026-04-24T01:30:10Z"
-      message: Reached expected number of succeeded pods
-      reason: CompletionsReached
-      status: "True"
-      type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-24T01:30:10Z"
-      lastTransitionTime: "2026-04-24T01:30:10Z"
-      message: Reached expected number of succeeded pods
-      reason: CompletionsReached
-      status: "True"
-      type: Complete
-    ready: 0
-    startTime: "2026-04-24T01:30:00Z"
-    succeeded: 1
-    terminating: 0
-    uncountedTerminatedPods: {}
-- apiVersion: batch/v1
-  kind: Job
-  metadata:
-    annotations:
       batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-25T01:30:00Z"
     labels:
       batch.kubernetes.io/job-name: dns-backup-29618010
@@ -196,18 +100,18 @@ items:
   kind: Job
   metadata:
     annotations:
-      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-24T01:15:00Z"
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-26T01:30:00Z"
     labels:
-      batch.kubernetes.io/job-name: manifest-backup-29616555
-      job-name: manifest-backup-29616555
-    name: manifest-backup-29616555
+      batch.kubernetes.io/job-name: dns-backup-29619450
+      job-name: dns-backup-29619450
+    name: dns-backup-29619450
     namespace: dr-ops
     ownerReferences:
     - apiVersion: batch/v1
       blockOwnerDeletion: true
       controller: true
       kind: CronJob
-      name: manifest-backup
+      name: dns-backup
   spec:
     backoffLimit: 1
     completionMode: NonIndexed
@@ -221,8 +125,8 @@ items:
     template:
       metadata:
         labels:
-          batch.kubernetes.io/job-name: manifest-backup-29616555
-          job-name: manifest-backup-29616555
+          batch.kubernetes.io/job-name: dns-backup-29619450
+          job-name: dns-backup-29619450
       spec:
         containers:
         - command:
@@ -244,6 +148,11 @@ items:
               secretKeyRef:
                 key: email
                 name: github-pat
+          - name: CF_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: token
+                name: cloudflare-api-token
           image: alpine/k8s:1.32.3
           imagePullPolicy: IfNotPresent
           name: backup
@@ -257,31 +166,29 @@ items:
         restartPolicy: OnFailure
         schedulerName: default-scheduler
         securityContext: {}
-        serviceAccount: manifest-backup
-        serviceAccountName: manifest-backup
         terminationGracePeriodSeconds: 30
         volumes:
         - configMap:
             defaultMode: 493
-            name: manifest-backup-script
+            name: dns-backup-script
           name: scripts
   status:
-    completionTime: "2026-04-24T01:18:04Z"
+    completionTime: "2026-04-26T01:30:10Z"
     conditions:
-    - lastProbeTime: "2026-04-24T01:18:04Z"
-      lastTransitionTime: "2026-04-24T01:18:04Z"
+    - lastProbeTime: "2026-04-26T01:30:10Z"
+      lastTransitionTime: "2026-04-26T01:30:10Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-24T01:18:04Z"
-      lastTransitionTime: "2026-04-24T01:18:04Z"
+    - lastProbeTime: "2026-04-26T01:30:10Z"
+      lastTransitionTime: "2026-04-26T01:30:10Z"
       message: Reached expected number of succeeded pods
       reason: CompletionsReached
       status: "True"
       type: Complete
     ready: 0
-    startTime: "2026-04-24T01:15:00Z"
+    startTime: "2026-04-26T01:30:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}
@@ -452,9 +359,102 @@ items:
             name: manifest-backup-script
           name: scripts
   status:
+    completionTime: "2026-04-26T01:18:29Z"
+    conditions:
+    - lastProbeTime: "2026-04-26T01:18:29Z"
+      lastTransitionTime: "2026-04-26T01:18:29Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-26T01:18:29Z"
+      lastTransitionTime: "2026-04-26T01:18:29Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-26T01:15:00Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      batch.kubernetes.io/cronjob-scheduled-timestamp: "2026-04-27T01:15:00Z"
+    labels:
+      batch.kubernetes.io/job-name: manifest-backup-29620875
+      job-name: manifest-backup-29620875
+    name: manifest-backup-29620875
+    namespace: dr-ops
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: CronJob
+      name: manifest-backup
+  spec:
+    backoffLimit: 1
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: manifest-backup-29620875
+          job-name: manifest-backup-29620875
+      spec:
+        containers:
+        - command:
+          - /bin/sh
+          - /scripts/backup.sh
+          env:
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: token
+                name: github-pat
+          - name: GITHUB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: github-pat
+          - name: GITHUB_EMAIL
+            valueFrom:
+              secretKeyRef:
+                key: email
+                name: github-pat
+          image: alpine/k8s:1.32.3
+          imagePullPolicy: IfNotPresent
+          name: backup
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /scripts
+            name: scripts
+        dnsPolicy: ClusterFirst
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: manifest-backup
+        serviceAccountName: manifest-backup
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 493
+            name: manifest-backup-script
+          name: scripts
+  status:
     active: 1
     ready: 1
-    startTime: "2026-04-26T01:15:00Z"
+    startTime: "2026-04-27T01:15:00Z"
     terminating: 0
     uncountedTerminatedPods: {}
 kind: List

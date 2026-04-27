@@ -4,6 +4,41 @@ items:
   kind: Service
   metadata:
     annotations:
+      meta.helm.sh/release-name: cilium
+      meta.helm.sh/release-namespace: kube-system
+      prometheus.io/port: "9964"
+      prometheus.io/scrape: "true"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: cilium-envoy
+      app.kubernetes.io/part-of: cilium
+      io.cilium/app: proxy
+      k8s-app: cilium-envoy
+    name: cilium-envoy
+    namespace: kube-system
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: envoy-metrics
+      port: 9964
+      protocol: TCP
+      targetPort: envoy-metrics
+    selector:
+      k8s-app: cilium-envoy
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
       prometheus.io/port: "9153"
       prometheus.io/scrape: "true"
     labels:

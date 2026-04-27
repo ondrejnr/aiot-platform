@@ -4,7 +4,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "12"
+      deployment.kubernetes.io/revision: "13"
     labels:
       app.kubernetes.io/component: controller
       app.kubernetes.io/instance: default
@@ -122,6 +122,16 @@ items:
         serviceAccount: tekton-chains-controller
         serviceAccountName: tekton-chains-controller
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: default
+              app.kubernetes.io/name: controller
+              app.kubernetes.io/part-of: tekton-chains
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - name: signing-secrets
           secret:
@@ -147,18 +157,18 @@ items:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:41:19Z"
-      lastUpdateTime: "2026-04-23T09:55:08Z"
-      message: ReplicaSet "tekton-chains-controller-666b9684ff" has successfully progressed.
+      lastUpdateTime: "2026-04-26T17:22:26Z"
+      message: ReplicaSet "tekton-chains-controller-5d95b8b596" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:14Z"
-      lastUpdateTime: "2026-04-24T10:19:14Z"
+    - lastTransitionTime: "2026-04-26T18:26:40Z"
+      lastUpdateTime: "2026-04-26T18:26:40Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 12
+    observedGeneration: 13
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -166,7 +176,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
     labels:
       app.kubernetes.io/component: events
       app.kubernetes.io/instance: default
@@ -304,6 +314,16 @@ items:
         serviceAccount: tekton-events-controller
         serviceAccountName: tekton-events-controller
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: events
+              app.kubernetes.io/instance: default
+              app.kubernetes.io/name: events
+              app.kubernetes.io/part-of: tekton-pipelines
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - configMap:
             defaultMode: 420
@@ -317,18 +337,18 @@ items:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:40:17Z"
-      lastUpdateTime: "2026-04-22T11:40:36Z"
-      message: ReplicaSet "tekton-events-controller-6d8db65c96" has successfully progressed.
+      lastUpdateTime: "2026-04-26T17:22:38Z"
+      message: ReplicaSet "tekton-events-controller-67cc4f6f56" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:14Z"
-      lastUpdateTime: "2026-04-24T10:19:14Z"
+    - lastTransitionTime: "2026-04-26T18:25:36Z"
+      lastUpdateTime: "2026-04-26T18:25:36Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -336,7 +356,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
     labels:
       operator.tekton.dev/operand-name: tektoncd-pipelines
       operator.tekton.dev/release: devel
@@ -420,23 +440,30 @@ items:
         serviceAccount: tekton-operators-proxy-webhook
         serviceAccountName: tekton-operators-proxy-webhook
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              name: tekton-operator
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
   status:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:40:17Z"
-      lastUpdateTime: "2026-04-22T11:40:40Z"
-      message: ReplicaSet "tekton-operator-proxy-webhook-6d6568fbcf" has successfully
+      lastUpdateTime: "2026-04-26T17:22:27Z"
+      message: ReplicaSet "tekton-operator-proxy-webhook-5ffc44d458" has successfully
         progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:14Z"
-      lastUpdateTime: "2026-04-24T10:19:14Z"
+    - lastTransitionTime: "2026-04-26T18:25:25Z"
+      lastUpdateTime: "2026-04-26T18:25:25Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -444,7 +471,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
     labels:
       app.kubernetes.io/component: controller
       app.kubernetes.io/instance: default
@@ -614,6 +641,16 @@ items:
         serviceAccount: tekton-pipelines-controller
         serviceAccountName: tekton-pipelines-controller
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: default
+              app.kubernetes.io/name: controller
+              app.kubernetes.io/part-of: tekton-pipelines
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - configMap:
             defaultMode: 420
@@ -627,19 +664,19 @@ items:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:40:16Z"
-      lastUpdateTime: "2026-04-22T11:40:33Z"
-      message: ReplicaSet "tekton-pipelines-controller-564cbddb6c" has successfully
+      lastUpdateTime: "2026-04-26T17:22:41Z"
+      message: ReplicaSet "tekton-pipelines-controller-67fc758899" has successfully
         progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:14Z"
-      lastUpdateTime: "2026-04-24T10:19:14Z"
+    - lastTransitionTime: "2026-04-26T18:26:21Z"
+      lastUpdateTime: "2026-04-26T18:26:21Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -647,7 +684,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "2"
+      deployment.kubernetes.io/revision: "3"
     labels:
       app.kubernetes.io/component: resolvers
       app.kubernetes.io/instance: default
@@ -792,6 +829,16 @@ items:
         serviceAccount: tekton-pipelines-resolvers
         serviceAccountName: tekton-pipelines-resolvers
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: resolvers
+              app.kubernetes.io/instance: default
+              app.kubernetes.io/name: resolvers
+              app.kubernetes.io/part-of: tekton-pipelines
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - emptyDir:
             sizeLimit: 4Gi
@@ -808,19 +855,19 @@ items:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:40:17Z"
-      lastUpdateTime: "2026-04-22T11:42:35Z"
-      message: ReplicaSet "tekton-pipelines-remote-resolvers-5c749bd799" has successfully
+      lastUpdateTime: "2026-04-26T17:22:31Z"
+      message: ReplicaSet "tekton-pipelines-remote-resolvers-76cd4f8469" has successfully
         progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-22T14:17:21Z"
-      lastUpdateTime: "2026-04-22T14:17:21Z"
+    - lastTransitionTime: "2026-04-26T18:25:28Z"
+      lastUpdateTime: "2026-04-26T18:25:28Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 2
+    observedGeneration: 3
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -828,7 +875,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
     labels:
       app.kubernetes.io/component: webhook
       app.kubernetes.io/instance: default
@@ -989,22 +1036,32 @@ items:
         serviceAccount: tekton-pipelines-webhook
         serviceAccountName: tekton-pipelines-webhook
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: webhook
+              app.kubernetes.io/instance: default
+              app.kubernetes.io/name: webhook
+              app.kubernetes.io/part-of: tekton-pipelines
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
   status:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:40:17Z"
-      lastUpdateTime: "2026-04-22T11:40:44Z"
-      message: ReplicaSet "tekton-pipelines-webhook-648cf4d468" has successfully progressed.
+      lastUpdateTime: "2026-04-26T17:22:38Z"
+      message: ReplicaSet "tekton-pipelines-webhook-f99b95fd8" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-25T18:15:18Z"
-      lastUpdateTime: "2026-04-25T18:15:18Z"
+    - lastTransitionTime: "2026-04-26T18:26:09Z"
+      lastUpdateTime: "2026-04-26T18:26:09Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 3
+    observedGeneration: 4
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1012,7 +1069,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "8"
+      deployment.kubernetes.io/revision: "9"
     labels:
       app.kubernetes.io/name: tekton-results-api
       app.kubernetes.io/part-of: tekton-results
@@ -1153,6 +1210,14 @@ items:
         serviceAccount: tekton-results-api
         serviceAccountName: tekton-results-api
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: tekton-results-api
+              app.kubernetes.io/version: v0.18.0
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - configMap:
             defaultMode: 420
@@ -1166,18 +1231,18 @@ items:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:41:29Z"
-      lastUpdateTime: "2026-04-23T09:55:16Z"
-      message: ReplicaSet "tekton-results-api-76f77d6cdf" has successfully progressed.
+      lastUpdateTime: "2026-04-26T17:21:36Z"
+      message: ReplicaSet "tekton-results-api-6845ccb496" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-25T17:45:13Z"
-      lastUpdateTime: "2026-04-25T17:45:13Z"
+    - lastTransitionTime: "2026-04-26T18:25:32Z"
+      lastUpdateTime: "2026-04-26T18:25:32Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 8
+    observedGeneration: 9
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1185,7 +1250,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "3"
+      deployment.kubernetes.io/revision: "4"
     labels:
       app.kubernetes.io/name: tekton-results-retention-policy-agent
       app.kubernetes.io/part-of: tekton-results
@@ -1275,6 +1340,14 @@ items:
         serviceAccount: tekton-results-watcher
         serviceAccountName: tekton-results-watcher
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: tekton-results-retention-policy-agent
+              app.kubernetes.io/version: v0.18.0
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - configMap:
             defaultMode: 420
@@ -1288,19 +1361,19 @@ items:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:41:29Z"
-      lastUpdateTime: "2026-04-23T07:15:38Z"
-      message: ReplicaSet "tekton-results-retention-policy-agent-58d6f7bfd5" has successfully
+      lastUpdateTime: "2026-04-26T17:21:28Z"
+      message: ReplicaSet "tekton-results-retention-policy-agent-6896db77c9" has successfully
         progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:14Z"
-      lastUpdateTime: "2026-04-24T10:19:14Z"
+    - lastTransitionTime: "2026-04-26T18:26:37Z"
+      lastUpdateTime: "2026-04-26T18:26:37Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 3
+    observedGeneration: 4
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1308,7 +1381,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "6"
+      deployment.kubernetes.io/revision: "7"
     labels:
       app.kubernetes.io/name: tekton-results-watcher
       app.kubernetes.io/part-of: tekton-results
@@ -1430,6 +1503,14 @@ items:
         serviceAccount: tekton-results-watcher
         serviceAccountName: tekton-results-watcher
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: tekton-results-watcher
+              app.kubernetes.io/version: v0.18.0
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
         volumes:
         - name: tls
           secret:
@@ -1439,18 +1520,18 @@ items:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:41:29Z"
-      lastUpdateTime: "2026-04-23T09:55:08Z"
-      message: ReplicaSet "tekton-results-watcher-7f7c98d7ff" has successfully progressed.
+      lastUpdateTime: "2026-04-26T17:21:36Z"
+      message: ReplicaSet "tekton-results-watcher-784b955cc4" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-25T17:45:07Z"
-      lastUpdateTime: "2026-04-25T17:45:07Z"
+    - lastTransitionTime: "2026-04-26T18:26:01Z"
+      lastUpdateTime: "2026-04-26T18:26:01Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 6
+    observedGeneration: 7
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1458,7 +1539,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
     labels:
       app.kubernetes.io/component: controller
       app.kubernetes.io/instance: default
@@ -1605,23 +1686,33 @@ items:
         serviceAccount: tekton-triggers-controller
         serviceAccountName: tekton-triggers-controller
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/instance: default
+              app.kubernetes.io/name: controller
+              app.kubernetes.io/part-of: tekton-triggers
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
   status:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:40:53Z"
-      lastUpdateTime: "2026-04-22T11:40:58Z"
-      message: ReplicaSet "tekton-triggers-controller-79bfcd5bfb" has successfully
+      lastUpdateTime: "2026-04-26T17:22:33Z"
+      message: ReplicaSet "tekton-triggers-controller-585d59c5f6" has successfully
         progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:14Z"
-      lastUpdateTime: "2026-04-24T10:19:14Z"
+    - lastTransitionTime: "2026-04-26T18:26:08Z"
+      lastUpdateTime: "2026-04-26T18:26:08Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1629,7 +1720,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
     labels:
       app.kubernetes.io/component: interceptors
       app.kubernetes.io/instance: default
@@ -1737,23 +1828,33 @@ items:
         serviceAccount: tekton-triggers-core-interceptors
         serviceAccountName: tekton-triggers-core-interceptors
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: interceptors
+              app.kubernetes.io/instance: default
+              app.kubernetes.io/name: core-interceptors
+              app.kubernetes.io/part-of: tekton-triggers
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
   status:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:40:54Z"
-      lastUpdateTime: "2026-04-22T11:41:17Z"
-      message: ReplicaSet "tekton-triggers-core-interceptors-668cbbb8c6" has successfully
+      lastUpdateTime: "2026-04-26T17:21:39Z"
+      message: ReplicaSet "tekton-triggers-core-interceptors-7f6647cd8d" has successfully
         progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:08Z"
-      lastUpdateTime: "2026-04-24T10:19:08Z"
+    - lastTransitionTime: "2026-04-26T18:32:42Z"
+      lastUpdateTime: "2026-04-26T18:32:42Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1
@@ -1761,7 +1862,7 @@ items:
   kind: Deployment
   metadata:
     annotations:
-      deployment.kubernetes.io/revision: "1"
+      deployment.kubernetes.io/revision: "2"
     labels:
       app.kubernetes.io/component: webhook
       app.kubernetes.io/instance: default
@@ -1862,22 +1963,32 @@ items:
         serviceAccount: tekton-triggers-webhook
         serviceAccountName: tekton-triggers-webhook
         terminationGracePeriodSeconds: 30
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: webhook
+              app.kubernetes.io/instance: default
+              app.kubernetes.io/name: webhook
+              app.kubernetes.io/part-of: tekton-triggers
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
   status:
     availableReplicas: 1
     conditions:
     - lastTransitionTime: "2026-04-22T11:40:54Z"
-      lastUpdateTime: "2026-04-22T11:41:02Z"
-      message: ReplicaSet "tekton-triggers-webhook-687fccdd66" has successfully progressed.
+      lastUpdateTime: "2026-04-26T17:21:15Z"
+      message: ReplicaSet "tekton-triggers-webhook-8574c88964" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T10:19:14Z"
-      lastUpdateTime: "2026-04-24T10:19:14Z"
+    - lastTransitionTime: "2026-04-26T18:26:11Z"
+      lastUpdateTime: "2026-04-26T18:26:11Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
       type: Available
-    observedGeneration: 1
+    observedGeneration: 2
     readyReplicas: 1
     replicas: 1
     updatedReplicas: 1

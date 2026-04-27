@@ -529,6 +529,120 @@ items:
   kind: Job
   metadata:
     labels:
+      k8up.io/owned-by: prune_aiot-prune-d778l
+      k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
+      k8up.io/type: prune
+      k8upjob: "true"
+      k8upjob/exclusive: "true"
+    name: prune-aiot-prune-d778l
+    namespace: semaphore
+    ownerReferences:
+    - apiVersion: k8up.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Prune
+      name: aiot-prune-d778l
+  spec:
+    backoffLimit: 6
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+    suspend: false
+    template:
+      metadata:
+        labels:
+          batch.kubernetes.io/job-name: prune-aiot-prune-d778l
+          job-name: prune-aiot-prune-d778l
+          k8upjob: "true"
+      spec:
+        containers:
+        - args:
+          - -varDir
+          - /k8up
+          - -prune
+          command:
+          - /usr/local/bin/k8up
+          - restic
+          env:
+          - name: STATS_URL
+          - name: HOSTNAME
+            value: semaphore
+          - name: KEEP_DAILY
+            value: "2"
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                key: access_key
+                name: r2-creds
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                key: secret_key
+                name: r2-creds
+          - name: RESTIC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: k8up-repo
+          - name: PROM_URL
+            value: http://127.0.0.1/
+          - name: RESTIC_REPOSITORY
+            value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
+          image: ghcr.io/k8up-io/k8up:v2.15.0
+          imagePullPolicy: IfNotPresent
+          name: prune
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /k8up
+            name: k8up-dir
+          - mountPath: /tmp
+            name: restic-tmp-dir
+          - mountPath: /.cache
+            name: restic-cache-dir
+        dnsPolicy: ClusterFirst
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: pod-executor
+        serviceAccountName: pod-executor
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: k8up-dir
+        - emptyDir: {}
+          name: restic-tmp-dir
+        - emptyDir: {}
+          name: restic-cache-dir
+  status:
+    completionTime: "2026-04-26T04:05:08Z"
+    conditions:
+    - lastProbeTime: "2026-04-26T04:05:08Z"
+      lastTransitionTime: "2026-04-26T04:05:08Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2026-04-26T04:05:08Z"
+      lastTransitionTime: "2026-04-26T04:05:08Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2026-04-26T04:05:00Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    labels:
       k8up.io/owned-by: prune_aiot-prune-lgq6x
       k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
       k8up.io/type: prune
@@ -636,120 +750,6 @@ items:
       type: Complete
     ready: 0
     startTime: "2026-04-24T04:05:00Z"
-    succeeded: 1
-    terminating: 0
-    uncountedTerminatedPods: {}
-- apiVersion: batch/v1
-  kind: Job
-  metadata:
-    labels:
-      k8up.io/owned-by: prune_aiot-prune-zkkzs
-      k8up.io/repository-hash: 7f9696c5c10bc4c5c36b1770cf5354c4c6400cf079e9c8a22840ff32a5c2e42
-      k8up.io/type: prune
-      k8upjob: "true"
-      k8upjob/exclusive: "true"
-    name: prune-aiot-prune-zkkzs
-    namespace: semaphore
-    ownerReferences:
-    - apiVersion: k8up.io/v1
-      blockOwnerDeletion: true
-      controller: true
-      kind: Prune
-      name: aiot-prune-zkkzs
-  spec:
-    backoffLimit: 6
-    completionMode: NonIndexed
-    completions: 1
-    manualSelector: false
-    parallelism: 1
-    podReplacementPolicy: TerminatingOrFailed
-    selector:
-      matchLabels:
-    suspend: false
-    template:
-      metadata:
-        labels:
-          batch.kubernetes.io/job-name: prune-aiot-prune-zkkzs
-          job-name: prune-aiot-prune-zkkzs
-          k8upjob: "true"
-      spec:
-        containers:
-        - args:
-          - -varDir
-          - /k8up
-          - -prune
-          command:
-          - /usr/local/bin/k8up
-          - restic
-          env:
-          - name: STATS_URL
-          - name: HOSTNAME
-            value: semaphore
-          - name: KEEP_DAILY
-            value: "2"
-          - name: RESTIC_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: password
-                name: k8up-repo
-          - name: AWS_ACCESS_KEY_ID
-            valueFrom:
-              secretKeyRef:
-                key: access_key
-                name: r2-creds
-          - name: AWS_SECRET_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                key: secret_key
-                name: r2-creds
-          - name: PROM_URL
-            value: http://127.0.0.1/
-          - name: RESTIC_REPOSITORY
-            value: s3:https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com/aiot-velero
-          image: ghcr.io/k8up-io/k8up:v2.15.0
-          imagePullPolicy: IfNotPresent
-          name: prune
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /k8up
-            name: k8up-dir
-          - mountPath: /tmp
-            name: restic-tmp-dir
-          - mountPath: /.cache
-            name: restic-cache-dir
-        dnsPolicy: ClusterFirst
-        restartPolicy: OnFailure
-        schedulerName: default-scheduler
-        securityContext: {}
-        serviceAccount: pod-executor
-        serviceAccountName: pod-executor
-        terminationGracePeriodSeconds: 30
-        volumes:
-        - emptyDir: {}
-          name: k8up-dir
-        - emptyDir: {}
-          name: restic-tmp-dir
-        - emptyDir: {}
-          name: restic-cache-dir
-  status:
-    completionTime: "2026-04-23T04:05:10Z"
-    conditions:
-    - lastProbeTime: "2026-04-23T04:05:10Z"
-      lastTransitionTime: "2026-04-23T04:05:10Z"
-      message: Reached expected number of succeeded pods
-      reason: CompletionsReached
-      status: "True"
-      type: SuccessCriteriaMet
-    - lastProbeTime: "2026-04-23T04:05:10Z"
-      lastTransitionTime: "2026-04-23T04:05:10Z"
-      message: Reached expected number of succeeded pods
-      reason: CompletionsReached
-      status: "True"
-      type: Complete
-    ready: 0
-    startTime: "2026-04-23T04:05:00Z"
     succeeded: 1
     terminating: 0
     uncountedTerminatedPods: {}

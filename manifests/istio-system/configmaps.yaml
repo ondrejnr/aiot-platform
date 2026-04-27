@@ -85,21 +85,21 @@ items:
   kind: ConfigMap
   metadata:
     annotations:
-      control-plane.alpha.kubernetes.io/leader: '{"holderIdentity":"istiod-5c47f5b7bb-2tl5g","holderKey":"default","leaseDurationSeconds":30,"acquireTime":"2026-04-19T21:48:51Z","renewTime":"2026-04-26T01:16:01Z","leaderTransitions":6}'
+      control-plane.alpha.kubernetes.io/leader: '{"holderIdentity":"istiod-5c47f5b7bb-2tl5g","holderKey":"default","leaseDurationSeconds":30,"acquireTime":"2026-04-19T21:48:51Z","renewTime":"2026-04-27T01:16:01Z","leaderTransitions":6}'
     name: istio-gateway-status-leader
     namespace: istio-system
 - apiVersion: v1
   kind: ConfigMap
   metadata:
     annotations:
-      control-plane.alpha.kubernetes.io/leader: '{"holderIdentity":"istiod-5c47f5b7bb-2tl5g","holderKey":"default","leaseDurationSeconds":30,"acquireTime":"2026-04-19T21:48:52Z","renewTime":"2026-04-26T01:15:58Z","leaderTransitions":6}'
+      control-plane.alpha.kubernetes.io/leader: '{"holderIdentity":"istiod-5c47f5b7bb-2tl5g","holderKey":"default","leaseDurationSeconds":30,"acquireTime":"2026-04-19T21:48:52Z","renewTime":"2026-04-27T01:15:57Z","leaderTransitions":6}'
     name: istio-leader
     namespace: istio-system
 - apiVersion: v1
   kind: ConfigMap
   metadata:
     annotations:
-      control-plane.alpha.kubernetes.io/leader: '{"holderIdentity":"istiod-5c47f5b7bb-2tl5g","holderKey":"default","leaseDurationSeconds":30,"acquireTime":"2026-04-19T21:48:46Z","renewTime":"2026-04-26T01:16:01Z","leaderTransitions":6}'
+      control-plane.alpha.kubernetes.io/leader: '{"holderIdentity":"istiod-5c47f5b7bb-2tl5g","holderKey":"default","leaseDurationSeconds":30,"acquireTime":"2026-04-19T21:48:46Z","renewTime":"2026-04-27T01:15:59Z","leaderTransitions":6}'
     name: istio-namespace-controller-election
     namespace: istio-system
 - apiVersion: v1

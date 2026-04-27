@@ -20,6 +20,8 @@ items:
         k8s-app: flannel
     template:
       metadata:
+        annotations:
+          kubectl.kubernetes.io/restartedAt: "2026-04-26T16:45:48Z"
         labels:
           app: flannel
           k8s-app: flannel
@@ -165,7 +167,7 @@ items:
     numberAvailable: 5
     numberMisscheduled: 0
     numberReady: 5
-    observedGeneration: 3
+    observedGeneration: 5
     updatedNumberScheduled: 5
 kind: List
 metadata:

@@ -129,26 +129,26 @@ items:
     cloudNativePGCommitHash: a9696201f
     cloudNativePGOperatorHash: 527e2e3b680dfba7f7578b98530f755f36156e7be00acda3318ef36fe4f4418f
     conditions:
-    - lastTransitionTime: "2026-04-24T07:18:17Z"
+    - lastTransitionTime: "2026-04-26T19:58:00Z"
       message: A single, unique system ID was found across reporting instances.
       reason: Unique
       status: "True"
       type: ConsistentSystemID
-    - lastTransitionTime: "2026-04-24T10:22:45Z"
-      message: Cluster is Ready
-      reason: ClusterIsReady
-      status: "True"
+    - lastTransitionTime: "2026-04-26T19:04:12Z"
+      message: Cluster Is Not Ready
+      reason: ClusterIsNotReady
+      status: "False"
       type: Ready
-    - lastTransitionTime: "2026-04-24T10:22:29Z"
+    - lastTransitionTime: "2026-04-26T19:09:04Z"
       message: Continuous archiving is working
       reason: ContinuousArchivingSuccess
       status: "True"
       type: ContinuousArchiving
     configMapResourceVersion:
       metrics:
-        cnpg-default-monitoring: "10500961"
+        cnpg-default-monitoring: "11983254"
     currentPrimary: pg-ha-2
-    currentPrimaryTimestamp: "2026-04-24T10:22:29.163084Z"
+    currentPrimaryTimestamp: "2026-04-26T19:04:15.224095Z"
     healthyPVC:
     - pg-ha-1
     - pg-ha-2
@@ -159,28 +159,29 @@ items:
     instances: 2
     instancesReportedState:
       pg-ha-1:
-        ip: 10.244.6.241
+        ip: 10.245.2.221
         isPrimary: false
-        timeLineID: 2
       pg-ha-2:
-        ip: 10.244.2.91
+        ip: 10.245.3.1
         isPrimary: true
-        timeLineID: 2
+        timeLineID: 6
     instancesStatus:
       healthy:
-      - pg-ha-1
       - pg-ha-2
+      replicating:
+      - pg-ha-1
     latestGeneratedNode: 2
     managedRolesStatus: {}
     pgDataImageInfo:
       image: ghcr.io/cloudnative-pg/postgresql:16.4
       majorVersion: 16
-    phase: Cluster in healthy state
+    phase: Waiting for the instances to become active
+    phaseReason: Some instances are not yet active. Please wait.
     poolerIntegrations:
       pgBouncerIntegration: {}
     pvcCount: 2
     readService: pg-ha-r
-    readyInstances: 2
+    readyInstances: 1
     secretsResourceVersion:
       applicationSecretVersion: "10500515"
       clientCaSecretVersion: "8648075"
@@ -191,8 +192,8 @@ items:
     switchReplicaClusterStatus: {}
     systemID: "7632221646064402452"
     targetPrimary: pg-ha-2
-    targetPrimaryTimestamp: "2026-04-24T10:22:27.082235Z"
-    timelineID: 2
+    targetPrimaryTimestamp: "2026-04-26T19:04:13.161661Z"
+    timelineID: 6
     topology:
       instances:
         pg-ha-1: {}

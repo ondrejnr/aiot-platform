@@ -543,6 +543,7 @@ items:
       meta.helm.sh/release-namespace: robusta
     labels:
       app.kubernetes.io/managed-by: Helm
+      argocd.argoproj.io/instance: robusta
       release: robusta
     name: robusta-forwarder-service-monitor
     namespace: robusta
@@ -563,6 +564,7 @@ items:
       meta.helm.sh/release-namespace: robusta
     labels:
       app.kubernetes.io/managed-by: Helm
+      argocd.argoproj.io/instance: robusta
       release: robusta
     name: robusta-runner-service-monitor
     namespace: robusta

@@ -45,9 +45,9 @@ items:
       privateRequiresTunnel: null
       upstreamSpec: null
     allocatable:
-      cpu: 19200m
-      memory: 36471224Ki
-      pods: "330"
+      cpu: 22400m
+      memory: 49609004Ki
+      pods: "440"
     appliedEnableNetworkPolicy: false
     appliedSpec:
       agentImageOverride: ""
@@ -66,9 +66,9 @@ items:
     capabilities:
       loadBalancerCapabilities: {}
     capacity:
-      cpu: "20"
-      memory: 39645624Ki
-      pods: "330"
+      cpu: "24"
+      memory: 55753004Ki
+      pods: "440"
     conditions:
     - status: "True"
       type: Ready
@@ -130,16 +130,16 @@ items:
       privateRequiresTunnel: null
       upstreamSpec: null
     limits:
-      cpu: "26"
-      memory: 37238Mi
+      cpu: 35810m
+      memory: 50736Mi
       pods: "0"
-    linuxWorkerCount: 3
+    linuxWorkerCount: 4
     nodeCount: 5
     provider: ""
     requested:
-      cpu: 5980m
-      memory: 11206Mi
-      pods: "91"
+      cpu: 8661m
+      memory: 15533Mi
+      pods: "155"
     version:
       buildDate: "2026-02-26T20:20:24Z"
       compiler: gc

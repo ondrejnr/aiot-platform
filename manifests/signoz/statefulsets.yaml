@@ -544,12 +544,12 @@ items:
               command:
               - /bin/bash
               - -c
-              - curl -s -m 2 http://localhost:8080/commands/ruok | grep ruok
-            failureThreshold: 6
-            initialDelaySeconds: 30
-            periodSeconds: 10
+              - curl -s -m 10 http://localhost:8080/commands/ruok | grep ruok
+            failureThreshold: 12
+            initialDelaySeconds: 60
+            periodSeconds: 15
             successThreshold: 1
-            timeoutSeconds: 5
+            timeoutSeconds: 15
           name: zookeeper
           ports:
           - containerPort: 2181
@@ -569,13 +569,13 @@ items:
               command:
               - /bin/bash
               - -c
-              - curl -s -m 2 http://localhost:8080/commands/ruok | grep error | grep
+              - curl -s -m 10 http://localhost:8080/commands/ruok | grep error | grep
                 null
-            failureThreshold: 6
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            failureThreshold: 12
+            initialDelaySeconds: 15
+            periodSeconds: 15
             successThreshold: 1
-            timeoutSeconds: 5
+            timeoutSeconds: 15
           resources:
             requests:
               cpu: 100m
@@ -629,11 +629,11 @@ items:
     availableReplicas: 1
     collisionCount: 0
     currentReplicas: 1
-    currentRevision: signoz-zookeeper-69445b4d6b
-    observedGeneration: 12
+    currentRevision: signoz-zookeeper-658b9d9976
+    observedGeneration: 13
     readyReplicas: 1
     replicas: 1
-    updateRevision: signoz-zookeeper-69445b4d6b
+    updateRevision: signoz-zookeeper-658b9d9976
     updatedReplicas: 1
 kind: List
 metadata:

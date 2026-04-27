@@ -5,29 +5,1304 @@ items:
   metadata:
     labels:
       app.kubernetes.io/managed-by: kyverno
-    name: 2a6dd828-0a8d-487e-abfe-60c0af8a3561
-    namespace: default-tenant
+    name: 72528922-324f-42fc-b828-fb35557e631f
+    namespace: ai-enricher
     ownerReferences:
     - apiVersion: v1
       kind: Pod
-      name: hello-aiot-frontend-push-hsfr9-build-and-push-pod
+      name: ai-enricher-6c57d5bc59-9k4j6
   results:
-  - message: 0 elements processed
-    policy: reduce-tekton-pr-taskrun-resource-requests
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
     properties:
-      process: admission review
-    result: skip
-    rule: reduce-tekton-pr-taskrun-resource-requests
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
     scored: true
     source: kyverno
     timestamp:
       nanos: 0
-      seconds: 1777008312
+      seconds: 1777251635
   scope:
     apiVersion: v1
     kind: Pod
-    name: hello-aiot-frontend-push-hsfr9-build-and-push-pod
-    namespace: default-tenant
+    name: ai-enricher-6c57d5bc59-9k4j6
+    namespace: ai-enricher
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: b8d43898-5746-40a6-9329-777864dbd8f7
+    namespace: ai-enricher
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: ai-enricher-redis-96d4967db-ksvp4
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251633
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: ai-enricher-redis-96d4967db-ksvp4
+    namespace: ai-enricher
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 1227d9fe-a23b-466b-93cf-32459049a6d3
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: digital-twin-5cfd7785d-cxfkz
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: digital-twin-5cfd7785d-cxfkz
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 13711a2d-8b74-4264-9764-dcfea7b6d32c
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-sink-7787d755f7-5wzcl
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-sink-7787d755f7-5wzcl
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 154d950e-e0f2-49ee-b4ee-39c4515624f1
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-ha-1
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251594
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-ha-1
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 1ed8c4e6-3510-403f-b0cb-1ce46fdd73ff
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-partition-mgr-29620745-qjm8n
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251930
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-partition-mgr-29620745-qjm8n
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 283ba901-8427-4d2d-b044-cfe93248f344
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: redis-0
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251643
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: redis-0
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 314569bd-8c64-4f96-88bb-b9a924051cf7
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: sensor-simulator-6f9869bbbc-4zg57
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: sensor-simulator-6f9869bbbc-4zg57
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 587db838-ec96-4f36-abc1-5baff062382e
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: hello-aiot-6fc4c9f6b9-wphts
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251633
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: hello-aiot-6fc4c9f6b9-wphts
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 61d4ad88-cebf-4bb1-9d7d-3b1dba3f7df2
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-partition-mgr-29620865-xnl7c
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251930
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-partition-mgr-29620865-xnl7c
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 76bb3b20-45b5-4e8f-b4cb-21958b688b70
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-sensor-cleanup-29620560-rb6wm
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251641
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-sensor-cleanup-29620560-rb6wm
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 8543aa3a-ce12-4c1c-ae43-686b88ac6b59
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-sensor-cleanup-29620560-b7tv5
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251630
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-sensor-cleanup-29620560-b7tv5
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 8af10846-5a00-42e7-a3ff-3cef0f7d5c12
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: api-gateway-666f785855-hslb9
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: api-gateway-666f785855-hslb9
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 8bfa302e-41dd-4532-8d67-0f1c6087fc3d
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-partition-mgr-29620805-cf6hn
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251930
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-partition-mgr-29620805-cf6hn
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 8d24886f-bb1b-4f69-aac8-1e4145881a81
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: qdrant-indexer-858b4c785f-p2cql
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: qdrant-indexer-858b4c785f-p2cql
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 90754580-d5bd-4f40-9bdd-e1bf7cdb1c35
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: cloudbeaver-6945f7d648-t2jft
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: cloudbeaver-6945f7d648-t2jft
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 9e2fc206-cf87-4386-b84c-0f0d7303e94d
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-sensor-cleanup-29620800-n2rs6
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251641
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-sensor-cleanup-29620800-n2rs6
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: a6e0cb24-e039-4e60-b014-6c41b72fcc2d
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: open-webui-cb875f77d-k7tjz
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: open-webui-cb875f77d-k7tjz
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: b6205c09-3379-4aaf-b2ee-d68253844ecc
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: hello-aiot-6fc4c9f6b9-7lkn9
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: hello-aiot-6fc4c9f6b9-7lkn9
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: c4cf2696-8aad-401b-9d0e-6a9f92224482
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: ngrok-proxy-bcc8c8b57-wwbmb
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: ngrok-proxy-bcc8c8b57-wwbmb
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: c93032c7-b9f9-4444-836c-82d44978af37
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: sensor-data-retention-29620800-29pdw
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251630
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: sensor-data-retention-29620800-29pdw
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: d2c50bf1-7fa1-4816-87ae-9aaedabada91
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-ha-2
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251493
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-ha-2
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: edcf1181-4416-4390-b89f-2fa28428c203
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: inference-connector-547ddfb8d5-b2sjh
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: inference-connector-547ddfb8d5-b2sjh
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ee8ac59d-74d8-4e11-97a6-fbf7a1ef8028
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: qdrant-77c97d44c5-w2ls7
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: qdrant-77c97d44c5-w2ls7
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: f28a72cd-0554-466e-86e0-e64da76eda70
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: sensor-data-retention-29620800-54q7q
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251644
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: sensor-data-retention-29620800-54q7q
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: f87fc645-a1ee-48c0-89dd-63aebbba39a5
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pg-sensor-cleanup-29620800-4ff5h
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251630
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pg-sensor-cleanup-29620800-4ff5h
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: fbc6c361-69c4-4dff-a2db-696fbf4b584a
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: rag-worker-7d8b9d47cc-prv47
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: rag-worker-7d8b9d47cc-prv47
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: fc4f196b-73a0-4b91-81be-a9af531bbbcd
+    namespace: aiot
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pgadmin-b6c868ffc-wvzth
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pgadmin-b6c868ffc-wvzth
+    namespace: aiot
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 0f5417fc-a85a-4da6-a680-3bd514d65202
+    namespace: argocd
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: argocd-redis-9bddd9d45-8mr2p
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251633
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: argocd-redis-9bddd9d45-8mr2p
+    namespace: argocd
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 43749eff-d2fa-4ffe-8f8e-3ab009932b8d
+    namespace: argocd
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: argocd-repo-server-75ff8f9db8-78cn4
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: argocd-repo-server-75ff8f9db8-78cn4
+    namespace: argocd
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 4671b3c9-9f4b-43ba-8ab2-eb2b67f5d54b
+    namespace: argocd
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: argocd-applicationset-controller-7c8cdd5588-w2k95
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: argocd-applicationset-controller-7c8cdd5588-w2k95
+    namespace: argocd
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 7a0dd391-39c6-44de-b16f-804bc70f6d88
+    namespace: argocd
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: argocd-server-7bf6d76ff9-zhb5x
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: argocd-server-7bf6d76ff9-zhb5x
+    namespace: argocd
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: a88649c8-064d-4b14-aa39-ef4e30c12018
+    namespace: argocd
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: argocd-application-controller-0
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251211
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: argocd-application-controller-0
+    namespace: argocd
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: d079c8d5-6911-4cdc-96f0-0be4c0a2092a
+    namespace: auth
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: dex-7f88f494b9-fkgk8
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: dex-7f88f494b9-fkgk8
+    namespace: auth
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 4202a8e1-39f3-47d8-86f9-86a1fd7647e2
+    namespace: backrest
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: backrest-6cd94bbdb9-lxjcq
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: backrest-6cd94bbdb9-lxjcq
+    namespace: backrest
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 13983066-a2b7-4928-8ea0-153e2eef36f2
+    namespace: cattle-capi-system
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: capi-controller-manager-cbc84ff74-hlswg
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: capi-controller-manager-cbc84ff74-hlswg
+    namespace: cattle-capi-system
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 697ef8e9-6eb9-44eb-b1c2-72686e3c5baa
+    namespace: cattle-capi-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: capi-controller-manager
+  results:
+  - category: Scheduling
+    message: no patches applied
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: skip
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777252645
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: capi-controller-manager
+    namespace: cattle-capi-system
   summary:
     error: 0
     fail: 0
@@ -39,29 +1314,1353 @@ items:
   metadata:
     labels:
       app.kubernetes.io/managed-by: kyverno
-    name: 3cd1a6a2-2fad-4db4-9ba5-7fe1dbed133b
-    namespace: default-tenant
+    name: 5dbc2c82-987e-4e92-a51e-248f387771b7
+    namespace: cattle-turtles-system
     ownerReferences:
     - apiVersion: v1
       kind: Pod
-      name: hello-aiot-frontend-push-gqwgr-build-and-push-pod
+      name: rancher-turtles-controller-manager-86bc6bbdb5-x4qbx
   results:
-  - message: 0 elements processed
-    policy: reduce-tekton-pr-taskrun-resource-requests
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
     properties:
-      process: admission review
-    result: skip
-    rule: reduce-tekton-pr-taskrun-resource-requests
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
     scored: true
     source: kyverno
     timestamp:
       nanos: 0
-      seconds: 1776938342
+      seconds: 1777249959
   scope:
     apiVersion: v1
     kind: Pod
-    name: hello-aiot-frontend-push-gqwgr-build-and-push-pod
-    namespace: default-tenant
+    name: rancher-turtles-controller-manager-86bc6bbdb5-x4qbx
+    namespace: cattle-turtles-system
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 2a273c66-9019-4089-8af7-8dcef4a7ffb8
+    namespace: cert-manager
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: cert-manager-ddf4d74b4-2796v
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251634
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: cert-manager-ddf4d74b4-2796v
+    namespace: cert-manager
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 958fd0e0-0800-4a03-8ff1-727c6ada47d9
+    namespace: cert-manager
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: cert-manager-webhook-74b94cd64b-gfpft
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251635
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: cert-manager-webhook-74b94cd64b-gfpft
+    namespace: cert-manager
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: b2fd40c1-b246-42be-a6cb-548e3afd2123
+    namespace: cert-manager
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: trust-manager-5df668d777-jpljb
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: trust-manager-5df668d777-jpljb
+    namespace: cert-manager
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: d24a12cb-76d5-42d6-8402-6d060c48ede3
+    namespace: cert-manager
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: cert-manager-cainjector-69fb6777b8-96pwb
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251636
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: cert-manager-cainjector-69fb6777b8-96pwb
+    namespace: cert-manager
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 9b5d0834-4f02-4cb5-ad47-6a1daaea9e81
+    namespace: chef-webhook
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: webhook-receiver-77d4bb77c4-5pq7t
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: webhook-receiver-77d4bb77c4-5pq7t
+    namespace: chef-webhook
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 10e8569f-3192-449d-b99d-ae4cfc57078c
+    namespace: cnpg-system
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: cnpg-controller-manager-7d4d7f5854-hnq46
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: cnpg-controller-manager-7d4d7f5854-hnq46
+    namespace: cnpg-system
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 12c8215c-13e8-45e1-9bc9-d0d79d30385d
+    namespace: default
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: ingress-nginx-controller-k4v26
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: ingress-nginx-controller-k4v26
+    namespace: default
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 67391b73-4b74-4cce-be73-d4a1c5dfa4fe
+    namespace: default
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: ingress-nginx-controller-zzwbd
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: ingress-nginx-controller-zzwbd
+    namespace: default
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 759e14e1-de83-4b32-b465-29c7032449df
+    namespace: default
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: ingress-nginx-controller-2q5sk
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: ingress-nginx-controller-2q5sk
+    namespace: default
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: a1b2766a-659d-411d-a806-d6bf3c5de757
+    namespace: default
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: ingress-nginx-controller-22htr
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: ingress-nginx-controller-22htr
+    namespace: default
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 1a5a4034-8f58-4aa6-a87b-7cf91eabbd64
+    namespace: descheduler
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: descheduler-29620875-b8trr
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777252530
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: descheduler-29620875-b8trr
+    namespace: descheduler
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ef646602-2e04-4bfb-8658-c926e7da1665
+    namespace: dr-ops
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: manifest-backup-29620875-2txv7
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777252530
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: manifest-backup-29620875-2txv7
+    namespace: dr-ops
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 38cd7706-d040-4921-b758-726c742e795b
+    namespace: emqx
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: emqx-0
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251645
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: emqx-0
+    namespace: emqx
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 0ebcfb86-7f57-48ae-a522-0acd46c47138
+    namespace: etcd-backup
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pre-cilium-20260426-163217-fnjfl
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pre-cilium-20260426-163217-fnjfl
+    namespace: etcd-backup
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 3a1c1063-5401-4ef9-9125-e05707c6e6dd
+    namespace: etcd-backup
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: etcd-snapshot-29619510-498c8
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: etcd-snapshot-29619510-498c8
+    namespace: etcd-backup
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 0257bdc8-d55e-4eb7-bd12-b6ab9f9e3d38
+    namespace: event-exporter
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: event-exporter-966688d5d-wb6sq
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251633
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: event-exporter-966688d5d-wb6sq
+    namespace: event-exporter
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 4bbebeea-e5ea-4dda-acd8-747d68f59b8b
+    namespace: fleet-default
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: rke2-machineconfig-cleanup-cronjob-29620805-hdjw4
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251930
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: rke2-machineconfig-cleanup-cronjob-29620805-hdjw4
+    namespace: fleet-default
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 3c0c28b9-32d2-4c06-9ea9-b93f416b6666
+    namespace: gitea
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: gitea-8598474664-fckvd
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: gitea-8598474664-fckvd
+    namespace: gitea
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ec90b6ef-2961-4237-9551-8d657c22c691
+    namespace: headlamp
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: headlamp-7c7b854774-2h5b5
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: headlamp-7c7b854774-2h5b5
+    namespace: headlamp
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 4697b74a-2d81-4c3c-9980-6cf959af7850
+    namespace: helloweb
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: helloweb-7f46455688-j422g
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251633
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: helloweb-7f46455688-j422g
+    namespace: helloweb
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 68e6e6a3-b06c-426b-85db-1c76af53c8f8
+    namespace: integration-service
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: integration-service-controller-manager-68b5b47cb5-2jjtc
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: integration-service-controller-manager-68b5b47cb5-2jjtc
+    namespace: integration-service
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 899e22ea-6ea5-4f41-b84d-a9db3a83df7e
+    namespace: integration-service
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: integration-service-snapshot-garbage-collector-29620800-9zpq9
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251630
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: integration-service-snapshot-garbage-collector-29620800-9zpq9
+    namespace: integration-service
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 13ef4867-90ee-4f64-aa51-07c2cdcc0169
+    namespace: istio-system
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: cluster-local-gateway-5b86b4b569-8zkg2
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: cluster-local-gateway-5b86b4b569-8zkg2
+    namespace: istio-system
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 8f1c2709-b79b-433f-ba57-83ac4e9e046a
+    namespace: istio-system
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: istiod-5c47f5b7bb-2tl5g
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: istiod-5c47f5b7bb-2tl5g
+    namespace: istio-system
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: c252417e-f9df-4234-8efa-c6ee316c5e4c
+    namespace: istio-system
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: cluster-jwks-proxy-dbf9cfc9c-rv9qz
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: cluster-jwks-proxy-dbf9cfc9c-rv9qz
+    namespace: istio-system
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: e43e38fc-89b7-49ea-90f8-f428ae783ea3
+    namespace: istio-system
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: istio-ingressgateway-6bbf5fdb6f-vp99t
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: istio-ingressgateway-6bbf5fdb6f-vp99t
+    namespace: istio-system
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 43cf370f-42e5-471d-84f1-ee63a4e724dd
+    namespace: jenkins
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: jenkins-0
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: jenkins-0
+    namespace: jenkins
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 31607f71-c9dc-47d4-957a-304b4d385114
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8sgpt-operator-controller-manager-5d8f9fd8c5-h5w8v
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251634
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8sgpt-operator-controller-manager-5d8f9fd8c5-h5w8v
+    namespace: k8sgpt
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 3ab7b306-9712-46e7-848a-345bd3c7f3c3
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8sgpt-llm-proxy-86f7c4749-wdsfc
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251635
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8sgpt-llm-proxy-86f7c4749-wdsfc
+    namespace: k8sgpt
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 43a26a03-950d-4db3-8246-88128168d425
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8sgpt-robusta-bridge-685db97fcc-mzsjk
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8sgpt-robusta-bridge-685db97fcc-mzsjk
+    namespace: k8sgpt
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: a2f5ca82-6fcd-4aea-9f37-f72341dd67fc
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8sgpt-mm-reporter-29620860-j7nb6
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251630
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8sgpt-mm-reporter-29620860-j7nb6
+    namespace: k8sgpt
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: a789270b-d7c8-4471-b517-6ddbdf288ffa
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8sgpt-anomaly-detector-8698569b4c-nxv76
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251634
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8sgpt-anomaly-detector-8698569b4c-nxv76
+    namespace: k8sgpt
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: becaf5ef-6401-453b-9e12-fd0e55e53907
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8sgpt-7d779d65dc-9x7fs
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8sgpt-7d779d65dc-9x7fs
+    namespace: k8sgpt
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: c275791a-cb15-43a2-b8df-acfad613141c
+    namespace: k8sgpt
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: k8sgpt
+  results:
+  - category: Scheduling
+    message: mutated Deployment/k8sgpt in namespace k8sgpt
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251931
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: k8sgpt
+    namespace: k8sgpt
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 8e75acc0-a74b-4bb0-bda9-25213402d31d
+    namespace: k8up-system
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8up-59d575445-mczjh
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251635
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8up-59d575445-mczjh
+    namespace: k8up-system
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 036d8576-a55b-4907-a798-750ea3b269e5
+    namespace: karpor
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: elasticsearch-cf4d6f86b-fc6ht
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: elasticsearch-cf4d6f86b-fc6ht
+    namespace: karpor
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 29659ae3-21e9-479f-8c8d-97946e9fff1f
+    namespace: karpor
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: karpor-server
+  results:
+  - category: Scheduling
+    message: no patches applied
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: skip
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777226044
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: karpor-server
+    namespace: karpor
   summary:
     error: 0
     fail: 0
@@ -73,34 +2672,3885 @@ items:
   metadata:
     labels:
       app.kubernetes.io/managed-by: kyverno
-    name: a89d74ea-8ea8-40d6-a1c6-8b8d9f5ebf4b
-    namespace: default-tenant
+    name: 3689e3ba-9d9b-4644-85aa-bbed46bb8ff5
+    namespace: karpor
     ownerReferences:
     - apiVersion: v1
       kind: Pod
-      name: hello-aiot-push-vpddp-build-and-push-pod
+      name: karpor-server-5f764798f5-xp5zr
   results:
-  - message: 0 elements processed
-    policy: reduce-tekton-pr-taskrun-resource-requests
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
     properties:
-      process: admission review
-    result: skip
-    rule: reduce-tekton-pr-taskrun-resource-requests
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
     scored: true
     source: kyverno
     timestamp:
       nanos: 0
-      seconds: 1777039673
+      seconds: 1777249959
   scope:
     apiVersion: v1
     kind: Pod
-    name: hello-aiot-push-vpddp-build-and-push-pod
-    namespace: default-tenant
+    name: karpor-server-5f764798f5-xp5zr
+    namespace: karpor
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 59ab6923-7d65-446b-9726-ae5d06fe233f
+    namespace: karpor
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: elasticsearch
+  results:
+  - category: Scheduling
+    message: no patches applied
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: skip
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777226044
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: elasticsearch
+    namespace: karpor
   summary:
     error: 0
     fail: 0
     pass: 0
     skip: 1
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 9f0ffdbb-35da-47eb-9460-6aca1e2044ec
+    namespace: karpor
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: karpor-syncer-5cc44cb585-7dnzr
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: karpor-syncer-5cc44cb585-7dnzr
+    namespace: karpor
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: a968b87f-f325-44ce-a24c-e8af6d526187
+    namespace: karpor
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: etcd-0
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251610
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: etcd-0
+    namespace: karpor
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: b0285a65-7d80-4c98-b5c7-3df9d84e0c29
+    namespace: karpor
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: StatefulSet
+      name: etcd
+  results:
+  - category: Scheduling
+    message: mutated StatefulSet/etcd in namespace karpor
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777226044
+  scope:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: etcd
+    namespace: karpor
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: b07b5b40-1e72-4b41-813b-7aa37f2d2642
+    namespace: karpor
+  results:
+  - category: Scheduling
+    message: mutated StatefulSet/etcd in namespace karpor
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777220550
+  scope:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: etcd
+    namespace: karpor
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: f608a21b-0914-4b19-82e7-5f33f064fe4f
+    namespace: karpor
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: karpor-syncer
+  results:
+  - category: Scheduling
+    message: no patches applied
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: skip
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777226044
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: karpor-syncer
+    namespace: karpor
+  summary:
+    error: 0
+    fail: 0
+    pass: 0
+    skip: 1
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 47a650b0-04bf-419b-ab36-c095c5838bde
+    namespace: knative-serving
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: net-istio-webhook-78bc468df7-p8wkh
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: net-istio-webhook-78bc468df7-p8wkh
+    namespace: knative-serving
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 558bae63-675a-4bed-9305-d6f275487527
+    namespace: knative-serving
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: controller-7df88868d8-c2lfr
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: controller-7df88868d8-c2lfr
+    namespace: knative-serving
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 56e606a5-80ca-42c4-a80c-5d40169c367d
+    namespace: knative-serving
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: net-istio-controller-8c9ff978f-62prh
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: net-istio-controller-8c9ff978f-62prh
+    namespace: knative-serving
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: a14cb5d4-627a-4494-84b3-e40c61d6968d
+    namespace: knative-serving
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: activator-85d9b786d9-s5tq4
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: activator-85d9b786d9-s5tq4
+    namespace: knative-serving
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ec3c2ef2-053d-46c7-9f3b-d1ca4f0ed9ff
+    namespace: knative-serving
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: webhook-645cfd6c5-crnbx
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: webhook-645cfd6c5-crnbx
+    namespace: knative-serving
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: fac328a5-d5c3-4d63-be3e-75a758e1cba8
+    namespace: knative-serving
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: autoscaler-65dbb6c97b-dqfqm
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: autoscaler-65dbb6c97b-dqfqm
+    namespace: knative-serving
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 45786864-c165-4a74-a391-ac16b5f1f445
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: proxy-87dbb4d69-lkjwc
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: proxy-87dbb4d69-lkjwc
+    namespace: konflux-ui
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: fe314728-a680-4121-a5f6-b34fb7069d8a
+    namespace: konflux-ui
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: dex-7b5d5884b9-c4c9g
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251635
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: dex-7b5d5884b9-c4c9g
+    namespace: konflux-ui
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 022ce296-f743-41e8-a4ae-7f9a853a6d25
+    namespace: kube-flannel
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: kube-flannel-ds-q2l4g
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: kube-flannel-ds-q2l4g
+    namespace: kube-flannel
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 2343ad5a-10c5-41d0-bf52-87d00e855487
+    namespace: kube-flannel
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: kube-flannel-ds-xcqqn
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: kube-flannel-ds-xcqqn
+    namespace: kube-flannel
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 79bc4910-e9fd-463d-a24d-afda94538f06
+    namespace: kube-flannel
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: kube-flannel-ds-l9m9m
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: kube-flannel-ds-l9m9m
+    namespace: kube-flannel
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: eb548006-79eb-48ba-9712-cbc2d0873b6b
+    namespace: kube-flannel
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: kube-flannel-ds-xpqjq
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: kube-flannel-ds-xpqjq
+    namespace: kube-flannel
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: fc5d1f38-d0b8-447e-b72c-d91b3f148905
+    namespace: kube-flannel
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: kube-flannel-ds-qk8w9
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: kube-flannel-ds-qk8w9
+    namespace: kube-flannel
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 14ac706d-e704-4f16-a49a-4923aff4ca7e
+    namespace: local-path-storage
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: local-path-provisioner-74f9666bc9-ssbb7
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251633
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: local-path-provisioner-74f9666bc9-ssbb7
+    namespace: local-path-storage
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 64d15604-ba81-44cd-a5c2-4052b15edefd
+    namespace: mattermost
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: mattermost-7c485d5794-547d6
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: mattermost-7c485d5794-547d6
+    namespace: mattermost
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 0890d431-89c3-4c01-bee8-75588e83a52a
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: prometheus-prometheus-node-exporter-6h9k9
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: prometheus-prometheus-node-exporter-6h9k9
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 1ed1fc73-25f8-4199-b970-752e69e20731
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: prometheus-prometheus-kube-prometheus-prometheus-0
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: prometheus-prometheus-kube-prometheus-prometheus-0
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 542065aa-06b5-48cf-955c-2af23b2a19db
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: event-exporter-8597d4d6dc-mvc2m
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251634
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: event-exporter-8597d4d6dc-mvc2m
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 84923493-d6c6-46df-b211-b951b2b912d2
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: prometheus-prometheus-node-exporter-jskb8
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: prometheus-prometheus-node-exporter-jskb8
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 89db559d-fed6-482c-8d06-f33a57e59c01
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: alertmanager-prometheus-kube-prometheus-alertmanager-0
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: alertmanager-prometheus-kube-prometheus-alertmanager-0
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 981561d8-c1f4-4682-8037-5c36a4962ad5
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: prometheus-kube-prometheus-operator-69f48f846c-45xhv
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251633
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: prometheus-kube-prometheus-operator-69f48f846c-45xhv
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: c65d9166-95c8-49cf-9a69-6728e4ebd1de
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: prometheus-prometheus-node-exporter-bxvtl
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: prometheus-prometheus-node-exporter-bxvtl
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: d7000d13-4cc6-4374-846f-fc144f9e6837
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: prometheus-grafana-6b896fb884-ljqwk
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: prometheus-grafana-6b896fb884-ljqwk
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: e32cbe16-a44b-4ca2-9105-2928cc3289c0
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: prometheus-kube-state-metrics-756b89dbd9-8trn4
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: prometheus-kube-state-metrics-756b89dbd9-8trn4
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: e51475cd-afa8-4b64-a011-50fae99673b6
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: prometheus-prometheus-node-exporter-wlntv
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: prometheus-prometheus-node-exporter-wlntv
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ff14c221-3255-4614-9cf4-90945b58c151
+    namespace: monitoring
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: prometheus-prometheus-node-exporter-zxfgv
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: prometheus-prometheus-node-exporter-zxfgv
+    namespace: monitoring
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 68d35c2e-c60a-4779-adca-c5b333963470
+    namespace: namespace-lister
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: namespace-lister-7c7749cbfb-tcbp4
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: namespace-lister-7c7749cbfb-tcbp4
+    namespace: namespace-lister
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 1985c198-015b-4187-b817-a26d0b3e34de
+    namespace: opentelemetry-operator-system
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: opentelemetry-operator-b6c56dbfd-llfdw
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: opentelemetry-operator-b6c56dbfd-llfdw
+    namespace: opentelemetry-operator-system
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 41dc87a4-4ed0-401a-baba-5d6c78df0f76
+    namespace: pipelines-as-code
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pipelines-as-code-controller-5896d8998b-hk2rn
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pipelines-as-code-controller-5896d8998b-hk2rn
+    namespace: pipelines-as-code
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: bec4c0e0-c92e-421b-a7a4-e1300de9a5d8
+    namespace: pipelines-as-code
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pipelines-as-code-watcher-7d557456b5-dr5cb
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pipelines-as-code-watcher-7d557456b5-dr5cb
+    namespace: pipelines-as-code
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ecac0dc9-1cf6-48dd-9c90-925cd74ae48f
+    namespace: pipelines-as-code
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: pipelines-as-code-webhook-f7b45c7ff-6lxk6
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251634
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: pipelines-as-code-webhook-f7b45c7ff-6lxk6
+    namespace: pipelines-as-code
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 2b5fb16e-551e-4c4a-8e57-b4513abc2953
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: ha-controller-sr2kd
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: ha-controller-sr2kd
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 4e6540ec-7b9d-45dc-9edd-7fb925055a15
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: linstor-csi-node-747qt
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: linstor-csi-node-747qt
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 5194235d-d8ca-4672-848d-e8b58ccbb647
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: linstor-satellite.aiot-worker-01-6tfls
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: linstor-satellite.aiot-worker-01-6tfls
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 57219095-4e1b-4c13-b9cb-d06fd9dca37c
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: linstor-controller-7d7575b865-z6l5x
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: linstor-controller-7d7575b865-z6l5x
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 62a0d6d7-de5f-4079-b7ba-79ac41039f74
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: linstor-csi-controller-694bd7f4c5-s2zx4
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: linstor-csi-controller-694bd7f4c5-s2zx4
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 9929642a-f6f1-448f-afbb-9b8d1307c5e6
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: linstor-csi-node-jt48k
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: linstor-csi-node-jt48k
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 9f5c9f5c-7646-48cb-a83c-3b0bda660ef4
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: linstor-affinity-controller-b6fd7f7b8-fx5gk
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: linstor-affinity-controller-b6fd7f7b8-fx5gk
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ad4105bb-9095-4df5-a4bc-1e57d6194d5f
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: ha-controller-9bkmg
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: ha-controller-9bkmg
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: c197bb03-1cd3-45b4-b30b-2fa4f44a003f
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: linstor-satellite.aiot-worker-02-tpwxh
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: linstor-satellite.aiot-worker-02-tpwxh
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: c67a1de4-b00d-4989-ac6c-df1204c6fe62
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: linstor-csi-nfs-server-m4fnc
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: linstor-csi-nfs-server-m4fnc
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: d404533d-e65d-4976-a1a1-68204c24a2cd
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: piraeus-operator-controller-manager-55bf9797fd-pz4d9
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: piraeus-operator-controller-manager-55bf9797fd-pz4d9
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: e7502012-7a4a-4a46-b002-6b24918fd053
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: linstor-csi-nfs-server-c46vp
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: linstor-csi-nfs-server-c46vp
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: f2084915-0b66-49d5-86d1-6dab554ea220
+    namespace: piraeus-datastore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: piraeus-operator-gencert-7c6b88d8f8-l8f5j
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: piraeus-operator-gencert-7c6b88d8f8-l8f5j
+    namespace: piraeus-datastore
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 850a901a-6597-4b8f-8f9c-f15b5f19783c
+    namespace: registry
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: internal-registry-67d69779c4-jv7fb
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: internal-registry-67d69779c4-jv7fb
+    namespace: registry
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: b4d7a8ed-06d1-4bce-a6c0-f5e54c1aec6b
+    namespace: release-service
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: release-service-controller-manager-66bf546bbc-7sxdx
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: release-service-controller-manager-66bf546bbc-7sxdx
+    namespace: release-service
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 413faf73-d98a-4e6a-ab8c-bca3cd9b5a0a
+    namespace: robusta
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: robusta-forwarder-5d5866848b-wjrlc
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251634
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: robusta-forwarder-5d5866848b-wjrlc
+    namespace: robusta
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: bf4e05bd-33cf-4c01-95a7-490159ec75dc
+    namespace: robusta
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: mm-relay-5659d89b49-5m2k2
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249960
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: mm-relay-5659d89b49-5m2k2
+    namespace: robusta
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: e846beae-89a9-44bb-b049-466b34b94484
+    namespace: robusta
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: robusta-runner-5d659b8b99-6jtrp
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: robusta-runner-5d659b8b99-6jtrp
+    namespace: robusta
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 6fa6f108-284b-4af5-b75b-35bf32eacd31
+    namespace: semaphore
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: semaphore
+  results:
+  - category: Scheduling
+    message: no patches applied
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: skip
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777233218
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: semaphore
+    namespace: semaphore
+  summary:
+    error: 0
+    fail: 0
+    pass: 0
+    skip: 1
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: b08fb78d-ea24-4ff6-8e74-4105f25c67ca
+    namespace: semaphore
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: semaphore-7d7c98d96c-jbc5p
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: semaphore-7d7c98d96c-jbc5p
+    namespace: semaphore
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 2537dabc-c4dc-4727-9aff-af5d19f26006
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: signoz-clickhouse-operator-6f996848dc-vnvr7
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: signoz-clickhouse-operator-6f996848dc-vnvr7
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 2fab0adb-98a5-4824-bea9-4bcac313f6ed
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: signoz-otel-collector-6468f5459d-dlrgh
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: signoz-otel-collector-6468f5459d-dlrgh
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 5c5b4d35-c38c-4825-ba8a-19bc85d6d2a1
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: signoz-clickhouse-operator
+  results:
+  - category: Scheduling
+    message: no patches applied
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: skip
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777227972
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: signoz-clickhouse-operator
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 0
+    pass: 0
+    skip: 1
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 73c251bd-ba5b-4357-ab60-032dddaf93cb
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8s-infra-otel-agent-dqbt6
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8s-infra-otel-agent-dqbt6
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 841037ed-e873-4ff5-893a-7a7f30179e05
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: signoz-zookeeper-0
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251210
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: signoz-zookeeper-0
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 869ca93a-7c52-4596-9f65-2ad445d9b988
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: signoz-0
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251191
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: signoz-0
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ab086fbb-1797-4908-b0d9-b2d23f3cb183
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8s-infra-otel-agent-tbqkh
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8s-infra-otel-agent-tbqkh
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: c852c4b1-2ba3-431a-b170-180aae7776dd
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8s-infra-otel-agent-kt4zq
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8s-infra-otel-agent-kt4zq
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: d3036b0c-7e7f-4cea-afe0-248173f69eee
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8s-infra-otel-deployment-599fb89485-fncdf
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8s-infra-otel-deployment-599fb89485-fncdf
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: dc17ce0a-e6e0-410d-8052-f4cd9c326378
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8s-infra-otel-agent-fjfzd
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249960
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8s-infra-otel-agent-fjfzd
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: eea9101e-d841-43ab-9c98-778489eae4d3
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: chi-signoz-clickhouse-cluster-0-0-0
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251191
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: chi-signoz-clickhouse-cluster-0-0-0
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ffe3a6b8-b7bf-4f87-9a31-6149a5c09a26
+    namespace: signoz
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: k8s-infra-otel-agent-7q6wt
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249960
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: k8s-infra-otel-agent-7q6wt
+    namespace: signoz
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 53e9557c-8a8c-4ee1-b917-e6b43e48daaa
+    namespace: tekton-operator
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-operator-webhook-65d7569769-r6tx4
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-operator-webhook-65d7569769-r6tx4
+    namespace: tekton-operator
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 87ed8b2c-afd9-4bb5-8af0-4e8bd2ba912e
+    namespace: tekton-operator
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-operator-69bd9c6f48-wthmh
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-operator-69bd9c6f48-wthmh
+    namespace: tekton-operator
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 02e51faa-23eb-4295-9f93-afdc19341161
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-results-retention-policy-agent
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-results-retention-policy-agent in namespace
+      tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777233256
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-results-retention-policy-agent
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 1120540c-dd71-4165-aed9-89b541232e46
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-results-postgres-0
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251210
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-results-postgres-0
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 1b778617-a4fa-4b40-a383-03efcc63c28d
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-pipelines-controller-67fc758899-hps6r
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-pipelines-controller-67fc758899-hps6r
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 215a45e6-593b-4cbf-8c07-e52755e20b8d
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-operator-proxy-webhook-5ffc44d458-fzkx9
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-operator-proxy-webhook-5ffc44d458-fzkx9
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 24b74294-0019-4608-8156-c6ea027ecd01
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-triggers-webhook
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-triggers-webhook in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777229586
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-triggers-webhook
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 2c5d502b-4f30-4500-ac63-9d1142abff9b
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-pipelines-webhook-f99b95fd8-4zkhx
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-pipelines-webhook-f99b95fd8-4zkhx
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 3c4a869d-179e-46d3-9c3f-c6b16a39ee85
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-triggers-controller
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-triggers-controller in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777229586
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-triggers-controller
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 4cdc293c-1dd5-4138-9be4-6bece35eabee
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-results-api-6845ccb496-tmzm8
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-results-api-6845ccb496-tmzm8
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 4f8de28e-1b0a-4ac8-9b64-80fea658ea03
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-results-watcher
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-results-watcher in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777233256
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-results-watcher
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 559b2328-8eb1-421b-956f-34dc0244b1f1
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: StatefulSet
+      name: tekton-results-postgres
+  results:
+  - category: Scheduling
+    message: mutated StatefulSet/tekton-results-postgres in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777233256
+  scope:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: tekton-results-postgres
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 568a3261-bb38-42c2-831f-76bbce1a806c
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-pipelines-controller
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-pipelines-controller in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777229585
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-pipelines-controller
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 62983ecb-311a-4e9f-aa4b-d8040275edae
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-operator-proxy-webhook
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-operator-proxy-webhook in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777229586
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-operator-proxy-webhook
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 6affa439-af69-4547-b120-a228f5a2193c
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-results-watcher-784b955cc4-wpn9j
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-results-watcher-784b955cc4-wpn9j
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 6b1c2124-f3e8-4e98-ba24-850f626fd24e
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-results-retention-policy-agent-6896db77c9-lqpq5
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-results-retention-policy-agent-6896db77c9-lqpq5
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 8115e4a0-4b69-4cf2-98ae-ea852af448ef
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-triggers-controller-585d59c5f6-5gzwp
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-triggers-controller-585d59c5f6-5gzwp
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 820026ef-aab8-405d-9475-f382ac03bd77
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-events-controller-67cc4f6f56-4w8zn
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-events-controller-67cc4f6f56-4w8zn
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 8c45db7b-9754-4980-868a-3780d540999d
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-results-api
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-results-api in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777233256
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-results-api
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 99bdb639-00c5-4f5a-8dab-b5666190047f
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-chains-controller-5d95b8b596-gdc9x
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-chains-controller-5d95b8b596-gdc9x
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: a249c53a-a5b5-49c2-a87a-591429e2cbaf
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-triggers-core-interceptors
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-triggers-core-interceptors in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777229586
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-triggers-core-interceptors
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: acadbfc7-a408-4484-bd86-4512568b8374
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-pipelines-remote-resolvers
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-pipelines-remote-resolvers in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777229585
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-pipelines-remote-resolvers
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ae4f1ed0-5118-49f0-8038-cc612b31c0cd
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-chains-controller
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-chains-controller in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777229586
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-chains-controller
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: b1c90d3f-574a-47aa-86e8-d0f9840d63f7
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-triggers-webhook-8574c88964-4ddm2
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249960
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-triggers-webhook-8574c88964-4ddm2
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: e094e0aa-688f-470f-8150-9763b2719df5
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-events-controller
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-events-controller in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777229585
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-events-controller
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: e16f9005-ca85-422f-aa5e-7f5bfa862f27
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-triggers-core-interceptors-7f6647cd8d-qt7bd
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-triggers-core-interceptors-7f6647cd8d-qt7bd
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: e28ac151-20a3-4ba2-a801-19f4ed66025a
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: tekton-pipelines-remote-resolvers-76cd4f8469-82lhk
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: tekton-pipelines-remote-resolvers-76cd4f8469-82lhk
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: f99d6021-4183-46d0-9d7a-d3646e90a82f
+    namespace: tekton-pipelines
+    ownerReferences:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-pipelines-webhook
+  results:
+  - category: Scheduling
+    message: mutated Deployment/tekton-pipelines-webhook in namespace tekton-pipelines
+    policy: inject-topology-spread
+    properties:
+      process: admission review
+    result: pass
+    rule: add-spread-deployments
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777229586
+  scope:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tekton-pipelines-webhook
+    namespace: tekton-pipelines
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: ddb69fbb-927e-41d4-8fa7-dffcd34a4c4b
+    namespace: victoriametrics
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: victoriametrics-856bc8df6-7rpf8
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: victoriametrics-856bc8df6-7rpf8
+    namespace: victoriametrics
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 050790cd-63fa-4e1a-9ea9-208ce12fbfd9
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: zabbix-nodesclean-29620860-p59dt
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777251630
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: zabbix-nodesclean-29620860-p59dt
+    namespace: zabbix
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 335266c8-4c58-4cf4-bf3c-eb81fba9ebf5
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: zabbix-agent2-6b86p
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: zabbix-agent2-6b86p
+    namespace: zabbix
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 490e7b6a-317d-4e23-bf40-39f27f19c1ea
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: zabbix-zabbix-webservice-78d569678b-5t2db
+  results:
+  - category: Resource Management
+    message: 'validation failure: validation error: Every container must define spec.containers[].resources.requests.memory
+      and spec.containers[].resources.limits.memory. rule require-memory-requests-limits
+      failed at path /resources/limits/'
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: fail
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: zabbix-zabbix-webservice-78d569678b-5t2db
+    namespace: zabbix
+  summary:
+    error: 0
+    fail: 1
+    pass: 0
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 54c88d82-d77e-4179-996c-18920ffabd4f
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: zabbix-zabbix-web-557d747ffc-gwxl7
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: zabbix-zabbix-web-557d747ffc-gwxl7
+    namespace: zabbix
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: 866052d5-b302-4ac2-b130-a270c29953e6
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: zabbix-agent2-ts8f2
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: zabbix-agent2-ts8f2
+    namespace: zabbix
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: b89e5466-8f36-464c-8a46-5c28ac5b4a4f
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: zabbix-zabbix-server-6b7d979447-wvr65
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249958
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: zabbix-zabbix-server-6b7d979447-wvr65
+    namespace: zabbix
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: d1dee1e5-929c-4a30-97b9-060ee512fbce
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: zabbix-agent2-q6md9
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249957
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: zabbix-agent2-q6md9
+    namespace: zabbix
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: d36fc292-812d-41a5-a045-e83944a3af7a
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: zabbix-agent2-hpvfk
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: zabbix-agent2-hpvfk
+    namespace: zabbix
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
+    warn: 0
+- apiVersion: wgpolicyk8s.io/v1alpha2
+  kind: PolicyReport
+  metadata:
+    labels:
+      app.kubernetes.io/managed-by: kyverno
+    name: fb9b1d9d-0a60-454c-8884-96037b1fb5dc
+    namespace: zabbix
+    ownerReferences:
+    - apiVersion: v1
+      kind: Pod
+      name: zabbix-agent2-5lg77
+  results:
+  - category: Resource Management
+    message: rule passed
+    policy: require-memory-resources
+    properties:
+      process: background scan
+    result: pass
+    rule: require-memory-requests-limits
+    scored: true
+    source: kyverno
+    timestamp:
+      nanos: 0
+      seconds: 1777249959
+  scope:
+    apiVersion: v1
+    kind: Pod
+    name: zabbix-agent2-5lg77
+    namespace: zabbix
+  summary:
+    error: 0
+    fail: 0
+    pass: 1
+    skip: 0
     warn: 0
 kind: List
 metadata:

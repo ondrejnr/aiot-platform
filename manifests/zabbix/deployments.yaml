@@ -13,6 +13,7 @@ items:
       app.kubernetes.io/managed-by: Helm
       app.kubernetes.io/name: zabbix
       app.kubernetes.io/version: 7.0.16
+      argocd.argoproj.io/instance: zabbix
       helm.sh/chart: zabbix-7.0.12
     name: zabbix-zabbix-server
     namespace: zabbix
@@ -180,8 +181,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T07:50:11Z"
-      lastUpdateTime: "2026-04-24T07:50:11Z"
+    - lastTransitionTime: "2026-04-26T19:41:41Z"
+      lastUpdateTime: "2026-04-26T19:41:41Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -204,6 +205,7 @@ items:
       app.kubernetes.io/managed-by: Helm
       app.kubernetes.io/name: zabbix
       app.kubernetes.io/version: 7.0.16
+      argocd.argoproj.io/instance: zabbix
       helm.sh/chart: zabbix-7.0.12
     name: zabbix-zabbix-web
     namespace: zabbix
@@ -313,8 +315,8 @@ items:
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-    - lastTransitionTime: "2026-04-24T05:59:26Z"
-      lastUpdateTime: "2026-04-24T05:59:26Z"
+    - lastTransitionTime: "2026-04-26T18:25:35Z"
+      lastUpdateTime: "2026-04-26T18:25:35Z"
       message: Deployment has minimum availability.
       reason: MinimumReplicasAvailable
       status: "True"
@@ -336,6 +338,7 @@ items:
       app.kubernetes.io/managed-by: Helm
       app.kubernetes.io/name: zabbix
       app.kubernetes.io/version: 7.0.16
+      argocd.argoproj.io/instance: zabbix
       helm.sh/chart: zabbix-7.0.12
     name: zabbix-zabbix-webservice
     namespace: zabbix
@@ -410,18 +413,18 @@ items:
   status:
     availableReplicas: 1
     conditions:
-    - lastTransitionTime: "2026-04-22T15:32:13Z"
-      lastUpdateTime: "2026-04-22T15:32:13Z"
-      message: Deployment has minimum availability.
-      reason: MinimumReplicasAvailable
-      status: "True"
-      type: Available
     - lastTransitionTime: "2026-04-20T06:52:32Z"
       lastUpdateTime: "2026-04-23T05:04:04Z"
       message: ReplicaSet "zabbix-zabbix-webservice-78d569678b" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
+    - lastTransitionTime: "2026-04-26T18:25:32Z"
+      lastUpdateTime: "2026-04-26T18:25:32Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
     observedGeneration: 9
     readyReplicas: 1
     replicas: 1

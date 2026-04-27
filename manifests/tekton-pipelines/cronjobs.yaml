@@ -4,12 +4,12 @@ items:
   kind: CronJob
   metadata:
     annotations:
-      operator.tekton.dev/last-applied-hash: 99f7009287847f403a4baef5f6d9d697834544b160ccf297320a4dc6ba01f562
+      operator.tekton.dev/last-applied-hash: fbeddaa47548139e32d5d2001a921e4e2c4cc14f163ff019d0b2a4a96e081573
     generateName: tekton-resource-pruner-
     labels:
       operator.tekton.dev/created-by: tektoncd-pruner
       tektonconfig.operator.tekton.dev/pruner: "true"
-    name: tekton-resource-pruner-4ch5v
+    name: tekton-resource-pruner-dxpzp
     namespace: tekton-pipelines
     ownerReferences:
     - apiVersion: operator.tekton.dev/v1alpha1
@@ -31,15 +31,16 @@ items:
             - args:
               - -s
               - ai-enricher;--keep=20;pipelinerun,taskrun;false ai-enricher-build;--keep=20;pipelinerun,taskrun;false
-                aiot;--keep=20;pipelinerun,taskrun;false auth;--keep=20;pipelinerun,taskrun;false
-                backrest;--keep=20;pipelinerun,taskrun;false build-service;--keep=20;pipelinerun,taskrun;false
-                cattle-capi-system;--keep=20;pipelinerun,taskrun;false cattle-fleet-clusters-system;--keep=20;pipelinerun,taskrun;false
-                cattle-fleet-local-system;--keep=20;pipelinerun,taskrun;false cattle-fleet-system;--keep=20;pipelinerun,taskrun;false
-                cattle-global-data;--keep=20;pipelinerun,taskrun;false cattle-impersonation-system;--keep=20;pipelinerun,taskrun;false
-                cattle-local-user-passwords;--keep=20;pipelinerun,taskrun;false cattle-system;--keep=20;pipelinerun,taskrun;false
-                cattle-turtles-system;--keep=20;pipelinerun,taskrun;false cattle-ui-plugin-system;--keep=20;pipelinerun,taskrun;false
-                cert-manager;--keep=20;pipelinerun,taskrun;false chef;--keep=20;pipelinerun,taskrun;false
-                chef-webhook;--keep=20;pipelinerun,taskrun;false cluster-fleet-local-local-1a3d67d0a899;--keep=20;pipelinerun,taskrun;false
+                aiot;--keep=20;pipelinerun,taskrun;false argocd;--keep=20;pipelinerun,taskrun;false
+                auth;--keep=20;pipelinerun,taskrun;false backrest;--keep=20;pipelinerun,taskrun;false
+                build-service;--keep=20;pipelinerun,taskrun;false cattle-capi-system;--keep=20;pipelinerun,taskrun;false
+                cattle-fleet-clusters-system;--keep=20;pipelinerun,taskrun;false cattle-fleet-local-system;--keep=20;pipelinerun,taskrun;false
+                cattle-fleet-system;--keep=20;pipelinerun,taskrun;false cattle-global-data;--keep=20;pipelinerun,taskrun;false
+                cattle-impersonation-system;--keep=20;pipelinerun,taskrun;false cattle-local-user-passwords;--keep=20;pipelinerun,taskrun;false
+                cattle-system;--keep=20;pipelinerun,taskrun;false cattle-turtles-system;--keep=20;pipelinerun,taskrun;false
+                cattle-ui-plugin-system;--keep=20;pipelinerun,taskrun;false cert-manager;--keep=20;pipelinerun,taskrun;false
+                chef;--keep=20;pipelinerun,taskrun;false chef-webhook;--keep=20;pipelinerun,taskrun;false
+                cluster-fleet-local-local-1a3d67d0a899;--keep=20;pipelinerun,taskrun;false
                 cluster-twin;--keep=20;pipelinerun,taskrun;false cnpg-system;--keep=20;pipelinerun,taskrun;false
                 default;--keep=20;pipelinerun,taskrun;false default-tenant;--keep=20;pipelinerun,taskrun;false
                 descheduler;--keep=20;pipelinerun,taskrun;false dr-ops;--keep=20;pipelinerun,taskrun;false
@@ -48,16 +49,17 @@ items:
                 fleet-default;--keep=20;pipelinerun,taskrun;false fleet-local;--keep=20;pipelinerun,taskrun;false
                 gitea;--keep=20;pipelinerun,taskrun;false gitea-bootstrap;--keep=20;pipelinerun,taskrun;false
                 habitat-demo;--keep=20;pipelinerun,taskrun;false headlamp;--keep=20;pipelinerun,taskrun;false
-                ingress-nginx;--keep=20;pipelinerun,taskrun;false inspec-scans;--keep=20;pipelinerun,taskrun;false
-                integration-service;--keep=20;pipelinerun,taskrun;false istio-system;--keep=20;pipelinerun,taskrun;false
-                jenkins;--keep=20;pipelinerun,taskrun;false k8sgpt;--keep=20;pipelinerun,taskrun;false
-                k8up-system;--keep=20;pipelinerun,taskrun;false knative-serving;--keep=20;pipelinerun,taskrun;false
+                helloweb;--keep=20;pipelinerun,taskrun;false ingress-nginx;--keep=20;pipelinerun,taskrun;false
+                inspec-scans;--keep=20;pipelinerun,taskrun;false integration-service;--keep=20;pipelinerun,taskrun;false
+                istio-system;--keep=20;pipelinerun,taskrun;false jenkins;--keep=20;pipelinerun,taskrun;false
+                k8sgpt;--keep=20;pipelinerun,taskrun;false k8up-system;--keep=20;pipelinerun,taskrun;false
+                karpor;--keep=20;pipelinerun,taskrun;false knative-serving;--keep=20;pipelinerun,taskrun;false
                 konflux-cli;--keep=20;pipelinerun,taskrun;false konflux-info;--keep=20;pipelinerun,taskrun;false
                 konflux-operator;--keep=20;pipelinerun,taskrun;false konflux-ui;--keep=20;pipelinerun,taskrun;false
-                kyverno;--keep=20;pipelinerun,taskrun;false local;--keep=20;pipelinerun,taskrun;false
-                local-path-storage;--keep=20;pipelinerun,taskrun;false mattermost;--keep=20;pipelinerun,taskrun;false
-                monitoring;--keep=20;pipelinerun,taskrun;false namespace-lister;--keep=20;pipelinerun,taskrun;false
-                opentelemetry-operator-system;--keep=20;pipelinerun,taskrun;false
+                kubeflow;--keep=20;pipelinerun,taskrun;false kyverno;--keep=20;pipelinerun,taskrun;false
+                local;--keep=20;pipelinerun,taskrun;false local-path-storage;--keep=20;pipelinerun,taskrun;false
+                mattermost;--keep=20;pipelinerun,taskrun;false monitoring;--keep=20;pipelinerun,taskrun;false
+                namespace-lister;--keep=20;pipelinerun,taskrun;false opentelemetry-operator-system;--keep=20;pipelinerun,taskrun;false
                 p-sqf5p;--keep=20;pipelinerun,taskrun;false p-wpbsz;--keep=20;pipelinerun,taskrun;false
                 pipelines-as-code;--keep=20;pipelinerun,taskrun;false piraeus-datastore;--keep=20;pipelinerun,taskrun;false
                 platform-meta;--keep=20;pipelinerun,taskrun;false registry;--keep=20;pipelinerun,taskrun;false
@@ -117,7 +119,7 @@ items:
     successfulJobsHistoryLimit: 2
     suspend: false
   status:
-    lastScheduleTime: "2026-04-26T00:00:00Z"
-    lastSuccessfulTime: "2026-04-26T00:00:27Z"
+    lastScheduleTime: "2026-04-27T00:00:00Z"
+    lastSuccessfulTime: "2026-04-27T00:00:24Z"
 kind: List
 metadata:
