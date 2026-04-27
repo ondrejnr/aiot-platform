@@ -3,7 +3,7 @@
 # Excludes system / operator-managed namespaces that have their own controllers.
 set -e
 
-EXCLUDE_REGEX='^(kube-system|kube-public|kube-node-lease|cilium|piraeus-datastore|local-path-storage|cnpg-system|cattle-.*|fleet-.*|cluster-fleet-.*|p-.*|local|tigera-.*|monitoring|cert-manager|ingress-nginx|kyverno|robusta|opentelemetry-operator-system|signoz|tekton-.*|openshift-pipelines|pipelines-as-code|enterprise-contract-service|integration-service|build-service|namespace-lister|release-service|konflux-.*|default-tenant|user-.*|knative-serving|istio-system)$'
+EXCLUDE_REGEX='^(kube-system|kube-public|kube-node-lease|piraeus-datastore|local-path-storage|cnpg-system|cattle-.*|fleet-.*|cluster-fleet-.*|p-.*|local|tigera-.*|monitoring|cert-manager|ingress-nginx|kyverno|robusta|opentelemetry-operator-system|signoz|tekton-.*|openshift-pipelines|pipelines-as-code|enterprise-contract-service|integration-service|build-service|namespace-lister|release-service|konflux-.*|default-tenant|user-.*|knative-serving|istio-system)$'
 
 kubectl get ns -o name | sed 's|namespace/||' | while read ns; do
   if echo "$ns" | grep -qE "$EXCLUDE_REGEX"; then continue; fi

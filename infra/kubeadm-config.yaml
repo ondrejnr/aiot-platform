@@ -9,8 +9,6 @@ nodeRegistration:
   kubeletExtraArgs:
     - name: node-ip
       value: ""                      # auto-detect; override per-host if needed
-skipPhases:
-  - addon/kube-proxy                 # Cilium kubeProxyReplacement=true
 ---
 apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
@@ -46,7 +44,7 @@ scheduler:
       value: 0.0.0.0
 networking:
   dnsDomain: cluster.local
-  podSubnet: 10.245.0.0/16           # MATCHES Cilium clusterPoolIPv4PodCIDRList
+  podSubnet: 10.244.0.0/16           # Flannel default
   serviceSubnet: 10.96.0.0/12
 etcd:
   local:
@@ -81,5 +79,4 @@ kubeReserved:
 ---
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
-# kube-proxy is skipped via skipPhases above; this block kept for completeness.
-mode: ""
+mode: "iptables"                       # Flannel relies on standard kube-proxy iptables mode

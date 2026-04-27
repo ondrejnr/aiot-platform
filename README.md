@@ -180,7 +180,7 @@ flowchart TB
 | oci-e5-node2     | worker         | 172.16.200.11 (WG)    | Oracle Linux 9.7  | OCI `eu-frankfurt-1`  |
 
 - **Kubernetes**: v1.32.13 (vanilla kubeadm)
-- **CNI**: Cilium 1.16.6 — pod CIDR `10.245.0.0/16`, vxlan overlay (port 8473), kubeProxyReplacement=true, Hubble enabled (migrated from flannel 2026-04-26)
+- **CNI**: Flannel v0.27.4 — pod CIDR `10.244.0.0/16`, VXLAN overlay (port 8472), with stock kube-proxy in iptables mode
 - **Multi-cloud**: OCI nodes join the GCP control plane over a **WireGuard** tunnel; the OCI tenancy is independent of the GCP project and survives GCP outages
 - **Public entrypoint**: single IP `35.241.255.137` → **HAProxy** on master → SNI-based TCP proxy to workers' `nginx-ingress` DaemonSet (ports 80/443), with SSH fallback on port 443
 - **TLS**: `cert-manager` + Let's Encrypt (HTTP-01), ClusterIssuer `letsencrypt-prod`
@@ -380,21 +380,21 @@ running aiot-platform cluster.
 
 ```bash
 # === On EVERY node (master + workers) ===
-sudo bash install/00-vm-prereqs.sh        # containerd, kubeadm, kubelet, helm
+sudo bash bootstrap/00-vm-prereqs.sh        # containerd, kubeadm, kubelet, helm
 
 # === On master only ===
-sudo bash install/01-init-master.sh       # kubeadm init from infra/kubeadm-config.yaml
+sudo bash bootstrap/01-kubeadm-init.sh       # kubeadm init from infra/kubeadm-config.yaml
                                           # → prints `kubeadm join` token; run on workers
 
 # === On master, after all workers joined ===
-sudo bash install/02-cilium.sh            # CNI: Cilium 1.16.6 with stored helm values
-sudo bash install/03-platform.sh          # cert-manager + ingress-nginx + local-path
-sudo bash install/04-helm-charts.sh       # all 14 helm releases (Rancher, ArgoCD, …)
-sudo bash install/05-apply-cluster.sh     # CRDs + cluster-scoped + per-NS manifests
+sudo bash bootstrap/02-flannel.sh         # CNI: Flannel v0.27.4
+sudo bash bootstrap/03-sealed-secrets.sh  # sealed-secrets controller
+sudo bash bootstrap/05-argocd.sh          # ArgoCD with KSOPS plugin
+sudo bash bootstrap/06-bootstrap-app.sh   # App-of-Apps root — ArgoCD reconciles the rest
 
 # === Optional: restore Secrets + PVC data ===
 export AWS_ACCESS_KEY_ID=…  AWS_SECRET_ACCESS_KEY=…  R2_ENDPOINT=https://….r2.cloudflarestorage.com
-./install/06-k8up-restore.sh restore <namespace> <pvc> [snapshot]
+./_legacy/install/06-k8up-restore.sh restore <namespace> <pvc> [snapshot]
 ```
 
 Or simply:
@@ -408,12 +408,12 @@ make status        # show health
 ```
 
 Helm release catalogue (chart, version, repo, values file) is declared in
-[`install/helm-charts.csv`](install/helm-charts.csv). Cluster topology
+[`_legacy/install/helm-charts.csv`](_legacy/install/helm-charts.csv). Cluster topology
 (API endpoints, node CIDR, certs SANs) is declared in
-[`infra/kubeadm-config.yaml`](infra/kubeadm-config.yaml). Cilium tuning lives
-in [`cluster-wide/helm-values/kube-system_cilium.yaml`](cluster-wide/helm-values/kube-system_cilium.yaml).
+[`infra/kubeadm-config.yaml`](infra/kubeadm-config.yaml). The Flannel manifest
+is fetched from upstream and patched in-place by [`bootstrap/02-flannel.sh`](bootstrap/02-flannel.sh) — memory limits are set on all containers and `KUBERNETES_SERVICE_HOST` is hard-coded to the master IP so OCI nodes reach the API server directly over WireGuard (bypassing the kube-proxy ClusterIP DNAT path that fails on multi-cloud nodes).
 
-See [`install/README.md`](install/README.md) for the full guide, recovery
+See [`INSTALL.md`](INSTALL.md) for the full guide, recovery
 procedures, and what is **not** in the repo (secrets, WireGuard mesh, external
 services).
 
@@ -422,26 +422,25 @@ services).
 ```
 aiot-platform/
 ├── README.md                ← this file
-├── Makefile                 ← `make prereqs|init|cilium|platform|helm|apply|all|status`
+├── Makefile                 ← `make prereqs|init|cni|platform|helm|apply|all|status`
 ├── .gitignore
 │
-├── install/                 ← FRESH-VM BOOTSTRAP — installs everything below
-│   ├── README.md
+├── bootstrap/               ← FRESH-VM BOOTSTRAP — installs everything below
 │   ├── 00-vm-prereqs.sh        (containerd + kubeadm + kubelet + helm)
-│   ├── 01-init-master.sh       (kubeadm init from infra/kubeadm-config.yaml)
-│   ├── 02-cilium.sh            (Cilium 1.16.6 CNI)
-│   ├── 03-platform.sh          (cert-manager + ingress-nginx + local-path SC)
-│   ├── 04-helm-charts.sh       (all 14 Helm releases from helm-charts.csv)
-│   ├── 05-apply-cluster.sh     (CRDs + cluster-scoped + per-NS manifests)
-│   ├── 06-k8up-restore.sh      (Restore.k8up.io CR generator: list / restore)
-│   └── helm-charts.csv         (declarative chart catalog)
+│   ├── 01-kubeadm-init.sh      (kubeadm init from infra/kubeadm-config.yaml)
+│   ├── 02-flannel.sh           (Flannel v0.27.4 CNI)
+│   ├── 03-sealed-secrets.sh    (sealed-secrets controller)
+│   ├── 04-sops-age.sh          (sops + age key as Secret in argocd ns)
+│   ├── 05-argocd.sh            (ArgoCD with KSOPS plugin)
+│   └── 06-bootstrap-app.sh     (App-of-Apps root — ArgoCD takes over)
 │
+
 ├── infra/                   ← host-level / platform files
 │   ├── kubeadm-config.yaml     (cluster-init source of truth)
 │   ├── kubelet-config.yaml
 │   ├── kube-apiserver.yaml
 │   ├── etcd.yaml
-│   ├── cni-cilium.conflist     (Cilium CNI config — replaced flannel 2026-04-26)
+│   ├── cni-flannel.conflist    (Flannel CNI config — installed by /opt/cni/bin)
 │   ├── haproxy/                (HAProxy SNI proxy on master, ports 80/443)
 │   ├── registry/               (internal Docker registry config)
 │   ├── gcp-instances.yaml
@@ -498,7 +497,7 @@ aiot-platform/
 │   └── dns/
 │
 ├── cluster/                 ← misc cluster-level dumps
-│   └── versions.md             (kubectl/cilium/helm versions, node list)
+│   └── versions.md             (kubectl/flannel/helm versions, node list)
 │
 └── inventory/               ← Ansible / Semaphore inventory snapshot
     └── semaphore-configmaps.yaml

@@ -27,7 +27,7 @@ sysctl --system >/dev/null
 swapoff -a
 sed -i '/ swap / s/^/#/' /etc/fstab || true
 
-# --- disable firewalld (Cilium handles netpol)
+# --- disable firewalld (CNI handles netpol; firewalld would block VXLAN)
 systemctl disable --now firewalld 2>/dev/null || true
 
 # --- SELinux permissive on RHEL family
