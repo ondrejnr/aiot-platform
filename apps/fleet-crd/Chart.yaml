@@ -1,0 +1,10 @@
+apiVersion: v2
+name: fleet-crd-overlay
+description: aiot-platform overlay for fleet-crd
+type: application
+version: 1.0.0
+appVersion: "108.0.3+up0.14.3"
+dependencies:
+  - name: fleet-crd
+    version: "108.0.3+up0.14.3"
+    repository: https://releases.rancher.com/server-charts/stable

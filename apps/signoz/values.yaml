@@ -1,0 +1,19 @@
+# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
+# Upstream chart key: signoz
+signoz:
+  clickhouse:
+    installCustomStorageClass: false
+    persistence:
+      size: 10Gi
+      storageClass: local-path
+  queryService:
+    configVars:
+      ClickHouseUrl: tcp://chi-signoz-clickhouse-cluster-0-0.signoz.svc.cluster.local:9000
+  signoz:
+    persistence:
+      size: 5Gi
+      storageClass: local-path
+  zookeeper:
+    persistence:
+      size: 5Gi
+      storageClass: local-path

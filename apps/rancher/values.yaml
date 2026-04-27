@@ -1,0 +1,17 @@
+# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
+# Upstream chart key: rancher
+rancher:
+  bootstrapPassword: AioT2026admin
+  hostname: rancher.35.241.255.137.nip.io
+  ingress:
+    tls:
+      source: secret
+  replicas: 1
+  resources:
+    limits:
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  startupProbe:
+    failureThreshold: 60

@@ -1,0 +1,10 @@
+apiVersion: v2
+name: k8sgpt-operator-overlay
+description: aiot-platform overlay for k8sgpt-operator
+type: application
+version: 1.0.0
+appVersion: "0.2.27"
+dependencies:
+  - name: k8sgpt-operator
+    version: "0.2.27"
+    repository: https://charts.k8sgpt.ai

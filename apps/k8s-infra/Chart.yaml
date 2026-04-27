@@ -1,0 +1,10 @@
+apiVersion: v2
+name: k8s-infra-overlay
+description: aiot-platform overlay for k8s-infra
+type: application
+version: 1.0.0
+appVersion: "0.15.0"
+dependencies:
+  - name: k8s-infra
+    version: "0.15.0"
+    repository: https://charts.signoz.io

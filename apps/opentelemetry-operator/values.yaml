@@ -1,0 +1,14 @@
+# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
+# Upstream chart key: opentelemetry-operator
+opentelemetry-operator:
+  admissionWebhooks:
+    certManager:
+      enabled: true
+  manager:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi

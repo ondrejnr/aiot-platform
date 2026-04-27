@@ -1,0 +1,10 @@
+apiVersion: v2
+name: rancher-turtles-overlay
+description: aiot-platform overlay for rancher-turtles
+type: application
+version: 1.0.0
+appVersion: "108.0.4+up0.25.4"
+dependencies:
+  - name: rancher-turtles
+    version: "108.0.4+up0.25.4"
+    repository: https://releases.rancher.com/server-charts/stable

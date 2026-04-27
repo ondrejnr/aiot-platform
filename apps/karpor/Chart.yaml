@@ -1,0 +1,10 @@
+apiVersion: v2
+name: karpor-overlay
+description: aiot-platform overlay for karpor
+type: application
+version: 1.0.0
+appVersion: "0.6.4"
+dependencies:
+  - name: karpor
+    version: "0.6.4"
+    repository: https://kusionstack.github.io/charts

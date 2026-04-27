@@ -1,0 +1,8 @@
+# Cluster-specific overrides — referenced from apps/<name>/values.yaml as
+# additional valueFile via spec.source.helm.valueFiles
+domain: 35.241.255.137.nip.io
+clusterIssuer: letsencrypt-prod
+storageClass: piraeus-r2
+r2:
+  endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+  bucket: aiot-velero

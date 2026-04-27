@@ -1,0 +1,142 @@
+# Generates 7 ArgoCD AppProject manifests as a single multi-doc YAML.
+# Layout: each project pins source repo + destination cluster + namespace allowlist
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata: { name: platform, namespace: argocd }
+spec:
+  description: Cluster-wide platform — CNI, ingress, certs, storage, backup
+  sourceRepos: ['https://github.com/ondrejnr/aiot-platform.git', 'https://*']
+  destinations:
+    - { namespace: 'kube-system',     server: '*' }
+    - { namespace: 'cert-manager',    server: '*' }
+    - { namespace: 'ingress-nginx',   server: '*' }
+    - { namespace: 'sealed-secrets',  server: '*' }
+    - { namespace: 'k8up-system',     server: '*' }
+    - { namespace: 'piraeus-datastore', server: '*' }
+    - { namespace: 'local-path-storage', server: '*' }
+    - { namespace: 'descheduler',     server: '*' }
+    - { namespace: 'kyverno',         server: '*' }
+  clusterResourceWhitelist:
+    - { group: '*', kind: '*' }
+  namespaceResourceWhitelist:
+    - { group: '*', kind: '*' }
+  orphanedResources: { warn: true }
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata: { name: monitoring, namespace: argocd }
+spec:
+  description: Observability stack
+  sourceRepos: ['https://github.com/ondrejnr/aiot-platform.git', 'https://*']
+  destinations:
+    - { namespace: 'monitoring',                   server: '*' }
+    - { namespace: 'signoz',                       server: '*' }
+    - { namespace: 'opentelemetry-operator-system', server: '*' }
+    - { namespace: 'victoriametrics',              server: '*' }
+    - { namespace: 'robusta',                      server: '*' }
+    - { namespace: 'event-exporter',               server: '*' }
+    - { namespace: 'k8sgpt',                       server: '*' }
+    - { namespace: 'karpor',                       server: '*' }
+  clusterResourceWhitelist: [{ group: '*', kind: '*' }]
+  namespaceResourceWhitelist: [{ group: '*', kind: '*' }]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata: { name: rancher, namespace: argocd }
+spec:
+  description: Rancher + Fleet + cluster-api turtles
+  sourceRepos: ['https://github.com/ondrejnr/aiot-platform.git', 'https://*']
+  destinations:
+    - { namespace: 'cattle-*',           server: '*' }
+    - { namespace: 'fleet-*',            server: '*' }
+    - { namespace: 'cluster-fleet-*',    server: '*' }
+    - { namespace: 'p-*',                server: '*' }
+    - { namespace: 'user-*',             server: '*' }
+  clusterResourceWhitelist: [{ group: '*', kind: '*' }]
+  namespaceResourceWhitelist: [{ group: '*', kind: '*' }]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata: { name: data, namespace: argocd }
+spec:
+  description: Stateful data services
+  sourceRepos: ['https://github.com/ondrejnr/aiot-platform.git', 'https://*']
+  destinations:
+    - { namespace: 'aiot',     server: '*' }
+    - { namespace: 'backrest', server: '*' }
+    - { namespace: 'gitea',    server: '*' }
+    - { namespace: 'gitea-bootstrap', server: '*' }
+    - { namespace: 'mattermost', server: '*' }
+    - { namespace: 'piraeus-datastore', server: '*' }
+  clusterResourceWhitelist: [{ group: '*', kind: '*' }]
+  namespaceResourceWhitelist: [{ group: '*', kind: '*' }]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata: { name: ai, namespace: argocd }
+spec:
+  description: AI/ML workloads
+  sourceRepos: ['https://github.com/ondrejnr/aiot-platform.git', 'https://*']
+  destinations:
+    - { namespace: 'aiot',                server: '*' }
+    - { namespace: 'ai-enricher',         server: '*' }
+    - { namespace: 'ai-enricher-build',   server: '*' }
+    - { namespace: 'kubeflow*',           server: '*' }
+    - { namespace: 'mlflow',              server: '*' }
+    - { namespace: 'inference',           server: '*' }
+    - { namespace: 'k8sgpt',              server: '*' }
+    - { namespace: 'qdrant',              server: '*' }
+  clusterResourceWhitelist: [{ group: '*', kind: '*' }]
+  namespaceResourceWhitelist: [{ group: '*', kind: '*' }]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata: { name: ci-cd, namespace: argocd }
+spec:
+  description: Build + deploy + source control
+  sourceRepos: ['https://github.com/ondrejnr/aiot-platform.git', 'https://*']
+  destinations:
+    - { namespace: 'argocd',              server: '*' }
+    - { namespace: 'jenkins',             server: '*' }
+    - { namespace: 'gitea',               server: '*' }
+    - { namespace: 'semaphore',           server: '*' }
+    - { namespace: 'konflux-*',           server: '*' }
+    - { namespace: 'tekton-*',            server: '*' }
+    - { namespace: 'pipelines-as-code',   server: '*' }
+    - { namespace: 'openshift-pipelines', server: '*' }
+    - { namespace: 'build-service',       server: '*' }
+    - { namespace: 'release-service',     server: '*' }
+    - { namespace: 'integration-service', server: '*' }
+    - { namespace: 'enterprise-contract-service', server: '*' }
+    - { namespace: 'default-tenant',      server: '*' }
+    - { namespace: 'user-*',              server: '*' }
+    - { namespace: 'namespace-lister',    server: '*' }
+  clusterResourceWhitelist: [{ group: '*', kind: '*' }]
+  namespaceResourceWhitelist: [{ group: '*', kind: '*' }]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata: { name: platform-mgmt, namespace: argocd }
+spec:
+  description: Cluster management UIs
+  sourceRepos: ['https://github.com/ondrejnr/aiot-platform.git', 'https://*']
+  destinations:
+    - { namespace: 'headlamp',     server: '*' }
+    - { namespace: 'karpor',       server: '*' }
+    - { namespace: 'kyverno',      server: '*' }
+    - { namespace: 'descheduler',  server: '*' }
+    - { namespace: 'event-exporter', server: '*' }
+    - { namespace: 'dr-ops',       server: '*' }
+    - { namespace: 'helloweb',     server: '*' }
+    - { namespace: 'cluster-twin', server: '*' }
+    - { namespace: 'tf-demo',      server: '*' }
+    - { namespace: 'platform-meta', server: '*' }
+    - { namespace: 'registry',     server: '*' }
+    - { namespace: 'chef-webhook', server: '*' }
+    - { namespace: 'inspec-scans', server: '*' }
+    - { namespace: 'auth',         server: '*' }
+    - { namespace: 'dex',          server: '*' }
+    - { namespace: 'etcd-backup',  server: '*' }
+  clusterResourceWhitelist: [{ group: '*', kind: '*' }]
+  namespaceResourceWhitelist: [{ group: '*', kind: '*' }]

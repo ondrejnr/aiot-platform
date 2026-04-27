@@ -1,0 +1,10 @@
+apiVersion: v2
+name: redis-overlay
+description: aiot-platform overlay for redis
+type: application
+version: 1.0.0
+appVersion: "20.5.0"
+dependencies:
+  - name: redis
+    version: "20.5.0"
+    repository: https://charts.bitnami.com/bitnami

@@ -1,0 +1,10 @@
+apiVersion: v2
+name: opentelemetry-operator-overlay
+description: aiot-platform overlay for opentelemetry-operator
+type: application
+version: 1.0.0
+appVersion: "0.109.2"
+dependencies:
+  - name: opentelemetry-operator
+    version: "0.109.2"
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts

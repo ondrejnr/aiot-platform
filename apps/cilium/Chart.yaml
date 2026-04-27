@@ -1,0 +1,10 @@
+apiVersion: v2
+name: cilium-overlay
+description: aiot-platform overlay for cilium
+type: application
+version: 1.0.0
+appVersion: "1.16.6"
+dependencies:
+  - name: cilium
+    version: "1.16.6"
+    repository: https://helm.cilium.io

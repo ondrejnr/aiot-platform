@@ -1,0 +1,10 @@
+apiVersion: v2
+name: signoz-overlay
+description: aiot-platform overlay for signoz
+type: application
+version: 1.0.0
+appVersion: "0.117.1"
+dependencies:
+  - name: signoz
+    version: "0.117.1"
+    repository: https://charts.signoz.io

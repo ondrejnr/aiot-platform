@@ -1,0 +1,10 @@
+apiVersion: v2
+name: k8up-overlay
+description: aiot-platform overlay for k8up
+type: application
+version: 1.0.0
+appVersion: "4.9.0"
+dependencies:
+  - name: k8up
+    version: "4.9.0"
+    repository: https://k8up-io.github.io/k8up

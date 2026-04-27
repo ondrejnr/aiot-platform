@@ -1,0 +1,9 @@
+# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
+# Upstream chart key: rancher-webhook
+rancher-webhook:
+  global:
+    cattle:
+      systemDefaultRegistry: ""
+  mcm:
+    enabled: true
+  priorityClassName: rancher-critical

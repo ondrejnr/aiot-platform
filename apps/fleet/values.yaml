@@ -1,0 +1,15 @@
+# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
+# Upstream chart key: fleet
+fleet:
+  agentTLSMode: strict
+  apiServerCA: ""
+  apiServerURL: https://rancher.35.241.255.137.nip.io
+  bootstrap:
+    agentNamespace: cattle-fleet-local-system
+    enabled: false
+  gitops:
+    enabled: true
+  global:
+    cattle:
+      systemDefaultRegistry: ""
+  priorityClassName: rancher-critical

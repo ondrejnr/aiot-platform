@@ -1,0 +1,10 @@
+apiVersion: v2
+name: qdrant-overlay
+description: aiot-platform overlay for qdrant
+type: application
+version: 1.0.0
+appVersion: "1.13.0"
+dependencies:
+  - name: qdrant
+    version: "1.13.0"
+    repository: https://qdrant.github.io/qdrant-helm

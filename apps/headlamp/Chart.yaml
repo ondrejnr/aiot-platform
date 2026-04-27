@@ -1,0 +1,10 @@
+apiVersion: v2
+name: headlamp-overlay
+description: aiot-platform overlay for headlamp
+type: application
+version: 1.0.0
+appVersion: "0.27.0"
+dependencies:
+  - name: headlamp
+    version: "0.27.0"
+    repository: https://kubernetes-sigs.github.io/headlamp/

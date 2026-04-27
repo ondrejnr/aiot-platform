@@ -1,0 +1,21 @@
+# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
+# Upstream chart key: jenkins
+jenkins:
+  controller:
+    admin:
+      password: admin123
+    ingress:
+      enabled: true
+      hostName: jenkins.35.241.255.137.nip.io
+      ingressClassName: nginx
+    installLatestPlugins: true
+    installPlugins:
+    - kubernetes
+    - workflow-aggregator
+    - git
+    - configuration-as-code
+    - dark-theme
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+  persistence:
+    existingClaim: jenkins-lp

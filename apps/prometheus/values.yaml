@@ -1,0 +1,30 @@
+# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
+# Upstream chart key: kube-prometheus-stack
+kube-prometheus-stack:
+  alertmanager:
+    alertmanagerSpec:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+  grafana:
+    adminPassword: admin123
+    grafana.ini:
+      auth:
+        disable_login_form: true
+      auth.anonymous:
+        enabled: true
+        org_name: Main Org.
+        org_role: Admin
+    ingress:
+      enabled: true
+      hosts:
+      - grafana.35.241.255.137.nip.io
+      ingressClassName: nginx
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+  prometheus:
+    prometheusSpec:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ""
+  prometheusOperator:
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""

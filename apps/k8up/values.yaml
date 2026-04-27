@@ -1,0 +1,17 @@
+# Live helm values from cluster (snapshot 2026-04-27T05:54:06Z)
+# Upstream chart key: k8up
+k8up:
+  crd:
+    install: false
+  k8up:
+    globalRepoPasswordSecretRef: k8up-repo
+    globalS3:
+      accessKeyIDSecretRef:
+        key: access_key
+        name: r2-creds
+      bucket: aiot-velero
+      endpoint: https://ca6c7e99d62811119041b9334c646aaf.r2.cloudflarestorage.com
+      secretAccessKeySecretRef:
+        key: secret_key
+        name: r2-creds
+    skipWithoutAnnotation: true

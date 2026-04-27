@@ -1,0 +1,10 @@
+# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
+# Upstream chart key: rancher-turtles
+rancher-turtles:
+  features:
+    no-cert-manager:
+      enabled: true
+  global:
+    cattle:
+      systemDefaultRegistry: ""
+  priorityClassName: rancher-critical
