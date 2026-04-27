@@ -3,7 +3,7 @@
 ![Kubernetes](https://img.shields.io/badge/kubernetes-v1.32.13-326ce5?logo=kubernetes&logoColor=white)
 ![Nodes](https://img.shields.io/badge/nodes-5%20(3%20GCP%20%2B%202%20OCI)-success)
 ![Namespaces](https://img.shields.io/badge/namespaces-80-blue)
-![Backup](https://img.shields.io/badge/velero-Cloudflare%20R2-f38020?logo=cloudflare&logoColor=white)
+![Backup](https://img.shields.io/badge/k8up-Cloudflare%20R2-f38020?logo=cloudflare&logoColor=white)
 ![LLM](https://img.shields.io/badge/LLM-Open--WebUI%20%2B%20RAG-ff6f00)
 ![K8sGPT](https://img.shields.io/badge/self--monitoring-K8sGPT-purple)
 ![Config](https://img.shields.io/badge/config-Chef%20%7C%20Puppet%20%7C%20Ansible-red)
@@ -23,7 +23,7 @@ Industrial data is useless unless it becomes a **decision**. AIoT is designed ar
 4. **Serve** — the best model is promoted and served by KServe/Knative with zero-downtime rollout
 5. **Ask** — operators and engineers interact with the whole system through an LLM chat (Open-WebUI) that uses RAG over platform data and can call the inference service as a tool
 
-Everything runs on a self-hosted, multi-cloud Kubernetes cluster (GCP + OCI), with **Chef Automate**, **Puppet Enterprise**, and **Ansible/Semaphore** keeping hosts and agents in a known state, and **Velero** guaranteeing disaster recovery to Cloudflare R2.
+Everything runs on a self-hosted, multi-cloud Kubernetes cluster (GCP + OCI), with **Chef Automate**, **Puppet Enterprise**, and **Ansible/Semaphore** keeping hosts and agents in a known state, and **k8up** + an etcd-snapshot CronJob guaranteeing disaster recovery to Cloudflare R2.
 
 ## Self-operating cluster — K8sGPT
 
@@ -194,7 +194,7 @@ flowchart TB
 - **Multi-cloud**: OCI nodes join the GCP control plane over a **WireGuard** tunnel; the OCI tenancy is independent of the GCP project and survives GCP outages
 - **Public entrypoint**: single IP `35.241.255.137` → **HAProxy** on master → SNI-based TCP proxy to workers' `nginx-ingress` DaemonSet (ports 80/443), with SSH fallback on port 443
 - **TLS**: `cert-manager` + Let's Encrypt (HTTP-01), ClusterIssuer `letsencrypt-prod`
-- **Storage**: single `local-path` StorageClass (Rancher local-path provisioner) — data is pinned to the node hosting the PVC; **Velero is the only HA/DR path**
+- **Storage**: single `local-path` StorageClass (Rancher local-path provisioner) — data is pinned to the node hosting the PVC; **k8up restic backups + etcd snapshots are the only HA/DR path**
 
 ---
 
@@ -222,7 +222,7 @@ The AIoT workflow moves sensor data from the edge all the way to trained, versio
   - `aiot-retrain-weekly` CronJob — triggers a new pipeline run every week with fresh data
   - `aiot-register-best` — promotes the best-scoring model run to MLflow Registry
   - `aiot-rollout-model` — updates the served `InferenceService` with the new model URI
-- **MLflow** (namespace `mlflow`) — experiment tracking, model registry; backed by `mlflow` DB on `pg-ha`; artifact store currently on Velero-tracked local PVC (migrating to MinIO-on-GCP-disk is planned)
+- **MLflow** (namespace `mlflow`) — experiment tracking, model registry; backed by `mlflow` DB on `pg-ha`; artifact store currently on a local PVC backed up by k8up (migrating to MinIO-on-GCP-disk is planned)
 - **KServe** — `maintenance-predictor` `InferenceService` under `kubeflow-user-example-com`, exposed through Knative + Istio on `inference.35.241.255.137.nip.io`
 - **Qdrant + rag-worker + Open-WebUI** (in `aiot`) — vector DB + RAG ingestion worker + chat UI, with LLM backends reachable from the cluster
 
@@ -306,55 +306,71 @@ flowchart TB
 
 ---
 
-## Backup & disaster recovery — `velero`, `vui`, `etcd-backup`
+## Backup & disaster recovery — `k8up`, `etcd-backup`
 
-Backup is a **first-class concern** because `local-path` storage has no replication.
+Backup is a **first-class concern** because `local-path` storage has no replication. The platform uses **two independent backup tracks** writing to the same Cloudflare R2 bucket (`s3://aiot-velero`):
 
 ```mermaid
 flowchart LR
-    CL["☸️ Cluster<br/>manifests + PVCs"]
-    V[["Velero<br/>daily 03:00"]]
-    KOPIA[["Kopia<br/>FS backup"]]
-    ETCD[["etcd-backup<br/>CronJob"]]
+    subgraph SRC["☸️ Cluster sources"]
+        PVC[("PVCs<br/>stateful pods")]
+        ETCDB[/"etcd database<br/>(control-plane)"/]
+        REPO[("This Git repo<br/>= manifests + helm values")]
+    end
+
+    K8UP[["k8up Operator<br/>k8up-system"]]
+    SCHED["Schedule CRs<br/>(aiot, jenkins, gitea, ...)"]
+    ETCDCJ["CronJob<br/>etcd-snapshot 02:30 UTC"]
+
     R2[("☁️ Cloudflare R2<br/>s3://aiot-velero")]
-    VUI{{"Velero UI<br/>vui.*"}}
 
-    CL --> V
-    CL --> KOPIA
-    CL --> ETCD
-    V --> R2
-    KOPIA --> R2
-    ETCD --> R2
-    VUI -.browse.-> R2
+    PVC --> K8UP
+    SCHED --> K8UP
+    K8UP -- restic --> R2
+    ETCDB --> ETCDCJ
+    ETCDCJ -- mc cp --> R2
+    REPO -. clone + apply .-> NEW
 
-    R2 ==restore==> NEW["🆕 New cluster<br/>rebuilt from this repo"]
+    R2 ==restore==> NEW["🆕 New cluster<br/>install/ scripts + restic restore"]
 
     classDef src fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
     classDef tool fill:#fef3c7,stroke:#d97706,color:#78350f
     classDef store fill:#ffedd5,stroke:#ea580c,color:#7c2d12
     classDef new fill:#dcfce7,stroke:#16a34a,color:#14532d
-    class CL src
-    class V,KOPIA,ETCD,VUI tool
+    class PVC,ETCDB,REPO src
+    class K8UP,SCHED,ETCDCJ tool
     class R2 store
     class NEW new
 ```
 
-### Velero
+### k8up (PVC / file-system backup)
 
-- **Target**: Cloudflare R2 bucket `s3://aiot-velero` (S3-compatible, endpoint `*.r2.cloudflarestorage.com`)
-- **Schedule** `daily-cluster-backup` (namespace `velero`) — every day at 03:00 UTC, retention 7 days
-- **Scope**: all cluster + namespaced Kubernetes objects (manifests, CRs, ConfigMaps, Secrets metadata), excluding ephemeral/log-like resources (`events`, `replicasets.apps`, `nodes`) and noisy namespaces (`kube-system`, `local-path-storage`, `monitoring`, `signoz`, `victoriametrics`, `velero`, `knative-serving`, `opentelemetry-operator-system`)
-- **File-system backup** (Kopia) per-pod-volume is available per-namespace via `BackupRepository` CRs (`aiot-default-kopia-*`, `kubeflow-default-kopia-*`, `mlflow-default-kopia-*`, `jenkins-default-kopia-*`, etc.) — enabled selectively for stateful workloads whose data must survive a node loss
-- **Restore is the exit strategy**: rebuilding a new cluster consists of applying the manifests from this repo, then running `velero restore create --from-backup <latest>` to rehydrate CRs and (optionally) volume data
+- **Operator**: helm release [`k8up`](cluster-wide/helm-values/k8up-system_k8up.yaml) in namespace `k8up-system` (chart `k8up-4.9.0`).
+- **Backend**: `restic` repository in Cloudflare R2 bucket `aiot-velero`, endpoint `https://<acct>.r2.cloudflarestorage.com`. Credentials in `r2-creds` and `k8up-repo` Secrets per namespace.
+- **Schedules** (`Schedule.k8up.io` CRs, all named `aiot`):
+  - `aiot`, `jenkins`, `gitea`, `backrest`, `semaphore`, `signoz`, `victoriametrics` namespaces
+  - **Backup**: daily at 03:10 UTC (`keepJobs: 2`)
+  - **Prune**: daily at 04:10 UTC (retention `keepDaily: 2`)
+- **Per-pod hooks**: `PreBackupPod` resources let stateful workloads (e.g. CNPG postgres, Jenkins) take application-consistent snapshots before restic runs.
+- **Restore**: create a `Restore.k8up.io` CR pointing at a snapshot ID — k8up spawns a restic-restore pod that writes back into the target PVC. See [k8up docs](https://k8up.io) for the CR schema.
 
-### vui
+### etcd-backup
 
-- Namespace `vui` hosts the **Velero web UI**, published on `vui.35.241.255.137.nip.io`
-- Read-only and admin service accounts (`vui-readonly-sa`, `vui-admin-sa`)
+- Namespace **`etcd-backup`** runs `CronJob/etcd-snapshot` (schedule `30 2 * * *`).
+- Init-container `snapshot` (`registry.k8s.io/etcd:3.5.16-0`) runs `etcdctl snapshot save` against the local etcd via `--endpoints=https://127.0.0.1:2379` (host network, control-plane node selector).
+- Main container `upload` (`minio/mc:latest`) uploads to `s3://aiot-velero/etcd-snapshots/etcd-<TS>.db` and prunes objects older than 7 days.
+- Last verified run: **today** — confirm with `kubectl -n etcd-backup get jobs` and `mc ls r2/aiot-velero/etcd-snapshots/`.
 
-### etcd
+### Restore strategy
 
-- Namespace **`etcd-backup`** runs a `CronJob` that snapshots the kubeadm etcd on a schedule (via `etcdctl` in the etcd pod's container). Snapshots are stored on the master and mirrored to R2.
+| Scenario | Recovery path |
+|---|---|
+| Single failed PVC | `Restore.k8up.io` CR → restic restore from R2 |
+| Lost worker node | Cordon/drain → reprovision VM → `00-vm-prereqs.sh` → `kubeadm join` → workloads reschedule |
+| Complete cluster loss | New VMs → `install/` scripts (00→05) → for stateful data: per-namespace `Restore.k8up.io` CRs |
+| Control-plane corruption | Reinstall master via `01-init-master.sh` with `--ignore-preflight-errors` then `etcdctl snapshot restore` from R2 |
+
+> **NOTE**: Velero is **not** installed. An older deployment used Velero + a custom UI (`vui.*.nip.io`); both have been retired in favour of k8up.
 
 ---
 
@@ -376,7 +392,6 @@ All services are published under `*.35.241.255.137.nip.io` with Let's Encrypt ce
 | Experiments       | `mlflow.*`                                     | `mlflow`          |                                        |
 | Observability     | `grafana.*`, `prometheus.*`, `vm.*`, `signoz.*`| `monitoring`, `victoriametrics`, `signoz` |                         |
 | Ops               | `headlamp.*`, `mm.*`, `n8n.*`                  | `headlamp`, `mattermost`, `n8n` |                              |
-| DR                | `vui.*`                                        | `vui`             | Velero UI                              |
 
 ---
 
@@ -404,8 +419,7 @@ sudo bash install/05-apply-cluster.sh     # CRDs + cluster-scoped + per-NS manif
 
 # === Optional: restore Secrets + PVC data ===
 export AWS_ACCESS_KEY_ID=…  AWS_SECRET_ACCESS_KEY=…  R2_ENDPOINT=https://….r2.cloudflarestorage.com
-export BACKUP_NAME=$(velero backup get -o name | head -1)
-sudo bash install/06-velero-restore.sh
+./install/06-k8up-restore.sh restore <namespace> <pvc> [snapshot]
 ```
 
 Or simply:

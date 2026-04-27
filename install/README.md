@@ -32,7 +32,7 @@ Pod CIDR: `10.245.0.0/16` · Service CIDR: `10.96.0.0/12` · CNI: **Cilium 1.16.
 | 3 | `03-platform.sh`        | master        | cert-manager + ingress-nginx + local-path SC         |
 | 4 | `04-helm-charts.sh`     | master        | all 14 helm releases (Rancher, ArgoCD, Jenkins, ...) |
 | 5 | `05-apply-cluster.sh`   | master        | apply CRDs + cluster-scoped + per-NS manifests       |
-| 6 | `06-velero-restore.sh`  | master        | restore Secrets + PV data from R2 backup (optional)  |
+| 6 | `06-k8up-restore.sh`     | master        | restore PVC data from R2 via k8up Restore CR (optional) 
 
 ```bash
 # === On EVERY node ===
@@ -48,36 +48,3 @@ sudo bash install/03-platform.sh
 sudo bash install/04-helm-charts.sh
 sudo bash install/05-apply-cluster.sh
 
-# Optional: restore PVC data + secrets from latest backup
-export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... R2_ENDPOINT=https://<acct>.r2.cloudflarestorage.com
-export BACKUP_NAME=$(velero backup get -o name | head -1)
-sudo bash install/06-velero-restore.sh
-```
-
-## Customising
-
-- **Helm chart catalog**: edit [`helm-charts.csv`](helm-charts.csv) — adds/removes
-  releases, adjusts versions, swaps repo URLs.
-- **Cilium tuning**: edit
-  [`../cluster-wide/helm-values/kube-system_cilium.yaml`](../cluster-wide/helm-values/kube-system_cilium.yaml).
-- **kubeadm topology**: edit [`../infra/kubeadm-config.yaml`](../infra/kubeadm-config.yaml).
-- **GCP / firewall**: see [`../infra/gcp-firewall-rules.yaml`](../infra/gcp-firewall-rules.yaml).
-
-## What is NOT in this repo
-
-- **Secrets** — sanitised. Provide your own (`Secret` manifests, sealed-secrets,
-  external-secrets) or run step 6 to restore from backup.
-- **External services**: Chef Automate (runs on `aiot-worker-01` as systemd —
-  see [`../inventory/`](../inventory/) and namespace
-  [`chef-webhook`](../namespaces/chef-webhook/)), Puppet Enterprise, GitHub PAT,
-  R2 credentials, Cloudflare DNS API tokens.
-- **WireGuard mesh** between GCP↔OCI nodes — set up out-of-band.
-- **DNS wildcard**: configure `*.<ip>.nip.io` (free) or your own zone.
-
-## Recovery flow on a single failed node
-
-1. Cordon + drain via Rancher or `kubectl`.
-2. Provision new VM, run `00-vm-prereqs.sh`.
-3. On master: `kubeadm token create --print-join-command` → run on the new VM.
-4. Cilium auto-deploys to the new node within ~30s.
-5. Workloads reschedule (ensure PVCs are not local-path-only on old node).

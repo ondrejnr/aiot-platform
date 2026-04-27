@@ -26,8 +26,7 @@ helm:
 apply:
 	sudo bash install/05-apply-cluster.sh
 restore:
-	sudo bash install/06-velero-restore.sh
-
+	@echo Use: ./install/06-k8up-restore.sh list \<ns\> or ./install/06-k8up-restore.sh restore \<ns\> \<pvc\>
 all: cilium platform helm apply
 
 status:
