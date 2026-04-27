@@ -1,0 +1,17 @@
+namespace,name,chart,version,repo,values_file
+kube-system,cilium,cilium,1.16.6,https://helm.cilium.io,cluster-wide/helm-values/kube-system_cilium.yaml
+cert-manager,cert-manager,cert-manager,v1.16.2,https://charts.jetstack.io,
+ingress-nginx,ingress-nginx,ingress-nginx,4.11.3,https://kubernetes.github.io/ingress-nginx,
+cattle-system,rancher,rancher,2.13.3,https://releases.rancher.com/server-charts/stable,cluster-wide/helm-values/cattle-system_rancher.yaml
+cattle-system,rancher-webhook,rancher-webhook,108.0.3+up0.9.3,https://releases.rancher.com/server-charts/stable,cluster-wide/helm-values/cattle-system_rancher-webhook.yaml
+cattle-fleet-system,fleet-crd,fleet-crd,108.0.3+up0.14.3,https://releases.rancher.com/server-charts/stable,cluster-wide/helm-values/cattle-fleet-system_fleet-crd.yaml
+cattle-fleet-system,fleet,fleet,108.0.3+up0.14.3,https://releases.rancher.com/server-charts/stable,cluster-wide/helm-values/cattle-fleet-system_fleet.yaml
+cattle-turtles-system,rancher-turtles,rancher-turtles,108.0.4+up0.25.4,https://releases.rancher.com/server-charts/stable,cluster-wide/helm-values/cattle-turtles-system_rancher-turtles.yaml
+argocd,argocd,argo-cd,7.7.10,https://argoproj.github.io/argo-helm,cluster-wide/helm-values/argocd_argocd.yaml
+jenkins,jenkins,jenkins,5.9.18,https://charts.jenkins.io,cluster-wide/helm-values/jenkins_jenkins.yaml
+monitoring,prometheus,kube-prometheus-stack,83.4.1,https://prometheus-community.github.io/helm-charts,cluster-wide/helm-values/monitoring_prometheus.yaml
+opentelemetry-operator-system,opentelemetry-operator,opentelemetry-operator,0.109.2,https://open-telemetry.github.io/opentelemetry-helm-charts,cluster-wide/helm-values/opentelemetry-operator-system_opentelemetry-operator.yaml
+signoz,signoz,signoz,0.117.1,https://charts.signoz.io,cluster-wide/helm-values/signoz_signoz.yaml
+signoz,k8s-infra,k8s-infra,0.15.0,https://charts.signoz.io,cluster-wide/helm-values/signoz_k8s-infra.yaml
+k8sgpt,k8sgpt-operator,k8sgpt-operator,0.2.27,https://charts.k8sgpt.ai,cluster-wide/helm-values/k8sgpt_k8sgpt-operator.yaml
+k8up-system,k8up,k8up,4.9.0,https://k8up-io.github.io/k8up,cluster-wide/helm-values/k8up-system_k8up.yaml

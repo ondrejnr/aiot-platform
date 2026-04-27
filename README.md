@@ -380,6 +380,54 @@ All services are published under `*.35.241.255.137.nip.io` with Let's Encrypt ce
 
 ---
 
+
+
+## Installing this cluster on fresh VMs
+
+A complete bootstrap workflow lives in [`install/`](install/) — a numbered set
+of idempotent shell scripts that take **brand-new Linux VMs** to a fully
+running aiot-platform cluster.
+
+```bash
+# === On EVERY node (master + workers) ===
+sudo bash install/00-vm-prereqs.sh        # containerd, kubeadm, kubelet, helm
+
+# === On master only ===
+sudo bash install/01-init-master.sh       # kubeadm init from infra/kubeadm-config.yaml
+                                          # → prints `kubeadm join` token; run on workers
+
+# === On master, after all workers joined ===
+sudo bash install/02-cilium.sh            # CNI: Cilium 1.16.6 with stored helm values
+sudo bash install/03-platform.sh          # cert-manager + ingress-nginx + local-path
+sudo bash install/04-helm-charts.sh       # all 14 helm releases (Rancher, ArgoCD, …)
+sudo bash install/05-apply-cluster.sh     # CRDs + cluster-scoped + per-NS manifests
+
+# === Optional: restore Secrets + PVC data ===
+export AWS_ACCESS_KEY_ID=…  AWS_SECRET_ACCESS_KEY=…  R2_ENDPOINT=https://….r2.cloudflarestorage.com
+export BACKUP_NAME=$(velero backup get -o name | head -1)
+sudo bash install/06-velero-restore.sh
+```
+
+Or simply:
+
+```bash
+make prereqs       # 00
+make init          # 01
+make all           # 02 → 03 → 04 → 05
+make restore       # 06 (optional)
+make status        # show health
+```
+
+Helm release catalogue (chart, version, repo, values file) is declared in
+[`install/helm-charts.csv`](install/helm-charts.csv). Cluster topology
+(API endpoints, node CIDR, certs SANs) is declared in
+[`infra/kubeadm-config.yaml`](infra/kubeadm-config.yaml). Cilium tuning lives
+in [`cluster-wide/helm-values/kube-system_cilium.yaml`](cluster-wide/helm-values/kube-system_cilium.yaml).
+
+See [`install/README.md`](install/README.md) for the full guide, recovery
+procedures, and what is **not** in the repo (secrets, WireGuard mesh, external
+services).
+
 ## Repository layout
 
 ```
