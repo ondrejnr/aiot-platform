@@ -22,16 +22,16 @@ serverVersion:
   major: "1"
   minor: "32"
 
-## Cilium
-version: 1.16.6
-chart: cilium-1.16.6
-revision: 2
-updated: 2026-04-27 04:08:22.154319931 +0000 UTC
+## Flannel
+version: v0.27.4
+manifest: https://github.com/flannel-io/flannel/releases/download/v0.27.4/kube-flannel.yml
+podCIDR: 10.244.0.0/16
+backend: vxlan (port 8472)
+notes: KUBERNETES_SERVICE_HOST patched to 10.132.0.2 so OCI nodes reach apiserver via WireGuard
 
 ## All Helm releases
 NAME                  	NAMESPACE                    	REVISION	UPDATED                                	STATUS  	CHART                           	APP VERSION
 argocd                	argocd                       	1       	2026-04-26 08:49:12.050585428 +0000 UTC	deployed	argo-cd-7.7.10                  	v2.13.2    
-cilium                	kube-system                  	2       	2026-04-27 04:08:22.154319931 +0000 UTC	deployed	cilium-1.16.6                   	1.16.6     
 fleet                 	cattle-fleet-system          	2       	2026-04-19 20:54:30.563836328 +0000 UTC	deployed	fleet-108.0.3+up0.14.3          	0.14.3     
 fleet-crd             	cattle-fleet-system          	1       	2026-04-19 20:51:13.869196002 +0000 UTC	deployed	fleet-crd-108.0.3+up0.14.3      	0.14.3     
 jenkins               	jenkins                      	4       	2026-04-21 01:38:35.796302023 +0000 UTC	deployed	jenkins-5.9.18                  	2.555.1    

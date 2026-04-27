@@ -26,11 +26,11 @@ cd aiot-platform
 # 1. OS prereqs (containerd, kubelet, kubeadm, kubectl, helm)
 sudo bash bootstrap/00-vm-prereqs.sh
 
-# 2. Initialise the control plane (skips kube-proxy; podSubnet 10.245.0.0/16)
+# 2. Initialise the control plane (Flannel CNI; podSubnet 10.244.0.0/16)
 sudo bash bootstrap/01-kubeadm-init.sh
 
-# 3. Install Cilium 1.16.6 (replaces kube-proxy)
-bash bootstrap/02-cilium.sh
+# 3. Install Flannel CNI v0.27.4
+sudo bash bootstrap/02-flannel.sh
 
 # 4. sealed-secrets controller (for non-sops secrets)
 bash bootstrap/03-sealed-secrets.sh
@@ -77,7 +77,7 @@ sudo kubeadm join <CP_IP>:6443 --token <T> --discovery-token-ca-cert-hash sha256
 │   │   └── argocd-self.yaml
 │   ├── projects/all.yaml        # 7 AppProjects
 │   └── applications/
-│       ├── platform/            # cilium, cert-manager, ingress-nginx, k8up, ...
+│       ├── platform/            # cert-manager, ingress-nginx, k8up, ...
 │       ├── monitoring/          # prometheus, signoz, victoriametrics, ...
 │       ├── rancher/             # rancher, fleet, turtles
 │       ├── data/                # cnpg, qdrant, redis, mattermost, zabbix
@@ -135,7 +135,6 @@ sops --encrypt --in-place secrets/<ns>/<file>.yaml
 
 - `clusters/aiot2-prod/values.yaml` — domain, storageClass, R2 endpoint
 - `infra/kubeadm-config.yaml` — `certSANs` list (your IPs/hostnames)
-- `apps/cilium/values.yaml` — `cluster.name`, `cluster.id` if doing ClusterMesh
 - `apps/rancher/values.yaml` — `hostname`, `bootstrapPassword`
 - `apps/cert-manager/values.yaml` — add ClusterIssuer email for Let's Encrypt
 - `apps/dex/values.yaml` — `issuer` URL, static users via secret reference

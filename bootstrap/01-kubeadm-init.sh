@@ -1,6 +1,6 @@
 #!/bin/bash
 # bootstrap/01-kubeadm-init.sh — initialize the first master node.
-# Reads infra/kubeadm-config.yaml. Master skips kube-proxy (Cilium replaces it).
+# Reads infra/kubeadm-config.yaml. CNI is Flannel; kube-proxy is enabled.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -17,7 +17,7 @@ WORK="/tmp/kubeadm-config.runtime.yaml"
 sed "s|advertiseAddress: 0.0.0.0|advertiseAddress: ${PRIMARY_IP}|" "$CFG" > "$WORK"
 
 echo "[01] kubeadm init using $WORK"
-kubeadm init --config="$WORK" --upload-certs --skip-phases=addon/kube-proxy
+kubeadm init --config="$WORK" --upload-certs
 
 # kubeconfig for invoking user
 mkdir -p "${HOME}/.kube"
@@ -38,4 +38,4 @@ echo "Run on EVERY worker:"
 echo "================================================================"
 kubeadm token create --print-join-command
 echo
-echo "Save the token output. Workers will report NotReady until step 02 (Cilium)."
+echo "Save the token output. Workers will report NotReady until step 02 (Flannel)."

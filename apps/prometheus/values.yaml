@@ -100,6 +100,6 @@ prometheus-node-exporter:
     limits:
       memory: 128Mi
 
-# Cilium replaces kube-proxy → no kube-proxy service exists, ServiceMonitor would be empty
+# kube-proxy is enabled (Flannel CNI); standard ServiceMonitor applies
 kubeProxy:
   enabled: false
