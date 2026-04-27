@@ -9,9 +9,9 @@
 ![Config](https://img.shields.io/badge/config-Chef%20%7C%20Puppet%20%7C%20Ansible-red)
 ![Status](https://img.shields.io/badge/status-production-brightgreen)
 
-> **Industrial AIoT platform** — an end-to-end system for **collecting, storing, and evaluating industrial sensor data with AI and large language models (LLMs)**. Field devices stream telemetry over MQTT, data is persisted and indexed, ML pipelines train and serve predictive-maintenance models, and a RAG-enabled LLM interface lets operators **ask questions about production data in natural language**.
+> **Industrial AIoT platform** — an end-to-end system for **collecting, storing, and evaluating industrial sensor data with AI and large language models (LLMs)**. Field devices stream telemetry over MQTT, data is persisted and indexed, and a RAG-enabled LLM interface lets operators **ask questions about production data in natural language**.
 
-The platform was built to answer practical questions from the shop floor — *"Which machine is drifting out of spec?"*, *"What caused yesterday's anomaly?"*, *"Predict the remaining useful life of pump #12"* — by combining classical ML (trained in Kubeflow, served via KServe) with an LLM layer (Open-WebUI + Qdrant RAG) grounded in the platform's own operational data.
+The platform was built to answer practical questions from the shop floor — *"Which machine is drifting out of spec?"*, *"What caused yesterday's anomaly?"* — by exposing operational data through an LLM layer (Open-WebUI + Qdrant RAG) grounded in the platform's own MQTT/Postgres history.
 
 ## Why this platform exists
 
@@ -19,9 +19,7 @@ Industrial data is useless unless it becomes a **decision**. AIoT is designed ar
 
 1. **Collect** — MQTT ingestion from sensors and PLCs, retained in a time-series–friendly Postgres (CloudNativePG)
 2. **Enrich** — digital-twin service aligns raw telemetry with asset metadata; embeddings stored in Qdrant for semantic retrieval
-3. **Learn** — Kubeflow Pipelines train forward-looking models (predictive maintenance v2) on a weekly schedule
-4. **Serve** — the best model is promoted and served by KServe/Knative with zero-downtime rollout
-5. **Ask** — operators and engineers interact with the whole system through an LLM chat (Open-WebUI) that uses RAG over platform data and can call the inference service as a tool
+3. **Ask** — operators and engineers interact with the whole system through an LLM chat (Open-WebUI) that uses RAG over platform data and can call the inference service as a tool
 
 Everything runs on a self-hosted, multi-cloud Kubernetes cluster (GCP + OCI), with **Chef Automate**, **Puppet Enterprise**, and **Ansible/Semaphore** keeping hosts and agents in a known state, and **k8up** + an etcd-snapshot CronJob guaranteeing disaster recovery to Cloudflare R2.
 
@@ -92,11 +90,6 @@ flowchart LR
         QD[("Qdrant<br/>vectors / RAG")]
     end
 
-    subgraph AI["🧠 AI / ML"]
-        KF[["Kubeflow Pipelines<br/>aiot-forward-maintenance-v2"]]
-        KS[["KServe<br/>InferenceService"]]
-    end
-
     subgraph LLM["💬 LLM LAYER"]
         OW[["Open-WebUI<br/>chat"]]
         RAG[["rag-worker<br/>+ indexer"]]
@@ -112,12 +105,10 @@ flowchart LR
     N8 --> SINK
     SINK --> PG
     PG --> KF
-    KF --> ML
     ML --> KS
     PG --> RAG
     RAG --> QD
     QD --> OW
-    KS -.tools.-> OW
 
     KG -.watches.-> INGEST
     KG -.watches.-> STORE
@@ -199,7 +190,7 @@ flowchart TB
 
 ## The AI data-processing pipeline
 
-The AIoT workflow moves sensor data from the edge all the way to trained, versioned models and an RAG-enabled chat interface.
+The AIoT workflow moves sensor data from the edge into Postgres + Qdrant, and exposes it through a RAG-enabled chat interface.
 
 ### 1. Ingestion — `emqx`, `aiot`
 
@@ -213,22 +204,13 @@ The AIoT workflow moves sensor data from the edge all the way to trained, versio
 - Partitioning and cleanup handled by CronJobs: `pg-partition-mgr`, `pg-sensor-cleanup`, `sensor-data-retention`, `postgres-backup`
 - Secondary index/feature store: **Qdrant** (namespace `aiot`) for vector embeddings used by RAG
 
-### 3. AI / ML — `kubeflow`, `kubeflow-user-example-com` `inference`
+### 3. RAG / LLM — `aiot`
 
-- **Kubeflow** (full install: Pipelines v2, Katib, Training Operator, Notebooks, KServe, Central Dashboard, Profiles)
-- **Profiles / multi-tenancy**: `kubeflow-user-example-com` namespace hosts the default user, with per-user namespaces (`p-sqf5p`, `p-wpbsz`, `user-5wxc8`) managed by the Profiles controller
-- **Training pipeline** `aiot-forward-maintenance-v2` — Argo-based pipeline for predictive maintenance on sensor data, chained with:
-  - `aiot-retrain-weekly` CronJob — triggers a new pipeline run every week with fresh data
-  - `aiot-register-best` — promotes the best-scoring model run
-  - `aiot-rollout-model` — updates the served `InferenceService` with the new model URI
-- **KServe** — `maintenance-predictor` `InferenceService` under `kubeflow-user-example-com`, exposed through Knative + Istio on `inference.35.241.255.137.nip.io`
-- **Qdrant + rag-worker + Open-WebUI** (in `aiot`) — vector DB + RAG ingestion worker + chat UI, with LLM backends reachable from the cluster
-
-### 4. Delivery — `istio-system`, `knative-serving`, `inference`
-
-- **Istio** ingress gateway for Kubeflow and KServe traffic (`kubeflow.*`, inference endpoints)
-- **Knative Serving** provides autoscaled, revision-based model deployments for KServe
-- `aiot-inference` (namespace `inference`) — thin connector service that exposes business-level prediction APIs on `inference.35.241.255.137.nip.io`
+- **Qdrant** — vector DB for embeddings of sensor metadata, asset descriptions, and historical alerts
+- **rag-worker** + **qdrant-indexer** — ingest fresh telemetry summaries and operator notes into Qdrant
+- **Open-WebUI** — chat UI on `chat.35.241.255.137.nip.io`, talks to external LLM providers (Groq via `inference-connector`)
+- **inference-connector** — thin proxy that exposes a uniform API to the LLM layer
+- **api-gateway** — business-level REST/HTTP endpoints on `api.35.241.255.137.nip.io`
 
 ---
 
@@ -299,7 +281,7 @@ flowchart TB
 ### Jenkins + Gitea — `jenkins`, `gitea`
 
 - **Gitea** — self-hosted Git (namespace `gitea`), the primary source for CI repos (e.g. `aiot-pipeline-demo`)
-- **Jenkins** — multibranch + classic pipelines, builds container images, pushes to the internal registry (namespace `registry`, NodePort 30500), and triggers Kubeflow pipeline runs
+- **Jenkins** — multibranch + classic pipelines, builds container images, pushes to the internal registry (namespace `registry`, NodePort 30500), 
 - Credentials (Gitea PAT, registry, Docker Hub) stored in Jenkins domain credentials
 
 ---
@@ -378,8 +360,6 @@ All services are published under `*.35.241.255.137.nip.io` with Let's Encrypt ce
 
 | Category          | Endpoint (hostname)                            | Namespace         | Notes                                  |
 | ----------------- | ---------------------------------------------- | ----------------- | -------------------------------------- |
-| Kubeflow          | `kubeflow.*`                                   | `istio-system`    | Multi-tenant, Dex + oauth2-proxy       |
-| ML inference      | `inference.*`                                  | `inference`       | KServe-backed                          |
 | AI / chat         | `chat.*`                                       | `aiot`            | Open-WebUI                             |
 | RAG API           | `rag.*`, `qdrant.*`                            | `aiot`            |                                        |
 | IoT core          | `api.*`, `twin.*`, `ngrok.*`                   | `aiot`            | API gateway, Digital Twin              |
@@ -391,8 +371,6 @@ All services are published under `*.35.241.255.137.nip.io` with Let's Encrypt ce
 | Ops               | `headlamp.*`, `mm.*`, `n8n.*`                  | `headlamp`, `mattermost`, `n8n` |                              |
 
 ---
-
-
 
 ## Installing this cluster on fresh VMs
 
