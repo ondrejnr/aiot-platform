@@ -1,0 +1,11 @@
+spec:
+  managed:
+    roles:
+      - name: aiot_admin
+        ensure: present
+        login: true
+        superuser: false
+        passwordSecret:
+          name: pg-aiot-admin-password
+        inRoles:
+          - aiot
