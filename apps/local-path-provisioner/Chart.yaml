@@ -1,0 +1,10 @@
+apiVersion: v2
+name: local-path-provisioner-overlay
+description: aiot-platform overlay for local-path-provisioner
+type: application
+version: 1.0.0
+appVersion: "0.0.30"
+dependencies:
+  - name: local-path-provisioner
+    version: "0.0.30"
+    repository: https://charts.containeroo.ch

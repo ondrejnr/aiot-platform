@@ -10,49 +10,34 @@ spec:
           - { name: ai-enricher }
           - { name: ai-enricher-build }
           - { name: aiot }
-          - { name: argocd }
           - { name: auth }
           - { name: backrest }
           - { name: build-service }
           - { name: cattle-capi-system }
           - { name: cattle-fleet-clusters-system }
           - { name: cattle-fleet-local-system }
-          - { name: cattle-fleet-system }
           - { name: cattle-global-data }
           - { name: cattle-impersonation-system }
           - { name: cattle-local-user-passwords }
-          - { name: cattle-system }
-          - { name: cattle-turtles-system }
           - { name: cattle-ui-plugin-system }
-          - { name: cert-manager }
           - { name: chef }
           - { name: chef-webhook }
           - { name: cluster-fleet-local-local-1a3d67d0a899 }
           - { name: cluster-twin }
-          - { name: cnpg-system }
           - { name: default }
           - { name: default-tenant }
-          - { name: descheduler }
           - { name: dr-ops }
           - { name: emqx }
           - { name: enterprise-contract-service }
           - { name: etcd-backup }
-          - { name: event-exporter }
           - { name: fleet-default }
           - { name: fleet-local }
-          - { name: gitea }
           - { name: gitea-bootstrap }
           - { name: habitat-demo }
-          - { name: headlamp }
           - { name: helloweb }
-          - { name: ingress-nginx }
           - { name: inspec-scans }
           - { name: integration-service }
           - { name: istio-system }
-          - { name: jenkins }
-          - { name: k8sgpt }
-          - { name: k8up-system }
-          - { name: karpor }
           - { name: knative-serving }
           - { name: konflux-cli }
           - { name: konflux-info }
@@ -61,32 +46,21 @@ spec:
           - { name: kubeflow }
           - { name: kube-node-lease }
           - { name: kube-public }
-          - { name: kube-system }
-          - { name: kyverno }
           - { name: local }
-          - { name: local-path-storage }
-          - { name: mattermost }
-          - { name: monitoring }
           - { name: namespace-lister }
           - { name: openshift-pipelines }
-          - { name: opentelemetry-operator-system }
           - { name: pipelines-as-code }
-          - { name: piraeus-datastore }
           - { name: platform-meta }
           - { name: p-sqf5p }
           - { name: p-wpbsz }
           - { name: registry }
           - { name: release-service }
-          - { name: robusta }
           - { name: semaphore }
-          - { name: signoz }
           - { name: tekton-operator }
           - { name: tekton-pipelines }
           - { name: tf-demo }
           - { name: user-b2zsr }
-          - { name: victoriametrics }
           - { name: vui }
-          - { name: zabbix }
   template:
     metadata:
       name: 'ns-{{name}}'
@@ -98,7 +72,7 @@ spec:
         path: namespaces/{{name}}
         directory:
           recurse: false
-          include: '{configmaps.yaml,services.yaml,ingresses.yaml,deployments.yaml,statefulsets.yaml,daemonsets.yaml,cronjobs.yaml,jobs.yaml,pdb.yaml,hpa.yaml,networkpolicies.yaml,certificates.yaml,issuers.yaml,podmonitors.yaml,servicemonitors.yaml}'
+          include: '{configmaps.yaml,services.yaml,ingresses.yaml,deployments.yaml,statefulsets.yaml,daemonsets.yaml,cronjobs.yaml,jobs.yaml,pdb.yaml,hpa.yaml,networkpolicies.yaml,certificates.yaml,issuers.yaml,podmonitors.yaml,servicemonitors.yaml,pvcs.yaml,rbac.yaml,roles.yaml,rolebindings.yaml,serviceaccounts.yaml}'
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{name}}'

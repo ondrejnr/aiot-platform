@@ -1,0 +1,10 @@
+apiVersion: v2
+name: mattermost-overlay
+description: aiot-platform overlay for mattermost-team-edition
+type: application
+version: 1.0.0
+appVersion: "6.6.62"
+dependencies:
+  - name: mattermost-team-edition
+    version: "6.6.62"
+    repository: https://helm.mattermost.com

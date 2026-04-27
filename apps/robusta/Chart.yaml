@@ -1,0 +1,10 @@
+apiVersion: v2
+name: robusta-overlay
+description: aiot-platform overlay for robusta
+type: application
+version: 1.0.0
+appVersion: "0.21.4"
+dependencies:
+  - name: robusta
+    version: "0.21.4"
+    repository: https://robusta-charts.storage.googleapis.com

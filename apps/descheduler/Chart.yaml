@@ -1,0 +1,10 @@
+apiVersion: v2
+name: descheduler-overlay
+description: aiot-platform overlay for descheduler
+type: application
+version: 1.0.0
+appVersion: "0.31.0"
+dependencies:
+  - name: descheduler
+    version: "0.31.0"
+    repository: https://kubernetes-sigs.github.io/descheduler
