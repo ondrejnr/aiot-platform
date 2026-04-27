@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: event-exporter-cfg
+  namespace: event-exporter
+data:
+  config.yaml: |
+    logLevel: warn
+    logFormat: json
+    metricsNamePrefix: event_exporter_
+    route:
+      routes:
+        - drop:
+            - reason: "InvalidDiskCapacity"
+            - reason: "FailedScheduling"
+              message: ".*untolerated taint.*"
+            - reason: "Unhealthy"
+              message: ".*Startup probe.*"
+          match:
+            - type: Warning
+          receiver: mattermost
+        - drop:
+            - reason: "InvalidDiskCapacity"
+          match:
+            - type: Warning
+          receiver: stdout
+    receivers:
+      - name: stdout
+        file:
+          path: /dev/stdout
+      - name: mattermost
+        webhook:
+          endpoint: "https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr"
+          headers:
+            Content-Type: application/json
+          layout:
+            text: ":warning: **{{ .Reason }}** `{{ .InvolvedObject.Namespace }}/{{ .InvolvedObject.Kind }}/{{ .InvolvedObject.Name }}` on `{{ .Source.Host }}`\n```\n{{ .Message }}\n```\n_count: {{ .Count }}, first: {{ .FirstTimestamp }}, last: {{ .LastTimestamp }}_"
