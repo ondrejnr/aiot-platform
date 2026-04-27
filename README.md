@@ -447,8 +447,33 @@ services).
 ```
 aiot-platform/
 ├── README.md                ← this file
-├── cluster-wide/            ← cluster-scoped resources
-│   ├── crds.txt                (CRD names list)
+├── Makefile                 ← `make prereqs|init|cilium|platform|helm|apply|all|status`
+├── .gitignore
+│
+├── install/                 ← FRESH-VM BOOTSTRAP — installs everything below
+│   ├── README.md
+│   ├── 00-vm-prereqs.sh        (containerd + kubeadm + kubelet + helm)
+│   ├── 01-init-master.sh       (kubeadm init from infra/kubeadm-config.yaml)
+│   ├── 02-cilium.sh            (Cilium 1.16.6 CNI)
+│   ├── 03-platform.sh          (cert-manager + ingress-nginx + local-path SC)
+│   ├── 04-helm-charts.sh       (all 14 Helm releases from helm-charts.csv)
+│   ├── 05-apply-cluster.sh     (CRDs + cluster-scoped + per-NS manifests)
+│   ├── 06-k8up-restore.sh      (Restore.k8up.io CR generator: list / restore)
+│   └── helm-charts.csv         (declarative chart catalog)
+│
+├── infra/                   ← host-level / platform files
+│   ├── kubeadm-config.yaml     (cluster-init source of truth)
+│   ├── kubelet-config.yaml
+│   ├── kube-apiserver.yaml
+│   ├── etcd.yaml
+│   ├── cni-cilium.conflist     (Cilium CNI config — replaced flannel 2026-04-26)
+│   ├── haproxy/                (HAProxy SNI proxy on master, ports 80/443)
+│   ├── registry/               (internal Docker registry config)
+│   ├── gcp-instances.yaml
+│   └── gcp-firewall-rules.yaml
+│
+├── cluster-wide/            ← cluster-scoped resources (snapshot)
+│   ├── crds.txt                (CRD name list)
 │   ├── clusterroles.yaml
 │   ├── clusterrolebindings.yaml
 │   ├── clusterissuers.yaml
@@ -458,33 +483,53 @@ aiot-platform/
 │   ├── persistentvolumes.yaml
 │   ├── nodes.yaml
 │   ├── helm-releases.yaml      (all Helm releases + chart versions)
-│   └── images.txt              (every container image currently used)
-├── infra/                   ← host-level / platform files
-│   ├── kubeadm-config.yaml
-│   ├── kubelet-config.yaml
-│   ├── kube-apiserver.yaml
-│   ├── etcd.yaml
-│   ├── cni-cilium.conflist
-│   ├── haproxy/                (HAProxy master config)
-│   ├── registry/               (internal registry config)
-│   ├── gcp-instances.yaml
-│   └── gcp-firewall-rules.yaml
-├── inventory/               ← Ansible inventory snapshot
+│   ├── images.txt              (every container image currently used)
+│   └── helm-values/            (14 files: <ns>_<release>.yaml — `helm get values`)
+│
+├── namespaces/              ← 80 namespaces, sanitized snapshot (no secrets)
+│   └── <ns>/
+│       ├── deployments.yaml
+│       ├── statefulsets.yaml
+│       ├── daemonsets.yaml
+│       ├── cronjobs.yaml
+│       ├── jobs.yaml
+│       ├── services.yaml
+│       ├── ingresses.yaml
+│       ├── configmaps.yaml
+│       ├── pvcs.yaml
+│       ├── pdb.yaml
+│       ├── hpa.yaml
+│       ├── networkpolicies.yaml
+│       ├── serviceaccounts.yaml
+│       ├── rbac.yaml                        (Roles + RoleBindings)
+│       ├── secrets.sanitized.yaml           (data values redacted)
+│       ├── certificates.yaml                (cert-manager)
+│       ├── issuers.yaml                     (cert-manager)
+│       ├── servicemonitors.yaml             (prometheus-operator)
+│       ├── podmonitors.yaml                 (prometheus-operator)
+│       └── istio-*.yaml                     (gateways, virtualservices,
+│                                             destinationrules, authorizationpolicies,
+│                                             peerauthentications, telemetries,
+│                                             envoyfilters)
+│
+├── manifests/               ← parallel raw snapshot written by nightly cron
+│   ├── _cluster/               (namespaces.yaml, clusterroles, CRDs index, ...)
+│   ├── _crds/                  (144 individual CRD YAMLs)
+│   └── <ns>/                   (raw kubectl get -oyaml dumps incl. secrets)
+│                               NOTE: not sanitized — used internally only,
+│                                     not for re-installation onto a new cluster.
+│
+├── cloudflare/              ← Cloudflare DNS snapshot (zone records)
+│   └── dns/
+│
 ├── cluster/                 ← misc cluster-level dumps
-└── namespaces/              ← 80 namespaces, one folder each
-    └── <ns>/
-        ├── deployments.yaml
-        ├── statefulsets.yaml
-        ├── daemonsets.yaml
-        ├── cronjobs.yaml
-        ├── jobs.yaml
-        ├── services.yaml
-        ├── ingresses.yaml
-        ├── configmaps.yaml
-        ├── pvc.yaml
-        ├── serviceaccounts.yaml
-        ├── rolebindings.yaml
-        ├── networkpolicies.yaml
-        ├── virtualservices.yaml       (istio)
-        └── gateways.yaml              (istio)
+│   └── versions.md             (kubectl/cilium/helm versions, node list)
+│
+└── inventory/               ← Ansible / Semaphore inventory snapshot
+    └── semaphore-configmaps.yaml
 ```
+
+> Use **`namespaces/`** + **`cluster-wide/`** + **`infra/`** + **`install/`** for
+> bootstrapping a clean cluster. **`manifests/`** is a private nightly snapshot
+> that may contain unredacted Secrets — do **not** apply it on a foreign
+> cluster.
