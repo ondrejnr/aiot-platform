@@ -35,9 +35,17 @@ subjects:
   namespace: node-problem-detector
 ---
 # kubelet-watchdog DaemonSet
-# Detects PLEG hang / containerd freeze and self-heals by restarting
-# containerd + kubelet via host PID namespace.
-# Triggered when kubelet healthz endpoint stays unreachable > 60 s.
+# Detects sustained kubelet healthz failure (>= 3 consecutive checks ~3 min)
+# and self-heals by restarting containerd + kubelet via host PID namespace.
+#
+# History:
+#   v1 (2026-04-25): used `curl` which is NOT in alpine:3.20 base image →
+#     every probe returned "FAIL" → kubelet restarted every 90s on ALL nodes
+#     causing constant InvalidDiskCapacity event spam (kubelet emits it during
+#     each cold start before cadvisor caches imagefs stats).
+#   v2 (2026-04-27): switched to `wget` (busybox built-in, always present),
+#     require 3 consecutive failures, 180s warmup before first probe,
+#     verify probe binary at startup.
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -82,18 +90,35 @@ spec:
         - |
           set -e
           apk add --no-cache util-linux >/dev/null 2>&1 || true
-          echo "kubelet-watchdog starting on $NODE_NAME"
+          # wget is in busybox base — no extra package needed
+          if ! command -v wget >/dev/null 2>&1; then
+            echo "FATAL: wget not found, refusing to run"; sleep 3600; exit 1
+          fi
+          if ! command -v nsenter >/dev/null 2>&1; then
+            echo "FATAL: nsenter not found"; sleep 3600; exit 1
+          fi
+          echo "kubelet-watchdog v2 starting on $NODE_NAME — warming up 180s"
+          sleep 180
+          FAILS=0
+          THRESHOLD=3
           while true; do
             sleep 60
-            HZ=$(nsenter -t 1 -n -- curl -fsS --max-time 5 http://127.0.0.1:10248/healthz 2>/dev/null || echo "FAIL")
-            if [ "$HZ" = "ok" ]; then continue; fi
-            echo "[$(date -Iseconds)] kubelet healthz unhealthy: $HZ"
+            HZ=$(nsenter -t 1 -n -- wget -q -T 5 -O- http://127.0.0.1:10248/healthz 2>/dev/null || echo "FAIL")
+            if [ "$HZ" = "ok" ]; then
+              if [ "$FAILS" -gt 0 ]; then echo "[$(date -Iseconds)] kubelet healthy again (was $FAILS)"; fi
+              FAILS=0
+              continue
+            fi
+            FAILS=$((FAILS+1))
+            echo "[$(date -Iseconds)] kubelet healthz fail $FAILS/$THRESHOLD: $HZ"
+            if [ "$FAILS" -lt "$THRESHOLD" ]; then continue; fi
+            FAILS=0
             if ! nsenter -t 1 -m -u -i -n -p -- crictl --runtime-endpoint unix:///run/containerd/containerd.sock version >/dev/null 2>&1; then
               echo "[$(date -Iseconds)] containerd unresponsive — restarting"
               nsenter -t 1 -m -u -i -n -p -- systemctl restart containerd || true
               sleep 15
             fi
-            echo "[$(date -Iseconds)] restarting kubelet"
+            echo "[$(date -Iseconds)] restarting kubelet (after $THRESHOLD consecutive fails)"
             nsenter -t 1 -m -u -i -n -p -- systemctl restart kubelet || true
-            sleep 30
+            sleep 60
           done
