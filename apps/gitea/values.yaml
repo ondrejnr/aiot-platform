@@ -1,7 +1,9 @@
 # aiot-platform overlay for gitea
-# Workaround: Bitnami removed legacy debian-12 image tags from docker.io/bitnami in Aug 2025.
-# Repoint sub-charts to docker.io/bitnamilegacy/*.
+# Bitnami removed legacy debian-12 image tags from docker.io/bitnami in Aug 2025
+# - repoint sub-charts to docker.io/bitnamilegacy/*.
 gitea:
+  persistence:
+    size: 20Gi
   postgresql-ha:
     pgpool:
       image:
