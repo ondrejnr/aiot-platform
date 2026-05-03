@@ -38,6 +38,7 @@ gitea:
         failureThreshold: 20
         successThreshold: 1
   redis-cluster:
+    enabled: false
     image:
       registry: docker.io
       repository: bitnamilegacy/redis-cluster
