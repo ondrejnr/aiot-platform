@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
   finalizers: [resources-finalizer.argocd.argoproj.io]
 spec:
-  project: platform
+  project: default
   source:
     repoURL: https://github.com/ondrejnr/aiot-platform.git
     targetRevision: main
