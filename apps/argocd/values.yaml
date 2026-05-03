@@ -9,7 +9,7 @@ argo-cd:
       exec.enabled: "false"
       statusbadge.enabled: "false"
       timeout.reconciliation: 180s
-      url: https://argocd.35.241.255.137.nip.io
+      url: https://argocd.142.132.207.168.nip.io
     params:
       server.insecure: true
     rbac:
@@ -21,12 +21,13 @@ argo-cd:
         g, admin, role:org-admin
       policy.default: role:readonly
   controller:
+    replicas: 0
     metrics:
       enabled: true
   dex:
     enabled: false
   global:
-    domain: argocd.35.241.255.137.nip.io
+    domain: argocd.142.132.207.168.nip.io
   notifications:
     enabled: false
   repoServer:
@@ -38,7 +39,7 @@ argo-cd:
         nginx.ingress.kubernetes.io/backend-protocol: HTTP
         nginx.ingress.kubernetes.io/ssl-redirect: "true"
       enabled: true
-      hostname: argocd.35.241.255.137.nip.io
+      hostname: argocd.142.132.207.168.nip.io
       ingressClassName: nginx
       tls: false
     metrics:

@@ -16,7 +16,6 @@ spec:
     server: https://kubernetes.default.svc
     namespace: k8sgpt
   syncPolicy:
-    automated: { prune: true, selfHeal: true }
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
