@@ -16,10 +16,8 @@ gitea:
       extraEnvVars:
       - name: POSTGRESQL_INIT_MAX_TIMEOUT
         value: '600'
-      - name: REPMGR_CONNECT_TIMEOUT
-        value: '120'
-      - name: REPMGR_RECONNECT_ATTEMPTS
-        value: '5'
+      repmgrConnectTimeout: 120
+      repmgrReconnectAttempts: 5
   redis-cluster:
     image:
       registry: docker.io
