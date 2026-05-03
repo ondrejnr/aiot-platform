@@ -1,2 +1,80 @@
-# No live values dump available — pass-through skeleton for kyverno
-kyverno: {}
+# aiot-platform overlay for kyverno
+# Probe tuning: cluster runs on host with periodic I/O pressure (qemu VM + heavy workloads).
+# Default probes (timeout 1s, failureThreshold 2) caused 30+ liveness-kill restarts.
+kyverno:
+  admissionController:
+    livenessProbe:
+      failureThreshold: 6
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+      httpGet:
+        path: /health/liveness
+        port: 9443
+        scheme: HTTPS
+    readinessProbe:
+      failureThreshold: 12
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 10
+      httpGet:
+        path: /health/readiness
+        port: 9443
+        scheme: HTTPS
+  backgroundController:
+    livenessProbe:
+      failureThreshold: 6
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+      httpGet:
+        path: /liveness
+        port: 9443
+        scheme: HTTPS
+    readinessProbe:
+      failureThreshold: 12
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 10
+      httpGet:
+        path: /readiness
+        port: 9443
+        scheme: HTTPS
+  cleanupController:
+    livenessProbe:
+      failureThreshold: 6
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+      httpGet:
+        path: /health/liveness
+        port: 9443
+        scheme: HTTPS
+    readinessProbe:
+      failureThreshold: 12
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 10
+      httpGet:
+        path: /health/readiness
+        port: 9443
+        scheme: HTTPS
+  reportsController:
+    livenessProbe:
+      failureThreshold: 6
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+      httpGet:
+        path: /liveness
+        port: 9443
+        scheme: HTTPS
+    readinessProbe:
+      failureThreshold: 12
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 10
+      httpGet:
+        path: /readiness
+        port: 9443
+        scheme: HTTPS

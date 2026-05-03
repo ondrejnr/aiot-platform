@@ -62,7 +62,7 @@ prometheus:
         cpu: 100m
         memory: 512Mi
       limits:
-        memory: 1500Mi
+        memory: 2Gi
     retention: 10d
     retentionSize: 4GB
     topologySpreadConstraints:
