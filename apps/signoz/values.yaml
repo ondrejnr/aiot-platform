@@ -20,6 +20,25 @@ signoz:
     persistence:
       size: 5Gi
       storageClass: local-path
+    # Probes patched 2026-05-03: signoz-0.121.0 cold-start under IO pressure
+    livenessProbe:
+      enabled: true
+      port: http
+      path: /api/v1/health
+      initialDelaySeconds: 120
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 10
+      successThreshold: 1
+    readinessProbe:
+      enabled: true
+      port: http
+      path: /api/v1/health?live=1
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 10
+      successThreshold: 1
   zookeeper:
     persistence:
       size: 5Gi
