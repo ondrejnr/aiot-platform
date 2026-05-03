@@ -1,6 +1,4 @@
 # aiot-platform overlay for gitea
-# Bitnami removed legacy debian-12 image tags from docker.io/bitnami in Aug 2025
-# - repoint sub-charts to docker.io/bitnamilegacy/*.
 gitea:
   persistence:
     size: 20Gi
@@ -18,6 +16,27 @@ gitea:
         value: '600'
       repmgrConnectTimeout: 120
       repmgrReconnectAttempts: 5
+      startupProbe:
+        enabled: true
+        initialDelaySeconds: 60
+        periodSeconds: 15
+        timeoutSeconds: 10
+        failureThreshold: 60
+        successThreshold: 1
+      livenessProbe:
+        enabled: true
+        initialDelaySeconds: 60
+        periodSeconds: 30
+        timeoutSeconds: 10
+        failureThreshold: 20
+        successThreshold: 1
+      readinessProbe:
+        enabled: true
+        initialDelaySeconds: 30
+        periodSeconds: 15
+        timeoutSeconds: 10
+        failureThreshold: 20
+        successThreshold: 1
   redis-cluster:
     image:
       registry: docker.io
