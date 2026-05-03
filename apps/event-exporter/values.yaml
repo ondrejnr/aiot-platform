@@ -1,2 +1,6 @@
-# No live values dump available — pass-through skeleton for kubernetes-event-exporter
-kubernetes-event-exporter: {}
+# aiot-platform overlay for kubernetes-event-exporter
+# Workaround: Bitnami removed legacy debian-12 image tags from docker.io/bitnami.
+kubernetes-event-exporter:
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/kubernetes-event-exporter
