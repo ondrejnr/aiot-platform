@@ -1,2 +1,6 @@
-# No live values dump available — pass-through skeleton for ingress-nginx
-ingress-nginx: {}
+ingress-nginx:
+  controller:
+    allowSnippetAnnotations: true
+    config:
+      annotations-risk-level: Critical
+      allow-snippet-annotations: "true"
