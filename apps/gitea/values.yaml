@@ -41,3 +41,18 @@ gitea:
     image:
       registry: docker.io
       repository: bitnamilegacy/redis-cluster
+  config:
+    server:
+      DOMAIN: gitea.142.132.207.168.nip.io
+      SSH_DOMAIN: gitea.142.132.207.168.nip.io
+      ROOT_URL: https://gitea.142.132.207.168.nip.io/
+      PROTOCOL: http
+    service:
+      ALLOW_ONLY_EXTERNAL_REGISTRATION: true
+      SHOW_REGISTRATION_BUTTON: false
+      DISABLE_REGISTRATION: false
+    oauth2_client:
+      ENABLE_AUTO_REGISTRATION: true
+      ACCOUNT_LINKING: auto
+      USERNAME: nickname
+      UPDATE_AVATAR: true
