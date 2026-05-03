@@ -13,6 +13,13 @@ gitea:
       image:
         registry: docker.io
         repository: bitnamilegacy/postgresql-repmgr
+      extraEnvVars:
+      - name: POSTGRESQL_INIT_MAX_TIMEOUT
+        value: '600'
+      - name: REPMGR_CONNECT_TIMEOUT
+        value: '120'
+      - name: REPMGR_RECONNECT_ATTEMPTS
+        value: '5'
   redis-cluster:
     image:
       registry: docker.io
