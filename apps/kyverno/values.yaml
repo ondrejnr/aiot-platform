@@ -22,6 +22,7 @@ kyverno:
         port: 9443
         scheme: HTTPS
   backgroundController:
+    enabled: false  # IO storm mitigation: heavy kine writer
     livenessProbe:
       failureThreshold: 6
       initialDelaySeconds: 30
@@ -41,6 +42,7 @@ kyverno:
         port: 9443
         scheme: HTTPS
   cleanupController:
+    enabled: false  # IO storm mitigation: heavy kine writer
     livenessProbe:
       failureThreshold: 6
       initialDelaySeconds: 30
@@ -60,6 +62,7 @@ kyverno:
         port: 9443
         scheme: HTTPS
   reportsController:
+    enabled: false  # IO storm mitigation: heavy kine writer
     livenessProbe:
       failureThreshold: 6
       initialDelaySeconds: 30
