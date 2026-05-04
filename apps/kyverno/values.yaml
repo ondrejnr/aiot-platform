@@ -21,8 +21,22 @@ kyverno:
         path: /health/readiness
         port: 9443
         scheme: HTTPS
+    rbac:
+      clusterRole:
+        extraResources:
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - validatingadmissionpolicies
+          - validatingadmissionpolicybindings
+          - mutatingadmissionpolicies
+          - mutatingadmissionpolicybindings
+          verbs:
+          - get
+          - list
+          - watch
   backgroundController:
-    enabled: false  # IO storm mitigation: heavy kine writer
+    enabled: false
     livenessProbe:
       failureThreshold: 6
       initialDelaySeconds: 30
@@ -42,7 +56,7 @@ kyverno:
         port: 9443
         scheme: HTTPS
   cleanupController:
-    enabled: false  # IO storm mitigation: heavy kine writer
+    enabled: false
     livenessProbe:
       failureThreshold: 6
       initialDelaySeconds: 30
@@ -62,7 +76,7 @@ kyverno:
         port: 9443
         scheme: HTTPS
   reportsController:
-    enabled: false  # IO storm mitigation: heavy kine writer
+    enabled: false
     livenessProbe:
       failureThreshold: 6
       initialDelaySeconds: 30
