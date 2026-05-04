@@ -1,6 +1,3 @@
-# aiot-platform overlay for kyverno
-# Probe tuning: cluster runs on host with periodic I/O pressure (qemu VM + heavy workloads).
-# Default probes (timeout 1s, failureThreshold 2) caused 30+ liveness-kill restarts.
 kyverno:
   admissionController:
     livenessProbe:
@@ -35,6 +32,11 @@ kyverno:
           - get
           - list
           - watch
+    container:
+      extraArgs:
+        leaderElectionRetryPeriod: 10s
+        clientRateLimitQPS: 300
+        clientRateLimitBurst: 600
   backgroundController:
     enabled: false
     livenessProbe:
