@@ -12,6 +12,43 @@ spec:
     path: apps/zabbix
     helm:
       valueFiles: [values.yaml]
+      values: |
+        zabbixImageTag: alpine-7.0-latest
+        postgresAccess:
+          host: pg-cluster-rw.databases.svc.cluster.local
+          port: "5432"
+          user: zabbix
+          password: "e982317cfac9d8d8208183a8fd037e56"
+          database: zabbix
+          schema: public
+        postgresql:
+          enabled: false
+        zabbixServer:
+          extraEnv:
+            - name: ZBX_VALUECACHESIZE
+              value: "256M"
+            - name: ZBX_HISTORYCACHESIZE
+              value: "64M"
+            - name: ZBX_TRENDCACHESIZE
+              value: "32M"
+            - name: ZBX_HISTORYINDEXCACHESIZE
+              value: "32M"
+        zabbixWeb:
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+              nginx.ingress.kubernetes.io/ssl-redirect: "true"
+            hosts:
+            - host: zabbix.142.132.207.168.nip.io
+              paths:
+              - path: /
+                pathType: Prefix
+            tls:
+            - hosts:
+              - zabbix.142.132.207.168.nip.io
+              secretName: zabbix-tls
   destination:
     server: https://kubernetes.default.svc
     namespace: zabbix
