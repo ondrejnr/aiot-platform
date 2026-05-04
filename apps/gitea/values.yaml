@@ -1,4 +1,5 @@
 # aiot-platform overlay for gitea
+# Probe relax 2026-05-04: bitnami exec probes timeout on IO-busy host
 gitea:
   persistence:
     size: 20Gi
@@ -7,41 +8,71 @@ gitea:
       image:
         registry: docker.io
         repository: bitnamilegacy/pgpool
+      livenessProbe:
+        enabled: true
+        initialDelaySeconds: 60
+        periodSeconds: 60
+        timeoutSeconds: 30
+        failureThreshold: 30
+        successThreshold: 1
+      readinessProbe:
+        enabled: true
+        initialDelaySeconds: 30
+        periodSeconds: 30
+        timeoutSeconds: 30
+        failureThreshold: 30
+        successThreshold: 1
     postgresql:
       image:
         registry: docker.io
         repository: bitnamilegacy/postgresql-repmgr
       extraEnvVars:
       - name: POSTGRESQL_INIT_MAX_TIMEOUT
-        value: '600'
+        value: "600"
       repmgrConnectTimeout: 120
       repmgrReconnectAttempts: 5
       startupProbe:
         enabled: true
         initialDelaySeconds: 60
-        periodSeconds: 15
-        timeoutSeconds: 10
+        periodSeconds: 20
+        timeoutSeconds: 30
         failureThreshold: 60
         successThreshold: 1
       livenessProbe:
         enabled: true
         initialDelaySeconds: 60
-        periodSeconds: 30
-        timeoutSeconds: 10
-        failureThreshold: 20
+        periodSeconds: 60
+        timeoutSeconds: 30
+        failureThreshold: 30
         successThreshold: 1
       readinessProbe:
         enabled: true
         initialDelaySeconds: 30
-        periodSeconds: 15
-        timeoutSeconds: 10
-        failureThreshold: 20
+        periodSeconds: 30
+        timeoutSeconds: 30
+        failureThreshold: 30
         successThreshold: 1
   redis-cluster:
     enabled: false
     image:
       registry: docker.io
       repository: bitnamilegacy/redis-cluster
+  redis:
+    master:
+      livenessProbe:
+        enabled: true
+        initialDelaySeconds: 30
+        periodSeconds: 30
+        timeoutSeconds: 30
+        failureThreshold: 15
+        successThreshold: 1
+      readinessProbe:
+        enabled: true
+        initialDelaySeconds: 30
+        periodSeconds: 30
+        timeoutSeconds: 30
+        failureThreshold: 15
+        successThreshold: 1
   config:
     server:
       DOMAIN: gitea.142.132.207.168.nip.io

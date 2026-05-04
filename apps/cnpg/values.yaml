@@ -1,2 +1,18 @@
-# No live values dump available — pass-through skeleton for cloudnative-pg
-cloudnative-pg: {}
+# aiot-platform overlay for cloudnative-pg
+# Single-replica deployment on IO-saturated host:
+# - leader election disabled (5s lease timeout fails when apiserver IO-bound)
+# - probe timeouts/thresholds relaxed for IO-busy host
+cloudnative-pg:
+  replicaCount: 1
+  config:
+    data: {}
+  monitoring:
+    podMonitorEnabled: false
+  livenessProbe:
+    timeoutSeconds: 15
+    failureThreshold: 15
+    periodSeconds: 30
+  readinessProbe:
+    timeoutSeconds: 15
+    failureThreshold: 15
+    periodSeconds: 30

@@ -1,4 +1,5 @@
 # Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
+# Probes patched 2026-05-04: IO-saturated host needs longer timeouts
 # Upstream chart key: signoz
 signoz:
   clickhouse:
@@ -6,13 +7,27 @@ signoz:
     persistence:
       size: 10Gi
       storageClass: local-path
-    # Hard memory cap — ClickHouse used 2 GiB without limit, caused host swap pressure
     resources:
       requests:
         cpu: 100m
         memory: 512Mi
       limits:
         memory: 2Gi
+    livenessProbe:
+      initialDelaySeconds: 120
+      periodSeconds: 30
+      timeoutSeconds: 15
+      failureThreshold: 15
+    readinessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 15
+      failureThreshold: 15
+    startupProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 20
+      timeoutSeconds: 15
+      failureThreshold: 60
   queryService:
     configVars:
       ClickHouseUrl: tcp://chi-signoz-clickhouse-cluster-0-0.signoz.svc.cluster.local:9000
@@ -20,15 +35,14 @@ signoz:
     persistence:
       size: 5Gi
       storageClass: local-path
-    # Probes patched 2026-05-03: signoz-0.121.0 cold-start under IO pressure
     livenessProbe:
       enabled: true
       port: http
       path: /api/v1/health
       initialDelaySeconds: 120
       periodSeconds: 30
-      timeoutSeconds: 10
-      failureThreshold: 10
+      timeoutSeconds: 15
+      failureThreshold: 15
       successThreshold: 1
     readinessProbe:
       enabled: true
@@ -36,10 +50,18 @@ signoz:
       path: /api/v1/health?live=1
       initialDelaySeconds: 60
       periodSeconds: 30
-      timeoutSeconds: 10
-      failureThreshold: 10
+      timeoutSeconds: 15
+      failureThreshold: 15
       successThreshold: 1
   zookeeper:
     persistence:
       size: 5Gi
       storageClass: local-path
+    livenessProbe:
+      timeoutSeconds: 30
+      periodSeconds: 30
+      failureThreshold: 15
+    readinessProbe:
+      timeoutSeconds: 30
+      periodSeconds: 30
+      failureThreshold: 15

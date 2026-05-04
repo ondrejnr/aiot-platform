@@ -1,2 +1,8 @@
-# No live values dump available — pass-through skeleton for descheduler
-descheduler: {}
+# aiot-platform overlay for descheduler
+# Cron suspended — on IO-saturated host, the cron-spawn cycle adds sandbox churn
+# and produces FailedKillPod ghosts. Re-enable when host has SSD/NVMe.
+descheduler:
+  kind: CronJob
+  cronJobApiVersion: "batch/v1"
+  schedule: "*/2 * * * *"
+  suspend: true
