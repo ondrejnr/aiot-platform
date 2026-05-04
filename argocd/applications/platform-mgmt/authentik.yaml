@@ -48,10 +48,13 @@ spec:
           architecture: standalone
           auth:
             enabled: false
+          # IO storm mitigation: cache only, no persistence
+          commonConfiguration: |-
+            appendonly no
+            save ""
           master:
             persistence:
-              storageClass: local-path
-              size: 2Gi
+              enabled: false
             # IO storm tolerance: cluster runs on IO-saturated host
             livenessProbe:
               timeoutSeconds: 30

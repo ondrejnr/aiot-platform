@@ -58,7 +58,13 @@ gitea:
       registry: docker.io
       repository: bitnamilegacy/redis-cluster
   redis:
+    # IO storm mitigation: cache only, no persistence (sessions can be re-created)
+    commonConfiguration: |-
+      appendonly no
+      save ""
     master:
+      persistence:
+        enabled: false
       livenessProbe:
         enabled: true
         initialDelaySeconds: 30

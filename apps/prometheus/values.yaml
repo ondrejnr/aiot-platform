@@ -63,8 +63,10 @@ prometheus:
         memory: 512Mi
       limits:
         memory: 2Gi
-    retention: 10d
-    retentionSize: 4GB
+    scrapeInterval: 60s
+    evaluationInterval: 60s
+    retention: 3d
+    retentionSize: 2GB
     topologySpreadConstraints:
     - maxSkew: 1
       topologyKey: kubernetes.io/hostname
