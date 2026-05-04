@@ -22,7 +22,7 @@ kyverno:
         port: 9443
         scheme: HTTPS
     rbac:
-      clusterRole:
+      coreClusterRole:
         extraResources:
         - apiGroups:
           - admissionregistration.k8s.io
