@@ -1,0 +1,24 @@
+# AWX deployment values
+awx:
+  hostname: awx.142.132.207.168.nip.io
+  adminUser: admin
+  # admin password and secret_key are in clear text below — gitops owner repo is private
+  # rotate both via:
+  #   kubectl -n awx delete secret awx-admin-password awx-secret-key
+  #   then update the values and let ArgoCD reconcile
+  adminPassword: Qyk6AEWWIkIlhBOg3QcL7TjA
+  secretKey: b1c3a69c5e127dfb0ec3f7524ff6dfd3d678b36de34e24dbe8aa0b026621f02f
+postgres:
+  host: pg-cluster-rw.databases.svc.cluster.local
+  port: 5432
+  database: awx
+  username: awx
+  password: oXYg5X6K872w1Q24BGiiiMaWApHsISTM
+  sslmode: prefer
+nodeSelector:
+  node-role.kubernetes.io/worker: ""
+
+oidc:
+  clientId: awx
+  clientSecret: tQz97tI1PGVW1puzzHIvvJmQ5HJgLrYUvL4yBicBzuVOA65srgIunSWMECn0Vrmxpi8WhkW8gV3xZBkyNQvSqcaynchpNAHNa261VaEok2NICBo8uxMqVVdFSmoAB0Kg
+  issuer: https://authentik.142.132.207.168.nip.io/application/o/awx/

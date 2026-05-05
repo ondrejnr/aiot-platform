@@ -1,0 +1,10 @@
+apiVersion: v2
+name: awx-operator-overlay
+description: aiot-platform overlay for AWX Operator
+type: application
+version: 1.0.0
+appVersion: "2.19.1"
+dependencies:
+  - name: awx-operator
+    version: "3.2.1"
+    repository: https://ansible-community.github.io/awx-operator-helm/

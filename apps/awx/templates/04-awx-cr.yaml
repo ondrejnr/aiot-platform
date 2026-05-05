@@ -1,0 +1,65 @@
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx
+  namespace: awx
+spec:
+  admin_user: {{ .Values.awx.adminUser | quote }}
+  admin_password_secret: awx-admin-password
+  secret_key_secret: awx-secret-key
+  postgres_configuration_secret: awx-postgres-configuration
+  postgres_keepalives: true
+  service_type: ClusterIP
+  ingress_type: ingress
+  ingress_class_name: nginx
+  hostname: {{ .Values.awx.hostname | quote }}
+  ingress_tls_secret: awx-tls
+  ingress_annotations: |
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: 200m
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  no_log: false
+  replicas: 1
+  web_resource_requirements:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  task_resource_requirements:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  ee_resource_requirements:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+  redis_resource_requirements:
+    requests:
+      cpu: 20m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
+  init_container_resource_requirements:
+    requests:
+      cpu: 20m
+      memory: 64Mi
+    limits:
+      memory: 128Mi
+  extra_settings:
+    - setting: SOCIAL_AUTH_OIDC_KEY
+      value: '"{{ .Values.oidc.clientId }}"'
+    - setting: SOCIAL_AUTH_OIDC_SECRET
+      value: '"{{ .Values.oidc.clientSecret }}"'
+    - setting: SOCIAL_AUTH_OIDC_OIDC_ENDPOINT
+      value: '"{{ .Values.oidc.issuer }}"'
+    - setting: SOCIAL_AUTH_OIDC_VERIFY_SSL
+      value: 'True'
+{{- with .Values.nodeSelector }}
+  node_selector: |
+{{ toYaml . | indent 4 }}
+{{- end }}

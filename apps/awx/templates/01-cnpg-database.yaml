@@ -1,0 +1,12 @@
+# CNPG Database CR — declaratively creates the awx role + DB inside pg-cluster
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: awx
+  namespace: databases
+spec:
+  name: {{ .Values.postgres.database }}
+  owner: {{ .Values.postgres.username }}
+  cluster:
+    name: pg-cluster
+  encoding: UTF8

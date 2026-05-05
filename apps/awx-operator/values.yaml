@@ -1,0 +1,7 @@
+# AWX Operator helm chart 3.2.1 (operator app v2.19.1)
+# We deploy ONLY the operator here; AWX CR is in apps/awx for separation
+awx-operator:
+  AWX:
+    enabled: false  # bundled AWX disabled; we manage AWX CR ourselves
+  rbac:
+    create: true

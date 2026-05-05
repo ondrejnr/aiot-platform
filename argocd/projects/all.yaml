@@ -97,6 +97,7 @@ spec:
   destinations:
     - { namespace: 'argocd',              server: '*' }
     - { namespace: 'jenkins',             server: '*' }
+    - { namespace: 'awx',                 server: '*' }
     - { namespace: 'gitea',               server: '*' }
     - { namespace: 'semaphore',           server: '*' }
     - { namespace: 'tekton-*',            server: '*' }
