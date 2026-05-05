@@ -93,6 +93,14 @@ kube-state-metrics:
       memory: 32Mi
     limits:
       memory: 256Mi
+  livenessProbe:
+    failureThreshold: 10
+    timeoutSeconds: 15
+    periodSeconds: 20
+  readinessProbe:
+    failureThreshold: 10
+    timeoutSeconds: 15
+    periodSeconds: 20
 
 prometheus-node-exporter:
   resources:

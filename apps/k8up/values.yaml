@@ -15,3 +15,8 @@ k8up:
         key: secret_key
         name: r2-creds
     skipWithoutAnnotation: true
+    enableLeaderElection: false
+    livenessProbe:
+      failureThreshold: 6
+      timeoutSeconds: 5
+      periodSeconds: 20

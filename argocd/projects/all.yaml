@@ -16,7 +16,6 @@ spec:
     - { namespace: 'piraeus-datastore', server: '*' }
     - { namespace: 'local-path-storage', server: '*' }
     - { namespace: 'descheduler',     server: '*' }
-    - { namespace: 'kyverno',         server: '*' }
   clusterResourceWhitelist:
     - { group: '*', kind: '*' }
   namespaceResourceWhitelist:
@@ -100,7 +99,6 @@ spec:
     - { namespace: 'jenkins',             server: '*' }
     - { namespace: 'gitea',               server: '*' }
     - { namespace: 'semaphore',           server: '*' }
-    - { namespace: 'konflux-*',           server: '*' }
     - { namespace: 'tekton-*',            server: '*' }
     - { namespace: 'pipelines-as-code',   server: '*' }
     - { namespace: 'openshift-pipelines', server: '*' }
@@ -123,7 +121,6 @@ spec:
   destinations:
     - { namespace: 'headlamp',     server: '*' }
     - { namespace: 'karpor',       server: '*' }
-    - { namespace: 'kyverno',      server: '*' }
     - { namespace: 'descheduler',  server: '*' }
     - { namespace: 'event-exporter', server: '*' }
     - { namespace: 'dr-ops',       server: '*' }
