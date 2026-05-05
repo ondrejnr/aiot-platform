@@ -35,9 +35,9 @@ spec:
   ee_resource_requirements:
     requests:
       cpu: 50m
-      memory: 128Mi
+      memory: 256Mi
     limits:
-      memory: 512Mi
+      memory: 1Gi
   redis_resource_requirements:
     requests:
       cpu: 20m
@@ -47,9 +47,9 @@ spec:
   init_container_resource_requirements:
     requests:
       cpu: 20m
-      memory: 64Mi
-    limits:
       memory: 128Mi
+    limits:
+      memory: 512Mi
   extra_settings:
     - setting: SOCIAL_AUTH_OIDC_KEY
       value: '"{{ .Values.oidc.clientId }}"'
