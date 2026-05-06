@@ -40,3 +40,16 @@ grafana:
       use_pkce: true
     users:
       auto_assign_org_role: Editor
+  additionalDataSources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090
+      isDefault: true
+      editable: true
+    - name: Alertmanager
+      type: alertmanager
+      access: proxy
+      url: http://prometheus-kube-prometheus-alertmanager.monitoring.svc:9093
+      jsonData:
+        implementation: prometheus
