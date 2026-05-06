@@ -160,8 +160,14 @@ data:
 
     def upsert_event(alert, resolved=False):
       labels = alert.get("labels", {})
-      fp = fingerprint(labels)
       alertname = labels.get("alertname", "PrometheusAlert")
+      refresh_namespaces(force=True)
+      for key in ("namespace", "exported_namespace", "kubernetes_namespace"):
+        ns = labels.get(key)
+        if ns and ns not in NAMESPACES:
+          log(f"skip alert for missing namespace {ns}: {alertname}")
+          return
+      fp = fingerprint(labels)
       bucket = int(time.time() // max(POLL_SECONDS, 60))
       event_name = f"prom-alert-{clean(alertname, 32)}-{fp}-{bucket}"
       state = SEEN.setdefault(fp, {"count": 0, "alert": alert})
