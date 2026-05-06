@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: signoz-sso-root-redirect
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: signoz
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/temporal-redirect-code: "302"
+    nginx.ingress.kubernetes.io/temporal-redirect: "https://authentik.46.4.123.8.nip.io/application/o/authorize/?client_id=signoz&redirect_uri=https%3A%2F%2Fsignoz.46.4.123.8.nip.io%2Fapi%2Fv1%2Fcomplete%2Foidc&response_type=code&scope=email+profile+openid+groups&state=https%3A%2F%2Fsignoz.46.4.123.8.nip.io%2Flogin%3Fdomain_id%3D019dfdba%253A489c%253A7728%253Aa9fe%253A2b8d69b17262"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - signoz.46.4.123.8.nip.io
+    secretName: signoz-tls
+  rules:
+  - host: signoz.46.4.123.8.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Exact
+        backend:
+          service:
+            name: signoz
+            port:
+              number: 8080
