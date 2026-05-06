@@ -1,0 +1,19 @@
+version: 1
+always_do:
+  - collect status and logs first
+  - show diagnosis
+  - show proposed action
+  - show risk
+  - wait for approval before any change
+  - verify after approved fix
+never_without_approval:
+  - delete pvc or pv
+  - delete namespace
+  - restart docker or k3d
+  - change firewall
+  - modify database data
+  - force delete many pods
+safe_with_approval:
+  - delete kubernetes events
+  - restart deployment
+  - argocd sync application

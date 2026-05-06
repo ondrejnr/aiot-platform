@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-sre-agent-knowledge
+data:
+  rules.yaml: |-
+{{ .Files.Get "knowledge/rules.yaml" | indent 4 }}
+  runbooks.yaml: |-
+{{ .Files.Get "knowledge/runbooks.yaml" | indent 4 }}
+  incidents.seed.jsonl: |-
+{{ .Files.Get "knowledge/incidents.seed.jsonl" | indent 4 }}

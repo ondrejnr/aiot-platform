@@ -16,6 +16,8 @@ data:
     UI_TOKEN=os.environ.get('SRE_AGENT_TOKEN','')
     AUDIT='/audit/audit.log'
     PENDING='/audit/pending.json'
+    INCIDENTS='/audit/incidents.jsonl'
+    KNOWLEDGE='/knowledge'
     CTX=ssl.create_default_context(cafile=CA)
 
     def audit(msg):
@@ -73,6 +75,56 @@ data:
         'argocdProblemApps':[{'name':a['metadata']['name'],'sync':a.get('status',{}).get('sync',{}).get('status'),'health':a.get('status',{}).get('health',{}).get('status')} for a in apps if a.get('status',{}).get('sync',{}).get('status')!='Synced' or a.get('status',{}).get('health',{}).get('status') not in ('Healthy',None)],
         'logs':'\n\n'.join(logs)
       }
+
+    def read_text(path):
+      try:
+        return open(path, encoding='utf-8').read()
+      except Exception:
+        return ''
+
+    def load_knowledge():
+      return {
+        'rules': read_text(KNOWLEDGE + '/rules.yaml'),
+        'runbooks': read_text(KNOWLEDGE + '/runbooks.yaml'),
+        'seed_incidents': read_text(KNOWLEDGE + '/incidents.seed.jsonl'),
+        'runtime_incidents': read_text(INCIDENTS),
+      }
+
+    def similar_incidents(service, data):
+      text=(service+' '+json.dumps(data,ensure_ascii=False)).lower()
+      rows=[]
+      for src in (read_text(KNOWLEDGE + '/incidents.seed.jsonl'), read_text(INCIDENTS)):
+        for line in src.splitlines():
+          line=line.strip()
+          if not line:
+            continue
+          try:
+            item=json.loads(line)
+          except Exception:
+            continue
+          hay=json.dumps(item,ensure_ascii=False).lower()
+          score=0
+          for tok in set((service+' grafana headlamp ingress argocd image pod crashloop datasource 502 503').split()):
+            if tok in text and tok in hay:
+              score += 1
+          if score:
+            rows.append((score,item))
+      rows=sorted(rows, key=lambda x:x[0], reverse=True)[:3]
+      return [r[1] for r in rows]
+
+    def append_incident(p, result, verify):
+      item={
+        'ts': time.strftime('%FT%TZ', time.gmtime()),
+        'service': p.get('target'),
+        'namespace': p.get('namespace'),
+        'symptom': p.get('userMessage'),
+        'proposed_action': p.get('action'),
+        'result': result,
+        'verify': verify,
+      }
+      os.makedirs('/audit', exist_ok=True)
+      with open(INCIDENTS, 'a', encoding='utf-8') as f:
+        f.write(json.dumps(item, ensure_ascii=False)+'\n')
 
     def collect_target(target):
       ns = target if target else ''
@@ -178,6 +230,8 @@ data:
       bad=[p for p in pods if p.get('phase') not in ('Running','Succeeded') or p.get('waiting')]
       apps=data.get('argocd',[])
       apptxt=', '.join('%s sync=%s health=%s' % (a.get('name'),a.get('sync'),a.get('health')) for a in apps) or 'nenašiel som ArgoCD app'
+      sims=similar_incidents(ns, data)
+      simtxt='; '.join('%s: %s -> %s' % (s.get('service','?'), s.get('symptom','?'), s.get('fix',s.get('result','?'))) for s in sims) or 'nenašiel som podobný incident'
       if proposed.get('kind')=='argocd_sync':
         navrh='Spustiť ArgoCD sync aplikácie %s.' % proposed.get('name')
       elif proposed.get('kind')=='restart_deploy':
@@ -187,13 +241,14 @@ data:
       ans=('Diagnóza:\n'
            '- Skontroloval som namespace %s. Pods: %s, problémové: %s.\n'
            '- ArgoCD: %s.\n\n'
+         '- Podobné incidenty: %s.\n\n'
            'Návrh:\n'
            '- %s\n\n'
            'Riziko:\n'
            '- Zmenu nevykonám bez schválenia. Pri reštarte môže byť krátky výpadok služby.\n\n'
            'Čakám na schválenie:\n'
            '- Ak súhlasíš, napíš: schvaľujem\n'
-           '- Ak nesúhlasíš, napíš: zamietam' % (ns, len(pods), len(bad), apptxt, navrh))
+           '- Ak nesúhlasíš, napíš: zamietam' % (ns, len(pods), len(bad), apptxt, simtxt, navrh))
       save_pending({'createdAt':time.time(),'userMessage':user_msg,'target':target,'namespace':ns,'action':proposed,'summary':ans})
       return ans
 
@@ -212,7 +267,9 @@ data:
         res='Neznámy typ čakajúcej akcie: '+json.dumps(a,ensure_ascii=False)
       clear_pending()
       c=collect(include_logs=False)
-      return res+'\n\nOverenie:\n- nodes: %s/%s ready\n- problem pods: %s\n- ArgoCD problem apps: %s' % (c['nodesReady'],c['nodesTotal'],c['badPodsCount'],len(c['argocdProblemApps']))
+      verify='nodes: %s/%s ready; problem pods: %s; ArgoCD problem apps: %s' % (c['nodesReady'],c['nodesTotal'],c['badPodsCount'],len(c['argocdProblemApps']))
+      append_incident(p, res, verify)
+      return res+'\n\nOverenie:\n- '+verify+'\n\nIncident som zapísal do knowledge base.'
 
     def answer_user(msg):
       low=msg.lower().strip()
@@ -238,7 +295,8 @@ data:
       c=collect(include_logs=True)
       if 'vymaz' in low and 'event' in low:
         return 'Toto je povolený safe-fix, ale vyžaduje potvrdenie. Napíš presne: potvrď vymazať events'
-      prompt='''Si lokálny Kubernetes SRE agent v klastri používateľa. Odpovedaj stručne po slovensky. Používaj normálne Kubernetes termíny: pod, pody, image, kontajner, deployment, namespace, service, ingress, ArgoCD app. Nikdy nepoužívaj slovo podmiestka. Máš právomoci: čítať pody/logy/eventy/nody/ingressy/ArgoCD, po explicitnom potvrdení vieš vymazať events, reštartovať deployment a spustiť ArgoCD sync. Workflow: logy -> diagnóza -> plán -> schválenie -> fix -> overenie. Nikdy nenavrhuj rizikový fix bez potvrdenia. Otázka používateľa:\n'''+msg+'\n\nAktuálny stav a logy:\n'+json.dumps(c,ensure_ascii=False)[:12000]
+      k=load_knowledge()
+      prompt='''Si lokálny Kubernetes SRE agent v klastri používateľa. Odpovedaj stručne po slovensky. Používaj normálne Kubernetes termíny: pod, pody, image, kontajner, deployment, namespace, service, ingress, ArgoCD app. Nikdy nepoužívaj slovo podmiestka. Máš právomoci: čítať pody/logy/eventy/nody/ingressy/ArgoCD, po explicitnom potvrdení vieš vymazať events, reštartovať deployment a spustiť ArgoCD sync. Workflow: logy -> diagnóza -> plán -> schválenie -> fix -> overenie. Nikdy nenavrhuj rizikový fix bez potvrdenia. Použi pravidlá, runbooky a incidenty nižšie. Otázka používateľa:\n'''+msg+'\n\nPravidlá:\n'+k['rules'][:3000]+'\nRunbooky:\n'+k['runbooks'][:5000]+'\nIncidenty:\n'+(k['seed_incidents']+k['runtime_incidents'])[-5000:]+'\nAktuálny stav a logy:\n'+json.dumps(c,ensure_ascii=False)[:12000]
       try:
         return ollama(prompt)
       except Exception as e:
@@ -307,7 +365,7 @@ spec:
     metadata:
       labels: { app: ai-sre-agent }
       annotations:
-        ai-sre-agent/config-version: "2026-05-06-sk-terms-1"
+        ai-sre-agent/config-version: "2026-05-06-knowledge-1"
     spec:
       serviceAccountName: ai-sre-agent
       containers:
@@ -334,6 +392,9 @@ spec:
               mountPath: /app
             - name: audit
               mountPath: /audit
+            - name: knowledge
+              mountPath: /knowledge
+              readOnly: true
       volumes:
         - name: app
           configMap:
@@ -341,6 +402,9 @@ spec:
         - name: audit
           persistentVolumeClaim:
             claimName: ai-sre-agent-audit
+        - name: knowledge
+          configMap:
+            name: ai-sre-agent-knowledge
 ---
 apiVersion: v1
 kind: Service

@@ -1,0 +1,58 @@
+runbooks:
+  - id: ingress-502-503
+    title: Ingress returns 502/503
+    match: ["502 Bad Gateway", "503 Service Temporarily Unavailable", "no endpoints", "connect() failed"]
+    checks:
+      - check ingress host, backend service and port
+      - check service endpoints
+      - check pod readiness and logs
+      - check nginx ingress controller logs if backend looks healthy
+    proposed_safe_actions:
+      - restart deployment after approval
+      - argocd sync app after approval
+    risk: low to medium; restart can cause short outage
+  - id: image-pull
+    title: Pod cannot pull image
+    match: ["ImagePullBackOff", "ErrImagePull", "pull access denied", "manifest unknown"]
+    checks:
+      - check image name and tag
+      - check imagePullSecrets
+      - check registry reachability
+      - check ArgoCD values for wrong tag
+    proposed_safe_actions:
+      - argocd sync after fixing GitOps values
+    risk: do not patch image live unless explicitly approved
+  - id: argocd-outofsync
+    title: ArgoCD app OutOfSync or degraded
+    match: ["OutOfSync", "Degraded", "ComparisonError", "InvalidSpecError"]
+    checks:
+      - inspect ArgoCD app conditions
+      - inspect source repo path, targetRevision and project permissions
+      - inspect destination namespace allowlist
+      - compare live objects with desired manifests
+    proposed_safe_actions:
+      - argocd sync app after approval
+    risk: sync may prune/change live resources
+  - id: crashloop
+    title: Pod CrashLoopBackOff
+    match: ["CrashLoopBackOff", "Error", "Back-off restarting failed container"]
+    checks:
+      - collect previous and current logs
+      - describe pod events
+      - check configmaps/secrets/env
+      - check probes and resource limits
+    proposed_safe_actions:
+      - restart deployment only if config is fixed or transient issue is likely
+    risk: restart without fixing root cause may loop again
+  - id: grafana-datasource
+    title: Grafana datasource or provisioning issue
+    match: ["grafana", "datasource", "provisioning", "prometheus"]
+    checks:
+      - check grafana pod readiness
+      - check datasource configmap mounted in /etc/grafana/provisioning/datasources
+      - check ArgoCD grafana app sync and health
+      - check prometheus service URL from grafana pod
+    proposed_safe_actions:
+      - argocd sync grafana after approval
+      - restart grafana deployment after approval
+    risk: short Grafana UI outage during restart
