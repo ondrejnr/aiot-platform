@@ -438,30 +438,6 @@ data:
     
     import threading
     threading.Thread(target=rag_bootstrap,daemon=True).start()
-    ThreadingHTTPServer(('0.0.0.0',8080),H).serve_forever()        self.send_html('<div class="login"><h1>AI SRE Agent</h1><p>'+html.escape(msg or 'Zadaj agent token.')+'</p><form method="post" action="/login"><input name="token" type="password" autofocus placeholder="agent token"><button>Prihlásiť</button></form></div>')
-      def do_HEAD(self): self.send_response(200); self.end_headers()
-      def do_GET(self):
-        if self.path.startswith('/api/status'):
-          if not self.authed(): return self.send_json({'error':'unauthorized'},401)
-          c=collect(include_logs=False); return self.send_json({'model':MODEL,'nodesReady':c['nodesReady'],'nodesTotal':c['nodesTotal'],'badPodsCount':c['badPodsCount'],'problemApps':len(c['fluxProblemApps'])})
-        if not self.authed(): return self.login()
-        self.send_html(APP)
-      def do_POST(self):
-        try:
-          ln=int(self.headers.get('Content-Length','0')); raw=self.rfile.read(ln).decode()
-          if self.path=='/login':
-            data=urllib.parse.parse_qs(raw)
-            if data.get('token',[''])[0] == UI_TOKEN:
-              self.send_response(303); self.send_header('Set-Cookie','sre_agent='+UI_TOKEN+'; Path=/; HttpOnly; Secure; SameSite=Lax'); self.send_header('Location','/'); self.end_headers(); return
-            return self.login('Zlý token')
-          if not self.authed(): return self.send_json({'error':'unauthorized'},401)
-          if self.path=='/api/chat':
-            msg=json.loads(raw or '{}').get('message','')[:4000]
-            audit('chat '+msg.replace('\n',' ')[:300])
-            return self.send_json({'answer':answer_user(msg)})
-          self.send_error(404)
-        except Exception:
-          self.send_json({'answer':'ERROR\n'+traceback.format_exc()},500)
     ThreadingHTTPServer(('0.0.0.0',8080),H).serve_forever()
 ---
 apiVersion: apps/v1
