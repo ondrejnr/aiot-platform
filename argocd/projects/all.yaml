@@ -33,6 +33,7 @@ spec:
   sourceRepos: ['https://github.com/ondrejnr/aiot-platform.git', 'https://*']
   destinations:
     - { namespace: 'monitoring',                   server: '*' }
+    - { namespace: 'kube-system',                  server: '*' }
     - { namespace: 'signoz',                       server: '*' }
     - { namespace: 'opentelemetry-operator-system', server: '*' }
     - { namespace: 'victoriametrics',              server: '*' }
