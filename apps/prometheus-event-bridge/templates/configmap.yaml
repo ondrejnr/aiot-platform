@@ -162,34 +162,18 @@ data:
       labels = alert.get("labels", {})
       fp = fingerprint(labels)
       alertname = labels.get("alertname", "PrometheusAlert")
-      event_name = f"prom-alert-{clean(alertname, 40)}-{fp}"
+      bucket = int(time.time() // max(POLL_SECONDS, 60))
+      event_name = f"prom-alert-{clean(alertname, 32)}-{fp}-{bucket}"
       state = SEEN.setdefault(fp, {"count": 0, "alert": alert})
       state["count"] += 1
       state["alert"] = alert
-      body = build_event(alert, event_name, state["count"], resolved)
+      body = build_event(alert, event_name, 1, resolved)
       namespace = body["metadata"]["namespace"]
-      path = f"/apis/events.k8s.io/v1/namespaces/{urllib.parse.quote(namespace)}/events/{urllib.parse.quote(event_name)}"
-      patch = {
-        "eventTime": body["eventTime"],
-        "note": body["note"],
-        "type": body["type"],
-        "action": body["action"],
-      }
-      if "series" in body:
-        patch["series"] = body["series"]
+      create_path = f"/apis/events.k8s.io/v1/namespaces/{urllib.parse.quote(namespace)}/events"
       try:
-        kube_json(path, method="PATCH", body=patch, content_type="application/merge-patch+json")
+        kube_json(create_path, method="POST", body=body)
       except urllib.error.HTTPError as exc:
-        if exc.code == 404:
-          create_path = f"/apis/events.k8s.io/v1/namespaces/{urllib.parse.quote(namespace)}/events"
-          try:
-            kube_json(create_path, method="POST", body=body)
-          except urllib.error.HTTPError as create_exc:
-            if create_exc.code == 409:
-              kube_json(path, method="PATCH", body=patch, content_type="application/merge-patch+json")
-            else:
-              raise
-        else:
+        if exc.code != 409:
           raise
 
     def poll_alerts():

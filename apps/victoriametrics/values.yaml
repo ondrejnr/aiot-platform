@@ -1,2 +1,10 @@
 # No live values dump available — pass-through skeleton for victoria-metrics-k8s-stack
-victoria-metrics-k8s-stack: {}
+victoria-metrics-k8s-stack:
+  # Disabled on k3d because the generated vmalertmanager pod labels exceed the 63-char limit
+  # with this long release name, which floods Kubernetes Events with ReconcilationError.
+  alertmanager:
+    enabled: false
+  vmalert:
+    spec:
+      extraArgs:
+        notifier.blackhole: "true"
