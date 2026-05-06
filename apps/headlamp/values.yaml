@@ -2,6 +2,8 @@ headlamp:
   config:
     inCluster: true
     inClusterContextName: main
+    extraArgs:
+      - "-metrics-enabled"
     # K3s API server is not configured to trust Authentik OIDC tokens.
     # Keep Headlamp in in-cluster mode and authenticate to the cluster with a service-account token.
     oidc:
@@ -12,6 +14,48 @@ headlamp:
       clientSecret: ""
       issuerURL: ""
       scopes: ""
+
+
+  initContainers:
+    - name: seed-prometheus-plugin-config
+      image: ghcr.io/headlamp-k8s/headlamp:v0.41.0
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      command:
+        - sh
+        - -c
+        - |
+          set -eu
+          cp -a /headlamp/frontend/. /work/frontend/
+          cat > /work/frontend/headlamp-metrics-defaults.js <<'EOF'
+          (function () {
+            try {
+              var key = "pluginConfigs";
+              var cfg = JSON.parse(localStorage.getItem(key) || "{}");
+              cfg.prometheus = cfg.prometheus || {};
+              cfg.prometheus.main = cfg.prometheus.main || {};
+              cfg.prometheus.main.isMetricsEnabled = true;
+              cfg.prometheus.main.autoDetect = false;
+              cfg.prometheus.main.address = "monitoring/prometheus-kube-prometheus-prometheus:9090";
+              cfg.prometheus.main.defaultTimespan = cfg.prometheus.main.defaultTimespan || "24h";
+              localStorage.setItem(key, JSON.stringify(cfg));
+            } catch (e) {
+              console.warn("Headlamp Prometheus defaults failed", e);
+            }
+          })();
+          EOF
+          sed -i 's#</head>#<script src="/headlamp-metrics-defaults.js"></script></head>#' /work/frontend/index.html
+      volumeMounts:
+        - name: patched-frontend
+          mountPath: /work/frontend
+  volumeMounts:
+    - name: patched-frontend
+      mountPath: /headlamp/frontend
+  volumes:
+    - name: patched-frontend
+      emptyDir: {}
   ingress:
     enabled: true
     ingressClassName: nginx
