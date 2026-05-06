@@ -1,10 +1,7 @@
-# Helm values for kube-prometheus-stack chart
-# Hardened 2026-04-27: resource limits + nodeSelector to workers only
-
 alertmanager:
   alertmanagerSpec:
     nodeSelector:
-      node-role.kubernetes.io/worker: ""
+      node-role.kubernetes.io/worker: ''
     priorityClassName: system-cluster-critical
     resources:
       requests:
@@ -19,16 +16,13 @@ alertmanager:
       labelSelector:
         matchLabels:
           app.kubernetes.io/name: alertmanager
-
 grafana:
   enabled: false
-
 prometheus:
   prometheusSpec:
     nodeSelector:
-      node-role.kubernetes.io/worker: ""
+      node-role.kubernetes.io/worker: ''
     priorityClassName: system-cluster-critical
-    # Hard memory cap prevents runaway scrape buffers from killing the node
     resources:
       requests:
         cpu: 100m
@@ -46,10 +40,9 @@ prometheus:
       labelSelector:
         matchLabels:
           app.kubernetes.io/name: prometheus
-
 prometheusOperator:
   nodeSelector:
-    node-role.kubernetes.io/worker: ""
+    node-role.kubernetes.io/worker: ''
   priorityClassName: system-cluster-critical
   resources:
     requests:
@@ -57,7 +50,6 @@ prometheusOperator:
       memory: 64Mi
     limits:
       memory: 256Mi
-
 kube-state-metrics:
   resources:
     requests:
@@ -73,20 +65,10 @@ kube-state-metrics:
     failureThreshold: 10
     timeoutSeconds: 15
     periodSeconds: 20
-
 prometheus-node-exporter:
-  resources:
-    requests:
-      cpu: 20m
-      memory: 24Mi
-    limits:
-      memory: 128Mi
-
-# kube-proxy is enabled (Flannel CNI); standard ServiceMonitor applies
+  enabled: false
 kubeProxy:
   enabled: false
-
-# k3s nema samostatne service objekty pre tieto komponenty -> vypnut
 kubeControllerManager:
   enabled: false
 kubeScheduler:
@@ -99,11 +81,3 @@ kubeDns:
   enabled: false
 kubeApiServer:
   enabled: true
-
-# port 9100 je obsadeny VictoriaMetrics node-exporterom
-prometheus-node-exporter:
-  service:
-    port: 9101
-    targetPort: 9101
-  extraArgs:
-    - --web.listen-address=:9101
