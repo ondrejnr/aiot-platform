@@ -33,6 +33,8 @@ spec:
   install:
     createNamespace: true
   values:
+    existingSecret:
+      name: capacitor
     env:
       AUTH: noauth
       IMPERSONATE_SA_RULES: "noauth=flux-ui:capacitor-clusteradmin"
