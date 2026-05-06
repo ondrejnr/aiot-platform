@@ -1,5 +1,8 @@
 ingress-nginx:
   controller:
+    watchIngressWithoutClass: true
+    ingressClassResource:
+      default: true
     admissionWebhooks:
       enabled: false
     hostPort:
