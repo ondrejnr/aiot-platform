@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: signoz-authentik-bootstrap
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: signoz
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  bootstrap.sh: |-
+    #!/bin/sh
+    set -eu
+    PY=/tmp/signoz-authentik-bootstrap.py
+    cat > "$PY" <<'PYCODE'
+    import os
+    from urllib.parse import urlencode, quote
+    from authentik.core.models import Application
+    from authentik.flows.models import Flow
+    from authentik.providers.oauth2.models import OAuth2Provider, RedirectURI, RedirectURIMatchingMode, ScopeMapping
+
+    client_secret = "__OIDC_CLIENT_SECRET__"
+    signoz_url = "https://signoz.46.4.123.8.nip.io"
+    callback = f"{signoz_url}/api/v1/complete/oidc"
+    domain_state_id = "019dfdba:489c:7728:a9fe:2b8d69b17262"
+    state = f"{signoz_url}/login?domain_id={quote(domain_state_id, safe='')}"
+    launch = "https://authentik.46.4.123.8.nip.io/application/o/authorize/?" + urlencode({
+        "client_id": "signoz",
+        "redirect_uri": callback,
+        "response_type": "code",
+        "scope": "email profile openid groups",
+        "state": state,
+    })
+
+    provider, _ = OAuth2Provider.objects.get_or_create(name="signoz")
+    provider.client_id = "signoz"
+    provider.client_secret = client_secret
+    provider.client_type = "confidential"
+    provider.redirect_uris = [RedirectURI(RedirectURIMatchingMode.STRICT, callback)]
+    provider.authorization_flow = Flow.objects.get(slug="default-provider-authorization-implicit-consent")
+    provider.invalidation_flow = Flow.objects.get(slug="default-provider-invalidation-flow")
+    provider.sub_mode = "user_username"
+    provider.include_claims_in_id_token = True
+    provider.save()
+    provider.property_mappings.set(ScopeMapping.objects.filter(scope_name__in=["openid", "email", "profile", "groups"]))
+
+    app, _ = Application.objects.get_or_create(slug="signoz", defaults={"name": "SigNoz"})
+    app.name = "SigNoz"
+    app.provider = provider
+    app.meta_launch_url = launch
+    app.open_in_new_tab = True
+    app.save()
+    print({"provider": provider.name, "client_id": provider.client_id, "launch": app.meta_launch_url})
+    PYCODE
+    sed -i "s|__OIDC_CLIENT_SECRET__|$OIDC_CLIENT_SECRET|g" "$PY"
+    kubectl -n authentik exec deploy/authentik-server -- ak shell -c "$(cat "$PY")"

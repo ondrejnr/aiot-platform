@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: signoz-sso-dashboard-bootstrap
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: signoz
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "20"
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: signoz-bootstrap
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: bootstrap
+        image: python:3.11-alpine
+        imagePullPolicy: IfNotPresent
+        command: ["python", "/bootstrap/script/bootstrap.py"]
+        env:
+        - name: SIGNOZ_BASE_URL
+          value: http://signoz:8080
+        - name: SIGNOZ_ADMIN_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: signoz-bootstrap-admin
+              key: email
+        - name: SIGNOZ_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: signoz-bootstrap-admin
+              key: password
+        - name: SIGNOZ_ORG_ID
+          valueFrom:
+            secretKeyRef:
+              name: signoz-bootstrap-admin
+              key: orgId
+        - name: OIDC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: signoz-oidc-client
+              key: clientSecret
+        volumeMounts:
+        - name: script
+          mountPath: /bootstrap/script
+        - name: dashboard
+          mountPath: /bootstrap/dashboard
+      volumes:
+      - name: script
+        configMap:
+          name: signoz-sso-dashboard-bootstrap
+      - name: dashboard
+        configMap:
+          name: signoz-dashboard-aiot-everything
