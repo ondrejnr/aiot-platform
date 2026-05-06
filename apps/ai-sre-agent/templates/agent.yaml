@@ -157,7 +157,7 @@ data:
 
     def infer_target(msg):
       low=msg.lower()
-      mapping={'grafana':'grafana','prometheus':'monitoring','headlamp':'headlamp','argocd':'argocd','jenkins':'jenkins','gitea':'gitea','zabbix':'zabbix','chef':'chef'}
+      mapping={'grafana':'grafana','grafanu':'grafana','grafane':'grafana','prometheus':'monitoring','prometheusu':'monitoring','headlamp':'headlamp','headlampu':'headlamp','argocd':'argocd','argo':'argocd','jenkins':'jenkins','jenkinsu':'jenkins','gitea':'gitea','giteu':'gitea','zabbix':'zabbix','zabbixu':'zabbix','chef':'chef','chefa':'chef'}
       for k,v in mapping.items():
         if k in low:
           return k,v
