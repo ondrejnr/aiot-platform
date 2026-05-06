@@ -97,6 +97,13 @@ data:
       with urllib.request.urlopen(req, timeout=900) as r:
         return json.loads(r.read().decode()).get('response','')
     
+    def ollama_chat(messages, tools=None, num_predict=600):
+      payload={'model':MODEL,'messages':messages,'stream':False,'options':{'temperature':0.1,'num_predict':num_predict}}
+      if tools: payload['tools']=tools
+      req=urllib.request.Request(OLLAMA+'/api/chat',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json'})
+      with urllib.request.urlopen(req, timeout=900) as r:
+        return json.loads(r.read().decode()).get('message',{})
+    
     def hr_status(hr):
       conds=hr.get('status',{}).get('conditions',[]) or []
       ready=next((c for c in conds if c.get('type')=='Ready'),{})
@@ -350,21 +357,163 @@ data:
       append_incident(p, res, verify)
       return res+'\n\nOverenie:\n- '+verify+'\n\nIncident som zapísal do knowledge base.'
     
+    TOOLS=[
+      {"type":"function","function":{"name":"get_pods","description":"List Kubernetes pods. namespace empty=all. only_problems=true returns only pods not Running.","parameters":{"type":"object","properties":{"namespace":{"type":"string"},"only_problems":{"type":"boolean"}}}}},
+      {"type":"function","function":{"name":"get_pod_logs","description":"Get last N lines of logs from a container of a pod.","parameters":{"type":"object","properties":{"namespace":{"type":"string"},"name":{"type":"string"},"lines":{"type":"integer"},"container":{"type":"string"}},"required":["namespace","name"]}}},
+      {"type":"function","function":{"name":"get_events","description":"Get recent Warning events from a namespace (or all).","parameters":{"type":"object","properties":{"namespace":{"type":"string"}}}}},
+      {"type":"function","function":{"name":"describe_pod","description":"Get pod status: containers, restarts, conditions, message.","parameters":{"type":"object","properties":{"namespace":{"type":"string"},"name":{"type":"string"}},"required":["namespace","name"]}}},
+      {"type":"function","function":{"name":"get_helmreleases","description":"List Flux HelmReleases with Ready status. only_problems=true filters to non-Ready ones.","parameters":{"type":"object","properties":{"only_problems":{"type":"boolean"}}}}},
+      {"type":"function","function":{"name":"get_nodes","description":"List Kubernetes nodes with Ready status and roles.","parameters":{"type":"object","properties":{}}}},
+      {"type":"function","function":{"name":"get_ingresses","description":"List Ingresses with hosts and target services.","parameters":{"type":"object","properties":{"namespace":{"type":"string"}}}}},
+      {"type":"function","function":{"name":"search_runbooks","description":"Search past incidents and runbooks for similar problems (semantic RAG).","parameters":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"]}}},
+    ]
+    
+    def tool_get_pods(args):
+      ns=args.get('namespace') or ''
+      only_problems=bool(args.get('only_problems'))
+      path='/api/v1/namespaces/'+urllib.parse.quote(ns)+'/pods?limit=200' if ns else '/api/v1/pods?limit=500'
+      pods=k8s('GET',path).get('items',[])
+      out=[]
+      for p in pods:
+        md=p.get('metadata',{}); st=p.get('status',{})
+        phase=st.get('phase'); conds={c.get('type'):c.get('status') for c in st.get('conditions',[]) or []}
+        cs=st.get('containerStatuses',[]) or []
+        waiting=[c.get('state',{}).get('waiting',{}).get('reason') for c in cs if c.get('state',{}).get('waiting')]
+        restarts=sum(c.get('restartCount',0) for c in cs)
+        bad=phase!='Running' or conds.get('Ready')!='True' or any(waiting)
+        if only_problems and not bad: continue
+        out.append({'ns':md.get('namespace'),'name':md.get('name'),'phase':phase,'ready':conds.get('Ready'),'waiting':waiting,'restarts':restarts})
+      return {'count':len(out),'pods':out[:60]}
+    
+    def tool_get_pod_logs(args):
+      ns=args.get('namespace'); name=args.get('name'); lines=int(args.get('lines') or 100); cont=args.get('container') or ''
+      q='?tailLines=%d' % min(lines,500)
+      if cont: q+='&container='+urllib.parse.quote(cont)
+      try:
+        req=urllib.request.Request(K8S+'/api/v1/namespaces/'+urllib.parse.quote(ns)+'/pods/'+urllib.parse.quote(name)+'/log'+q)
+        req.add_header('Authorization','Bearer '+TOKEN)
+        with urllib.request.urlopen(req,context=CTX,timeout=25) as r:
+          txt=r.read().decode(errors='replace')
+        return {'lines':txt[-8000:]}
+      except Exception as e:
+        return {'error':repr(e)}
+    
+    def tool_get_events(args):
+      ns=args.get('namespace') or ''
+      path='/api/v1/namespaces/'+urllib.parse.quote(ns)+'/events?limit=100' if ns else '/api/v1/events?limit=300'
+      evs=k8s('GET',path).get('items',[])
+      out=[]
+      for e in evs:
+        if e.get('type')!='Warning': continue
+        out.append({'ns':e.get('metadata',{}).get('namespace'),'reason':e.get('reason'),'object':e.get('involvedObject',{}).get('kind','')+'/'+e.get('involvedObject',{}).get('name',''),'message':(e.get('message','') or '')[:300],'lastTimestamp':e.get('lastTimestamp') or e.get('eventTime')})
+      out.sort(key=lambda x: x.get('lastTimestamp') or '', reverse=True)
+      return {'count':len(out),'events':out[:30]}
+    
+    def tool_describe_pod(args):
+      ns=args.get('namespace'); name=args.get('name')
+      try:
+        p=k8s('GET','/api/v1/namespaces/'+urllib.parse.quote(ns)+'/pods/'+urllib.parse.quote(name))
+      except Exception as e: return {'error':repr(e)}
+      st=p.get('status',{}); cs=st.get('containerStatuses',[]) or []
+      return {'phase':st.get('phase'),'message':st.get('message'),'reason':st.get('reason'),'conditions':[{'type':c.get('type'),'status':c.get('status'),'reason':c.get('reason'),'message':(c.get('message','') or '')[:200]} for c in st.get('conditions',[]) or []],'containers':[{'name':c.get('name'),'image':c.get('image'),'ready':c.get('ready'),'restartCount':c.get('restartCount'),'state':list(c.get('state',{}).keys()),'lastTermination':c.get('lastState',{}).get('terminated')} for c in cs]}
+    
+    def tool_get_helmreleases(args):
+      only_problems=bool(args.get('only_problems'))
+      hrs=list_helmreleases()
+      out=[hr_status(h) for h in hrs]
+      if only_problems: out=[h for h in out if h['ready']!='True' and not h['suspended']]
+      return {'count':len(out),'helmreleases':[{'ns':h['namespace'],'name':h['name'],'ready':h['ready'],'message':(h.get('message','') or '')[:300]} for h in out[:40]]}
+    
+    def tool_get_nodes(args):
+      ns=k8s('GET','/api/v1/nodes').get('items',[])
+      out=[]
+      for n in ns:
+        conds={c.get('type'):c.get('status') for c in n.get('status',{}).get('conditions',[]) or []}
+        out.append({'name':n.get('metadata',{}).get('name'),'ready':conds.get('Ready'),'roles':[k.split('/')[-1] for k in (n.get('metadata',{}).get('labels',{}) or {}) if k.startswith('node-role.kubernetes.io/')]})
+      return {'count':len(out),'nodes':out}
+    
+    def tool_get_ingresses(args):
+      ns=args.get('namespace') or ''
+      path='/apis/networking.k8s.io/v1/namespaces/'+urllib.parse.quote(ns)+'/ingresses' if ns else '/apis/networking.k8s.io/v1/ingresses'
+      igs=k8s('GET',path).get('items',[])
+      out=[]
+      for i in igs:
+        md=i.get('metadata',{}); rules=i.get('spec',{}).get('rules',[]) or []
+        hosts=[r.get('host') for r in rules]
+        backends=[]
+        for r in rules:
+          for p in (r.get('http',{}).get('paths',[]) or []):
+            b=p.get('backend',{}).get('service',{})
+            backends.append((b.get('name'),b.get('port',{}).get('number')))
+        out.append({'ns':md.get('namespace'),'name':md.get('name'),'hosts':hosts,'backends':backends})
+      return {'count':len(out),'ingresses':out[:40]}
+    
+    def tool_search_runbooks(args):
+      q=args.get('query') or ''
+      hits=rag_search(q, top_k=5)
+      return {'count':len(hits),'hits':[{'score':round(h.get('score') or 0,3),'source':h.get('source'),'text':(h.get('text') or '')[:500]} for h in hits]}
+    
+    TOOL_FNS={
+      'get_pods':tool_get_pods,
+      'get_pod_logs':tool_get_pod_logs,
+      'get_events':tool_get_events,
+      'describe_pod':tool_describe_pod,
+      'get_helmreleases':tool_get_helmreleases,
+      'get_nodes':tool_get_nodes,
+      'get_ingresses':tool_get_ingresses,
+      'search_runbooks':tool_search_runbooks,
+    }
+    
+    SYSTEM_PROMPT='''Si Kubernetes SRE agent v klastri pouzivatela. Odpovedaj vyhradne po slovensky, strucne.
+    
+    PRAVIDLA:
+    - Mas k dispozicii nastroje (tools). VOLAJ ICH na ziskanie datzkriesla, NIKDY si nevymyslaj cisla, mena podov, namespace ani chyby.
+    - Klaster pouziva FLUX (nie ArgoCD). Nikdy nezmienuj ArgoCD.
+    - Ak na otazku nepotrebujes data, odpovedz priamo bez volania nastrojov.
+    - Bezne otazky o stave: zavolaj get_nodes a get_pods(only_problems=true) a get_helmreleases(only_problems=true).
+    - Pri konkretnej sluzbe (napr. grafana): zavolaj get_pods(namespace=...) -> describe_pod -> get_pod_logs -> get_events.
+    - Pri novom probleme zavolaj search_runbooks aby si nasiel podobny historicky incident.
+    - Po max 4 volaniach napis FINALNU odpoved v tomto formate:
+      Stav:
+      <2-3 vety>
+      Diagnoza:
+      <co je zle, alebo "ziadne problemy">
+      Navrh:
+      <konkretny krok alebo "netreba zasahovat">
+    
+    Pri rizikovych zmenach (delete, restart, reconcile) NIKDY ich nespustaj sam. Iba navrhni a pockaj na potvrdenie pouzivatela formou: "potvrd vymazat events", "potvrd restart deployment ns/name", "potvrd flux reconcile ns/name".'''
+    
+    def chat_with_tools(user_msg, max_iters=4):
+      msgs=[{'role':'system','content':SYSTEM_PROMPT},{'role':'user','content':user_msg}]
+      for _ in range(max_iters):
+        m=ollama_chat(msgs, tools=TOOLS, num_predict=600)
+        tc=m.get('tool_calls') or []
+        if not tc:
+          return m.get('content','').strip() or '(prazdna odpoved modelu)'
+        msgs.append({'role':'assistant','content':m.get('content',''),'tool_calls':tc})
+        for call in tc[:4]:
+          fn=(call.get('function') or {}).get('name')
+          args=(call.get('function') or {}).get('arguments') or {}
+          if isinstance(args,str):
+            try: args=json.loads(args)
+            except Exception: args={}
+          try:
+            result=TOOL_FNS[fn](args) if fn in TOOL_FNS else {'error':'unknown tool '+str(fn)}
+          except Exception as e:
+            result={'error':repr(e)}
+          audit('tool '+str(fn)+' '+json.dumps(args,ensure_ascii=False)[:200])
+          msgs.append({'role':'tool','content':json.dumps(result,ensure_ascii=False)[:6000]})
+      m=ollama_chat(msgs+[{'role':'user','content':'Daj mi finalnu odpoved teraz vo formate Stav/Diagnoza/Navrh, ziadne dalsie volania nastrojov.'}], tools=None, num_predict=500)
+      return (m.get('content') or '').strip() or '(model neodpovedal)'
+    
     def answer_user(msg):
       low=msg.lower().strip()
       if low in ('schvaľujem','schvalujem','schval aktualny navrh','potvrdzujem','suhlasim','súhlasím'):
         return execute_pending()
       if low in ('zrus','zruš','zamietam','neschvalujem'):
         clear_pending(); return 'Čakajúci návrh je zrušený. Nič som nezmenil.'
-      if any(w in low for w in ['oprav','fixni','vyries','vyrieš']):
-        target,ns=infer_target(msg)
-        if target and ns:
-          data=collect_target(ns)
-          action=propose_action(target,ns,data)
-          return render_plan(target,ns,data,action,msg)
-        return 'Rozumiem, ale neviem, ktorú službu mám opraviť. Napíš napríklad: oprav grafanu, oprav headlamp, oprav jenkins.'
       if 'potvrd' in low and 'event' in low:
-        res=delete_events(); return res+'\n\nOverenie: spusti otázku "skontroluj stav".'
+        return delete_events()+'\n\nOverenie: spusti otázku "skontroluj stav".'
       if low.startswith('potvrd restart deployment '):
         target=low.replace('potvrd restart deployment ','').strip()
         if '/' not in target: return 'Formát: potvrď restart deployment namespace/name'
@@ -373,18 +522,12 @@ data:
         target=low.replace('potvrd flux reconcile ','').strip()
         if '/' not in target: return 'Formát: potvrď flux reconcile namespace/name'
         ns,name=target.split('/',1); return reconcile_hr(ns,name)
-      c=collect(include_logs=True)
-      if 'vymaz' in low and 'event' in low:
-        return 'Toto je povolený safe-fix, ale vyžaduje potvrdenie. Napíš presne: potvrď vymazať events'
-      k=load_knowledge()
-      rag_hits=rag_search(msg, top_k=3)
-      rag_text='\n'.join(['['+h.get('source','')+'] '+h.get('text','')[:600] for h in rag_hits]) if rag_hits else ''
-      facts={'nodesReady':c['nodesReady'],'nodesTotal':c['nodesTotal'],'badPodsCount':c['badPodsCount'],'fluxProblemAppsCount':len(c['fluxProblemApps']),'fluxProblemApps':[{'ns':h['namespace'],'name':h['name'],'ready':h['ready'],'message':h.get('message','')[:200]} for h in c['fluxProblemApps'][:20]],'badPods':[{'ns':p.get('namespace'),'name':p.get('name'),'phase':p.get('phase'),'reason':p.get('reason','')} for p in c.get('badPods',[])[:30]]}
-      prompt='''Si Kubernetes SRE agent. Odpovedaj výhradne po slovensky, stručne (max 10 riadkov).\n\nPRÍSNE PRAVIDLÁ — ŠTANDARD ANTI-HALUCINÁCIA:\n1. Používaj IBA čísla, mená podov/namespace a chyby, ktoré sú v sekcii FAKTY nižšie. Nič si nevymýšľaj.\n2. Ak fakt nie je vo FAKTY, povedz doslova: \"nemám dáta\". Nikdy nehádaj.\n3. Ak FAKTY hovoria nodesReady=N a nodesTotal=N, povedz \"všetky nody Ready\". Nehovor o Pending podoch ak badPods je prázdny.\n4. Nepoužívaj slovo \"podmiestka\". Používaj: pod, pody, deployment, namespace, service, ingress, Flux HelmRelease.\n5. Ak je fluxProblemAppsCount=0, NEVYTVÁRAJ zoznam zlyhaných appiek.\n6. Nezmieňuj ArgoCD — kluster používa Flux.\n7. Nehovor o HTTP 400/404/500 chybách, ak nie sú vo FAKTY.\n\nPRÁVOMOCI: čítať pody/logy/eventy/nody/ingressy/Flux HelmReleases. Po explicitnom potvrdení: vymazať events, reštartovať deployment, spustiť Flux reconcile HelmRelease. Nikdy nenavrhuj rizikový fix bez potvrdenia od používateľa.\n\nFORMÁT ODPOVEDE (presne tieto sekcie):\nStav:\n<2-3 vety zhrnutia z FAKTY>\nDiagnóza:\n<ak sú problémy z FAKTY; inak \"žiadne problémy\">\nNávrh:\n<konkrétny krok alebo \"netreba zasahovať\">\n\nOTÁZKA: '''+msg+'\n\nFAKTY (jediný zdroj pravdy):\n'+json.dumps(facts,ensure_ascii=False,indent=2)+'\n\nPodobné incidenty/runbooky (RAG, len pomocné):\n'+(rag_text or '(žiadne)')+'\n\nKontext (runbooky/pravidlá, len pomocný):\n'+(k['rules'][:1000]+'\n'+k['runbooks'][:1500])
       try:
-        return ollama(prompt)
+        return chat_with_tools(msg)
       except Exception as e:
-        return 'Model ešte nie je pripravený alebo odpoveď trvá príliš dlho: %r\n\nRýchly stav: nodes %s/%s ready, badPods=%s, problemApps=%s' % (e,c['nodesReady'],c['nodesTotal'],c['badPodsCount'],len(c['fluxProblemApps']))
+        try: c=collect(include_logs=False)
+        except Exception: c={'nodesReady':'?','nodesTotal':'?','badPodsCount':'?','fluxProblemApps':[]}
+        return 'Chyba pri volani modelu/nastrojov: %r\n\nRychly stav: nodes %s/%s ready, badPods=%s, problemApps=%s' % (e,c.get('nodesReady'),c.get('nodesTotal'),c.get('badPodsCount'),len(c.get('fluxProblemApps',[])))
     
     PAGE='''<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI SRE Agent</title><style>
     :root{color-scheme:dark}body{margin:0;font-family:Inter,Segoe UI,system-ui;background:#0b1020;color:#e7eaf3}.top{height:52px;display:flex;align-items:center;gap:14px;padding:0 18px;background:#121a31;border-bottom:1px solid #26304d;position:sticky;top:0}.dot{width:10px;height:10px;border-radius:50%;background:#22c55e}.brand{font-weight:700}.status{font-size:13px;color:#aab3cf}.wrap{max-width:980px;margin:0 auto;padding:22px}.chat{display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - 190px)}.msg{padding:14px 16px;border-radius:14px;line-height:1.45;white-space:pre-wrap}.user{align-self:flex-end;background:#2563eb;color:white;max-width:78%}.bot{align-self:flex-start;background:#151f38;border:1px solid #2b385c;max-width:86%}.composer{position:sticky;bottom:0;background:linear-gradient(transparent,#0b1020 20%);padding:18px 0}.box{display:flex;gap:10px}.box textarea{flex:1;min-height:54px;max-height:160px;resize:vertical;border-radius:14px;border:1px solid #34415f;background:#11182b;color:#e7eaf3;padding:13px}.box button,.login button{border:0;border-radius:12px;background:#22c55e;color:#07120b;font-weight:700;padding:0 18px}.hint{font-size:12px;color:#8f9ab8;margin-top:8px}.login{max-width:420px;margin:90px auto;background:#151f38;border:1px solid #2b385c;padding:24px;border-radius:18px}.login input{width:100%;box-sizing:border-box;border-radius:12px;border:1px solid #34415f;background:#0b1020;color:#e7eaf3;padding:13px;margin:12px 0}.spinner{color:#aab3cf}
