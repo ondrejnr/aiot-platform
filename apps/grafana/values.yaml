@@ -28,9 +28,15 @@ grafana:
       name: Authentik
       client_id: grafana
       client_secret: d4abe87e66a406f23cea1beeb9b4713e40ecb1a46b952b0f30eec77aff21aba8
-      scopes: openid profile email
+      scopes: openid profile email groups
       auth_url: https://authentik.46.4.123.8.nip.io/application/o/authorize/
       token_url: https://authentik.46.4.123.8.nip.io/application/o/token/
       api_url: https://authentik.46.4.123.8.nip.io/application/o/userinfo/
       allow_sign_up: true
       auto_login: false
+      role_attribute_path: "contains(groups[*], 'authentik Admins') && 'GrafanaAdmin' || contains(groups[*], 'admin') && 'Admin' || 'Editor'"
+      role_attribute_strict: false
+      allow_assign_grafana_admin: true
+      use_pkce: true
+    users:
+      auto_assign_org_role: Editor
