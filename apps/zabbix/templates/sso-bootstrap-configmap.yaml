@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zabbix-sso-bootstrap
+  namespace: zabbix
+  labels:
+    app.kubernetes.io/name: zabbix
+    app.kubernetes.io/component: sso-bootstrap
+    app.kubernetes.io/part-of: zabbix
+    argocd.argoproj.io/instance: zabbix
+data:
+  zabbix-sso-bootstrap.py: |
+    import json
+    import secrets
+    import string
+    import urllib.request
+
+    ZABBIX_API = "http://zabbix-zabbix-web.zabbix.svc.cluster.local/api_jsonrpc.php"
+    ADMIN_USER = "Admin"
+    ADMIN_PASSWORD = "zabbix"
+    AUTHENTIK_URL = "https://authentik.46.4.123.8.nip.io"
+    ZABBIX_URL = "https://zabbix.46.4.123.8.nip.io"
+
+    def api(method, params, token=None):
+        payload = {"jsonrpc": "2.0", "method": method, "params": params, "id": 1}
+        if token:
+            payload["auth"] = token
+        req = urllib.request.Request(
+            ZABBIX_API,
+            data=json.dumps(payload).encode(),
+            headers={"Content-Type": "application/json-rpc"},
+        )
+        data = json.loads(urllib.request.urlopen(req, timeout=30).read())
+        if "error" in data:
+            raise RuntimeError(f"{method}: {data[ error]}")
+        return data.get("result")
+
+    token = api("user.login", {"username": ADMIN_USER, "password": ADMIN_PASSWORD})
+    api("authentication.update", {"saml_auth_enabled": 1, "saml_case_sensitive": 0}, token)
+
+    directories = api("userdirectory.get", {"output": "extend", "filter": {"idp_type": 2}}, token)
+    if not directories:
+        raise RuntimeError("No SAML userdirectory found in Zabbix")
+    directory_id = directories[0]["userdirectoryid"]
+    api("userdirectory.update", {
+        "userdirectoryid": directory_id,
+        "idp_entityid": AUTHENTIK_URL,
+        "sso_url": f"{AUTHENTIK_URL}/application/saml/zabbix/sso/binding/redirect/",
+        "slo_url": "",
+        "username_attribute": "http://schemas.goauthentik.io/2021/02/saml/username",
+        "sp_entityid": "zabbix.46.4.123.8.nip.io",
+        "nameid_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+        "sign_assertions": 1,
+        "sign_messages": 0,
+        "sign_authn_requests": 0,
+        "sign_logout_requests": 0,
+        "sign_logout_responses": 0,
+    }, token)
+
+    users = api("user.get", {
+        "filter": {"username": ["akadmin"]},
+        "output": ["userid", "username"],
+    }, token)
+    if users:
+        api("user.update", {
+            "userid": users[0]["userid"],
+            "roleid": "3",
+            "usrgrps": [{"usrgrpid": "7"}],
+        }, token)
+    else:
+        password = "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
+        api("user.create", {
+            "username": "akadmin",
+            "name": "Authentik",
+            "surname": "Admin",
+            "passwd": password,
+            "roleid": "3",
+            "usrgrps": [{"usrgrpid": "7"}],
+        }, token)
+
+    print("Zabbix SAML SSO bootstrap completed")
