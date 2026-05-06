@@ -25,11 +25,18 @@ spec:
           ingress:
             enabled: true
             ingressClassName: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+              nginx.ingress.kubernetes.io/ssl-redirect: "true"
             hosts:
             - authentik.46.4.123.8.nip.io
             paths:
             - "/"
             pathType: Prefix
+            tls:
+            - hosts:
+              - authentik.46.4.123.8.nip.io
+              secretName: authentik-tls
         worker:
           replicas: 1
         authentik:

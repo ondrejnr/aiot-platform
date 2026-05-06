@@ -8,6 +8,13 @@ jenkins:
       enabled: true
       hostName: jenkins.46.4.123.8.nip.io
       ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      tls:
+      - hosts:
+        - jenkins.46.4.123.8.nip.io
+        secretName: jenkins-tls
     installLatestPlugins: true
     installPlugins:
     - kubernetes
