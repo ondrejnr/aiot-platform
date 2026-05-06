@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudbeaver
+  namespace: aiot
+  labels:
+    app.kubernetes.io/name: cloudbeaver
+spec:
+  selector:
+    app.kubernetes.io/name: cloudbeaver
+  ports:
+    - name: http
+      port: 8978
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudbeaver
+  namespace: aiot
+  labels:
+    app.kubernetes.io/name: cloudbeaver
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/auth-url: http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx
+    nginx.ingress.kubernetes.io/auth-signin: https://authentik.{{ .Values.domain }}/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri
+    nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+    nginx.ingress.kubernetes.io/auth-snippet: |
+      proxy_set_header X-Forwarded-Host $http_host;
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - cloudbeaver.{{ .Values.domain }}
+      secretName: cloudbeaver-tls
+  rules:
+    - host: cloudbeaver.{{ .Values.domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cloudbeaver
+                port:
+                  name: http

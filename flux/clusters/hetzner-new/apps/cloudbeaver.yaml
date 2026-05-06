@@ -1,0 +1,22 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cloudbeaver
+  namespace: aiot
+spec:
+  suspend: false
+  interval: 30m
+  releaseName: cloudbeaver
+  chart:
+    spec:
+      chart: ./apps/cloudbeaver
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    createNamespace: true
+  upgrade:
+    cleanupOnFail: true

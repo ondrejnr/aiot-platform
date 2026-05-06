@@ -1,0 +1,13 @@
+domain: 46.4.123.8.nip.io
+image: dbeaver/cloudbeaver:24.3.1
+storageClass: local-path
+storageSize: 2Gi
+admin:
+  username: cbadmin
+  password: Cb@dmin2026
+postgres:
+  host: pg-cluster-rw.databases.svc.cluster.local
+  port: 5432
+  database: aiot
+  user: appuser
+  password: AiotPg2026!
