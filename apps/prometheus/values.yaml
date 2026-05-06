@@ -99,3 +99,11 @@ kubeDns:
   enabled: false
 kubeApiServer:
   enabled: true
+
+# port 9100 je obsadeny VictoriaMetrics node-exporterom
+prometheus-node-exporter:
+  service:
+    port: 9101
+    targetPort: 9101
+  extraArgs:
+    - --web.listen-address=:9101
