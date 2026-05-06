@@ -7,6 +7,10 @@ peConsole:
     host: pe.46.4.123.8.nip.io
     className: nginx
     clusterIssuer: letsencrypt-prod
+  authentik:
+    enabled: true
+    host: authentik.46.4.123.8.nip.io
+    serverService: authentik-server.authentik.svc.cluster.local
   autoLogin:
     enabled: true
     username: "admin"
