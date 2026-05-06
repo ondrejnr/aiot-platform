@@ -85,3 +85,17 @@ prometheus-node-exporter:
 # kube-proxy is enabled (Flannel CNI); standard ServiceMonitor applies
 kubeProxy:
   enabled: false
+
+# k3s nema samostatne service objekty pre tieto komponenty -> vypnut
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeEtcd:
+  enabled: false
+coreDns:
+  enabled: false
+kubeDns:
+  enabled: false
+kubeApiServer:
+  enabled: true
