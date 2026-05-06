@@ -1,13 +1,39 @@
-# No live values dump available — pass-through skeleton for victoria-metrics-k8s-stack
 victoria-metrics-k8s-stack:
-  # Disabled on k3d because the generated vmalertmanager pod labels exceed the 63-char limit
-  # with this long release name, which floods Kubernetes Events with ReconcilationError.
+  # vmalertmanager: jednoduchý 1-replika setup, route default = "null" (dry-run)
   alertmanager:
-    enabled: false
+    enabled: true
+    spec:
+      replicaCount: 1
+      resources:
+        requests:
+          cpu: 20m
+          memory: 64Mi
+        limits:
+          memory: 256Mi
+    config:
+      route:
+        receiver: "null"
+        group_by: ["alertname","namespace","severity"]
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 12h
+        routes:
+          - matchers: [ 'severity = critical' ]
+            receiver: "mattermost"
+            continue: true
+      receivers:
+        - name: "null"
+        - name: "mattermost"
+          # Mattermost incoming-webhook URL; doplň cez sealed-secret + envSubst alebo ručne v UI
+          webhook_configs:
+            - url: "http://placeholder-set-in-secret/hooks/REPLACE_ME"
+              send_resolved: true
+
+  # vmalert: prepoj na vmalertmanager namiesto blackhole
   vmalert:
     spec:
       extraArgs:
-        notifier.blackhole: "true"
-  # Disabled because the rendered Service name exceeds Kubernetes 63-char limit with this release name.
+        notifier.url: "http://vmalertmanager-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc:9093"
+
   kubeControllerManager:
     enabled: false
