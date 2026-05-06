@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: prometheus-event-bridge
+  namespace: prometheus-event-bridge
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: prometheus-event-bridge
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/prometheus-event-bridge
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

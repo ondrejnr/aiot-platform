@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: gitea
+  namespace: gitea
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: gitea
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/gitea
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

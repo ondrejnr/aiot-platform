@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: victoriametrics
+  namespace: victoriametrics
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: victoriametrics
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/victoriametrics
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

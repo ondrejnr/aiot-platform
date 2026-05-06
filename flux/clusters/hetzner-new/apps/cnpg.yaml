@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: cnpg
+  namespace: cnpg-system
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: cnpg
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/cnpg
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

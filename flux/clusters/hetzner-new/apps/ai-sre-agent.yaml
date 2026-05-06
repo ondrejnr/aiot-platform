@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: ai-sre-agent
+  namespace: ai-agent
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: ai-sre-agent
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/ai-sre-agent
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

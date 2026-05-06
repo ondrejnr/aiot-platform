@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: prometheus
+  namespace: monitoring
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: prometheus
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/prometheus
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

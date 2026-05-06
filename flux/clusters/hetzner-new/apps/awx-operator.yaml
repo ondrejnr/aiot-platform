@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: awx-operator
+  namespace: awx
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: awx-operator
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/awx-operator
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

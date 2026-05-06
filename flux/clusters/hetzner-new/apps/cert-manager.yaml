@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: cert-manager
+  namespace: cert-manager
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: cert-manager
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/cert-manager
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

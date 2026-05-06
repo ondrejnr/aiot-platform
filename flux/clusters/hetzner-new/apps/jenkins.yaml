@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: jenkins
+  namespace: jenkins
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: jenkins
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/jenkins
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

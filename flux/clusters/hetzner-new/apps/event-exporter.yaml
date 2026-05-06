@@ -2,15 +2,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: descheduler
-  namespace: descheduler
+  name: event-exporter
+  namespace: event-exporter
 spec:
   suspend: true
   interval: 30m
-  releaseName: descheduler
+  releaseName: event-exporter
   chart:
     spec:
-      chart: ./apps/descheduler
+      chart: ./apps/event-exporter
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository
