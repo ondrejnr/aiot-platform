@@ -1,4 +1,10 @@
 mattermost-team-edition:
+  externalDB:
+    enabled: true
+    externalDriverType: postgres
+    externalConnectionString: "mattermost:MattermostPg2026!@pg-cluster-rw.databases.svc.cluster.local:5432/mattermost?sslmode=disable&connect_timeout=10"
+  mysql:
+    enabled: false
   ingress:
     enabled: true
     ingressClassName: nginx
