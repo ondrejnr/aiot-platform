@@ -8,7 +8,7 @@ pgadmin4:
       - name: PGADMIN_CONFIG_WEBSERVER_AUTO_CREATE_USER
         value: "True"
       - name: PGADMIN_CONFIG_WEBSERVER_REMOTE_USER
-        value: HTTP_X_AUTHENTIK_EMAIL
+        value: "'HTTP_X_AUTHENTIK_EMAIL'"
       - name: PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED
         value: "False"
       - name: PGADMIN_CONFIG_PROXY_X_HOST_COUNT
