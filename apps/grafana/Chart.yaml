@@ -1,0 +1,10 @@
+apiVersion: v2
+name: grafana-overlay
+description: aiot-platform overlay for grafana
+type: application
+version: 1.0.0
+appVersion: "11.4.0"
+dependencies:
+  - name: grafana
+    version: "8.8.5"
+    repository: https://grafana.github.io/helm-charts

@@ -1,0 +1,10 @@
+apiVersion: v2
+name: pgadmin-overlay
+description: aiot-platform overlay for pgadmin4
+type: application
+version: 1.0.0
+appVersion: "8.13"
+dependencies:
+  - name: pgadmin4
+    version: "1.36.0"
+    repository: https://helm.runix.net

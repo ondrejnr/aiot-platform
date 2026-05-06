@@ -1,0 +1,31 @@
+grafana:
+  persistence:
+    enabled: true
+    storageClassName: local-path
+    size: 5Gi
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - grafana.46.4.123.8.nip.io
+    tls:
+      - hosts: [grafana.46.4.123.8.nip.io]
+        secretName: grafana-tls
+  grafana.ini:
+    server:
+      root_url: https://grafana.46.4.123.8.nip.io
+    auth.generic_oauth:
+      enabled: true
+      name: Authentik
+      scopes: openid profile email
+      auth_url: https://authentik.46.4.123.8.nip.io/application/o/authorize/
+      token_url: https://authentik.46.4.123.8.nip.io/application/o/token/
+      api_url: https://authentik.46.4.123.8.nip.io/application/o/userinfo/
+      allow_sign_up: true
