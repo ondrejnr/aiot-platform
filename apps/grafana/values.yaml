@@ -13,12 +13,13 @@ grafana:
     ingressClassName: nginx
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: 'true'
     hosts:
-      - grafana.46.4.123.8.nip.io
+    - grafana.46.4.123.8.nip.io
     tls:
-      - hosts: [grafana.46.4.123.8.nip.io]
-        secretName: grafana-tls
+    - hosts:
+      - grafana.46.4.123.8.nip.io
+      secretName: grafana-tls
   grafana.ini:
     server:
       root_url: https://grafana.46.4.123.8.nip.io
@@ -34,22 +35,26 @@ grafana:
       api_url: https://authentik.46.4.123.8.nip.io/application/o/userinfo/
       allow_sign_up: true
       auto_login: false
-      role_attribute_path: "contains(groups[*], 'authentik Admins') && 'GrafanaAdmin' || contains(groups[*], 'admin') && 'Admin' || 'Editor'"
+      role_attribute_path: contains(groups[*], 'authentik Admins') && 'GrafanaAdmin'
+        || contains(groups[*], 'admin') && 'Admin' || 'Editor'
       role_attribute_strict: false
       allow_assign_grafana_admin: true
       use_pkce: true
     users:
       auto_assign_org_role: Editor
-  additionalDataSources:
-    - name: Prometheus
-      type: prometheus
-      access: proxy
-      url: http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090
-      isDefault: true
-      editable: true
-    - name: Alertmanager
-      type: alertmanager
-      access: proxy
-      url: http://prometheus-kube-prometheus-alertmanager.monitoring.svc:9093
-      jsonData:
-        implementation: prometheus
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090
+        isDefault: true
+        editable: true
+      - name: Alertmanager
+        type: alertmanager
+        access: proxy
+        url: http://prometheus-kube-prometheus-alertmanager.monitoring.svc:9093
+        jsonData:
+          implementation: prometheus
