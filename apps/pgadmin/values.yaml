@@ -2,6 +2,17 @@ pgadmin4:
   env:
     email: admin@example.com
     password: AdminPass123!
+    variables:
+      - name: PGADMIN_CONFIG_AUTHENTICATION_SOURCES
+        value: "['webserver', 'internal']"
+      - name: PGADMIN_CONFIG_WEBSERVER_AUTO_CREATE_USER
+        value: "True"
+      - name: PGADMIN_CONFIG_WEBSERVER_REMOTE_USER
+        value: HTTP_X_AUTHENTIK_EMAIL
+      - name: PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED
+        value: "False"
+      - name: PGADMIN_CONFIG_PROXY_X_HOST_COUNT
+        value: "1"
   persistentVolume:
     enabled: true
     storageClass: local-path
