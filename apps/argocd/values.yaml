@@ -42,5 +42,15 @@ argo-cd:
       hostname: argocd.46.4.123.8.nip.io
       ingressClassName: nginx
       tls: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/backend-protocol: HTTP
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      hosts:
+      - argocd.46.4.123.8.nip.io
+      tls:
+      - hosts:
+        - argocd.46.4.123.8.nip.io
+        secretName: argocd-tls
     metrics:
       enabled: true
