@@ -37,16 +37,3 @@ puppetserver:
         repository: bitnamilegacy/os-shell
         tag: 12-debian-12-r19
 
-puppetboard:
-  enabled: true
-  image: ghcr.io/voxpupuli/puppetboard:7.0.2
-  replicas: 1
-  puppetdbHost: puppet-puppetserver-puppetdb
-  puppetdbPort: "8080"
-  puppetdbProto: http
-  secretKey: "puppetboard-2026-secret"
-  ingress:
-    enabled: true
-    host: puppet.46.4.123.8.nip.io
-    className: nginx
-    clusterIssuer: letsencrypt-prod
