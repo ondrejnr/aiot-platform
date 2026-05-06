@@ -133,7 +133,7 @@ data:
       event_type = "Normal" if resolved or severity in ("info", "none") else "Warning"
       action = "Resolved" if resolved else "Firing"
       event_time = now()
-      return {
+      event = {
         "apiVersion": "events.k8s.io/v1",
         "kind": "Event",
         "metadata": {
@@ -153,12 +153,10 @@ data:
         "action": action,
         "reportingController": REPORTING_CONTROLLER,
         "reportingInstance": INSTANCE,
-        "series": {"count": count, "lastObservedTime": event_time},
-        "deprecatedCount": count,
-        "deprecatedFirstTimestamp": event_time,
-        "deprecatedLastTimestamp": event_time,
-        "deprecatedSource": {"component": REPORTING_CONTROLLER},
       }
+      if count >= 2:
+        event["series"] = {"count": count, "lastObservedTime": event_time}
+      return event
 
     def upsert_event(alert, resolved=False):
       labels = alert.get("labels", {})
@@ -176,10 +174,9 @@ data:
         "note": body["note"],
         "type": body["type"],
         "action": body["action"],
-        "series": body["series"],
-        "deprecatedCount": body["deprecatedCount"],
-        "deprecatedLastTimestamp": body["deprecatedLastTimestamp"],
       }
+      if "series" in body:
+        patch["series"] = body["series"]
       try:
         kube_json(path, method="PATCH", body=patch, content_type="application/merge-patch+json")
       except urllib.error.HTTPError as exc:
