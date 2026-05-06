@@ -3,6 +3,9 @@ victoria-metrics-k8s-stack:
   # with this long release name. Standalone alertmanager (apps/alertmanager) sa používa miesto neho.
   alertmanager:
     enabled: false
+  vmsingle:
+    spec:
+      retentionPeriod: "7d"
   vmalert:
     spec:
       notifiers:
