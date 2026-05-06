@@ -30,8 +30,6 @@ spec:
               value: admin
             - name: EMQX_DASHBOARD__DEFAULT_PASSWORD
               value: AiotEmqx2026!
-            - name: EMQX_AUTHENTICATION__1__ENABLE
-              value: "false"
           ports:
             - name: mqtt
               containerPort: 1883
