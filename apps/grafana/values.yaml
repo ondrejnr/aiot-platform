@@ -49,6 +49,6 @@ grafana:
       - name: Prometheus
         type: prometheus
         access: proxy
-        url: http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090
+        url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc:8429
         isDefault: true
         editable: true
