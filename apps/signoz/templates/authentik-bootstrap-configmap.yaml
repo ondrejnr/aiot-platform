@@ -21,16 +21,9 @@ data:
     client_secret = "__OIDC_CLIENT_SECRET__"
     signoz_url = "https://signoz.46.4.123.8.nip.io"
     callback = f"{signoz_url}/api/v1/complete/oidc"
-    domain_state_id = "019dfdba:489c:7728:a9fe:2b8d69b17262"
-    state = f"{signoz_url}/login?domain_id={quote(domain_state_id, safe='')}"
-    launch = "https://authentik.46.4.123.8.nip.io/application/o/authorize/?" + urlencode({
-        "client_id": "signoz",
-        "redirect_uri": callback,
-        "response_type": "code",
-        "scope": "email profile openid groups",
-        "state": state,
-    })
 
+    # Keep the OIDC provider configured for future licensed SigNoz SSO,
+    # but launch the app through Authentik forward-auth + local SigNoz session bootstrap.
     provider, _ = OAuth2Provider.objects.get_or_create(name="signoz")
     provider.client_id = "signoz"
     provider.client_secret = client_secret
@@ -45,11 +38,11 @@ data:
 
     app, _ = Application.objects.get_or_create(slug="signoz", defaults={"name": "SigNoz"})
     app.name = "SigNoz"
-    app.provider = provider
-    app.meta_launch_url = launch
+    app.provider = None
+    app.meta_launch_url = signoz_url + "/"
     app.open_in_new_tab = True
     app.save()
-    print({"provider": provider.name, "client_id": provider.client_id, "launch": app.meta_launch_url})
+    print({"provider": None, "launch": app.meta_launch_url})
     PYCODE
     sed -i "s|__OIDC_CLIENT_SECRET__|$OIDC_CLIENT_SECRET|g" "$PY"
     kubectl -n authentik exec deploy/authentik-server -- ak shell -c "$(cat "$PY")"
