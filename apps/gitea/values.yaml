@@ -12,6 +12,10 @@ gitea:
       registry: docker.io
       repository: bitnamilegacy/redis-cluster
   redis:
+    enabled: true
+    architecture: standalone
+    auth:
+      enabled: false
     # IO storm mitigation: cache only, no persistence (sessions can be re-created)
     commonConfiguration: |-
       appendonly no
