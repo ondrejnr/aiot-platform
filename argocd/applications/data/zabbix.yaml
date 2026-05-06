@@ -41,13 +41,13 @@ spec:
               cert-manager.io/cluster-issuer: letsencrypt-prod
               nginx.ingress.kubernetes.io/ssl-redirect: "true"
             hosts:
-            - host: zabbix.142.132.207.168.nip.io
+            - host: zabbix.46.4.123.8.nip.io
               paths:
               - path: /
                 pathType: Prefix
             tls:
             - hosts:
-              - zabbix.142.132.207.168.nip.io
+              - zabbix.46.4.123.8.nip.io
               secretName: zabbix-tls
   destination:
     server: https://kubernetes.default.svc

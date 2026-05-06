@@ -3,10 +3,10 @@ dex:
     enabled: true
     className: nginx
     hosts:
-      - host: dex.142.132.207.168.nip.io
+      - host: dex.46.4.123.8.nip.io
         paths: [{ path: /, pathType: Prefix }]
   config:
-    issuer: https://dex.142.132.207.168.nip.io
+    issuer: https://dex.46.4.123.8.nip.io
     storage:
       type: kubernetes
       config: { inCluster: true }

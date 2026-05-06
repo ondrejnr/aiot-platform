@@ -1,6 +1,6 @@
 # AWX deployment values
 awx:
-  hostname: awx.142.132.207.168.nip.io
+  hostname: awx.46.4.123.8.nip.io
   adminUser: admin
   # admin password and secret_key are in clear text below — gitops owner repo is private
   # rotate both via:
@@ -21,4 +21,4 @@ nodeSelector:
 oidc:
   clientId: awx
   clientSecret: tQz97tI1PGVW1puzzHIvvJmQ5HJgLrYUvL4yBicBzuVOA65srgIunSWMECn0Vrmxpi8WhkW8gV3xZBkyNQvSqcaynchpNAHNa261VaEok2NICBo8uxMqVVdFSmoAB0Kg
-  issuer: https://authentik.142.132.207.168.nip.io/application/o/awx/
+  issuer: https://authentik.46.4.123.8.nip.io/application/o/awx/
