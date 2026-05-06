@@ -19,6 +19,7 @@ kube-prometheus-stack:
     enabled: false
   prometheus:
     prometheusSpec:
+      replicas: 0
       nodeSelector:
         node-role.kubernetes.io/worker: ''
       priorityClassName: system-cluster-critical

@@ -38,7 +38,7 @@ headlamp:
               cfg.prometheus.main = cfg.prometheus.main || {};
               cfg.prometheus.main.isMetricsEnabled = true;
               cfg.prometheus.main.autoDetect = false;
-              cfg.prometheus.main.address = "monitoring/prometheus-kube-prometheus-prometheus:9090";
+              cfg.prometheus.main.address = "victoriametrics/vmsingle-victoriametrics-victoria-metrics-k8s-stack:8429";
               cfg.prometheus.main.defaultTimespan = cfg.prometheus.main.defaultTimespan || "24h";
               localStorage.setItem(key, JSON.stringify(cfg));
             } catch (e) {
