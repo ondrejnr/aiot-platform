@@ -1,6 +1,7 @@
 peConsole:
   # External PE master IP:port the Service Endpoints should point at.
-  externalIP: "142.132.207.168"
+  # 172.18.0.1 = k3d docker bridge gateway = the host (PE master native install)
+  externalIP: "172.18.0.1"
   externalPort: 4443
   ingress:
     enabled: true
