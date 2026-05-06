@@ -1,0 +1,13 @@
+peConsole:
+  # External PE master IP:port the Service Endpoints should point at.
+  externalIP: "46.4.123.8"
+  externalPort: 4443
+  ingress:
+    enabled: true
+    host: pe.46.4.123.8.nip.io
+    className: nginx
+    clusterIssuer: letsencrypt-prod
+  autoLogin:
+    enabled: true
+    username: "admin"
+    password: "AioT2026pe-Admin"

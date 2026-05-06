@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pe-console
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pe-console
+  namespace: pe-console
+spec:
+  suspend: false
+  interval: 30m
+  releaseName: pe-console
+  chart:
+    spec:
+      chart: ./apps/pe-console
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    createNamespace: true
+  upgrade:
+    cleanupOnFail: true

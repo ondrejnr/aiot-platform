@@ -1,0 +1,10 @@
+apiVersion: v2
+name: puppet-overlay
+description: aiot-platform overlay for Puppet (puppetserver + puppetdb + postgres + puppetboard)
+type: application
+version: 1.0.0
+appVersion: "9.5.2"
+dependencies:
+  - name: puppetserver
+    version: "9.5.2"
+    repository: https://puppetlabs.github.io/puppetserver-helm-chart

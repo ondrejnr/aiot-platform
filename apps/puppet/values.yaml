@@ -1,0 +1,52 @@
+puppetserver:
+  puppetserver:
+    name: puppetserver
+    fqdns:
+      alternateServerNames: "puppet.46.4.123.8.nip.io,puppet"
+  puppetdb:
+    credentials:
+      puppetdb:
+        postgres: "PuppetDb2026!"
+        admin: "PuppetAdmin2026!"
+  postgres:
+    credentials:
+      postgres:
+        postgres: "PostgresRoot2026!"
+        puppetdb: "PuppetDb2026!"
+    storage:
+      storageClass: local-path
+      size: 5Gi
+  r10k:
+    codeStorage:
+      storageClass: local-path
+      size: 1Gi
+  postgresql:
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/postgresql
+      tag: 15.9.0-debian-12-r0
+    primary:
+      persistence:
+        storageClass: local-path
+        size: 10Gi
+    networkPolicy:
+      enabled: false
+    volumePermissions:
+      image:
+        registry: docker.io
+        repository: bitnamilegacy/os-shell
+        tag: 12-debian-12-r19
+
+puppetboard:
+  enabled: true
+  image: ghcr.io/voxpupuli/puppetboard:7.0.2
+  replicas: 1
+  puppetdbHost: puppet-puppetserver-puppetdb
+  puppetdbPort: "8080"
+  puppetdbProto: http
+  secretKey: "puppetboard-2026-secret"
+  ingress:
+    enabled: true
+    host: puppet.46.4.123.8.nip.io
+    className: nginx
+    clusterIssuer: letsencrypt-prod
