@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: ollama
 spec:
+  strategy: { type: Recreate }
   replicas: 1
   selector:
     matchLabels: { app: ollama }
@@ -47,6 +48,7 @@ kind: Service
 metadata:
   name: ollama
 spec:
+  strategy: { type: Recreate }
   selector: { app: ollama }
   ports:
     - name: http
