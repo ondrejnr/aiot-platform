@@ -174,20 +174,26 @@ data:
       return {'kind':'none'}
 
     def render_plan(target, ns, data, proposed, user_msg):
-      prompt=('Si lokálny Kubernetes SRE agent. Používateľ chce opravu služby. Najprv NESMIEŠ nič meniť. '
-          'Odpovedz po slovensky v presnom formáte:\n'
-          'Diagnóza:\n- ...\n'
-          'Návrh:\n- ...\n'
-          'Riziko:\n- ...\n'
-          'Čakám na schválenie:\n- ak súhlasíš, napíš: schvaľujem\n\n'
-          'Buď stručný. Dáta služby a logy:\n'
-          + json.dumps(data,ensure_ascii=False)[:12000]
-          + '\nNavrhnutá bezpečná akcia po schválení: '
-          + json.dumps(proposed,ensure_ascii=False))
-      try:
-        ans=ollama(prompt, num_predict=320)
-      except Exception as e:
-        ans='Diagnóza:\n- Model nestihol odpovedať: %r\n- Stav služby som ale načítal.\n\nNávrh:\n- Navrhnutá akcia po schválení: %s\n\nRiziko:\n- Akcia sa vykoná až po tvojom schválení.\n\nČakám na schválenie:\n- Ak súhlasíš, napíš: schvaľujem' % (e, proposed)
+      pods=data.get('pods',[])
+      bad=[p for p in pods if p.get('phase') not in ('Running','Succeeded') or p.get('waiting')]
+      apps=data.get('argocd',[])
+      apptxt=', '.join('%s sync=%s health=%s' % (a.get('name'),a.get('sync'),a.get('health')) for a in apps) or 'nenašiel som ArgoCD app'
+      if proposed.get('kind')=='argocd_sync':
+        navrh='Spustiť ArgoCD sync aplikácie %s.' % proposed.get('name')
+      elif proposed.get('kind')=='restart_deploy':
+        navrh='Reštartovať deployment %s/%s.' % (proposed.get('namespace'), proposed.get('name'))
+      else:
+        navrh='Zatiaľ nerobiť zmenu, iba sledovať alebo spraviť hlbšiu diagnostiku.'
+      ans=('Diagnóza:\n'
+           '- Skontroloval som namespace %s. Pods: %s, problémové: %s.\n'
+           '- ArgoCD: %s.\n\n'
+           'Návrh:\n'
+           '- %s\n\n'
+           'Riziko:\n'
+           '- Zmenu nevykonám bez schválenia. Pri reštarte môže byť krátky výpadok služby.\n\n'
+           'Čakám na schválenie:\n'
+           '- Ak súhlasíš, napíš: schvaľujem\n'
+           '- Ak nesúhlasíš, napíš: zamietam' % (ns, len(pods), len(bad), apptxt, navrh))
       save_pending({'createdAt':time.time(),'userMessage':user_msg,'target':target,'namespace':ns,'action':proposed,'summary':ans})
       return ans
 
@@ -301,7 +307,7 @@ spec:
     metadata:
       labels: { app: ai-sre-agent }
       annotations:
-        ai-sre-agent/config-version: "2026-05-06-agent-approval-2"
+        ai-sre-agent/config-version: "2026-05-06-agent-approval-3"
     spec:
       serviceAccountName: ai-sre-agent
       containers:
