@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/part-of: zabbix
     argocd.argoproj.io/instance: zabbix
   annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
 spec:
