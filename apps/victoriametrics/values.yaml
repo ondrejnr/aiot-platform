@@ -8,3 +8,6 @@ victoria-metrics-k8s-stack:
     spec:
       extraArgs:
         notifier.blackhole: "true"
+  # Disabled because the rendered Service name exceeds Kubernetes 63-char limit with this release name.
+  kubeControllerManager:
+    enabled: false
