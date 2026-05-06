@@ -54,6 +54,38 @@ data:
         return [{'score':p.get('score'),'text':p.get('payload',{}).get('text',''),'source':p.get('payload',{}).get('source','')} for p in r.get('result',[])]
       except Exception: return []
     
+    def rag_index_events():
+      try:
+        ev=k8s('GET','/api/v1/events?limit=300')
+        items=ev.get('items',[]) if isinstance(ev,dict) else []
+        items=[e for e in items if e.get('type')=='Warning']
+        items.sort(key=lambda e: e.get('lastTimestamp') or e.get('eventTime') or '', reverse=True)
+        pid=900000
+        for e in items[:150]:
+          ns=e.get('involvedObject',{}).get('namespace','-')
+          kind=e.get('involvedObject',{}).get('kind','-')
+          name=e.get('involvedObject',{}).get('name','-')
+          reason=e.get('reason','')
+          msg=e.get('message','')
+          ts=e.get('lastTimestamp','')
+          txt='Warning event %s/%s/%s reason=%s at=%s msg=%s' % (ns,kind,name,reason,ts,msg)
+          rag_index(pid, txt, {'source':'k8s_events','kind':'event','ns':ns,'reason':reason}); pid+=1
+      except Exception as e:
+        try: open(AUDIT,'a').write(time.strftime('%FT%T%z ')+'rag_events_error: '+repr(e)+'\n')
+        except Exception: pass
+    
+    def rag_index_helmreleases():
+      try:
+        pid=800000
+        for hr in list_helmreleases():
+          ns=hr.get('metadata',{}).get('namespace','-'); name=hr.get('metadata',{}).get('name','-')
+          st=hr_status(hr) or {}
+          txt='HelmRelease %s/%s ready=%s reason=%s msg=%s chart=%s' % (ns,name,st.get('ready'),st.get('reason'),st.get('message',''),hr.get('spec',{}).get('chart',{}).get('spec',{}).get('chart',''))
+          rag_index(pid, txt, {'source':'flux_hr','kind':'helmrelease','ns':ns,'name':name}); pid+=1
+      except Exception as e:
+        try: open(AUDIT,'a').write(time.strftime('%FT%T%z ')+'rag_hr_error: '+repr(e)+'\n')
+        except Exception: pass
+    
     def rag_bootstrap():
       rag_init()
       pid=1
@@ -74,6 +106,17 @@ data:
             if not ln: continue
             rag_index(pid,ln,{'source':'incidents.jsonl','kind':'incident'}); pid+=1
       except Exception: pass
+      rag_index_events()
+      rag_index_helmreleases()
+    
+    def rag_refresh_loop():
+      while True:
+        try: time.sleep(300)
+        except Exception: time.sleep(60)
+        try: rag_index_events()
+        except Exception: pass
+        try: rag_index_helmreleases()
+        except Exception: pass
     
     def audit(msg):
       os.makedirs('/audit', exist_ok=True)
@@ -532,10 +575,13 @@ data:
     PAGE='''<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI SRE Agent</title><style>
     :root{color-scheme:dark}body{margin:0;font-family:Inter,Segoe UI,system-ui;background:#0b1020;color:#e7eaf3}.top{height:52px;display:flex;align-items:center;gap:14px;padding:0 18px;background:#121a31;border-bottom:1px solid #26304d;position:sticky;top:0}.dot{width:10px;height:10px;border-radius:50%;background:#22c55e}.brand{font-weight:700}.status{font-size:13px;color:#aab3cf}.wrap{max-width:980px;margin:0 auto;padding:22px}.chat{display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - 190px)}.msg{padding:14px 16px;border-radius:14px;line-height:1.45;white-space:pre-wrap}.user{align-self:flex-end;background:#2563eb;color:white;max-width:78%}.bot{align-self:flex-start;background:#151f38;border:1px solid #2b385c;max-width:86%}.composer{position:sticky;bottom:0;background:linear-gradient(transparent,#0b1020 20%);padding:18px 0}.box{display:flex;gap:10px}.box textarea{flex:1;min-height:54px;max-height:160px;resize:vertical;border-radius:14px;border:1px solid #34415f;background:#11182b;color:#e7eaf3;padding:13px}.box button,.login button{border:0;border-radius:12px;background:#22c55e;color:#07120b;font-weight:700;padding:0 18px}.hint{font-size:12px;color:#8f9ab8;margin-top:8px}.login{max-width:420px;margin:90px auto;background:#151f38;border:1px solid #2b385c;padding:24px;border-radius:18px}.login input{width:100%;box-sizing:border-box;border-radius:12px;border:1px solid #34415f;background:#0b1020;color:#e7eaf3;padding:13px;margin:12px 0}.spinner{color:#aab3cf}
     </style></head><body>{body}</body></html>'''
-    APP='''<div class="top"><span class="dot"></span><span class="brand">AI SRE Agent</span><span id="status" class="status">načítavam stav…</span></div><div class="wrap"><div id="chat" class="chat"><div class="msg bot">Som lokálny SRE agent. Napíš problém normálne ako sem. Budem robiť: logy → diagnóza → plán → schválenie → fix → overenie.</div></div><div class="composer"><div class="box"><textarea id="input" placeholder="Napr. Skontroluj prečo Grafana nejde…"></textarea><button onclick="send()">Odoslať</button></div><div class="hint">Safe potvrdenia: „potvrď vymazať events“, „potvrď restart deployment namespace/name“, „potvrď flux reconcile namespace/name“.</div></div></div><script>
+    APP='''<div class="top"><span class="dot"></span><span class="brand">AI SRE Agent</span><span id="status" class="status">načítavam stav…</span></div><div class="wrap"><div id="chat" class="chat"><div class="msg bot">Som lokálny SRE agent. Napíš problém normálne ako sem. Budem robiť: logy → diagnóza → plán → schválenie → fix → overenie.</div></div><div class="composer"><div class="box"><textarea id="input" placeholder="Napr. Skontroluj prečo Grafana nejde…"></textarea><button onclick="send()">Odoslať</button></div><div class="hint">Safe potvrdenia: „potvrď vymazať events“, „potvrď restart deployment namespace/name“, „potvrď flux reconcile namespace/name“. Po odpovedi klikni 👍/👎 — agent sa z toho učí.</div></div></div><script>
+    let lastQ='';
     async function status(){try{let r=await fetch('/api/status');let j=await r.json();document.getElementById('status').textContent=`model ${j.model} · nodes ${j.nodesReady}/${j.nodesTotal} · bad pods ${j.badPodsCount} · Flux problémy ${j.problemApps}`}catch(e){document.getElementById('status').textContent='status nedostupný'}}
     function add(cls,txt){let d=document.createElement('div');d.className='msg '+cls;d.textContent=txt;document.getElementById('chat').appendChild(d);d.scrollIntoView({behavior:'smooth',block:'end'});return d}
-    async function send(){let el=document.getElementById('input');let text=el.value.trim();if(!text)return;el.value='';add('user',text);let wait=add('bot spinner','pracujem… na CPU to môže trvať aj niekoľko minút');try{let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});let j=await r.json();wait.className='msg bot';wait.textContent=j.answer||JSON.stringify(j)}catch(e){wait.className='msg bot';wait.textContent='Chyba alebo timeout: '+e}status()}
+    function addFeedback(answer){let q=lastQ;let bar=document.createElement('div');bar.className='fb';bar.style.cssText='align-self:flex-start;display:flex;gap:8px;margin-top:-6px;font-size:13px;color:#8f9ab8';let yes=document.createElement('button');yes.textContent='👍 užitočné';let no=document.createElement('button');no.textContent='👎 nie';for(let b of [yes,no]){b.style.cssText='background:#1a2444;border:1px solid #34415f;color:#e7eaf3;border-radius:8px;padding:4px 10px;cursor:pointer'};yes.onclick=()=>send_fb(q,answer,true,bar);no.onclick=()=>send_fb(q,answer,false,bar);bar.appendChild(yes);bar.appendChild(no);document.getElementById('chat').appendChild(bar)}
+    async function send_fb(q,a,useful,bar){try{await fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,answer:a,useful:useful})});bar.textContent=useful?'✓ uložené ako úspešné (pridané do RAG)':'✓ uložené ako neúspešné';bar.style.color='#22c55e'}catch(e){bar.textContent='chyba pri ukladaní spätnej väzby'}}
+    async function send(){let el=document.getElementById('input');let text=el.value.trim();if(!text)return;el.value='';lastQ=text;add('user',text);let wait=add('bot spinner','pracujem… na CPU to môže trvať aj niekoľko minút');try{let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});let j=await r.json();let ans=j.answer||JSON.stringify(j);wait.className='msg bot';wait.textContent=ans;addFeedback(ans)}catch(e){wait.className='msg bot';wait.textContent='Chyba alebo timeout: '+e}status()}
     document.getElementById('input').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey)send()});status();setInterval(status,30000);
     </script>'''
     
@@ -575,12 +621,30 @@ data:
             msg=json.loads(raw or '{}').get('message','')[:4000]
             audit('chat '+msg.replace('\n',' ')[:300])
             return self.send_json({'answer':answer_user(msg)})
+          if self.path=='/api/feedback':
+            try: d=json.loads(raw or '{}')
+            except Exception: d={}
+            q=str(d.get('question',''))[:2000]; a=str(d.get('answer',''))[:4000]
+            useful=bool(d.get('useful')); comment=str(d.get('comment',''))[:500]
+            rec={'ts':time.strftime('%FT%T%z'),'question':q,'answer':a,'useful':useful,'comment':comment}
+            try:
+              os.makedirs('/audit',exist_ok=True)
+              open('/audit/feedback.jsonl','a',encoding='utf-8').write(json.dumps(rec,ensure_ascii=False)+'\n')
+            except Exception: pass
+            if useful and q and a:
+              try:
+                pid=int(time.time()*1000)%2000000000+1000000
+                txt='Q: %s\nA: %s' % (q,a)
+                rag_index(pid, txt, {'source':'feedback','kind':'feedback_positive'})
+              except Exception: pass
+            return self.send_json({'ok':True})
           self.send_error(404)
         except Exception:
           self.send_json({'answer':'ERROR\n'+traceback.format_exc()},500)
     
     import threading
     threading.Thread(target=rag_bootstrap,daemon=True).start()
+    threading.Thread(target=rag_refresh_loop,daemon=True).start()
     ThreadingHTTPServer(('0.0.0.0',8080),H).serve_forever()
 ---
 apiVersion: apps/v1
