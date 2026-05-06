@@ -16,6 +16,9 @@ spec:
     - { namespace: 'piraeus-datastore', server: '*' }
     - { namespace: 'local-path-storage', server: '*' }
     - { namespace: 'descheduler',     server: '*' }
+    - { namespace: 'auth',           server: '*' }
+    - { namespace: 'dex',            server: '*' }
+    - { namespace: 'cnpg-system',    server: '*' }
   clusterResourceWhitelist:
     - { group: '*', kind: '*' }
   namespaceResourceWhitelist:
@@ -68,6 +71,10 @@ spec:
     - { namespace: 'gitea-bootstrap', server: '*' }
     - { namespace: 'mattermost', server: '*' }
     - { namespace: 'piraeus-datastore', server: '*' }
+    - { namespace: 'qdrant',   server: '*' }
+    - { namespace: 'zabbix',   server: '*' }
+    - { namespace: 'cnpg-system', server: '*' }
+    - { namespace: 'databases',   server: '*' }
   clusterResourceWhitelist: [{ group: '*', kind: '*' }]
   namespaceResourceWhitelist: [{ group: '*', kind: '*' }]
 ---
