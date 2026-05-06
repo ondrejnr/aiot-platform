@@ -28,12 +28,6 @@ spec:
             annotations:
               cert-manager.io/cluster-issuer: letsencrypt-prod
               nginx.ingress.kubernetes.io/ssl-redirect: "true"
-            annotations:
-              cert-manager.io/cluster-issuer: letsencrypt-prod
-              nginx.ingress.kubernetes.io/ssl-redirect: "true"
-            annotations:
-              cert-manager.io/cluster-issuer: letsencrypt-prod
-              nginx.ingress.kubernetes.io/ssl-redirect: "true"
             hosts:
             - authentik.46.4.123.8.nip.io
             paths:
