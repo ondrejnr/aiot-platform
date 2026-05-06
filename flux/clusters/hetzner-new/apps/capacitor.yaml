@@ -36,8 +36,8 @@ spec:
     existingSecret:
       name: capacitor
     env:
-      AUTH: noauth
-      IMPERSONATE_SA_RULES: "noauth=flux-ui:capacitor-clusteradmin"
+      AUTH: static
+      IMPERSONATE_SA_RULES: "admin=flux-ui:capacitor-clusteradmin"
     ingress:
       enabled: true
       className: nginx
