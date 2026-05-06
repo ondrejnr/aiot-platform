@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: aiot-recording
+  namespace: {{ .Values.namespace }}
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: aiot.recording
+      interval: 1m
+      rules:
+        - record: namespace:pod_cpu_usage:sum
+          expr: sum by (namespace) (rate(container_cpu_usage_seconds_total{container!="",image!=""}[5m]))
+        - record: namespace:pod_memory_rss:sum
+          expr: sum by (namespace) (container_memory_rss{container!="",image!=""})
+        - record: namespace:pod_memory_working_set:sum
+          expr: sum by (namespace) (container_memory_working_set_bytes{container!="",image!=""})
+        - record: cluster:nodes_disk_pressure:count
+          expr: count(kube_node_status_condition{condition="DiskPressure",status="true"})
+        - record: cluster:nodes_memory_pressure:count
+          expr: count(kube_node_status_condition{condition="MemoryPressure",status="true"})
+        - record: cluster:nodes_not_ready:count
+          expr: count(kube_node_status_condition{condition="Ready",status!="true"})
+        - record: cluster:pods_pending:count
+          expr: count(kube_pod_status_phase{phase="Pending"})
+        - record: cluster:pods_failed:count
+          expr: count(kube_pod_status_phase{phase="Failed"})
+        - record: namespace:container_restarts:rate1h
+          expr: sum by (namespace) (rate(kube_pod_container_status_restarts_total[1h]))
