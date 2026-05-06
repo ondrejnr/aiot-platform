@@ -34,13 +34,9 @@ spec:
     createNamespace: true
   values:
     adminUser:
-      create: true
-      createClusterRole: true
-      createSecret: true
-      username: admin
-      passwordHash: "$2y$05$0Ia3U/0zd/Ptvhd2hpFll.ZqRPJ2hm/ACdTJycp1TQrUiHJ8k6FQ2"
+      create: false
     additionalArgs:
-      - --auth-methods=oidc,user-account
+      - --auth-methods=oidc
     ingress:
       enabled: true
       className: nginx
