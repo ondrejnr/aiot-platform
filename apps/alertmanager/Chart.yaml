@@ -1,0 +1,10 @@
+apiVersion: v2
+name: alertmanager-overlay
+description: Standalone alertmanager for vmalert (short release name to satisfy k3d label length)
+type: application
+version: 1.0.0
+appVersion: "0.28.1"
+dependencies:
+  - name: alertmanager
+    version: "1.13.0"
+    repository: https://prometheus-community.github.io/helm-charts

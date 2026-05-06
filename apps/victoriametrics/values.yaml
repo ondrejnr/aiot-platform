@@ -1,39 +1,11 @@
 victoria-metrics-k8s-stack:
-  # vmalertmanager: jednoduchý 1-replika setup, route default = "null" (dry-run)
+  # Disabled on k3d because the generated vmalertmanager pod labels exceed the 63-char limit
+  # with this long release name. Standalone alertmanager (apps/alertmanager) sa používa miesto neho.
   alertmanager:
-    enabled: true
-    spec:
-      replicaCount: 1
-      resources:
-        requests:
-          cpu: 20m
-          memory: 64Mi
-        limits:
-          memory: 256Mi
-    config:
-      route:
-        receiver: "null"
-        group_by: ["alertname","namespace","severity"]
-        group_wait: 30s
-        group_interval: 5m
-        repeat_interval: 12h
-        routes:
-          - matchers: [ 'severity = critical' ]
-            receiver: "mattermost"
-            continue: true
-      receivers:
-        - name: "null"
-        - name: "mattermost"
-          # Mattermost incoming-webhook URL; doplň cez sealed-secret + envSubst alebo ručne v UI
-          webhook_configs:
-            - url: "http://placeholder-set-in-secret/hooks/REPLACE_ME"
-              send_resolved: true
-
-  # vmalert: prepoj na vmalertmanager namiesto blackhole
+    enabled: false
   vmalert:
     spec:
       extraArgs:
-        notifier.url: "http://vmalertmanager-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc:9093"
-
+        notifier.url: "http://am.monitoring.svc:9093"
   kubeControllerManager:
     enabled: false
