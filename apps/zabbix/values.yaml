@@ -22,6 +22,10 @@ zabbix:
   zabbixWeb:
     samlCertsSecretName: zabbix-saml-certs
     extraEnv:
+      - name: ZBX_SERVER_HOST
+        value: zabbix-zabbix-server
+      - name: ZBX_SERVER_PORT
+        value: "10051"
       - name: ZBX_SSO_SETTINGS
         value: >-
           {"strict": false, "baseurl": "https://zabbix.46.4.123.8.nip.io/", "use_proxy_headers": true}
