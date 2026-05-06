@@ -1,21 +1,5 @@
 alertmanager:
-  alertmanagerSpec:
-    nodeSelector:
-      node-role.kubernetes.io/worker: ''
-    priorityClassName: system-cluster-critical
-    resources:
-      requests:
-        cpu: 20m
-        memory: 64Mi
-      limits:
-        memory: 256Mi
-    topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: kubernetes.io/hostname
-      whenUnsatisfiable: ScheduleAnyway
-      labelSelector:
-        matchLabels:
-          app.kubernetes.io/name: alertmanager
+  enabled: false
 grafana:
   enabled: false
 prometheus:
