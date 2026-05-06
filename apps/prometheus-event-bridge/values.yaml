@@ -3,7 +3,7 @@ image:
   tag: 3.12-slim
   pullPolicy: IfNotPresent
 
-prometheusUrl: http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090
+prometheusUrl: http://vmalert-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc:8080
 pollIntervalSeconds: 60
 fallbackNamespace: monitoring
 
