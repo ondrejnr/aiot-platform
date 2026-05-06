@@ -191,6 +191,9 @@ data:
         if state not in ("firing", "pending"):
           continue
         labels = alert.get("labels", {})
+        severity = labels.get("severity", "").lower()
+        if severity in ("none", "info"):
+          continue
         fp = fingerprint(labels)
         active[fp] = alert
         upsert_event(alert, resolved=False)

@@ -1,4 +1,18 @@
 kube-prometheus-stack:
+  defaultRules:
+    rules:
+      alertmanager: false
+      kubeControllerManager: false
+      kubeProxy: false
+      kubeSchedulerAlerting: false
+      kubeSchedulerRecording: false
+    disabled:
+      Watchdog: true
+      InfoInhibitor: true
+      PrometheusNotConnectedToAlertmanagers: true
+      KubeControllerManagerDown: true
+      KubeProxyDown: true
+      KubeSchedulerDown: true
   alertmanager:
     enabled: false
   grafana:
