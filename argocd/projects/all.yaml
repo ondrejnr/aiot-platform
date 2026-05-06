@@ -40,6 +40,7 @@ spec:
     - { namespace: 'event-exporter',               server: '*' }
     - { namespace: 'k8sgpt',                       server: '*' }
     - { namespace: 'karpor',                       server: '*' }
+    - { namespace: 'grafana',                       server: '*' }
   clusterResourceWhitelist: [{ group: '*', kind: '*' }]
   namespaceResourceWhitelist: [{ group: '*', kind: '*' }]
 ---
