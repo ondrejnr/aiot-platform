@@ -15,6 +15,28 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: victoriametrics
+  ignoreDifferences:
+    - kind: Secret
+      namespace: victoriametrics
+      name: victoriametrics-grafana
+      jsonPointers:
+        - /data
+    - kind: Secret
+      namespace: victoriametrics
+      name: victoriametrics-victoria-metrics-operator-validation
+      jsonPointers:
+        - /data
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      name: victoriametrics-victoria-metrics-operator-admission
+      jqPathExpressions:
+        - .webhooks[].clientConfig.caBundle
+    - group: apps
+      kind: Deployment
+      namespace: victoriametrics
+      name: victoriametrics-grafana
+      jsonPointers:
+        - /spec/template/metadata/annotations
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
