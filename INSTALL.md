@@ -82,7 +82,7 @@ sudo kubeadm join <CP_IP>:6443 --token <T> --discovery-token-ca-cert-hash sha256
 │       ├── rancher/             # rancher, fleet, turtles
 │       ├── data/                # cnpg, qdrant, redis, mattermost, zabbix
 │       ├── ci-cd/               # argocd, jenkins, gitea
-│       ├── platform-mgmt/       # headlamp, karpor
+│       ├── platform-mgmt/       # headlamp
 │       └── _namespaces-appset.yaml  # ApplicationSet over namespaces/
 ├── apps/                        # 1 umbrella chart per release (Chart.yaml + values.yaml)
 ├── secrets/                     # sops+age encrypted Secrets (.sops.yaml present)

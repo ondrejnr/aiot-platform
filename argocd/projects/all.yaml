@@ -41,7 +41,6 @@ spec:
     - { namespace: 'event-exporter',               server: '*' }
     - { namespace: 'prometheus-event-bridge',       server: '*' }
     - { namespace: 'k8sgpt',                       server: '*' }
-    - { namespace: 'karpor',                       server: '*' }
     - { namespace: 'grafana',                       server: '*' }
   clusterResourceWhitelist: [{ group: '*', kind: '*' }]
   namespaceResourceWhitelist: [{ group: '*', kind: '*' }]
@@ -132,7 +131,6 @@ spec:
   sourceRepos: ['https://github.com/ondrejnr/aiot-platform.git', 'https://*']
   destinations:
     - { namespace: 'headlamp',     server: '*' }
-    - { namespace: 'karpor',       server: '*' }
     - { namespace: 'descheduler',  server: '*' }
     - { namespace: 'event-exporter', server: '*' }
     - { namespace: 'dr-ops',       server: '*' }
