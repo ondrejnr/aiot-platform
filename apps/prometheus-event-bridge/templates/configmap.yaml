@@ -1,0 +1,228 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  bridge.py: |
+    import datetime as dt
+    import hashlib
+    import json
+    import os
+    import socket
+    import ssl
+    import sys
+    import time
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+
+    PROM_URL = os.environ.get("PROMETHEUS_URL", "http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090").rstrip("/")
+    POLL_SECONDS = int(os.environ.get("POLL_INTERVAL_SECONDS", "60"))
+    FALLBACK_NS = os.environ.get("FALLBACK_NAMESPACE", "monitoring")
+    API = os.environ.get("KUBERNETES_SERVICE_HOST", "kubernetes.default.svc")
+    PORT = os.environ.get("KUBERNETES_SERVICE_PORT", "443")
+    KUBE_URL = f"https://{API}:{PORT}"
+    TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+    CA_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+    INSTANCE = socket.gethostname()[:128]
+    REPORTING_CONTROLLER = "aiot.io/prometheus-event-bridge"
+
+    with open(TOKEN_PATH, "r", encoding="utf-8") as f:
+      TOKEN = f.read().strip()
+
+    SSL_CONTEXT = ssl.create_default_context(cafile=CA_PATH)
+    SEEN = {}
+    NAMESPACES = set()
+    LAST_NS_REFRESH = 0
+
+    def now():
+      return dt.datetime.now(dt.timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z")
+
+    def log(message):
+      print(f"{now()} {message}", flush=True)
+
+    def http_json(url, method="GET", body=None, headers=None):
+      data = None if body is None else json.dumps(body).encode("utf-8")
+      req = urllib.request.Request(url, data=data, method=method)
+      req.add_header("Accept", "application/json")
+      if data is not None:
+        req.add_header("Content-Type", headers.get("Content-Type", "application/json") if headers else "application/json")
+      if headers:
+        for key, value in headers.items():
+          req.add_header(key, value)
+      with urllib.request.urlopen(req, context=SSL_CONTEXT if url.startswith("https://") else None, timeout=20) as resp:
+        raw = resp.read()
+        return json.loads(raw.decode("utf-8")) if raw else {}
+
+    def kube_json(path, method="GET", body=None, content_type="application/json"):
+      return http_json(
+        KUBE_URL + path,
+        method=method,
+        body=body,
+        headers={"Authorization": "Bearer " + TOKEN, "Content-Type": content_type},
+      )
+
+    def refresh_namespaces(force=False):
+      global NAMESPACES, LAST_NS_REFRESH
+      if not force and time.time() - LAST_NS_REFRESH < 300 and NAMESPACES:
+        return
+      try:
+        data = kube_json("/api/v1/namespaces")
+        NAMESPACES = {item["metadata"]["name"] for item in data.get("items", [])}
+        LAST_NS_REFRESH = time.time()
+      except Exception as exc:
+        log(f"namespace refresh failed: {exc}")
+        NAMESPACES = NAMESPACES or {FALLBACK_NS}
+
+    def clean(value, limit=63):
+      value = "".join(ch.lower() if ch.isalnum() else "-" for ch in value)
+      value = "-".join(part for part in value.split("-") if part)
+      return (value or "alert")[:limit].strip("-") or "alert"
+
+    def fingerprint(labels):
+      raw = json.dumps(labels, sort_keys=True, separators=(",", ":"))
+      return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
+    def event_namespace(labels):
+      refresh_namespaces()
+      candidates = [labels.get("namespace"), labels.get("exported_namespace"), labels.get("kubernetes_namespace")]
+      for candidate in candidates:
+        if candidate in NAMESPACES:
+          return candidate
+      return FALLBACK_NS if FALLBACK_NS in NAMESPACES else sorted(NAMESPACES)[0]
+
+    def regarding(labels, namespace, alertname):
+      if labels.get("pod"):
+        return {"apiVersion": "v1", "kind": "Pod", "namespace": namespace, "name": labels["pod"]}
+      if labels.get("node"):
+        return {"apiVersion": "v1", "kind": "Node", "name": labels["node"]}
+      if labels.get("deployment"):
+        return {"apiVersion": "apps/v1", "kind": "Deployment", "namespace": namespace, "name": labels["deployment"]}
+      if labels.get("statefulset"):
+        return {"apiVersion": "apps/v1", "kind": "StatefulSet", "namespace": namespace, "name": labels["statefulset"]}
+      if labels.get("daemonset"):
+        return {"apiVersion": "apps/v1", "kind": "DaemonSet", "namespace": namespace, "name": labels["daemonset"]}
+      if labels.get("job"):
+        return {"apiVersion": "batch/v1", "kind": "Job", "namespace": namespace, "name": labels["job"]}
+      return {"apiVersion": "monitoring.coreos.com/v1", "kind": "PrometheusRule", "namespace": FALLBACK_NS, "name": alertname}
+
+    def note_for(alert, resolved=False):
+      labels = alert.get("labels", {})
+      annotations = alert.get("annotations", {})
+      alertname = labels.get("alertname", "PrometheusAlert")
+      state = "resolved" if resolved else alert.get("state", "firing")
+      severity = labels.get("severity", "unknown")
+      summary = annotations.get("summary") or annotations.get("message") or annotations.get("description") or "Prometheus alert"
+      description = annotations.get("description", "")
+      interesting = {k: v for k, v in labels.items() if k in ("namespace", "pod", "deployment", "statefulset", "daemonset", "node", "job", "service", "instance") and v}
+      text = f"Prometheus alert {alertname} is {state}; severity={severity}. {summary}"
+      if description and description != summary:
+        text += f" {description}"
+      if interesting:
+        text += " Labels: " + ", ".join(f"{k}={v}" for k, v in sorted(interesting.items()))
+      return text[:1024]
+
+    def build_event(alert, event_name, count, resolved=False):
+      labels = alert.get("labels", {})
+      alertname = labels.get("alertname", "PrometheusAlert")
+      namespace = event_namespace(labels)
+      severity = labels.get("severity", "").lower()
+      event_type = "Normal" if resolved or severity in ("info", "none") else "Warning"
+      action = "Resolved" if resolved else "Firing"
+      event_time = now()
+      return {
+        "apiVersion": "events.k8s.io/v1",
+        "kind": "Event",
+        "metadata": {
+          "name": event_name,
+          "namespace": namespace,
+          "labels": {
+            "app.kubernetes.io/name": "prometheus-event-bridge",
+            "aiot.io/source": "prometheus-alert",
+            "aiot.io/alertname": clean(alertname, 63),
+          },
+        },
+        "eventTime": event_time,
+        "reason": ("PrometheusAlert" + action)[:128],
+        "regarding": regarding(labels, namespace, alertname),
+        "note": note_for(alert, resolved),
+        "type": event_type,
+        "action": action,
+        "reportingController": REPORTING_CONTROLLER,
+        "reportingInstance": INSTANCE,
+        "series": {"count": count, "lastObservedTime": event_time},
+        "deprecatedCount": count,
+        "deprecatedFirstTimestamp": event_time,
+        "deprecatedLastTimestamp": event_time,
+        "deprecatedSource": {"component": REPORTING_CONTROLLER},
+      }
+
+    def upsert_event(alert, resolved=False):
+      labels = alert.get("labels", {})
+      fp = fingerprint(labels)
+      alertname = labels.get("alertname", "PrometheusAlert")
+      event_name = f"prom-alert-{clean(alertname, 40)}-{fp}"
+      state = SEEN.setdefault(fp, {"count": 0, "alert": alert})
+      state["count"] += 1
+      state["alert"] = alert
+      body = build_event(alert, event_name, state["count"], resolved)
+      namespace = body["metadata"]["namespace"]
+      path = f"/apis/events.k8s.io/v1/namespaces/{urllib.parse.quote(namespace)}/events/{urllib.parse.quote(event_name)}"
+      patch = {
+        "eventTime": body["eventTime"],
+        "note": body["note"],
+        "type": body["type"],
+        "action": body["action"],
+        "series": body["series"],
+        "deprecatedCount": body["deprecatedCount"],
+        "deprecatedLastTimestamp": body["deprecatedLastTimestamp"],
+      }
+      try:
+        kube_json(path, method="PATCH", body=patch, content_type="application/merge-patch+json")
+      except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+          create_path = f"/apis/events.k8s.io/v1/namespaces/{urllib.parse.quote(namespace)}/events"
+          try:
+            kube_json(create_path, method="POST", body=body)
+          except urllib.error.HTTPError as create_exc:
+            if create_exc.code == 409:
+              kube_json(path, method="PATCH", body=patch, content_type="application/merge-patch+json")
+            else:
+              raise
+        else:
+          raise
+
+    def poll_alerts():
+      data = http_json(PROM_URL + "/api/v1/alerts")
+      alerts = data.get("data", {}).get("alerts", [])
+      active = {}
+      for alert in alerts:
+        state = alert.get("state")
+        if state not in ("firing", "pending"):
+          continue
+        labels = alert.get("labels", {})
+        fp = fingerprint(labels)
+        active[fp] = alert
+        upsert_event(alert, resolved=False)
+      for fp, old in list(SEEN.items()):
+        if fp not in active and not old.get("resolved"):
+          old["resolved"] = True
+          upsert_event(old.get("alert", {"labels": {"alertname": "PrometheusAlert"}}), resolved=True)
+      return len(active)
+
+    def main():
+      log(f"starting prometheus-event-bridge prometheus={PROM_URL} interval={POLL_SECONDS}s")
+      refresh_namespaces(force=True)
+      while True:
+        try:
+          count = poll_alerts()
+          log(f"synced active Prometheus alerts as Kubernetes Events: {count}")
+        except Exception as exc:
+          log(f"sync failed: {type(exc).__name__}: {exc}")
+        time.sleep(POLL_SECONDS)
+
+    if __name__ == "__main__":
+      main()
