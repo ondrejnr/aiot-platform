@@ -111,7 +111,8 @@ data:
       audit('approved_fix argocd_sync %s' % name)
       return 'Spusteny ArgoCD sync: %s' % name
 
-    PAGE='''<!doctype html><html><head><meta charset="utf-8"><title>AI SRE Agent</title><style>body{font-family:system-ui;margin:2rem;max-width:1200px}textarea,input{width:100%;padding:.6rem;margin:.2rem 0}button{padding:.7rem 1rem;margin:.3rem}.warn{background:#fff3cd;padding:1rem;border-radius:8px}pre{background:#111;color:#ddd;padding:1rem;white-space:pre-wrap;border-radius:8px}</style></head><body><h1>AI SRE Agent</h1><div class="warn">Workflow: logy -> diagnoza -> plan -> schvalenie -> fix -> overenie. Rizikove akcie nie su v MVP povolene.</div><form method="post" action="/diagnose"><p><button>Spustit diagnostiku</button></p></form><h2>Schvalene safe fixy</h2><form method="post" action="/fix"><button name="action" value="delete-events">Vymazat Kubernetes events</button></form><form method="post" action="/fix"><input name="ns" placeholder="namespace"><input name="name" placeholder="deployment"><button name="action" value="restart-deploy">Restart deployment</button></form><form method="post" action="/fix"><input name="name" placeholder="argocd app"><button name="action" value="sync-app">ArgoCD sync</button></form>{body}</body></html>'''
+    PAGE='''<!doctype html><html><head><meta charset="utf-8"><title>AI SRE Agent</title><style>body{font-family:system-ui;margin:2rem;max-width:1200px}textarea,input{width:100%;padding:.6rem;margin:.2rem 0}button{padding:.7rem 1rem;margin:.3rem}.warn{background:#fff3cd;padding:1rem;border-radius:8px}pre{background:#111;color:#ddd;padding:1rem;white-space:pre-wrap;border-radius:8px}</style></head><body><h1>AI SRE Agent</h1><div class="warn">Workflow: logy -> diagnoza -> plan -> schvalenie -> fix -> overenie. Rizikove akcie nie su v MVP povolene.</div>{body}</body></html>'''
+    MAIN='''<form method="post" action="/diagnose"><p><button>Spustit diagnostiku</button></p></form><h2>Schvalene safe fixy</h2><form method="post" action="/fix"><button name="action" value="delete-events">Vymazat Kubernetes events</button></form><form method="post" action="/fix"><input name="ns" placeholder="namespace"><input name="name" placeholder="deployment"><button name="action" value="restart-deploy">Restart deployment</button></form><form method="post" action="/fix"><input name="name" placeholder="argocd app"><button name="action" value="sync-app">ArgoCD sync</button></form>'''
 
     class H(BaseHTTPRequestHandler):
       def authed(self, data=None):
@@ -139,7 +140,7 @@ data:
       def do_GET(self):
         if not self.authed():
           return self.login()
-        self.html('<p>Pripravene. Spusti diagnostiku.</p>')
+        self.html(MAIN+'<p>Pripravene. Spusti diagnostiku.</p>')
       def do_POST(self):
         try:
           ln=int(self.headers.get('Content-Length','0'))
