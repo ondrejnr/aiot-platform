@@ -21,7 +21,7 @@ argo-cd:
         g, admin, role:org-admin
       policy.default: role:readonly
   controller:
-    replicas: 0
+    replicas: 1
     metrics:
       enabled: true
   dex:
