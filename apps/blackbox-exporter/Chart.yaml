@@ -1,0 +1,10 @@
+apiVersion: v2
+name: blackbox-exporter-overlay
+description: aiot-platform blackbox-exporter (HTTP/TCP/ICMP probes)
+type: application
+version: 1.0.0
+appVersion: "0.25.0"
+dependencies:
+  - name: prometheus-blackbox-exporter
+    version: "9.0.1"
+    repository: https://prometheus-community.github.io/helm-charts

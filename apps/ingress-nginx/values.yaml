@@ -15,3 +15,14 @@ ingress-nginx:
     allowSnippetAnnotations: true
     config:
       annotations-risk-level: Critical
+    metrics:
+      enabled: true
+      port: 10254
+      service:
+        servicePort: 10254
+      serviceMonitor:
+        enabled: true
+        namespace: monitoring
+        additionalLabels:
+          release: prometheus
+        scrapeInterval: 60s
