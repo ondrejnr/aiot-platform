@@ -7,7 +7,6 @@ metadata:
     app.kubernetes.io/name: zabbix
     app.kubernetes.io/component: sso-bootstrap
     app.kubernetes.io/part-of: zabbix
-    argocd.argoproj.io/instance: zabbix
 data:
   zabbix-sso-bootstrap.py: |
     import json

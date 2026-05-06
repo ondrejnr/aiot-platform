@@ -958,7 +958,7 @@ items:
       PG_DB = os.getenv("PG_DB", "aiot")
       PG_USER = os.getenv("PG_USER", "aiot_admin")
       PG_PASS = os.getenv("PG_PASS", "AioT2026!Prod")
-      MM_WEBHOOK = os.getenv("MM_WEBHOOK", "http://mattermost.mattermost.svc.cluster.local:8065/hooks/4ko7reuoai833j7mt7hg7d6iuy")
+      MM_WEBHOOK = os.getenv("MM_WEBHOOK", "")
       ALERT_THRESHOLD = float(os.getenv("ALERT_THRESHOLD", "0.85"))
       ALERT_COOLDOWN = int(os.getenv("ALERT_COOLDOWN", "300"))
       BATCH_INTERVAL = float(os.getenv("BATCH_INTERVAL", "5"))

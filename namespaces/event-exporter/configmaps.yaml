@@ -10,21 +10,11 @@ items:
           routes:
             - match:
                 - type: Warning
-              receiver: mattermost
-            - match:
-                - type: Warning
               receiver: stdout
         receivers:
           - name: stdout
             file:
               path: /dev/stdout
-          - name: mattermost
-            webhook:
-              endpoint: "https://mm.35.241.255.137.nip.io/hooks/jzjdqjnck7y6ubjdauce6gm5cr"
-              headers:
-                Content-Type: application/json
-              layout:
-                text: ":warning: **{{ .Reason }}** `{{ .InvolvedObject.Namespace }}/{{ .InvolvedObject.Kind }}/{{ .InvolvedObject.Name }}` on `{{ .Source.Host }}`\n```\n{{ .Message }}\n```\n_count: {{ .Count }}, first: {{ .FirstTimestamp }}, last: {{ .LastTimestamp }}_"
     kind: ConfigMap
     metadata:
       annotations: {}

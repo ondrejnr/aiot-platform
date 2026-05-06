@@ -934,7 +934,7 @@ items:
                 - |
                   set -e
                   TS=$(date -u +%Y-%m-%d-%H%M%S)
-                  DBS="aiot mlflow n8n open_webui grafana mattermost"
+                  DBS="aiot mlflow n8n open_webui grafana"
                   for DB in $DBS; do
                     mkdir -p "$BACKUP_DIR/$DB"
                     echo "==> Dumping $DB"
@@ -1036,7 +1036,7 @@ items:
                 - |
                   set -e
                   TS=$(date -u +%Y-%m-%d-%H%M%S)
-                  DBS="aiot mlflow n8n open_webui grafana mattermost"
+                  DBS="aiot mlflow n8n open_webui grafana"
                   for DB in $DBS; do
                     mkdir -p "$BACKUP_DIR/$DB"
                     echo "==> Dumping $DB"

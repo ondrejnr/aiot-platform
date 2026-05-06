@@ -5,7 +5,7 @@ awx:
   # admin password and secret_key are in clear text below — gitops owner repo is private
   # rotate both via:
   #   kubectl -n awx delete secret awx-admin-password awx-secret-key
-  #   then update the values and let ArgoCD reconcile
+  #   then update the values and let Flux reconcile
   adminPassword: Qyk6AEWWIkIlhBOg3QcL7TjA
   secretKey: b1c3a69c5e127dfb0ec3f7524ff6dfd3d678b36de34e24dbe8aa0b026621f02f
 postgres:

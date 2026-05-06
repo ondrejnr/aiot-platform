@@ -30,7 +30,6 @@ A unique property of this platform is that the cluster **monitors and reasons ab
 - **K8sGPT Operator** — continuously analyses every namespace for misconfigurations, failing pods, broken probes, stuck PVCs, CrashLoopBackOff patterns, and RBAC gaps
 - **LLM-backed diagnostics** — findings are explained in plain English through an LLM (local or Groq), so an alert reads *"pod X is restarting because liveness probe targets an unreachable port — check service `Y`"* instead of a raw Kubernetes event
 - **Anomaly detector** (`k8sgpt-anomaly-detector`) — ML-based trend detection over metrics and logs
-- **Mattermost bot** (`k8sgpt-mm-bot`) — posts high-severity findings to the `#k8s` channel in Mattermost; engineers reply in the thread and the bot can run follow-up diagnostics
 - **Robusta bridge** (`k8sgpt-robusta-bridge`) — forwards events to Robusta for automated playbook execution (restart, scale, cordon, notify) when the diagnosis matches a known remediation
 - **Scheduled reports** — `ai-health-report` and `ai-log-analyzer` CronJobs produce daily summaries of cluster health; `monitoring-watchdog` keeps the pipeline itself alive
 
@@ -48,7 +47,6 @@ flowchart LR
         AN["Anomaly Detector<br/>ML on metrics"]
         LLM{{"🧠 LLM<br/>Groq / local"}}
         BR["Robusta bridge<br/>auto-remediation"]
-        BOT["Mattermost bot<br/>#k8s channel"]
         RPT["Scheduled reports<br/>ai-health · ai-log"]
     end
 
@@ -97,7 +95,6 @@ flowchart LR
 
     subgraph OPS["🛡️ SELF-OPERATING"]
         KG{{"K8sGPT<br/>AI-supervised cluster"}}
-        MM[["Mattermost<br/>#k8s"]]
     end
 
     S1 & S2 -->|MQTT| MQ
@@ -200,7 +197,6 @@ The AIoT workflow moves sensor data from the edge into Postgres + Qdrant, and ex
 
 ### 2. Storage — `aiot`, `cnpg-system`
 
-- **CloudNativePG cluster** `pg-ha` (3 replicas in `aiot`) — single source of truth for all tabular/relational data (sensor readings, n8n workflows, Mattermost, SigNoz metadata, …)
 - Partitioning and cleanup handled by CronJobs: `pg-partition-mgr`, `pg-sensor-cleanup`, `sensor-data-retention`, `postgres-backup`
 - Secondary index/feature store: **Qdrant** (namespace `aiot`) for vector embeddings used by RAG
 
@@ -231,7 +227,6 @@ flowchart TB
     subgraph CHEF["🍴 Chef Automate (compliance)"]
         direction LR
         C1["InSpec scans<br/>Automate reporting"]
-        C2["chef-webhook<br/>→ Mattermost + Grafana"]
     end
 
     subgraph ANS["🟣 Ansible via Semaphore (operations)"]
@@ -258,7 +253,6 @@ flowchart TB
 
 - **Chef Automate** runs **outside Kubernetes**, as a systemd service (`chef-automate.service`) on `aiot-worker-01`, exposed on port `8443` and published under `chef.35.241.255.137.nip.io`
 - **Chef Infra Server** drives node convergence across all 6 cluster nodes + test VMs
-- Namespace **`chef-webhook`** hosts a webhook receiver that bridges Chef Automate events (compliance runs, client converges, InSpec scans) into the cluster — results land on Mattermost (`mm.35.241.255.137.nip.io`, channel `#k8s`) and into Grafana dashboards
 - Compliance scans are exported under `inspec-scans` namespace for long-term retention
 
 ### Puppet Enterprise — `chef` ns (`pe.*` ingress), host-level
@@ -368,7 +362,6 @@ All services are published under `*.35.241.255.137.nip.io` with Let's Encrypt ce
 | Automation UI     | `semaphore.*`                                  | `semaphore`       | Ansible via Semaphore                  |
 | DB / data         | `pgadmin.*`, `cloudbeaver.*`, `emqx.*`         | `aiot`, `emqx`    |                                        |
 | Observability     | `grafana.*`, `prometheus.*`, `vm.*`, `signoz.*`| `monitoring`, `victoriametrics`, `signoz` |                         |
-| Ops               | `headlamp.*`, `mm.*`, `n8n.*`                  | `headlamp`, `mattermost`, `n8n` |                              |
 
 ---
 
@@ -389,8 +382,6 @@ sudo bash bootstrap/01-kubeadm-init.sh       # kubeadm init from infra/kubeadm-c
 # === On master, after all workers joined ===
 sudo bash bootstrap/02-flannel.sh         # CNI: Flannel v0.27.4
 sudo bash bootstrap/03-sealed-secrets.sh  # sealed-secrets controller
-sudo bash bootstrap/05-argocd.sh          # ArgoCD with KSOPS plugin
-sudo bash bootstrap/06-bootstrap-app.sh   # App-of-Apps root — ArgoCD reconciles the rest
 
 # === Optional: restore Secrets + PVC data ===
 export AWS_ACCESS_KEY_ID=…  AWS_SECRET_ACCESS_KEY=…  R2_ENDPOINT=https://….r2.cloudflarestorage.com
@@ -430,9 +421,6 @@ aiot-platform/
 │   ├── 01-kubeadm-init.sh      (kubeadm init from infra/kubeadm-config.yaml)
 │   ├── 02-flannel.sh           (Flannel v0.27.4 CNI)
 │   ├── 03-sealed-secrets.sh    (sealed-secrets controller)
-│   ├── 04-sops-age.sh          (sops + age key as Secret in argocd ns)
-│   ├── 05-argocd.sh            (ArgoCD with KSOPS plugin)
-│   └── 06-bootstrap-app.sh     (App-of-Apps root — ArgoCD takes over)
 │
 
 ├── infra/                   ← host-level / platform files

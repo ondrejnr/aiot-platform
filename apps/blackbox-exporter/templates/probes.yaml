@@ -1,3 +1,4 @@
+
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Probe
@@ -207,25 +208,6 @@ spec:
     staticConfig:
       static:
         - https://jenkins.46.4.123.8.nip.io/
----
-apiVersion: monitoring.coreos.com/v1
-kind: Probe
-metadata:
-  name: ingress-mattermost
-  namespace: blackbox-exporter
-  labels:
-    release: prometheus
-spec:
-  jobName: blackbox-http-mattermost
-  module: http_2xx
-  interval: 60s
-  scrapeTimeout: 15s
-  prober:
-    url: blackbox-exporter-prometheus-blackbox-exporter.blackbox-exporter.svc:9115
-  targets:
-    staticConfig:
-      static:
-        - https://mattermost.46.4.123.8.nip.io/
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Probe
