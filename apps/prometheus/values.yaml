@@ -59,10 +59,10 @@ kube-prometheus-stack:
   kubeEtcd:
     enabled: false
   coreDns:
-    enabled: false
+    enabled: true
   kubeDns:
     enabled: false
   kubeApiServer:
     enabled: true
   nodeExporter:
-    enabled: false
+    enabled: true
