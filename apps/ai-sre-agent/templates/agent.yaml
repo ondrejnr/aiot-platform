@@ -376,7 +376,8 @@ data:
           self.send_error(404)
         except Exception:
           self.send_json({'answer':'ERROR\n'+traceback.format_exc()},500)
-    ThreadingHTTPServer(('0.0.0.0',8080),H).serve_forever()---
+    ThreadingHTTPServer(('0.0.0.0',8080),H).serve_forever()
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
