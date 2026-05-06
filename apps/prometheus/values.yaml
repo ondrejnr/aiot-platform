@@ -1,67 +1,68 @@
-alertmanager:
-  enabled: false
-grafana:
-  enabled: false
-prometheus:
-  prometheusSpec:
+kube-prometheus-stack:
+  alertmanager:
+    enabled: false
+  grafana:
+    enabled: false
+  prometheus:
+    prometheusSpec:
+      nodeSelector:
+        node-role.kubernetes.io/worker: ''
+      priorityClassName: system-cluster-critical
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          memory: 2Gi
+      scrapeInterval: 60s
+      evaluationInterval: 60s
+      retention: 3d
+      retentionSize: 2GB
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: prometheus
+  prometheusOperator:
     nodeSelector:
       node-role.kubernetes.io/worker: ''
     priorityClassName: system-cluster-critical
     resources:
       requests:
-        cpu: 100m
-        memory: 512Mi
+        cpu: 20m
+        memory: 64Mi
       limits:
-        memory: 2Gi
-    scrapeInterval: 60s
-    evaluationInterval: 60s
-    retention: 3d
-    retentionSize: 2GB
-    topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: kubernetes.io/hostname
-      whenUnsatisfiable: ScheduleAnyway
-      labelSelector:
-        matchLabels:
-          app.kubernetes.io/name: prometheus
-prometheusOperator:
-  nodeSelector:
-    node-role.kubernetes.io/worker: ''
-  priorityClassName: system-cluster-critical
-  resources:
-    requests:
-      cpu: 20m
-      memory: 64Mi
-    limits:
-      memory: 256Mi
-kube-state-metrics:
-  resources:
-    requests:
-      cpu: 20m
-      memory: 32Mi
-    limits:
-      memory: 256Mi
-  livenessProbe:
-    failureThreshold: 10
-    timeoutSeconds: 15
-    periodSeconds: 20
-  readinessProbe:
-    failureThreshold: 10
-    timeoutSeconds: 15
-    periodSeconds: 20
-prometheus-node-exporter:
-  enabled: false
-kubeProxy:
-  enabled: false
-kubeControllerManager:
-  enabled: false
-kubeScheduler:
-  enabled: false
-kubeEtcd:
-  enabled: false
-coreDns:
-  enabled: false
-kubeDns:
-  enabled: false
-kubeApiServer:
-  enabled: true
+        memory: 256Mi
+  kube-state-metrics:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 32Mi
+      limits:
+        memory: 256Mi
+    livenessProbe:
+      failureThreshold: 10
+      timeoutSeconds: 15
+      periodSeconds: 20
+    readinessProbe:
+      failureThreshold: 10
+      timeoutSeconds: 15
+      periodSeconds: 20
+  kubeProxy:
+    enabled: false
+  kubeControllerManager:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  kubeEtcd:
+    enabled: false
+  coreDns:
+    enabled: false
+  kubeDns:
+    enabled: false
+  kubeApiServer:
+    enabled: true
+  nodeExporter:
+    enabled: false
