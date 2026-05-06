@@ -68,13 +68,14 @@ data:
             ]
             interface = {"type": 1, "main": 1, "useip": 1, "ip": ip, "dns": "", "port": "10050"}
             existing = api("host.get", {"filter": {"host": [host]}, "output": ["hostid"]}, token)
-            params = {"name": name, "status": 0, "groups": [{"groupid": linux_group["groupid"]}], "templates": [{"templateid": linux_prom["templateid"]}], "interfaces": [interface], "macros": macros}
+            params = {"name": name, "status": 0, "groups": [{"groupid": linux_group["groupid"]}], "templates": [{"templateid": linux_prom["templateid"]}], "macros": macros}
             if existing:
                 hostid = existing[0]["hostid"]
                 params["hostid"] = hostid
                 api("host.update", params, token)
             else:
                 params["host"] = host
+                params["interfaces"] = [interface]
                 hostid = api("host.create", params, token)["hostids"][0]
             hostids.append(hostid)
         return hostids
