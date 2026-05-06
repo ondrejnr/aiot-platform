@@ -4,6 +4,12 @@ metadata:
   name: zabbix-monitor
   namespace: monitoring
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: zabbix-monitor
+  namespace: zabbix
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -36,12 +42,24 @@ subjects:
 - kind: ServiceAccount
   name: zabbix-monitor
   namespace: monitoring
+- kind: ServiceAccount
+  name: zabbix-monitor
+  namespace: zabbix
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: zabbix-monitor-token
   namespace: monitoring
+  annotations:
+    kubernetes.io/service-account.name: zabbix-monitor
+type: kubernetes.io/service-account-token
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: zabbix-monitor-token
+  namespace: zabbix
   annotations:
     kubernetes.io/service-account.name: zabbix-monitor
 type: kubernetes.io/service-account-token

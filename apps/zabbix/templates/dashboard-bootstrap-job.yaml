@@ -25,6 +25,12 @@ spec:
           image: python:3.12-alpine
           imagePullPolicy: IfNotPresent
           command: ["python", "/work/zabbix-dashboard-bootstrap.py"]
+          env:
+            - name: KUBE_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: zabbix-monitor-token
+                  key: token
           volumeMounts:
             - name: script
               mountPath: /work

@@ -10,11 +10,15 @@ metadata:
 data:
   zabbix-dashboard-bootstrap.py: |
     import json
+    import os
     import urllib.request
-    
+
     ZABBIX_API = "http://zabbix-zabbix-web.zabbix.svc.cluster.local/api_jsonrpc.php"
     ADMIN_USER = "Admin"
     ADMIN_PASSWORD = "zabbix"
+    KUBE_API_TOKEN = os.environ.get("KUBE_API_TOKEN", "")
+    KUBE_API_URL = "https://kubernetes.default.svc.cluster.local:443"
+    KUBE_STATE_ENDPOINT_NAME = "prometheus-kube-state-metrics"
     NODES = [
         ("k3d-aiot-hetzner-server-0", "Node k3d-aiot-hetzner-server-0", "172.18.0.2"),
         ("k3d-aiot-hetzner-agent-0", "Node k3d-aiot-hetzner-agent-0", "172.18.0.4"),
@@ -22,7 +26,7 @@ data:
         ("k3d-aiot-hetzner-agent-2", "Node k3d-aiot-hetzner-agent-2", "172.18.0.3"),
         ("k3d-aiot-hetzner-agent-3", "Node k3d-aiot-hetzner-agent-3", "172.18.0.5"),
     ]
-    
+
     def api(method, params=None, token=None):
         payload = {"jsonrpc": "2.0", "method": method, "params": params or {}, "id": 1}
         if token:
@@ -36,16 +40,16 @@ data:
         if "error" in data:
             raise RuntimeError(f"{method}: " + json.dumps(data.get("error")))
         return data.get("result")
-    
+
     def first(method, params, token, what):
         result = api(method, params, token)
         if not result:
             raise RuntimeError(f"Missing {what}")
         return result[0]
-    
+
     def field(ftype, name, value):
         return {"type": str(ftype), "name": name, "value": str(value)}
-    
+
     def itemid(token, hostid, names):
         if isinstance(names, str):
             names = [names]
@@ -54,7 +58,88 @@ data:
             if result:
                 return result[0]["itemid"]
         return None
-    
+
+
+    def ensure_hostgroup(token, name):
+        existing = api("hostgroup.get", {"filter": {"name": [name]}, "output": ["groupid", "name"]}, token)
+        if existing:
+            return existing[0]
+        groupid = api("hostgroup.create", {"name": name}, token)["groupids"][0]
+        return {"groupid": groupid, "name": name}
+
+    def template_id(token, name):
+        return first("template.get", {"filter": {"host": [name]}, "output": ["templateid", "host", "name"]}, token, name + " template")["templateid"]
+
+    def upsert_host(token, host, name, groupid, templateids, macros):
+        interface = {"type": 1, "main": 1, "useip": 1, "ip": "127.0.0.1", "dns": "", "port": "10050"}
+        existing = api("host.get", {"filter": {"host": [host]}, "output": ["hostid"]}, token)
+        params = {
+            "name": name,
+            "status": 0,
+            "groups": [{"groupid": groupid}],
+            "templates": [{"templateid": templateid} for templateid in templateids],
+            "macros": macros,
+        }
+        if existing:
+            params["hostid"] = existing[0]["hostid"]
+            api("host.update", params, token)
+            return params["hostid"]
+        params["host"] = host
+        params["interfaces"] = [interface]
+        return api("host.create", params, token)["hostids"][0]
+
+    def kube_macros(extra=None):
+        macros = [
+            {"macro": "{$KUBE.API.TOKEN}", "value": KUBE_API_TOKEN, "type": 1},
+            {"macro": "{$KUBE.API.URL}", "value": KUBE_API_URL},
+            {"macro": "{$KUBE.HTTP.PROXY}", "value": ""},
+        ]
+        macros.extend(extra or [])
+        return macros
+
+    def configure_kubernetes_monitoring(token):
+        if not KUBE_API_TOKEN:
+            print("Skipping Kubernetes Zabbix bootstrap: missing KUBE_API_TOKEN")
+            return []
+        group = ensure_hostgroup(token, "Kubernetes")
+        state_template = template_id(token, "Kubernetes cluster state by HTTP")
+        nodes_template = template_id(token, "Kubernetes nodes by HTTP")
+        state_hostid = upsert_host(
+            token,
+            "k3d-aiot-hetzner",
+            "Kubernetes cluster k3d-aiot-hetzner",
+            group["groupid"],
+            [state_template],
+            kube_macros([
+                {"macro": "{$KUBE.STATE.ENDPOINT.NAME}", "value": KUBE_STATE_ENDPOINT_NAME},
+                {"macro": "{$KUBE.KUBELET.SCHEME}", "value": "https"},
+                {"macro": "{$KUBE.KUBELET.PORT}", "value": "10250"},
+                {"macro": "{$KUBE.API_SERVER.SCHEME}", "value": "https"},
+                {"macro": "{$KUBE.API_SERVER.PORT}", "value": "6443"},
+                {"macro": "{$KUBE.CONTROLLER_MANAGER.SCHEME}", "value": "https"},
+                {"macro": "{$KUBE.CONTROLLER_MANAGER.PORT}", "value": "10257"},
+                {"macro": "{$KUBE.SCHEDULER.SCHEME}", "value": "https"},
+                {"macro": "{$KUBE.SCHEDULER.PORT}", "value": "10259"},
+                {"macro": "{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}", "value": "CHANGE_IF_NEEDED"},
+                {"macro": "{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}", "value": "CHANGE_IF_NEEDED"},
+                {"macro": "{$KUBE.LLD.FILTER.PV.NOT_MATCHES}", "value": "CHANGE_IF_NEEDED"},
+            ]),
+        )
+        nodes_hostid = upsert_host(
+            token,
+            "k3d-aiot-hetzner-nodes",
+            "Kubernetes nodes k3d-aiot-hetzner",
+            group["groupid"],
+            [nodes_template],
+            kube_macros([
+                {"macro": "{$KUBE.NODES.ENDPOINT.NAME}", "value": ""},
+                {"macro": "{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}", "value": "CHANGE_IF_NEEDED"},
+                {"macro": "{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}", "value": "CHANGE_IF_NEEDED"},
+                {"macro": "{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}", "value": "CHANGE_IF_NEEDED"},
+            ]),
+        )
+        return [state_hostid, nodes_hostid]
+
     def configure_hosts(token):
         linux_group = first("hostgroup.get", {"filter": {"name": ["Linux servers"]}, "output": ["groupid", "name"]}, token, "Linux servers group")
         linux_prom = first("template.get", {"filter": {"host": ["Linux by Prom"]}, "output": ["templateid", "host", "name"]}, token, "Linux by Prom template")
@@ -79,7 +164,7 @@ data:
                 hostid = api("host.create", params, token)["hostids"][0]
             hostids.append(hostid)
         return hostids
-    
+
     def graph(token, name, x, y, hostids, item_names, reference):
         colors = ["FF465C", "B0AF07", "0EC9AC", "524BBC", "ED1248", "D1C337", "00BFFF", "4CAF50"]
         itemids = [itemid(token, hostid, item_names) for hostid in hostids]
@@ -95,7 +180,7 @@ data:
             field(0, "legend", 1), field(0, "legend_columns", 3), field(0, "legend_lines", 3), field(1, "reference", reference),
         ])
         return {"type": "svggraph", "name": name, "x": str(x), "y": str(y), "width": "24", "height": "5", "view_mode": "0", "fields": fields}
-    
+
     def top_hosts(name, x, width, hostids, metric, reference):
         fields = [field(3, f"hostids.{index}", hostid) for index, hostid in enumerate(hostids)]
         columns = [
@@ -111,7 +196,7 @@ data:
                 fields.extend([field(1, "columns.1.min", 0), field(1, "columns.1.max", 100), field(1, "columnsthresholds.1.color.0", "FFFF00"), field(1, "columnsthresholds.1.threshold.0", 50), field(1, "columnsthresholds.1.color.1", "FF8000"), field(1, "columnsthresholds.1.threshold.1", 80), field(1, "columnsthresholds.1.color.2", "FF4000"), field(1, "columnsthresholds.1.threshold.2", 90)])
         fields.extend([field(0, "column", 1), field(1, "reference", reference)])
         return {"type": "tophosts", "name": name, "x": str(x), "y": "0", "width": str(width), "height": "4", "view_mode": "0", "fields": fields}
-    
+
     def configure_dashboard(token, node_hostids):
         zabbix_hostid = first("host.get", {"filter": {"host": ["Zabbix server"]}, "output": ["hostid"]}, token, "Zabbix server host")["hostid"]
         hostids = [zabbix_hostid] + node_hostids
@@ -145,8 +230,9 @@ data:
             page["dashboard_pageid"] = dashboard["pages"][0]["dashboard_pageid"]
         api("dashboard.update", {"dashboardid": dashboard["dashboardid"], "pages": [page]}, token)
         return len(widgets)
-    
+
     token = api("user.login", {"username": ADMIN_USER, "password": ADMIN_PASSWORD})
+    kube_hostids = configure_kubernetes_monitoring(token)
     node_hostids = configure_hosts(token)
     widget_count = configure_dashboard(token, node_hostids)
-    print(f"Zabbix node dashboard bootstrap completed: {len(node_hostids)} node hosts, {widget_count} widgets")
+    print(f"Zabbix dashboard bootstrap completed: {len(node_hostids)} node hosts, {len(kube_hostids)} kubernetes hosts, {widget_count} widgets")
