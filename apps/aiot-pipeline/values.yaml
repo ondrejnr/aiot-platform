@@ -1,0 +1,33 @@
+global:
+  domain: 46.4.123.8.nip.io
+  namespace: aiot
+
+postgres:
+  host: pg-cluster-rw.databases.svc.cluster.local
+  port: 5432
+  database: aiot
+  user: appuser
+  password: "AiotPg2026!"
+
+mqtt:
+  topic: aiot/sensors/telemetry
+
+redis:
+  stream: sensor_data
+
+redpanda:
+  topic: sensor-data
+  storageSize: 10Gi
+  storageClass: local-path
+
+sensorSimulator:
+  replicas: 1
+  intervalSeconds: 2
+
+bridges:
+  mqttToRedis:
+    replicas: 1
+  redisToRedpanda:
+    replicas: 1
+  pgSink:
+    replicas: 1

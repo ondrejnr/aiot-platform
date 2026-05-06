@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiot-emqx
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: emqx
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: emqx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: emqx
+        {{- include "aiot.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: emqx
+          image: emqx/emqx:5.8.4
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: EMQX_NAME
+              value: aiot-emqx
+            - name: EMQX_NODE__COOKIE
+              value: aiot-emqx-cookie
+            - name: EMQX_DASHBOARD__DEFAULT_USERNAME
+              value: admin
+            - name: EMQX_DASHBOARD__DEFAULT_PASSWORD
+              value: AiotEmqx2026!
+            - name: EMQX_AUTHENTICATION__1__ENABLE
+              value: "false"
+          ports:
+            - name: mqtt
+              containerPort: 1883
+            - name: dashboard
+              containerPort: 18083
+          readinessProbe:
+            tcpSocket:
+              port: mqtt
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: mqtt
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 768Mi

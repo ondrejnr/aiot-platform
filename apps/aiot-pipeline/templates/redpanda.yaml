@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: aiot-redpanda
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: redpanda
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  serviceName: aiot-redpanda
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: redpanda
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: redpanda
+        {{- include "aiot.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: redpanda
+          image: docker.redpanda.com/redpandadata/redpanda:v24.3.5
+          imagePullPolicy: IfNotPresent
+          command:
+            - /usr/bin/rpk
+            - redpanda
+            - start
+            - --overprovisioned
+            - --smp
+            - "1"
+            - --memory
+            - 512M
+            - --reserve-memory
+            - 0M
+            - --node-id
+            - "0"
+            - --check=false
+            - --kafka-addr
+            - internal://0.0.0.0:9092
+            - --advertise-kafka-addr
+            - internal://aiot-redpanda.aiot.svc.cluster.local:9092
+            - --rpc-addr
+            - 0.0.0.0:33145
+            - --advertise-rpc-addr
+            - aiot-redpanda-0.aiot-redpanda.aiot.svc.cluster.local:33145
+          ports:
+            - name: kafka
+              containerPort: 9092
+            - name: admin
+              containerPort: 9644
+            - name: rpc
+              containerPort: 33145
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/redpanda/data
+          readinessProbe:
+            httpGet:
+              path: /v1/status/ready
+              port: admin
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /v1/status/ready
+              port: admin
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 250m
+              memory: 768Mi
+            limits:
+              cpu: 1500m
+              memory: 1536Mi
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.redpanda.storageClass | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.redpanda.storageSize | quote }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiot-redpanda-console
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: redpanda-console
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: redpanda-console
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: redpanda-console
+        {{- include "aiot.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: console
+          image: docker.redpanda.com/redpandadata/console:v2.8.4
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KAFKA_BROKERS
+              value: aiot-redpanda.aiot.svc.cluster.local:9092
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /admin/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

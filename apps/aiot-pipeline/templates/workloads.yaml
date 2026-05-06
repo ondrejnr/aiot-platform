@@ -1,0 +1,195 @@
+{{- $pythonImage := "python:3.12-slim" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiot-sensor-simulator
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: sensor-simulator
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.sensorSimulator.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: sensor-simulator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: sensor-simulator
+        {{- include "aiot.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: app
+          image: {{ $pythonImage }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args: ["pip install --no-cache-dir paho-mqtt >/tmp/pip.log 2>&1 && python /app/sensor_simulator.py"]
+          env:
+            - name: MQTT_HOST
+              value: aiot-emqx
+            - name: MQTT_TOPIC
+              value: {{ .Values.mqtt.topic | quote }}
+            - name: SENSOR_INTERVAL_SECONDS
+              value: {{ .Values.sensorSimulator.intervalSeconds | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /app
+          resources:
+            requests:
+              cpu: 50m
+              memory: 96Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+      volumes:
+        - name: scripts
+          configMap:
+            name: aiot-pipeline-scripts
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiot-mqtt-to-redis
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: mqtt-to-redis
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.bridges.mqttToRedis.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: mqtt-to-redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: mqtt-to-redis
+        {{- include "aiot.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: app
+          image: {{ $pythonImage }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args: ["pip install --no-cache-dir paho-mqtt redis >/tmp/pip.log 2>&1 && python /app/mqtt_to_redis.py"]
+          env:
+            - name: MQTT_HOST
+              value: aiot-emqx
+            - name: MQTT_TOPIC
+              value: {{ .Values.mqtt.topic | quote }}
+            - name: REDIS_HOST
+              value: aiot-redis
+            - name: REDIS_STREAM
+              value: {{ .Values.redis.stream | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /app
+          resources:
+            requests:
+              cpu: 50m
+              memory: 96Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+      volumes:
+        - name: scripts
+          configMap:
+            name: aiot-pipeline-scripts
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiot-redis-to-redpanda
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: redis-to-redpanda
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.bridges.redisToRedpanda.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: redis-to-redpanda
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: redis-to-redpanda
+        {{- include "aiot.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: app
+          image: {{ $pythonImage }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args: ["pip install --no-cache-dir redis kafka-python >/tmp/pip.log 2>&1 && python /app/redis_to_redpanda.py"]
+          env:
+            - name: REDIS_HOST
+              value: aiot-redis
+            - name: REDIS_STREAM
+              value: {{ .Values.redis.stream | quote }}
+            - name: KAFKA_BROKERS
+              value: aiot-redpanda:9092
+            - name: KAFKA_TOPIC
+              value: {{ .Values.redpanda.topic | quote }}
+          volumeMounts:
+            - name: scripts
+              mountPath: /app
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi
+      volumes:
+        - name: scripts
+          configMap:
+            name: aiot-pipeline-scripts
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiot-pg-sink
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: pg-sink
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.bridges.pgSink.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: pg-sink
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: pg-sink
+        {{- include "aiot.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: app
+          image: {{ $pythonImage }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args: ["pip install --no-cache-dir kafka-python psycopg2-binary >/tmp/pip.log 2>&1 && python /app/pg_sink.py"]
+          envFrom:
+            - secretRef:
+                name: aiot-pg-credentials
+          env:
+            - name: KAFKA_BROKERS
+              value: aiot-redpanda:9092
+            - name: KAFKA_TOPIC
+              value: {{ .Values.redpanda.topic | quote }}
+            - name: PG_TABLE
+              value: sensor_data
+          volumeMounts:
+            - name: scripts
+              mountPath: /app
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi
+      volumes:
+        - name: scripts
+          configMap:
+            name: aiot-pipeline-scripts

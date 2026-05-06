@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aiot-emqx
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: emqx
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/component: emqx
+  ports:
+    - name: mqtt
+      port: 1883
+      targetPort: mqtt
+    - name: dashboard
+      port: 18083
+      targetPort: dashboard
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aiot-redis
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: redis
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/component: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aiot-redpanda
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: redpanda
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/component: redpanda
+  ports:
+    - name: kafka
+      port: 9092
+      targetPort: kafka
+    - name: admin
+      port: 9644
+      targetPort: admin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aiot-redpanda-console
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: redpanda-console
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/component: redpanda-console
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
