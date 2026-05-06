@@ -21,6 +21,8 @@ data:
 
     PROM_URL = os.environ.get("PROMETHEUS_URL", "http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090").rstrip("/")
     POLL_SECONDS = int(os.environ.get("POLL_INTERVAL_SECONDS", "60"))
+    EVENT_BUCKET_SECONDS = int(os.environ.get("EVENT_BUCKET_SECONDS", "3600"))
+    ALERT_BLACKLIST = set(filter(None, os.environ.get("ALERT_BLACKLIST", "KubeSchedulerDown,KubeControllerManagerDown,KubeProxyDown").split(",")))
     FALLBACK_NS = os.environ.get("FALLBACK_NAMESPACE", "monitoring")
     API = os.environ.get("KUBERNETES_SERVICE_HOST", "kubernetes.default.svc")
     PORT = os.environ.get("KUBERNETES_SERVICE_PORT", "443")
@@ -168,7 +170,7 @@ data:
           log(f"skip alert for missing namespace {ns}: {alertname}")
           return
       fp = fingerprint(labels)
-      bucket = int(time.time() // max(POLL_SECONDS, 60))
+      bucket = int(time.time() // max(EVENT_BUCKET_SECONDS, POLL_SECONDS, 60))
       event_name = f"prom-alert-{clean(alertname, 32)}-{fp}-{bucket}"
       state = SEEN.setdefault(fp, {"count": 0, "alert": alert})
       state["count"] += 1
@@ -193,6 +195,8 @@ data:
         labels = alert.get("labels", {})
         severity = labels.get("severity", "").lower()
         if severity in ("none", "info"):
+          continue
+        if labels.get("alertname") in ALERT_BLACKLIST:
           continue
         fp = fingerprint(labels)
         active[fp] = alert
