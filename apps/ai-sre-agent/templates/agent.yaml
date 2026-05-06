@@ -7,7 +7,7 @@ data:
   app.py: |-
     import os, ssl, json, time, urllib.request, urllib.parse, traceback, html
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-
+    
     TOKEN=open('/var/run/secrets/kubernetes.io/serviceaccount/token').read().strip()
     CA='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
     K8S='https://kubernetes.default.svc'
@@ -19,12 +19,12 @@ data:
     INCIDENTS='/audit/incidents.jsonl'
     KNOWLEDGE='/knowledge'
     CTX=ssl.create_default_context(cafile=CA)
-
+    
     def audit(msg):
       os.makedirs('/audit', exist_ok=True)
       with open(AUDIT,'a',encoding='utf-8') as f:
         f.write(time.strftime('%FT%T%z ') + msg + '\n')
-
+    
     def k8s(method, path, body=None, ctype='application/json', timeout=25):
       data=None if body is None else json.dumps(body).encode()
       req=urllib.request.Request(K8S+path, data=data, method=method)
@@ -35,17 +35,38 @@ data:
       with urllib.request.urlopen(req, context=CTX, timeout=timeout) as r:
         raw=r.read().decode('utf-8','replace')
         return json.loads(raw) if raw else {}
-
+    
     def ollama(prompt, num_predict=350):
       body=json.dumps({'model':MODEL,'prompt':prompt,'stream':False,'options':{'temperature':0.1,'num_predict':num_predict}}).encode()
       req=urllib.request.Request(OLLAMA+'/api/generate',data=body,headers={'Content-Type':'application/json'})
       with urllib.request.urlopen(req, timeout=900) as r:
         return json.loads(r.read().decode()).get('response','')
-
+    
+    def hr_status(hr):
+      conds=hr.get('status',{}).get('conditions',[]) or []
+      ready=next((c for c in conds if c.get('type')=='Ready'),{})
+      return {
+        'name': hr['metadata']['name'],
+        'namespace': hr['metadata']['namespace'],
+        'ready': ready.get('status','Unknown'),
+        'reason': ready.get('reason',''),
+        'message': ready.get('message',''),
+        'suspended': hr.get('spec',{}).get('suspend',False),
+      }
+    
+    def list_helmreleases():
+      try:
+        return k8s('GET','/apis/helm.toolkit.fluxcd.io/v2/helmreleases').get('items',[])
+      except Exception:
+        try:
+          return k8s('GET','/apis/helm.toolkit.fluxcd.io/v2beta2/helmreleases').get('items',[])
+        except Exception:
+          return []
+    
     def collect(include_logs=True):
       pods=k8s('GET','/api/v1/pods?limit=1000').get('items',[])
       nodes=k8s('GET','/api/v1/nodes').get('items',[])
-      apps=k8s('GET','/apis/argoproj.io/v1alpha1/namespaces/argocd/applications').get('items',[])
+      hrs=list_helmreleases()
       bad=[]
       for p in pods:
         phase=p.get('status',{}).get('phase')
@@ -72,16 +93,16 @@ data:
         'nodesTotal': len(nodes),
         'badPods': bad[:30],
         'badPodsCount': len(bad),
-        'argocdProblemApps':[{'name':a['metadata']['name'],'sync':a.get('status',{}).get('sync',{}).get('status'),'health':a.get('status',{}).get('health',{}).get('status')} for a in apps if a.get('status',{}).get('sync',{}).get('status')!='Synced' or a.get('status',{}).get('health',{}).get('status') not in ('Healthy',None)],
+        'fluxProblemApps':[hr_status(h) for h in hrs if hr_status(h)['ready']!='True' and not hr_status(h)['suspended']],
         'logs':'\n\n'.join(logs)
       }
-
+    
     def read_text(path):
       try:
         return open(path, encoding='utf-8').read()
       except Exception:
         return ''
-
+    
     def load_knowledge():
       return {
         'rules': read_text(KNOWLEDGE + '/rules.yaml'),
@@ -89,7 +110,7 @@ data:
         'seed_incidents': read_text(KNOWLEDGE + '/incidents.seed.jsonl'),
         'runtime_incidents': read_text(INCIDENTS),
       }
-
+    
     def similar_incidents(service, data):
       text=(service+' '+json.dumps(data,ensure_ascii=False)).lower()
       rows=[]
@@ -104,14 +125,14 @@ data:
             continue
           hay=json.dumps(item,ensure_ascii=False).lower()
           score=0
-          for tok in set((service+' grafana headlamp ingress argocd image pod crashloop datasource 502 503').split()):
+          for tok in set((service+' grafana headlamp ingress flux helm image pod crashloop datasource 502 503').split()):
             if tok in text and tok in hay:
               score += 1
           if score:
             rows.append((score,item))
       rows=sorted(rows, key=lambda x:x[0], reverse=True)[:3]
       return [r[1] for r in rows]
-
+    
     def append_incident(p, result, verify):
       item={
         'ts': time.strftime('%FT%TZ', time.gmtime()),
@@ -125,10 +146,10 @@ data:
       os.makedirs('/audit', exist_ok=True)
       with open(INCIDENTS, 'a', encoding='utf-8') as f:
         f.write(json.dumps(item, ensure_ascii=False)+'\n')
-
+    
     def collect_target(target):
       ns = target if target else ''
-      out = {'target': target, 'namespace': ns, 'pods': [], 'logs': '', 'ingresses': [], 'services': [], 'argocd': []}
+      out = {'target': target, 'namespace': ns, 'pods': [], 'logs': '', 'ingresses': [], 'services': [], 'flux': []}
       try:
         pods = k8s('GET','/api/v1/namespaces/%s/pods?limit=200' % urllib.parse.quote(ns)).get('items',[])
         for p in pods:
@@ -159,29 +180,29 @@ data:
       except Exception as e:
         out['services_error']=repr(e)
       try:
-        apps=k8s('GET','/apis/argoproj.io/v1alpha1/namespaces/argocd/applications').get('items',[])
-        out['argocd']=[{'name':a['metadata']['name'],'sync':a.get('status',{}).get('sync',{}).get('status'),'health':a.get('status',{}).get('health',{}).get('status'),'message':a.get('status',{}).get('conditions',[{}])[0].get('message','') if a.get('status',{}).get('conditions') else ''} for a in apps if target in a['metadata']['name'] or a.get('spec',{}).get('destination',{}).get('namespace')==ns]
+        hrs=list_helmreleases()
+        out['flux']=[hr_status(h) for h in hrs if h['metadata']['namespace']==ns or target in h['metadata']['name']]
       except Exception as e:
-        out['argocd_error']=repr(e)
+        out['flux_error']=repr(e)
       return out
-
+    
     def load_pending():
       try:
         return json.load(open(PENDING, encoding='utf-8'))
       except Exception:
         return None
-
+    
     def save_pending(p):
       os.makedirs('/audit', exist_ok=True)
       with open(PENDING, 'w', encoding='utf-8') as f:
         json.dump(p, f, ensure_ascii=False, indent=2)
-
+    
     def clear_pending():
       try:
         os.remove(PENDING)
       except Exception:
         pass
-
+    
     def delete_events():
       nss=[n['metadata']['name'] for n in k8s('GET','/api/v1/namespaces').get('items',[])]
       cnt=0
@@ -195,52 +216,53 @@ data:
           pass
       audit('approved_fix delete_events count=%s' % cnt)
       return 'Vymazané Kubernetes events: %s' % cnt
-
+    
     def restart_deploy(ns,name):
       body={'spec':{'template':{'metadata':{'annotations':{'ai-sre-agent/restartedAt':time.strftime('%FT%TZ',time.gmtime())}}}}}
       k8s('PATCH','/apis/apps/v1/namespaces/%s/deployments/%s' % (urllib.parse.quote(ns), urllib.parse.quote(name)), body, 'application/merge-patch+json')
       audit('approved_fix restart_deployment %s/%s' % (ns,name))
       return 'Reštartovaný deployment: %s/%s' % (ns,name)
-
-    def sync_app(name):
-      k8s('PATCH','/apis/argoproj.io/v1alpha1/namespaces/argocd/applications/%s' % urllib.parse.quote(name), {'operation':{'sync':{}}}, 'application/merge-patch+json')
-      audit('approved_fix argocd_sync %s' % name)
-      return 'Spustený ArgoCD sync: %s' % name
-
+    
+    def reconcile_hr(ns, name):
+      ts=time.strftime('%FT%TZ', time.gmtime())
+      body={'metadata':{'annotations':{'reconcile.fluxcd.io/requestedAt':ts}}}
+      k8s('PATCH','/apis/helm.toolkit.fluxcd.io/v2/namespaces/%s/helmreleases/%s' % (urllib.parse.quote(ns), urllib.parse.quote(name)), body, 'application/merge-patch+json')
+      audit('approved_fix flux_reconcile %s/%s' % (ns,name))
+      return 'Spustený Flux reconcile HelmRelease: %s/%s' % (ns,name)
+    
     def infer_target(msg):
       low=msg.lower()
-      mapping={'grafana':'grafana','grafanu':'grafana','grafane':'grafana','prometheus':'monitoring','prometheusu':'monitoring','headlamp':'headlamp','headlampu':'headlamp','argocd':'argocd','argo':'argocd','jenkins':'jenkins','jenkinsu':'jenkins','gitea':'gitea','giteu':'gitea','zabbix':'zabbix','zabbixu':'zabbix','chef':'chef','chefa':'chef'}
+      mapping={'grafana':'grafana','grafanu':'grafana','grafane':'grafana','prometheus':'monitoring','prometheusu':'monitoring','headlamp':'headlamp','headlampu':'headlamp','flux':'flux-system','jenkins':'jenkins','jenkinsu':'jenkins','gitea':'gitea','giteu':'gitea','zabbix':'zabbix','zabbixu':'zabbix','chef':'chef','chefa':'chef','signoz':'signoz','signozu':'signoz','authentik':'authentik','puppet':'puppet','pe':'pe-console','pe-console':'pe-console'}
       for k,v in mapping.items():
         if k in low:
           return k,v
       return '', ''
-
+    
     def propose_action(target, ns, data):
-      app = data.get('argocd',[{}])[0] if data.get('argocd') else {}
+      hr = data.get('flux',[{}])[0] if data.get('flux') else {}
       bad_pods=[p for p in data.get('pods',[]) if p.get('phase') not in ('Running','Succeeded') or p.get('waiting')]
-      if app.get('sync') and app.get('sync') != 'Synced':
-        return {'kind':'argocd_sync','name':app.get('name')}
+      if hr.get('ready') and hr.get('ready') != 'True' and not hr.get('suspended'):
+        return {'kind':'flux_reconcile','namespace':hr.get('namespace',ns),'name':hr.get('name')}
       if bad_pods:
-        # restart the first deployment-like app by target name; safe but still requires approval
         return {'kind':'restart_deploy','namespace':ns,'name':target}
       return {'kind':'none'}
-
+    
     def render_plan(target, ns, data, proposed, user_msg):
       pods=data.get('pods',[])
       bad=[p for p in pods if p.get('phase') not in ('Running','Succeeded') or p.get('waiting')]
-      apps=data.get('argocd',[])
-      apptxt=', '.join('%s sync=%s health=%s' % (a.get('name'),a.get('sync'),a.get('health')) for a in apps) or 'nenašiel som ArgoCD app'
+      apps=data.get('flux',[])
+      apptxt=', '.join('%s/%s ready=%s reason=%s' % (a.get('namespace'),a.get('name'),a.get('ready'),a.get('reason')) for a in apps) or 'nenašiel som Flux HelmRelease'
       sims=similar_incidents(ns, data)
       simtxt='; '.join('%s: %s -> %s' % (s.get('service','?'), s.get('symptom','?'), s.get('fix',s.get('result','?'))) for s in sims) or 'nenašiel som podobný incident'
-      if proposed.get('kind')=='argocd_sync':
-        navrh='Spustiť ArgoCD sync aplikácie %s.' % proposed.get('name')
+      if proposed.get('kind')=='flux_reconcile':
+        navrh='Spustiť Flux reconcile HelmRelease %s/%s.' % (proposed.get('namespace'), proposed.get('name'))
       elif proposed.get('kind')=='restart_deploy':
         navrh='Reštartovať deployment %s/%s.' % (proposed.get('namespace'), proposed.get('name'))
       else:
         navrh='Zatiaľ nerobiť zmenu, iba sledovať alebo spraviť hlbšiu diagnostiku.'
       ans=('Diagnóza:\n'
            '- Skontroloval som namespace %s. Pods: %s, problémové: %s.\n'
-           '- ArgoCD: %s.\n\n'
+           '- Flux: %s.\n\n'
          '- Podobné incidenty: %s.\n\n'
            'Návrh:\n'
            '- %s\n\n'
@@ -251,14 +273,14 @@ data:
            '- Ak nesúhlasíš, napíš: zamietam' % (ns, len(pods), len(bad), apptxt, simtxt, navrh))
       save_pending({'createdAt':time.time(),'userMessage':user_msg,'target':target,'namespace':ns,'action':proposed,'summary':ans})
       return ans
-
+    
     def execute_pending():
       p=load_pending()
       if not p:
         return 'Nemám čakajúci návrh na vykonanie. Najprv napíš napríklad: oprav grafanu.'
       a=p.get('action',{})
-      if a.get('kind')=='argocd_sync':
-        res=sync_app(a.get('name',''))
+      if a.get('kind')=='flux_reconcile':
+        res=reconcile_hr(a.get('namespace',''), a.get('name',''))
       elif a.get('kind')=='restart_deploy':
         res=restart_deploy(a.get('namespace',''), a.get('name',''))
       elif a.get('kind')=='none':
@@ -267,10 +289,10 @@ data:
         res='Neznámy typ čakajúcej akcie: '+json.dumps(a,ensure_ascii=False)
       clear_pending()
       c=collect(include_logs=False)
-      verify='nodes: %s/%s ready; problem pods: %s; ArgoCD problem apps: %s' % (c['nodesReady'],c['nodesTotal'],c['badPodsCount'],len(c['argocdProblemApps']))
+      verify='nodes: %s/%s ready; problem pods: %s; Flux problem HRs: %s' % (c['nodesReady'],c['nodesTotal'],c['badPodsCount'],len(c['fluxProblemApps']))
       append_incident(p, res, verify)
       return res+'\n\nOverenie:\n- '+verify+'\n\nIncident som zapísal do knowledge base.'
-
+    
     def answer_user(msg):
       low=msg.lower().strip()
       if low in ('schvaľujem','schvalujem','schval aktualny navrh','potvrdzujem','suhlasim','súhlasím'):
@@ -290,28 +312,31 @@ data:
         target=low.replace('potvrd restart deployment ','').strip()
         if '/' not in target: return 'Formát: potvrď restart deployment namespace/name'
         ns,name=target.split('/',1); return restart_deploy(ns,name)
-      if low.startswith('potvrd argocd sync '):
-        return sync_app(low.replace('potvrd argocd sync ','').strip())
+      if low.startswith('potvrd flux reconcile '):
+        target=low.replace('potvrd flux reconcile ','').strip()
+        if '/' not in target: return 'Formát: potvrď flux reconcile namespace/name'
+        ns,name=target.split('/',1); return reconcile_hr(ns,name)
       c=collect(include_logs=True)
       if 'vymaz' in low and 'event' in low:
         return 'Toto je povolený safe-fix, ale vyžaduje potvrdenie. Napíš presne: potvrď vymazať events'
       k=load_knowledge()
-      prompt='''Si lokálny Kubernetes SRE agent v klastri používateľa. Odpovedaj stručne po slovensky. Používaj normálne Kubernetes termíny: pod, pody, image, kontajner, deployment, namespace, service, ingress, ArgoCD app. Nikdy nepoužívaj slovo podmiestka. Máš právomoci: čítať pody/logy/eventy/nody/ingressy/ArgoCD, po explicitnom potvrdení vieš vymazať events, reštartovať deployment a spustiť ArgoCD sync. Workflow: logy -> diagnóza -> plán -> schválenie -> fix -> overenie. Nikdy nenavrhuj rizikový fix bez potvrdenia. Použi pravidlá, runbooky a incidenty nižšie. Otázka používateľa:\n'''+msg+'\n\nPravidlá:\n'+k['rules'][:3000]+'\nRunbooky:\n'+k['runbooks'][:5000]+'\nIncidenty:\n'+(k['seed_incidents']+k['runtime_incidents'])[-5000:]+'\nAktuálny stav a logy:\n'+json.dumps(c,ensure_ascii=False)[:12000]
+      facts={'nodesReady':c['nodesReady'],'nodesTotal':c['nodesTotal'],'badPodsCount':c['badPodsCount'],'fluxProblemAppsCount':len(c['fluxProblemApps']),'fluxProblemApps':[{'ns':h['namespace'],'name':h['name'],'ready':h['ready'],'message':h.get('message','')[:200]} for h in c['fluxProblemApps'][:20]],'badPods':[{'ns':p.get('namespace'),'name':p.get('name'),'phase':p.get('phase'),'reason':p.get('reason','')} for p in c.get('badPods',[])[:30]]}
+      prompt='''Si Kubernetes SRE agent. Odpovedaj výhradne po slovensky, stručne (max 10 riadkov).\n\nPRÍSNE PRAVIDLÁ — ŠTANDARD ANTI-HALUCINÁCIA:\n1. Používaj IBA čísla, mená podov/namespace a chyby, ktoré sú v sekcii FAKTY nižšie. Nič si nevymýšľaj.\n2. Ak fakt nie je vo FAKTY, povedz doslova: \"nemám dáta\". Nikdy nehádaj.\n3. Ak FAKTY hovoria nodesReady=N a nodesTotal=N, povedz \"všetky nody Ready\". Nehovor o Pending podoch ak badPods je prázdny.\n4. Nepoužívaj slovo \"podmiestka\". Používaj: pod, pody, deployment, namespace, service, ingress, Flux HelmRelease.\n5. Ak je fluxProblemAppsCount=0, NEVYTVÁRAJ zoznam zlyhaných appiek.\n6. Nezmieňuj ArgoCD — kluster používa Flux.\n7. Nehovor o HTTP 400/404/500 chybách, ak nie sú vo FAKTY.\n\nPRÁVOMOCI: čítať pody/logy/eventy/nody/ingressy/Flux HelmReleases. Po explicitnom potvrdení: vymazať events, reštartovať deployment, spustiť Flux reconcile HelmRelease. Nikdy nenavrhuj rizikový fix bez potvrdenia od používateľa.\n\nFORMÁT ODPOVEDE (presne tieto sekcie):\nStav:\n<2-3 vety zhrnutia z FAKTY>\nDiagnóza:\n<ak sú problémy z FAKTY; inak \"žiadne problémy\">\nNávrh:\n<konkrétny krok alebo \"netreba zasahovať\">\n\nOTÁZKA: '''+msg+'\n\nFAKTY (jediný zdroj pravdy):\n'+json.dumps(facts,ensure_ascii=False,indent=2)+'\n\nKontext (runbooky/pravidlá, len pomocný):\n'+(k['rules'][:1500]+'\n'+k['runbooks'][:2500])
       try:
         return ollama(prompt)
       except Exception as e:
-        return 'Model ešte nie je pripravený alebo odpoveď trvá príliš dlho: %r\n\nRýchly stav: nodes %s/%s ready, badPods=%s, problemApps=%s' % (e,c['nodesReady'],c['nodesTotal'],c['badPodsCount'],len(c['argocdProblemApps']))
-
+        return 'Model ešte nie je pripravený alebo odpoveď trvá príliš dlho: %r\n\nRýchly stav: nodes %s/%s ready, badPods=%s, problemApps=%s' % (e,c['nodesReady'],c['nodesTotal'],c['badPodsCount'],len(c['fluxProblemApps']))
+    
     PAGE='''<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI SRE Agent</title><style>
     :root{color-scheme:dark}body{margin:0;font-family:Inter,Segoe UI,system-ui;background:#0b1020;color:#e7eaf3}.top{height:52px;display:flex;align-items:center;gap:14px;padding:0 18px;background:#121a31;border-bottom:1px solid #26304d;position:sticky;top:0}.dot{width:10px;height:10px;border-radius:50%;background:#22c55e}.brand{font-weight:700}.status{font-size:13px;color:#aab3cf}.wrap{max-width:980px;margin:0 auto;padding:22px}.chat{display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - 190px)}.msg{padding:14px 16px;border-radius:14px;line-height:1.45;white-space:pre-wrap}.user{align-self:flex-end;background:#2563eb;color:white;max-width:78%}.bot{align-self:flex-start;background:#151f38;border:1px solid #2b385c;max-width:86%}.composer{position:sticky;bottom:0;background:linear-gradient(transparent,#0b1020 20%);padding:18px 0}.box{display:flex;gap:10px}.box textarea{flex:1;min-height:54px;max-height:160px;resize:vertical;border-radius:14px;border:1px solid #34415f;background:#11182b;color:#e7eaf3;padding:13px}.box button,.login button{border:0;border-radius:12px;background:#22c55e;color:#07120b;font-weight:700;padding:0 18px}.hint{font-size:12px;color:#8f9ab8;margin-top:8px}.login{max-width:420px;margin:90px auto;background:#151f38;border:1px solid #2b385c;padding:24px;border-radius:18px}.login input{width:100%;box-sizing:border-box;border-radius:12px;border:1px solid #34415f;background:#0b1020;color:#e7eaf3;padding:13px;margin:12px 0}.spinner{color:#aab3cf}
     </style></head><body>{body}</body></html>'''
-    APP='''<div class="top"><span class="dot"></span><span class="brand">AI SRE Agent</span><span id="status" class="status">načítavam stav…</span></div><div class="wrap"><div id="chat" class="chat"><div class="msg bot">Som lokálny SRE agent. Napíš problém normálne ako sem. Budem robiť: logy → diagnóza → plán → schválenie → fix → overenie.</div></div><div class="composer"><div class="box"><textarea id="input" placeholder="Napr. Skontroluj prečo Grafana nejde…"></textarea><button onclick="send()">Odoslať</button></div><div class="hint">Safe potvrdenia: „potvrď vymazať events“, „potvrď restart deployment namespace/name“, „potvrď argocd sync app“.</div></div></div><script>
-    async function status(){try{let r=await fetch('/api/status');let j=await r.json();document.getElementById('status').textContent=`model ${j.model} · nodes ${j.nodesReady}/${j.nodesTotal} · bad pods ${j.badPodsCount} · Argo problémy ${j.problemApps}`}catch(e){document.getElementById('status').textContent='status nedostupný'}}
+    APP='''<div class="top"><span class="dot"></span><span class="brand">AI SRE Agent</span><span id="status" class="status">načítavam stav…</span></div><div class="wrap"><div id="chat" class="chat"><div class="msg bot">Som lokálny SRE agent. Napíš problém normálne ako sem. Budem robiť: logy → diagnóza → plán → schválenie → fix → overenie.</div></div><div class="composer"><div class="box"><textarea id="input" placeholder="Napr. Skontroluj prečo Grafana nejde…"></textarea><button onclick="send()">Odoslať</button></div><div class="hint">Safe potvrdenia: „potvrď vymazať events“, „potvrď restart deployment namespace/name“, „potvrď flux reconcile namespace/name“.</div></div></div><script>
+    async function status(){try{let r=await fetch('/api/status');let j=await r.json();document.getElementById('status').textContent=`model ${j.model} · nodes ${j.nodesReady}/${j.nodesTotal} · bad pods ${j.badPodsCount} · Flux problémy ${j.problemApps}`}catch(e){document.getElementById('status').textContent='status nedostupný'}}
     function add(cls,txt){let d=document.createElement('div');d.className='msg '+cls;d.textContent=txt;document.getElementById('chat').appendChild(d);d.scrollIntoView({behavior:'smooth',block:'end'});return d}
     async function send(){let el=document.getElementById('input');let text=el.value.trim();if(!text)return;el.value='';add('user',text);let wait=add('bot spinner','pracujem… na CPU to môže trvať aj niekoľko minút');try{let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});let j=await r.json();wait.className='msg bot';wait.textContent=j.answer||JSON.stringify(j)}catch(e){wait.className='msg bot';wait.textContent='Chyba alebo timeout: '+e}status()}
     document.getElementById('input').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey)send()});status();setInterval(status,30000);
     </script>'''
-
+    
     class H(BaseHTTPRequestHandler):
       def authed(self, data=None):
         if not UI_TOKEN: return True
@@ -332,7 +357,7 @@ data:
       def do_GET(self):
         if self.path.startswith('/api/status'):
           if not self.authed(): return self.send_json({'error':'unauthorized'},401)
-          c=collect(include_logs=False); return self.send_json({'model':MODEL,'nodesReady':c['nodesReady'],'nodesTotal':c['nodesTotal'],'badPodsCount':c['badPodsCount'],'problemApps':len(c['argocdProblemApps'])})
+          c=collect(include_logs=False); return self.send_json({'model':MODEL,'nodesReady':c['nodesReady'],'nodesTotal':c['nodesTotal'],'badPodsCount':c['badPodsCount'],'problemApps':len(c['fluxProblemApps'])})
         if not self.authed(): return self.login()
         self.send_html(APP)
       def do_POST(self):
@@ -351,8 +376,7 @@ data:
           self.send_error(404)
         except Exception:
           self.send_json({'answer':'ERROR\n'+traceback.format_exc()},500)
-    ThreadingHTTPServer(('0.0.0.0',8080),H).serve_forever()
----
+    ThreadingHTTPServer(('0.0.0.0',8080),H).serve_forever()---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
