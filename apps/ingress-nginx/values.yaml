@@ -1,5 +1,7 @@
 ingress-nginx:
   controller:
+    admissionWebhooks:
+      enabled: false
     allowSnippetAnnotations: true
     config:
       annotations-risk-level: Critical
