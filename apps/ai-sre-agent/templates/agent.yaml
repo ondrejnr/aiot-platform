@@ -12,7 +12,7 @@ data:
     CA='/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
     K8S='https://kubernetes.default.svc'
     OLLAMA=os.environ.get('OLLAMA_URL','http://ollama:11434')
-    MODEL=os.environ.get('MODEL','qwen2.5-coder:14b')
+    MODEL=os.environ.get('MODEL','qwen2.5-coder:7b')
     UI_TOKEN=os.environ.get('SRE_AGENT_TOKEN','')
     AUDIT='/audit/audit.log'
     CTX=ssl.create_default_context(cafile=CA)
@@ -33,7 +33,7 @@ data:
         raw=r.read().decode('utf-8','replace')
         return json.loads(raw) if raw else {}
 
-    def ollama(prompt, num_predict=700):
+    def ollama(prompt, num_predict=350):
       body=json.dumps({'model':MODEL,'prompt':prompt,'stream':False,'options':{'temperature':0.1,'num_predict':num_predict}}).encode()
       req=urllib.request.Request(OLLAMA+'/api/generate',data=body,headers={'Content-Type':'application/json'})
       with urllib.request.urlopen(req, timeout=900) as r:
@@ -111,7 +111,7 @@ data:
       c=collect(include_logs=True)
       if 'vymaz' in low and 'event' in low:
         return 'Toto je povolený safe-fix, ale vyžaduje potvrdenie. Napíš presne: potvrď vymazať events'
-      prompt='''Si lokálny Kubernetes SRE agent v klastri používateľa. Odpovedaj stručne po slovensky. Máš právomoci: čítať pody/logy/eventy/nody/ingressy/ArgoCD, po explicitnom potvrdení vieš vymazať events, reštartovať deployment a spustiť ArgoCD sync. Workflow: logy -> diagnóza -> plán -> schválenie -> fix -> overenie. Nikdy nenavrhuj rizikový fix bez potvrdenia. Otázka používateľa:\n'''+msg+'\n\nAktuálny stav a logy:\n'+json.dumps(c,ensure_ascii=False)[:30000]
+      prompt='''Si lokálny Kubernetes SRE agent v klastri používateľa. Odpovedaj stručne po slovensky. Máš právomoci: čítať pody/logy/eventy/nody/ingressy/ArgoCD, po explicitnom potvrdení vieš vymazať events, reštartovať deployment a spustiť ArgoCD sync. Workflow: logy -> diagnóza -> plán -> schválenie -> fix -> overenie. Nikdy nenavrhuj rizikový fix bez potvrdenia. Otázka používateľa:\n'''+msg+'\n\nAktuálny stav a logy:\n'+json.dumps(c,ensure_ascii=False)[:12000]
       try:
         return ollama(prompt)
       except Exception as e:
@@ -180,7 +180,7 @@ spec:
     metadata:
       labels: { app: ai-sre-agent }
       annotations:
-        ai-sre-agent/config-version: "2026-05-06-chat-1"
+        ai-sre-agent/config-version: "2026-05-06-chat-7b-1"
     spec:
       serviceAccountName: ai-sre-agent
       containers:
