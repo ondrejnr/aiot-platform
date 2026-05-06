@@ -1,2 +1,21 @@
-# No live values dump available — pass-through skeleton for headlamp
-headlamp: {}
+headlamp:
+  config:
+    oidc:
+      clientID: headlamp
+      issuerURL: https://authentik.46.4.123.8.nip.io/application/o/headlamp/
+      scopes: openid profile email
+      existingSecret: headlamp-oidc
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - host: headlamp.46.4.123.8.nip.io
+        paths:
+          - path: /
+            type: Prefix
+    tls:
+      - hosts: [headlamp.46.4.123.8.nip.io]
+        secretName: headlamp-tls

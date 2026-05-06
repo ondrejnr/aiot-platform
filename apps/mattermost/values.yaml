@@ -1,2 +1,12 @@
-# No live values dump available — pass-through skeleton for mattermost-team-edition
-mattermost-team-edition: {}
+mattermost-team-edition:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - mattermost.46.4.123.8.nip.io
+    tls:
+      - hosts: [mattermost.46.4.123.8.nip.io]
+        secretName: mattermost-tls

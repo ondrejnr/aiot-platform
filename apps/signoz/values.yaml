@@ -1,6 +1,3 @@
-# Live helm values from cluster (snapshot 2026-04-27T05:54:07Z)
-# Probes patched 2026-05-04: IO-saturated host needs longer timeouts
-# Upstream chart key: signoz
 signoz:
   clickhouse:
     installCustomStorageClass: false
@@ -53,6 +50,22 @@ signoz:
       timeoutSeconds: 15
       failureThreshold: 15
       successThreshold: 1
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+      hosts:
+      - host: signoz.46.4.123.8.nip.io
+        paths:
+        - path: /
+          pathType: Prefix
+          port: 8080
+      tls:
+      - hosts:
+        - signoz.46.4.123.8.nip.io
+        secretName: signoz-tls
   zookeeper:
     persistence:
       size: 5Gi

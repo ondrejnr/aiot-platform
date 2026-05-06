@@ -1,2 +1,16 @@
-# No live values dump available — pass-through skeleton for qdrant
-qdrant: {}
+qdrant:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    hosts:
+      - host: qdrant.46.4.123.8.nip.io
+        paths:
+          - path: /
+            pathType: Prefix
+            servicePort: 6333
+    tls:
+      - hosts: [qdrant.46.4.123.8.nip.io]
+        secretName: qdrant-tls
