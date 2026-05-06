@@ -1,0 +1,51 @@
+# DaemonSet emitting native K8s Events on Node objects -> visible in
+# Headlamp -> Cluster -> Events with reasons like KernelOops, OOMKilling,
+# DockerHung, TaskHung, NodeRebooted, NTPIsDown, ContainerdStart, ...
+node-problem-detector:
+  hostNetwork: true
+  hostPID: true
+
+  extraVolumes:
+    - name: log
+      hostPath:
+        path: /var/log
+    - name: kmsg
+      hostPath:
+        path: /dev/kmsg
+    - name: machine-id
+      hostPath:
+        path: /etc/machine-id
+        type: File
+  extraVolumeMounts:
+    - name: log
+      mountPath: /var/log
+      readOnly: true
+    - name: kmsg
+      mountPath: /dev/kmsg
+      readOnly: true
+    - name: machine-id
+      mountPath: /etc/machine-id
+      readOnly: true
+
+  tolerations:
+    - operator: Exists
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring
+      additionalLabels:
+        release: prometheus
+
+  rbac:
+    create: true
+    pspEnabled: false
+
+  resources:
+    requests:
+      cpu: 10m
+      memory: 30Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
