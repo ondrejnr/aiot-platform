@@ -32,4 +32,6 @@ jenkins:
     nodeSelector:
       node-role.kubernetes.io/worker: ""
   persistence:
-    existingClaim: jenkins-lp
+    enabled: true
+    storageClass: local-path
+    size: 20Gi
