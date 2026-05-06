@@ -15,7 +15,8 @@ gitea:
     enabled: true
     architecture: standalone
     auth:
-      enabled: false
+      enabled: true
+      password: changeme
     # IO storm mitigation: cache only, no persistence (sessions can be re-created)
     commonConfiguration: |-
       appendonly no
