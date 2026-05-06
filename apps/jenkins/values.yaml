@@ -32,19 +32,21 @@ jenkins:
               oic:
                 clientId: jenkins
                 clientSecret: ${jenkins-oidc-clientSecret}
-                wellKnownOpenIDConfigurationUrl: https://authentik.46.4.123.8.nip.io/application/o/jenkins/.well-known/openid-configuration
+                serverConfiguration:
+                  wellKnown:
+                    wellKnownOpenIDConfigurationUrl: https://authentik.46.4.123.8.nip.io/application/o/jenkins/.well-known/openid-configuration
                 userNameField: preferred_username
                 fullNameFieldName: name
                 emailFieldName: email
                 groupsFieldName: groups
-                escapeHatchEnabled: true
-                escapeHatchUsername: admin
-                escapeHatchSecret: admin123
-                escapeHatchGroup: admins
                 logoutFromOpenidProvider: true
                 postLogoutRedirectUrl: https://jenkins.46.4.123.8.nip.io
-                rootURLFromRequest: false
                 sendScopesInTokenRequest: true
+                properties:
+                - escapeHatch:
+                    username: admin
+                    secret: admin123
+                    group: admins
             authorizationStrategy:
               loggedInUsersCanDoAnything:
                 allowAnonymousRead: false
