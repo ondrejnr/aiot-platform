@@ -14,6 +14,9 @@ gitea:
   redis:
     enabled: true
     architecture: standalone
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/redis
     auth:
       enabled: true
       password: changeme
