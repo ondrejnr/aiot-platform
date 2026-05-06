@@ -188,7 +188,7 @@ data:
       active = {}
       for alert in alerts:
         state = alert.get("state")
-        if state not in ("firing", "pending"):
+        if state != "firing":
           continue
         labels = alert.get("labels", {})
         severity = labels.get("severity", "").lower()
