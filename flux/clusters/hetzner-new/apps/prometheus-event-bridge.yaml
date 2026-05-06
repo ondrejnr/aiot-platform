@@ -5,7 +5,7 @@ metadata:
   name: prometheus-event-bridge
   namespace: prometheus-event-bridge
 spec:
-  suspend: true
+  suspend: false
   interval: 30m
   releaseName: prometheus-event-bridge
   chart:

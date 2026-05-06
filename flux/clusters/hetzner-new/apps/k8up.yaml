@@ -5,7 +5,7 @@ metadata:
   name: k8up
   namespace: k8up-system
 spec:
-  suspend: true
+  suspend: false
   interval: 30m
   releaseName: k8up
   chart:

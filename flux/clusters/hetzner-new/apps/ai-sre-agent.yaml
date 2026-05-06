@@ -5,7 +5,7 @@ metadata:
   name: ai-sre-agent
   namespace: ai-agent
 spec:
-  suspend: true
+  suspend: false
   interval: 30m
   releaseName: ai-sre-agent
   chart:

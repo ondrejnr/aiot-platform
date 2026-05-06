@@ -5,7 +5,7 @@ metadata:
   name: jenkins
   namespace: jenkins
 spec:
-  suspend: true
+  suspend: false
   interval: 30m
   releaseName: jenkins
   chart:
