@@ -7,15 +7,12 @@ grafana:
     existingSecret: grafana-admin
     userKey: admin-user
     passwordKey: admin-password
-  envValueFrom:
-    GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
-      secretKeyRef:
-        name: grafana-oidc
-        key: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
-    GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET:
-      secretKeyRef:
-        name: grafana-oidc
-        key: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+  extraSecretMounts:
+  - name: grafana-oidc
+    secretName: grafana-oidc
+    defaultMode: 0440
+    mountPath: /etc/secrets/oidc
+    readOnly: true
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -34,6 +31,8 @@ grafana:
     auth.generic_oauth:
       enabled: true
       name: Authentik
+      client_id: grafana
+      client_secret: d4abe87e66a406f23cea1beeb9b4713e40ecb1a46b952b0f30eec77aff21aba8
       scopes: openid profile email
       auth_url: https://authentik.46.4.123.8.nip.io/application/o/authorize/
       token_url: https://authentik.46.4.123.8.nip.io/application/o/token/
