@@ -10,6 +10,16 @@ argo-cd:
       statusbadge.enabled: "false"
       timeout.reconciliation: 180s
       url: https://argocd.46.4.123.8.nip.io
+      oidc.config: |
+        name: Authentik
+        issuer: https://authentik.46.4.123.8.nip.io/application/o/argocd/
+        clientID: argocd
+        clientSecret: $oidc.authentik.clientSecret
+        requestedScopes:
+          - openid
+          - profile
+          - email
+          - groups
     params:
       server.insecure: true
     rbac:
@@ -35,22 +45,18 @@ argo-cd:
       enabled: true
   server:
     ingress:
-      annotations:
-        nginx.ingress.kubernetes.io/backend-protocol: HTTP
-        nginx.ingress.kubernetes.io/ssl-redirect: "true"
       enabled: true
-      hostname: argocd.46.4.123.8.nip.io
       ingressClassName: nginx
-      tls: true
+      hostname: argocd.46.4.123.8.nip.io
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/backend-protocol: HTTP
         nginx.ingress.kubernetes.io/ssl-redirect: "true"
       hosts:
-      - argocd.46.4.123.8.nip.io
-      tls:
-      - hosts:
         - argocd.46.4.123.8.nip.io
-        secretName: argocd-tls
+      tls:
+        - hosts:
+            - argocd.46.4.123.8.nip.io
+          secretName: argocd-tls
     metrics:
       enabled: true
