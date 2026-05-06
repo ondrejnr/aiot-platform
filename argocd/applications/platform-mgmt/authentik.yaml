@@ -18,6 +18,11 @@ spec:
       releaseName: authentik
       values: |
         global:
+          env:
+          - name: AUTHENTIK_HOST
+            value: https://authentik.46.4.123.8.nip.io
+          - name: AUTHENTIK_HOST_BROWSER
+            value: https://authentik.46.4.123.8.nip.io
           envFrom:
           - secretRef:
               name: authentik-bootstrap
