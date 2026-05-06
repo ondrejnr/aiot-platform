@@ -16,9 +16,12 @@ data:
     from urllib.parse import urlencode, quote
     from authentik.core.models import Application
     from authentik.flows.models import Flow
+    from authentik.outposts.models import Outpost
     from authentik.providers.oauth2.models import OAuth2Provider, RedirectURI, RedirectURIMatchingMode, ScopeMapping
+    from authentik.providers.proxy.models import ProxyProvider
 
     client_secret = "__OIDC_CLIENT_SECRET__"
+    authentik_url = "https://authentik.46.4.123.8.nip.io"
     signoz_url = "https://signoz.46.4.123.8.nip.io"
     callback = f"{signoz_url}/api/v1/complete/oidc"
 
@@ -42,7 +45,24 @@ data:
     app.meta_launch_url = signoz_url + "/"
     app.open_in_new_tab = True
     app.save()
-    print({"provider": None, "launch": app.meta_launch_url})
+
+    # Keep the embedded outpost pinned to the current Authentik host.
+    # Without this, a restored/migrated DB can keep redeeming proxy OAuth tokens
+    # against the old host and cause an issuer-mismatch redirect loop.
+    outpost = Outpost.objects.filter(name="authentik Embedded Outpost").first()
+    outpost_status = "missing"
+    if outpost:
+        cfg = outpost.config
+        cfg.authentik_host = authentik_url
+        cfg.authentik_host_browser = authentik_url
+        outpost.config = cfg
+        proxy = ProxyProvider.objects.filter(name="aiot-domain-fwd").first()
+        if proxy and not outpost.providers.filter(pk=proxy.pk).exists():
+            outpost.providers.add(proxy)
+        outpost.save()
+        outpost_status = "updated"
+
+    print({"provider": None, "launch": app.meta_launch_url, "outpost": outpost_status})
     PYCODE
     sed -i "s|__OIDC_CLIENT_SECRET__|$OIDC_CLIENT_SECRET|g" "$PY"
     kubectl -n authentik exec deploy/authentik-server -- ak shell -c "$(cat "$PY")"
