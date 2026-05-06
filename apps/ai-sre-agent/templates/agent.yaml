@@ -15,6 +15,7 @@ data:
     MODEL=os.environ.get('MODEL','qwen2.5-coder:7b')
     UI_TOKEN=os.environ.get('SRE_AGENT_TOKEN','')
     AUDIT='/audit/audit.log'
+    PENDING='/audit/pending.json'
     CTX=ssl.create_default_context(cafile=CA)
 
     def audit(msg):
@@ -73,6 +74,62 @@ data:
         'logs':'\n\n'.join(logs)
       }
 
+    def collect_target(target):
+      ns = target if target else ''
+      out = {'target': target, 'namespace': ns, 'pods': [], 'logs': '', 'ingresses': [], 'services': [], 'argocd': []}
+      try:
+        pods = k8s('GET','/api/v1/namespaces/%s/pods?limit=200' % urllib.parse.quote(ns)).get('items',[])
+        for p in pods:
+          waiting=[]
+          for cs in p.get('status',{}).get('containerStatuses',[]) or []:
+            st=cs.get('state',{})
+            if st.get('waiting'):
+              waiting.append(cs.get('name','?')+':'+st['waiting'].get('reason','waiting'))
+          out['pods'].append({'name':p['metadata']['name'],'phase':p.get('status',{}).get('phase'),'ready':p.get('status',{}).get('containerStatuses',[]),'waiting':waiting})
+        logs=[]
+        for p in pods[:4]:
+          try:
+            path='/api/v1/namespaces/%s/pods/%s/log?tailLines=80&allContainers=true' % (urllib.parse.quote(ns), urllib.parse.quote(p['metadata']['name']))
+            req=urllib.request.Request(K8S+path,headers={'Authorization':'Bearer '+TOKEN})
+            with urllib.request.urlopen(req, context=CTX, timeout=12) as r:
+              logs.append('### '+p['metadata']['name']+'\n'+r.read().decode('utf-8','replace')[-3500:])
+          except Exception as e:
+            logs.append('### '+p['metadata']['name']+'\nLOG_ERROR '+repr(e))
+        out['logs']='\n\n'.join(logs)
+      except Exception as e:
+        out['pods_error']=repr(e)
+      try:
+        out['ingresses']=k8s('GET','/apis/networking.k8s.io/v1/namespaces/%s/ingresses' % urllib.parse.quote(ns)).get('items',[])
+      except Exception as e:
+        out['ingress_error']=repr(e)
+      try:
+        out['services']=k8s('GET','/api/v1/namespaces/%s/services' % urllib.parse.quote(ns)).get('items',[])
+      except Exception as e:
+        out['services_error']=repr(e)
+      try:
+        apps=k8s('GET','/apis/argoproj.io/v1alpha1/namespaces/argocd/applications').get('items',[])
+        out['argocd']=[{'name':a['metadata']['name'],'sync':a.get('status',{}).get('sync',{}).get('status'),'health':a.get('status',{}).get('health',{}).get('status'),'message':a.get('status',{}).get('conditions',[{}])[0].get('message','') if a.get('status',{}).get('conditions') else ''} for a in apps if target in a['metadata']['name'] or a.get('spec',{}).get('destination',{}).get('namespace')==ns]
+      except Exception as e:
+        out['argocd_error']=repr(e)
+      return out
+
+    def load_pending():
+      try:
+        return json.load(open(PENDING, encoding='utf-8'))
+      except Exception:
+        return None
+
+    def save_pending(p):
+      os.makedirs('/audit', exist_ok=True)
+      with open(PENDING, 'w', encoding='utf-8') as f:
+        json.dump(p, f, ensure_ascii=False, indent=2)
+
+    def clear_pending():
+      try:
+        os.remove(PENDING)
+      except Exception:
+        pass
+
     def delete_events():
       nss=[n['metadata']['name'] for n in k8s('GET','/api/v1/namespaces').get('items',[])]
       cnt=0
@@ -98,8 +155,72 @@ data:
       audit('approved_fix argocd_sync %s' % name)
       return 'Spustený ArgoCD sync: %s' % name
 
+    def infer_target(msg):
+      low=msg.lower()
+      mapping={'grafana':'grafana','prometheus':'monitoring','headlamp':'headlamp','argocd':'argocd','jenkins':'jenkins','gitea':'gitea','zabbix':'zabbix','chef':'chef'}
+      for k,v in mapping.items():
+        if k in low:
+          return k,v
+      return '', ''
+
+    def propose_action(target, ns, data):
+      app = data.get('argocd',[{}])[0] if data.get('argocd') else {}
+      bad_pods=[p for p in data.get('pods',[]) if p.get('phase') not in ('Running','Succeeded') or p.get('waiting')]
+      if app.get('sync') and app.get('sync') != 'Synced':
+        return {'kind':'argocd_sync','name':app.get('name')}
+      if bad_pods:
+        # restart the first deployment-like app by target name; safe but still requires approval
+        return {'kind':'restart_deploy','namespace':ns,'name':target}
+      return {'kind':'none'}
+
+    def render_plan(target, ns, data, proposed, user_msg):
+      prompt=('Si lokálny Kubernetes SRE agent. Používateľ chce opravu služby. Najprv NESMIEŠ nič meniť. '
+          'Odpovedz po slovensky v presnom formáte:\n'
+          'Diagnóza:\n- ...\n'
+          'Návrh:\n- ...\n'
+          'Riziko:\n- ...\n'
+          'Čakám na schválenie:\n- ak súhlasíš, napíš: schvaľujem\n\n'
+          'Buď stručný. Dáta služby a logy:\n'
+          + json.dumps(data,ensure_ascii=False)[:12000]
+          + '\nNavrhnutá bezpečná akcia po schválení: '
+          + json.dumps(proposed,ensure_ascii=False))
+      try:
+        ans=ollama(prompt, num_predict=320)
+      except Exception as e:
+        ans='Diagnóza:\n- Model nestihol odpovedať: %r\n- Stav služby som ale načítal.\n\nNávrh:\n- Navrhnutá akcia po schválení: %s\n\nRiziko:\n- Akcia sa vykoná až po tvojom schválení.\n\nČakám na schválenie:\n- Ak súhlasíš, napíš: schvaľujem' % (e, proposed)
+      save_pending({'createdAt':time.time(),'userMessage':user_msg,'target':target,'namespace':ns,'action':proposed,'summary':ans})
+      return ans
+
+    def execute_pending():
+      p=load_pending()
+      if not p:
+        return 'Nemám čakajúci návrh na vykonanie. Najprv napíš napríklad: oprav grafanu.'
+      a=p.get('action',{})
+      if a.get('kind')=='argocd_sync':
+        res=sync_app(a.get('name',''))
+      elif a.get('kind')=='restart_deploy':
+        res=restart_deploy(a.get('namespace',''), a.get('name',''))
+      elif a.get('kind')=='none':
+        res='Nebola navrhnutá žiadna bezpečná automatická zmena. Treba ďalšiu diagnózu alebo manuálny fix.'
+      else:
+        res='Neznámy typ čakajúcej akcie: '+json.dumps(a,ensure_ascii=False)
+      clear_pending()
+      c=collect(include_logs=False)
+      return res+'\n\nOverenie:\n- nodes: %s/%s ready\n- problem pods: %s\n- ArgoCD problem apps: %s' % (c['nodesReady'],c['nodesTotal'],c['badPodsCount'],len(c['argocdProblemApps']))
+
     def answer_user(msg):
       low=msg.lower().strip()
+      if low in ('schvaľujem','schvalujem','schval aktualny navrh','potvrdzujem','suhlasim','súhlasím'):
+        return execute_pending()
+      if low in ('zrus','zruš','zamietam','neschvalujem'):
+        clear_pending(); return 'Čakajúci návrh je zrušený. Nič som nezmenil.'
+      if any(w in low for w in ['oprav','fixni','vyries','vyrieš']):
+        target,ns=infer_target(msg)
+        if target and ns:
+          data=collect_target(ns)
+          action=propose_action(target,ns,data)
+          return render_plan(target,ns,data,action,msg)
+        return 'Rozumiem, ale neviem, ktorú službu mám opraviť. Napíš napríklad: oprav grafanu, oprav headlamp, oprav jenkins.'
       if 'potvrd' in low and 'event' in low:
         res=delete_events(); return res+'\n\nOverenie: spusti otázku "skontroluj stav".'
       if low.startswith('potvrd restart deployment '):
@@ -180,7 +301,7 @@ spec:
     metadata:
       labels: { app: ai-sre-agent }
       annotations:
-        ai-sre-agent/config-version: "2026-05-06-chat-7b-1"
+        ai-sre-agent/config-version: "2026-05-06-chat-1"
     spec:
       serviceAccountName: ai-sre-agent
       containers:
