@@ -2,6 +2,13 @@ ingress-nginx:
   controller:
     admissionWebhooks:
       enabled: false
+    hostPort:
+      enabled: true
+      ports:
+        http: 80
+        https: 443
+    service:
+      enabled: false
     allowSnippetAnnotations: true
     config:
       annotations-risk-level: Critical
