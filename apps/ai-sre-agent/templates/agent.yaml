@@ -5,7 +5,7 @@ metadata:
   labels: { app: ai-sre-agent }
 data:
   app.py: |-
-    import os, ssl, json, time, urllib.request, urllib.parse, traceback
+    import os, ssl, json, time, urllib.request, urllib.parse, traceback, html
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
     TOKEN=open('/var/run/secrets/kubernetes.io/serviceaccount/token').read().strip()
@@ -22,27 +22,24 @@ data:
       with open(AUDIT,'a',encoding='utf-8') as f:
         f.write(time.strftime('%FT%T%z ') + msg + '\n')
 
-    def esc(s):
-      return str(s).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-
-    def k8s(method, path, body=None, ctype='application/json'):
+    def k8s(method, path, body=None, ctype='application/json', timeout=25):
       data=None if body is None else json.dumps(body).encode()
       req=urllib.request.Request(K8S+path, data=data, method=method)
       req.add_header('Authorization','Bearer '+TOKEN)
       req.add_header('Accept','application/json')
       if body is not None:
         req.add_header('Content-Type',ctype)
-      with urllib.request.urlopen(req, context=CTX, timeout=25) as r:
+      with urllib.request.urlopen(req, context=CTX, timeout=timeout) as r:
         raw=r.read().decode('utf-8','replace')
         return json.loads(raw) if raw else {}
 
-    def ollama(prompt):
-      body=json.dumps({'model':MODEL,'prompt':prompt,'stream':False,'options':{'temperature':0.1}}).encode()
+    def ollama(prompt, num_predict=700):
+      body=json.dumps({'model':MODEL,'prompt':prompt,'stream':False,'options':{'temperature':0.1,'num_predict':num_predict}}).encode()
       req=urllib.request.Request(OLLAMA+'/api/generate',data=body,headers={'Content-Type':'application/json'})
-      with urllib.request.urlopen(req, timeout=600) as r:
+      with urllib.request.urlopen(req, timeout=900) as r:
         return json.loads(r.read().decode()).get('response','')
 
-    def collect():
+    def collect(include_logs=True):
       pods=k8s('GET','/api/v1/pods?limit=1000').get('items',[])
       nodes=k8s('GET','/api/v1/nodes').get('items',[])
       apps=k8s('GET','/apis/argoproj.io/v1alpha1/namespaces/argocd/applications').get('items',[])
@@ -57,30 +54,24 @@ data:
         if phase not in ('Running','Succeeded') or waiting:
           bad.append({'ns':p['metadata']['namespace'],'pod':p['metadata']['name'],'phase':phase,'node':p.get('spec',{}).get('nodeName',''),'waiting':waiting})
       logs=[]
-      for b in bad[:8]:
-        try:
-          path='/api/v1/namespaces/%s/pods/%s/log?tailLines=80&allContainers=true' % (urllib.parse.quote(b['ns']), urllib.parse.quote(b['pod']))
-          req=urllib.request.Request(K8S+path,headers={'Authorization':'Bearer '+TOKEN})
-          with urllib.request.urlopen(req, context=CTX, timeout=12) as r:
-            txt=r.read().decode('utf-8','replace')[-5000:]
-          logs.append('### %s/%s\n%s' % (b['ns'],b['pod'],txt))
-        except Exception as e:
-          logs.append('### %s/%s\nLOG_ERROR %s' % (b['ns'],b['pod'],e))
+      if include_logs:
+        for b in bad[:8]:
+          try:
+            path='/api/v1/namespaces/%s/pods/%s/log?tailLines=80&allContainers=true' % (urllib.parse.quote(b['ns']), urllib.parse.quote(b['pod']))
+            req=urllib.request.Request(K8S+path,headers={'Authorization':'Bearer '+TOKEN})
+            with urllib.request.urlopen(req, context=CTX, timeout=12) as r:
+              txt=r.read().decode('utf-8','replace')[-4500:]
+            logs.append('### %s/%s\n%s' % (b['ns'],b['pod'],txt))
+          except Exception as e:
+            logs.append('### %s/%s\nLOG_ERROR %s' % (b['ns'],b['pod'],e))
       return {
-        'nodes':[{'name':n['metadata']['name'],'ready':[c for c in n.get('status',{}).get('conditions',[]) if c.get('type')=='Ready']} for n in nodes],
-        'badPods':bad[:30],
-        'argocd':[{'name':a['metadata']['name'],'sync':a.get('status',{}).get('sync',{}).get('status'),'health':a.get('status',{}).get('health',{}).get('status')} for a in apps],
+        'nodesReady': sum(1 for n in nodes for c in n.get('status',{}).get('conditions',[]) if c.get('type')=='Ready' and c.get('status')=='True'),
+        'nodesTotal': len(nodes),
+        'badPods': bad[:30],
+        'badPodsCount': len(bad),
+        'argocdProblemApps':[{'name':a['metadata']['name'],'sync':a.get('status',{}).get('sync',{}).get('status'),'health':a.get('status',{}).get('health',{}).get('status')} for a in apps if a.get('status',{}).get('sync',{}).get('status')!='Synced' or a.get('status',{}).get('health',{}).get('status') not in ('Healthy',None)],
         'logs':'\n\n'.join(logs)
       }
-
-    def diagnose():
-      c=collect()
-      prompt='''Si lokalny Kubernetes SRE agent. Postup musi byt: logy -> diagnoza -> plan -> schvalenie -> fix -> overenie. Nic rizikove bez schvalenia. Na zaklade dat napis strucne: 1) co je zle, 2) pravdepodobna pricina, 3) plan opravy, 4) rizika, 5) overenie. Data:\n'''+json.dumps(c,ensure_ascii=False)[:30000]
-      try:
-        ans=ollama(prompt)
-      except Exception as e:
-        ans='MODEL_NOT_READY: '+repr(e)+'\n\nZber dat funguje, ale model sa este stahuje alebo startuje.'
-      return c, ans
 
     def delete_events():
       nss=[n['metadata']['name'] for n in k8s('GET','/api/v1/namespaces').get('items',[])]
@@ -94,87 +85,87 @@ data:
         except Exception:
           pass
       audit('approved_fix delete_events count=%s' % cnt)
-      return 'Vymazane events: %s' % cnt
+      return 'Vymazané Kubernetes events: %s' % cnt
 
     def restart_deploy(ns,name):
-      if not ns or not name:
-        return 'Chyba: treba namespace aj deployment.'
       body={'spec':{'template':{'metadata':{'annotations':{'ai-sre-agent/restartedAt':time.strftime('%FT%TZ',time.gmtime())}}}}}
       k8s('PATCH','/apis/apps/v1/namespaces/%s/deployments/%s' % (urllib.parse.quote(ns), urllib.parse.quote(name)), body, 'application/merge-patch+json')
       audit('approved_fix restart_deployment %s/%s' % (ns,name))
-      return 'Restartovany deployment: %s/%s' % (ns,name)
+      return 'Reštartovaný deployment: %s/%s' % (ns,name)
 
     def sync_app(name):
-      if not name:
-        return 'Chyba: treba nazov ArgoCD app.'
       k8s('PATCH','/apis/argoproj.io/v1alpha1/namespaces/argocd/applications/%s' % urllib.parse.quote(name), {'operation':{'sync':{}}}, 'application/merge-patch+json')
       audit('approved_fix argocd_sync %s' % name)
-      return 'Spusteny ArgoCD sync: %s' % name
+      return 'Spustený ArgoCD sync: %s' % name
 
-    PAGE='''<!doctype html><html><head><meta charset="utf-8"><title>AI SRE Agent</title><style>body{font-family:system-ui;margin:2rem;max-width:1200px}textarea,input{width:100%;padding:.6rem;margin:.2rem 0}button{padding:.7rem 1rem;margin:.3rem}.warn{background:#fff3cd;padding:1rem;border-radius:8px}pre{background:#111;color:#ddd;padding:1rem;white-space:pre-wrap;border-radius:8px}</style></head><body><h1>AI SRE Agent</h1><div class="warn">Workflow: logy -> diagnoza -> plan -> schvalenie -> fix -> overenie. Rizikove akcie nie su v MVP povolene.</div>{body}</body></html>'''
-    MAIN='''<form method="post" action="/diagnose"><p><button>Spustit diagnostiku</button></p></form><h2>Schvalene safe fixy</h2><form method="post" action="/fix"><button name="action" value="delete-events">Vymazat Kubernetes events</button></form><form method="post" action="/fix"><input name="ns" placeholder="namespace"><input name="name" placeholder="deployment"><button name="action" value="restart-deploy">Restart deployment</button></form><form method="post" action="/fix"><input name="name" placeholder="argocd app"><button name="action" value="sync-app">ArgoCD sync</button></form>'''
+    def answer_user(msg):
+      low=msg.lower().strip()
+      if 'potvrd' in low and 'event' in low:
+        res=delete_events(); return res+'\n\nOverenie: spusti otázku "skontroluj stav".'
+      if low.startswith('potvrd restart deployment '):
+        target=low.replace('potvrd restart deployment ','').strip()
+        if '/' not in target: return 'Formát: potvrď restart deployment namespace/name'
+        ns,name=target.split('/',1); return restart_deploy(ns,name)
+      if low.startswith('potvrd argocd sync '):
+        return sync_app(low.replace('potvrd argocd sync ','').strip())
+      c=collect(include_logs=True)
+      if 'vymaz' in low and 'event' in low:
+        return 'Toto je povolený safe-fix, ale vyžaduje potvrdenie. Napíš presne: potvrď vymazať events'
+      prompt='''Si lokálny Kubernetes SRE agent v klastri používateľa. Odpovedaj stručne po slovensky. Máš právomoci: čítať pody/logy/eventy/nody/ingressy/ArgoCD, po explicitnom potvrdení vieš vymazať events, reštartovať deployment a spustiť ArgoCD sync. Workflow: logy -> diagnóza -> plán -> schválenie -> fix -> overenie. Nikdy nenavrhuj rizikový fix bez potvrdenia. Otázka používateľa:\n'''+msg+'\n\nAktuálny stav a logy:\n'+json.dumps(c,ensure_ascii=False)[:30000]
+      try:
+        return ollama(prompt)
+      except Exception as e:
+        return 'Model ešte nie je pripravený alebo odpoveď trvá príliš dlho: %r\n\nRýchly stav: nodes %s/%s ready, badPods=%s, problemApps=%s' % (e,c['nodesReady'],c['nodesTotal'],c['badPodsCount'],len(c['argocdProblemApps']))
+
+    PAGE='''<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI SRE Agent</title><style>
+    :root{color-scheme:dark}body{margin:0;font-family:Inter,Segoe UI,system-ui;background:#0b1020;color:#e7eaf3}.top{height:52px;display:flex;align-items:center;gap:14px;padding:0 18px;background:#121a31;border-bottom:1px solid #26304d;position:sticky;top:0}.dot{width:10px;height:10px;border-radius:50%;background:#22c55e}.brand{font-weight:700}.status{font-size:13px;color:#aab3cf}.wrap{max-width:980px;margin:0 auto;padding:22px}.chat{display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - 190px)}.msg{padding:14px 16px;border-radius:14px;line-height:1.45;white-space:pre-wrap}.user{align-self:flex-end;background:#2563eb;color:white;max-width:78%}.bot{align-self:flex-start;background:#151f38;border:1px solid #2b385c;max-width:86%}.composer{position:sticky;bottom:0;background:linear-gradient(transparent,#0b1020 20%);padding:18px 0}.box{display:flex;gap:10px}.box textarea{flex:1;min-height:54px;max-height:160px;resize:vertical;border-radius:14px;border:1px solid #34415f;background:#11182b;color:#e7eaf3;padding:13px}.box button,.login button{border:0;border-radius:12px;background:#22c55e;color:#07120b;font-weight:700;padding:0 18px}.hint{font-size:12px;color:#8f9ab8;margin-top:8px}.login{max-width:420px;margin:90px auto;background:#151f38;border:1px solid #2b385c;padding:24px;border-radius:18px}.login input{width:100%;box-sizing:border-box;border-radius:12px;border:1px solid #34415f;background:#0b1020;color:#e7eaf3;padding:13px;margin:12px 0}.spinner{color:#aab3cf}
+    </style></head><body>{body}</body></html>'''
+    APP='''<div class="top"><span class="dot"></span><span class="brand">AI SRE Agent</span><span id="status" class="status">načítavam stav…</span></div><div class="wrap"><div id="chat" class="chat"><div class="msg bot">Som lokálny SRE agent. Napíš problém normálne ako sem. Budem robiť: logy → diagnóza → plán → schválenie → fix → overenie.</div></div><div class="composer"><div class="box"><textarea id="input" placeholder="Napr. Skontroluj prečo Grafana nejde…"></textarea><button onclick="send()">Odoslať</button></div><div class="hint">Safe potvrdenia: „potvrď vymazať events“, „potvrď restart deployment namespace/name“, „potvrď argocd sync app“.</div></div></div><script>
+    async function status(){try{let r=await fetch('/api/status');let j=await r.json();document.getElementById('status').textContent=`model ${j.model} · nodes ${j.nodesReady}/${j.nodesTotal} · bad pods ${j.badPodsCount} · Argo problémy ${j.problemApps}`}catch(e){document.getElementById('status').textContent='status nedostupný'}}
+    function add(cls,txt){let d=document.createElement('div');d.className='msg '+cls;d.textContent=txt;document.getElementById('chat').appendChild(d);d.scrollIntoView({behavior:'smooth',block:'end'});return d}
+    async function send(){let el=document.getElementById('input');let text=el.value.trim();if(!text)return;el.value='';add('user',text);let wait=add('bot spinner','pracujem… na CPU to môže trvať aj niekoľko minút');try{let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});let j=await r.json();wait.className='msg bot';wait.textContent=j.answer||JSON.stringify(j)}catch(e){wait.className='msg bot';wait.textContent='Chyba alebo timeout: '+e}status()}
+    document.getElementById('input').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey)send()});status();setInterval(status,30000);
+    </script>'''
 
     class H(BaseHTTPRequestHandler):
       def authed(self, data=None):
-        if not UI_TOKEN:
-          return True
+        if not UI_TOKEN: return True
         cookie=self.headers.get('Cookie','')
-        if ('sre_agent='+UI_TOKEN) in cookie:
-          return True
-        if data and data.get('token',[''])[0] == UI_TOKEN:
-          return True
+        if ('sre_agent='+UI_TOKEN) in cookie: return True
+        if data and data.get('token',[''])[0] == UI_TOKEN: return True
         qs=urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
         return qs.get('token',[''])[0] == UI_TOKEN
-      def login(self, msg=''):
-        self.html('<h2>Login</h2><p>'+esc(msg)+'</p><form method="post" action="/login"><input name="token" type="password" placeholder="agent token"><button>Login</button></form>')
-      def html(self,body=''):
-        b=PAGE.replace('{body}', body).encode()
-        self.send_response(200)
-        self.send_header('Content-Type','text/html; charset=utf-8')
-        self.send_header('Content-Length',str(len(b)))
-        self.end_headers()
-        self.wfile.write(b)
-      def do_HEAD(self):
-        self.send_response(200)
-        self.end_headers()
+      def send_html(self,body,code=200):
+        b=PAGE.replace('{body}',body).encode()
+        self.send_response(code); self.send_header('Content-Type','text/html; charset=utf-8'); self.send_header('Content-Length',str(len(b))); self.end_headers(); self.wfile.write(b)
+      def send_json(self,obj,code=200):
+        b=json.dumps(obj,ensure_ascii=False).encode()
+        self.send_response(code); self.send_header('Content-Type','application/json; charset=utf-8'); self.send_header('Content-Length',str(len(b))); self.end_headers(); self.wfile.write(b)
+      def login(self,msg=''):
+        self.send_html('<div class="login"><h1>AI SRE Agent</h1><p>'+html.escape(msg or 'Zadaj agent token.')+'</p><form method="post" action="/login"><input name="token" type="password" autofocus placeholder="agent token"><button>Prihlásiť</button></form></div>')
+      def do_HEAD(self): self.send_response(200); self.end_headers()
       def do_GET(self):
-        if not self.authed():
-          return self.login()
-        self.html(MAIN+'<p>Pripravene. Spusti diagnostiku.</p>')
+        if self.path.startswith('/api/status'):
+          if not self.authed(): return self.send_json({'error':'unauthorized'},401)
+          c=collect(include_logs=False); return self.send_json({'model':MODEL,'nodesReady':c['nodesReady'],'nodesTotal':c['nodesTotal'],'badPodsCount':c['badPodsCount'],'problemApps':len(c['argocdProblemApps'])})
+        if not self.authed(): return self.login()
+        self.send_html(APP)
       def do_POST(self):
         try:
-          ln=int(self.headers.get('Content-Length','0'))
-          data=urllib.parse.parse_qs(self.rfile.read(ln).decode())
+          ln=int(self.headers.get('Content-Length','0')); raw=self.rfile.read(ln).decode()
           if self.path=='/login':
+            data=urllib.parse.parse_qs(raw)
             if data.get('token',[''])[0] == UI_TOKEN:
-              self.send_response(303)
-              self.send_header('Set-Cookie','sre_agent='+UI_TOKEN+'; Path=/; HttpOnly; Secure; SameSite=Lax')
-              self.send_header('Location','/')
-              self.end_headers()
-              return
-            return self.login('Zly token')
-          if not self.authed(data):
-            return self.login()
-          if self.path=='/diagnose':
-            c,a=diagnose()
-            audit('diagnose badPods=%s' % len(c.get('badPods',[])))
-            self.html('<h2>Diagnoza a plan</h2><pre>'+esc(a)+'</pre><h2>Surove data</h2><pre>'+esc(json.dumps(c,indent=2,ensure_ascii=False))+'</pre>')
-          elif self.path=='/fix':
-            act=data.get('action',[''])[0]
-            if act=='delete-events':
-              res=delete_events()
-            elif act=='restart-deploy':
-              res=restart_deploy(data.get('ns',[''])[0],data.get('name',[''])[0])
-            elif act=='sync-app':
-              res=sync_app(data.get('name',[''])[0])
-            else:
-              res='Nepovolena akcia'
-            c,_=diagnose()
-            self.html('<h2>Fix</h2><pre>'+esc(res)+'</pre><h2>Overenie</h2><pre>'+esc(json.dumps(c,indent=2,ensure_ascii=False))+'</pre>')
-          else:
-            self.send_error(404)
+              self.send_response(303); self.send_header('Set-Cookie','sre_agent='+UI_TOKEN+'; Path=/; HttpOnly; Secure; SameSite=Lax'); self.send_header('Location','/'); self.end_headers(); return
+            return self.login('Zlý token')
+          if not self.authed(): return self.send_json({'error':'unauthorized'},401)
+          if self.path=='/api/chat':
+            msg=json.loads(raw or '{}').get('message','')[:4000]
+            audit('chat '+msg.replace('\n',' ')[:300])
+            return self.send_json({'answer':answer_user(msg)})
+          self.send_error(404)
         except Exception:
-          self.html('<h2>Error</h2><pre>'+esc(traceback.format_exc())+'</pre>')
+          self.send_json({'answer':'ERROR\n'+traceback.format_exc()},500)
     ThreadingHTTPServer(('0.0.0.0',8080),H).serve_forever()
 ---
 apiVersion: apps/v1
@@ -188,6 +179,8 @@ spec:
   template:
     metadata:
       labels: { app: ai-sre-agent }
+      annotations:
+        ai-sre-agent/config-version: "2026-05-06-chat-1"
     spec:
       serviceAccountName: ai-sre-agent
       containers:
@@ -240,6 +233,9 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "900"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "900"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "900"
 spec:
   ingressClassName: nginx
   tls:
