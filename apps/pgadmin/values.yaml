@@ -2,6 +2,7 @@ pgadmin4:
   env:
     email: admin@example.com
     password: AdminPass123!
+    pgpassfile: /var/lib/pgadmin/pgpass
     variables:
       - name: PGADMIN_CONFIG_AUTHENTICATION_SOURCES
         value: "['webserver', 'internal']"
@@ -17,6 +18,64 @@ pgadmin4:
     enabled: true
     storageClass: local-path
     size: 2Gi
+
+  serverDefinitions:
+    enabled: true
+    resourceType: ConfigMap
+    servers:
+      aiotRw:
+        Name: AIOT PostgreSQL RW
+        Group: Servers
+        Host: pg-cluster-rw.databases.svc.cluster.local
+        Port: 5432
+        MaintenanceDB: aiot
+        Username: appuser
+        SSLMode: prefer
+        PassFile: /var/lib/pgadmin/pgpass
+      aiotRo:
+        Name: AIOT PostgreSQL RO
+        Group: Servers
+        Host: pg-cluster-ro.databases.svc.cluster.local
+        Port: 5432
+        MaintenanceDB: aiot
+        Username: appuser
+        SSLMode: prefer
+        PassFile: /var/lib/pgadmin/pgpass
+  extraDeploy:
+    - apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: pgadmin-pgpass
+        namespace: databases
+      data:
+        pgpass: |
+          pg-cluster-rw.databases.svc.cluster.local:5432:*:appuser:AiotPg2026!
+          pg-cluster-ro.databases.svc.cluster.local:5432:*:appuser:AiotPg2026!
+          pg-cluster-r.databases.svc.cluster.local:5432:*:appuser:AiotPg2026!
+  extraConfigmapMounts:
+    - name: pgpass-src
+      mountPath: /tmp/pgpass-src/pgpass
+      subPath: pgpass
+      configMap: pgadmin-pgpass
+      readOnly: true
+      defaultMode: 256
+  extraInitContainers: |
+    - name: install-pgpass
+      image: busybox:1.36
+      command:
+        - sh
+        - -c
+        - |
+          cp /tmp/pgpass-src/pgpass /var/lib/pgadmin/pgpass
+          chmod 600 /var/lib/pgadmin/pgpass
+          chown 5050:5050 /var/lib/pgadmin/pgpass
+      volumeMounts:
+        - name: pgadmin-data
+          mountPath: /var/lib/pgadmin
+        - name: pgpass-src
+          mountPath: /tmp/pgpass-src/pgpass
+          subPath: pgpass
+          readOnly: true
   ingress:
     enabled: true
     ingressClassName: nginx
