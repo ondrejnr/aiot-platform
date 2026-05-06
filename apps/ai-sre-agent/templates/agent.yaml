@@ -13,12 +13,67 @@ data:
     K8S='https://kubernetes.default.svc'
     OLLAMA=os.environ.get('OLLAMA_URL','http://ollama:11434')
     MODEL=os.environ.get('MODEL','qwen2.5-coder:7b')
+    EMBED_MODEL=os.environ.get('EMBED_MODEL','nomic-embed-text')
+    QDRANT=os.environ.get('QDRANT_URL','http://qdrant.qdrant.svc:6333')
+    QDRANT_COLLECTION=os.environ.get('QDRANT_COLLECTION','sre_kb')
     UI_TOKEN=os.environ.get('SRE_AGENT_TOKEN','')
     AUDIT='/audit/audit.log'
     PENDING='/audit/pending.json'
     INCIDENTS='/audit/incidents.jsonl'
     KNOWLEDGE='/knowledge'
     CTX=ssl.create_default_context(cafile=CA)
+    
+    def embed(text):
+      req=urllib.request.Request(OLLAMA+'/api/embeddings',data=json.dumps({'model':EMBED_MODEL,'prompt':text[:4000]}).encode(),headers={'Content-Type':'application/json'})
+      return json.loads(urllib.request.urlopen(req,timeout=60).read()).get('embedding',[])
+    
+    def qdrant(method,path,body=None):
+      data=None if body is None else json.dumps(body).encode()
+      req=urllib.request.Request(QDRANT+path,data=data,method=method,headers={'Content-Type':'application/json'})
+      with urllib.request.urlopen(req,timeout=30) as r: return json.loads(r.read().decode())
+    
+    def rag_init():
+      try:
+        qdrant('PUT','/collections/'+QDRANT_COLLECTION,{'vectors':{'size':768,'distance':'Cosine'}})
+      except Exception: pass
+    
+    def rag_index(doc_id, text, meta):
+      try:
+        v=embed(text)
+        if not v: return
+        qdrant('PUT','/collections/'+QDRANT_COLLECTION+'/points',{'points':[{'id':doc_id,'vector':v,'payload':{'text':text[:2000],**meta}}]})
+      except Exception as e:
+        try: open(AUDIT,'a').write(time.strftime('%FT%T%z ')+'rag_index_error: '+repr(e)+'\n')
+        except Exception: pass
+    
+    def rag_search(query, top_k=3):
+      try:
+        v=embed(query)
+        if not v: return []
+        r=qdrant('POST','/collections/'+QDRANT_COLLECTION+'/points/search',{'vector':v,'limit':top_k,'with_payload':True})
+        return [{'score':p.get('score'),'text':p.get('payload',{}).get('text',''),'source':p.get('payload',{}).get('source','')} for p in r.get('result',[])]
+      except Exception: return []
+    
+    def rag_bootstrap():
+      rag_init()
+      pid=1
+      try:
+        for fn in os.listdir(KNOWLEDGE):
+          p=os.path.join(KNOWLEDGE,fn)
+          if not os.path.isfile(p): continue
+          try: txt=open(p,encoding='utf-8',errors='ignore').read()
+          except Exception: continue
+          for i in range(0,len(txt),1500):
+            chunk=txt[i:i+1500]
+            if chunk.strip(): rag_index(pid,chunk,{'source':fn,'kind':'knowledge'}); pid+=1
+      except Exception: pass
+      try:
+        if os.path.exists(INCIDENTS):
+          for ln in open(INCIDENTS,encoding='utf-8',errors='ignore'):
+            ln=ln.strip()
+            if not ln: continue
+            rag_index(pid,ln,{'source':'incidents.jsonl','kind':'incident'}); pid+=1
+      except Exception: pass
     
     def audit(msg):
       os.makedirs('/audit', exist_ok=True)
@@ -146,6 +201,8 @@ data:
       os.makedirs('/audit', exist_ok=True)
       with open(INCIDENTS, 'a', encoding='utf-8') as f:
         f.write(json.dumps(item, ensure_ascii=False)+'\n')
+      try: rag_index(int(time.time()*1000)%2**31, json.dumps(item,ensure_ascii=False), {'source':'incidents.jsonl','kind':'incident'})
+      except Exception: pass
     
     def collect_target(target):
       ns = target if target else ''
@@ -320,8 +377,10 @@ data:
       if 'vymaz' in low and 'event' in low:
         return 'Toto je povolený safe-fix, ale vyžaduje potvrdenie. Napíš presne: potvrď vymazať events'
       k=load_knowledge()
+      rag_hits=rag_search(msg, top_k=3)
+      rag_text='\n'.join(['['+h.get('source','')+'] '+h.get('text','')[:600] for h in rag_hits]) if rag_hits else ''
       facts={'nodesReady':c['nodesReady'],'nodesTotal':c['nodesTotal'],'badPodsCount':c['badPodsCount'],'fluxProblemAppsCount':len(c['fluxProblemApps']),'fluxProblemApps':[{'ns':h['namespace'],'name':h['name'],'ready':h['ready'],'message':h.get('message','')[:200]} for h in c['fluxProblemApps'][:20]],'badPods':[{'ns':p.get('namespace'),'name':p.get('name'),'phase':p.get('phase'),'reason':p.get('reason','')} for p in c.get('badPods',[])[:30]]}
-      prompt='''Si Kubernetes SRE agent. Odpovedaj výhradne po slovensky, stručne (max 10 riadkov).\n\nPRÍSNE PRAVIDLÁ — ŠTANDARD ANTI-HALUCINÁCIA:\n1. Používaj IBA čísla, mená podov/namespace a chyby, ktoré sú v sekcii FAKTY nižšie. Nič si nevymýšľaj.\n2. Ak fakt nie je vo FAKTY, povedz doslova: \"nemám dáta\". Nikdy nehádaj.\n3. Ak FAKTY hovoria nodesReady=N a nodesTotal=N, povedz \"všetky nody Ready\". Nehovor o Pending podoch ak badPods je prázdny.\n4. Nepoužívaj slovo \"podmiestka\". Používaj: pod, pody, deployment, namespace, service, ingress, Flux HelmRelease.\n5. Ak je fluxProblemAppsCount=0, NEVYTVÁRAJ zoznam zlyhaných appiek.\n6. Nezmieňuj ArgoCD — kluster používa Flux.\n7. Nehovor o HTTP 400/404/500 chybách, ak nie sú vo FAKTY.\n\nPRÁVOMOCI: čítať pody/logy/eventy/nody/ingressy/Flux HelmReleases. Po explicitnom potvrdení: vymazať events, reštartovať deployment, spustiť Flux reconcile HelmRelease. Nikdy nenavrhuj rizikový fix bez potvrdenia od používateľa.\n\nFORMÁT ODPOVEDE (presne tieto sekcie):\nStav:\n<2-3 vety zhrnutia z FAKTY>\nDiagnóza:\n<ak sú problémy z FAKTY; inak \"žiadne problémy\">\nNávrh:\n<konkrétny krok alebo \"netreba zasahovať\">\n\nOTÁZKA: '''+msg+'\n\nFAKTY (jediný zdroj pravdy):\n'+json.dumps(facts,ensure_ascii=False,indent=2)+'\n\nKontext (runbooky/pravidlá, len pomocný):\n'+(k['rules'][:1500]+'\n'+k['runbooks'][:2500])
+      prompt='''Si Kubernetes SRE agent. Odpovedaj výhradne po slovensky, stručne (max 10 riadkov).\n\nPRÍSNE PRAVIDLÁ — ŠTANDARD ANTI-HALUCINÁCIA:\n1. Používaj IBA čísla, mená podov/namespace a chyby, ktoré sú v sekcii FAKTY nižšie. Nič si nevymýšľaj.\n2. Ak fakt nie je vo FAKTY, povedz doslova: \"nemám dáta\". Nikdy nehádaj.\n3. Ak FAKTY hovoria nodesReady=N a nodesTotal=N, povedz \"všetky nody Ready\". Nehovor o Pending podoch ak badPods je prázdny.\n4. Nepoužívaj slovo \"podmiestka\". Používaj: pod, pody, deployment, namespace, service, ingress, Flux HelmRelease.\n5. Ak je fluxProblemAppsCount=0, NEVYTVÁRAJ zoznam zlyhaných appiek.\n6. Nezmieňuj ArgoCD — kluster používa Flux.\n7. Nehovor o HTTP 400/404/500 chybách, ak nie sú vo FAKTY.\n\nPRÁVOMOCI: čítať pody/logy/eventy/nody/ingressy/Flux HelmReleases. Po explicitnom potvrdení: vymazať events, reštartovať deployment, spustiť Flux reconcile HelmRelease. Nikdy nenavrhuj rizikový fix bez potvrdenia od používateľa.\n\nFORMÁT ODPOVEDE (presne tieto sekcie):\nStav:\n<2-3 vety zhrnutia z FAKTY>\nDiagnóza:\n<ak sú problémy z FAKTY; inak \"žiadne problémy\">\nNávrh:\n<konkrétny krok alebo \"netreba zasahovať\">\n\nOTÁZKA: '''+msg+'\n\nFAKTY (jediný zdroj pravdy):\n'+json.dumps(facts,ensure_ascii=False,indent=2)+'\n\nPodobné incidenty/runbooky (RAG, len pomocné):\n'+(rag_text or '(žiadne)')+'\n\nKontext (runbooky/pravidlá, len pomocný):\n'+(k['rules'][:1000]+'\n'+k['runbooks'][:1500])
       try:
         return ollama(prompt)
       except Exception as e:
@@ -353,6 +412,33 @@ data:
         self.send_response(code); self.send_header('Content-Type','application/json; charset=utf-8'); self.send_header('Content-Length',str(len(b))); self.end_headers(); self.wfile.write(b)
       def login(self,msg=''):
         self.send_html('<div class="login"><h1>AI SRE Agent</h1><p>'+html.escape(msg or 'Zadaj agent token.')+'</p><form method="post" action="/login"><input name="token" type="password" autofocus placeholder="agent token"><button>Prihlásiť</button></form></div>')
+      def do_HEAD(self): self.send_response(200); self.end_headers()
+      def do_GET(self):
+        if self.path.startswith('/api/status'):
+          if not self.authed(): return self.send_json({'error':'unauthorized'},401)
+          c=collect(include_logs=False); return self.send_json({'model':MODEL,'nodesReady':c['nodesReady'],'nodesTotal':c['nodesTotal'],'badPodsCount':c['badPodsCount'],'problemApps':len(c['fluxProblemApps'])})
+        if not self.authed(): return self.login()
+        self.send_html(APP)
+      def do_POST(self):
+        try:
+          ln=int(self.headers.get('Content-Length','0')); raw=self.rfile.read(ln).decode()
+          if self.path=='/login':
+            data=urllib.parse.parse_qs(raw)
+            if data.get('token',[''])[0] == UI_TOKEN:
+              self.send_response(303); self.send_header('Set-Cookie','sre_agent='+UI_TOKEN+'; Path=/; HttpOnly; Secure; SameSite=Lax'); self.send_header('Location','/'); self.end_headers(); return
+            return self.login('Zlý token')
+          if not self.authed(): return self.send_json({'error':'unauthorized'},401)
+          if self.path=='/api/chat':
+            msg=json.loads(raw or '{}').get('message','')[:4000]
+            audit('chat '+msg.replace('\n',' ')[:300])
+            return self.send_json({'answer':answer_user(msg)})
+          self.send_error(404)
+        except Exception:
+          self.send_json({'answer':'ERROR\n'+traceback.format_exc()},500)
+    
+    import threading
+    threading.Thread(target=rag_bootstrap,daemon=True).start()
+    ThreadingHTTPServer(('0.0.0.0',8080),H).serve_forever()        self.send_html('<div class="login"><h1>AI SRE Agent</h1><p>'+html.escape(msg or 'Zadaj agent token.')+'</p><form method="post" action="/login"><input name="token" type="password" autofocus placeholder="agent token"><button>Prihlásiť</button></form></div>')
       def do_HEAD(self): self.send_response(200); self.end_headers()
       def do_GET(self):
         if self.path.startswith('/api/status'):
