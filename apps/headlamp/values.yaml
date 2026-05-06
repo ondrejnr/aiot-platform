@@ -1,7 +1,13 @@
 headlamp:
   config:
     oidc:
-      existingSecret: oidc
+      secret:
+        create: false
+        name: oidc
+      clientID: headlamp
+      clientSecret: 3kGjhx3XYayGx56I7wLdcZK25zwqBOliwUcgeNrAql6EfN7yWJWbUjtNDckxgTJ3b7kL7Z1q1MhJphhKoPS4ACowoWQwpoOM2s1DUt5VFyHC0qZEIGLFDbkjDOEoq9mS
+      issuerURL: https://authentik.46.4.123.8.nip.io/application/o/headlamp/
+      scopes: openid profile email
   ingress:
     enabled: true
     ingressClassName: nginx
