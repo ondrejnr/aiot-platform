@@ -1,4 +1,5 @@
 grafana:
+  assertNoLeakedSecrets: false
   persistence:
     enabled: true
     storageClassName: local-path
@@ -7,12 +8,6 @@ grafana:
     existingSecret: grafana-admin
     userKey: admin-user
     passwordKey: admin-password
-  extraSecretMounts:
-  - name: grafana-oidc
-    secretName: grafana-oidc
-    defaultMode: 0440
-    mountPath: /etc/secrets/oidc
-    readOnly: true
   ingress:
     enabled: true
     ingressClassName: nginx
