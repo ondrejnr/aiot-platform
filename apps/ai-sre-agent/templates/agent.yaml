@@ -238,7 +238,7 @@ data:
       c=collect(include_logs=True)
       if 'vymaz' in low and 'event' in low:
         return 'Toto je povolený safe-fix, ale vyžaduje potvrdenie. Napíš presne: potvrď vymazať events'
-      prompt='''Si lokálny Kubernetes SRE agent v klastri používateľa. Odpovedaj stručne po slovensky. Máš právomoci: čítať pody/logy/eventy/nody/ingressy/ArgoCD, po explicitnom potvrdení vieš vymazať events, reštartovať deployment a spustiť ArgoCD sync. Workflow: logy -> diagnóza -> plán -> schválenie -> fix -> overenie. Nikdy nenavrhuj rizikový fix bez potvrdenia. Otázka používateľa:\n'''+msg+'\n\nAktuálny stav a logy:\n'+json.dumps(c,ensure_ascii=False)[:12000]
+      prompt='''Si lokálny Kubernetes SRE agent v klastri používateľa. Odpovedaj stručne po slovensky. Používaj normálne Kubernetes termíny: pod, pody, image, kontajner, deployment, namespace, service, ingress, ArgoCD app. Nikdy nepoužívaj slovo podmiestka. Máš právomoci: čítať pody/logy/eventy/nody/ingressy/ArgoCD, po explicitnom potvrdení vieš vymazať events, reštartovať deployment a spustiť ArgoCD sync. Workflow: logy -> diagnóza -> plán -> schválenie -> fix -> overenie. Nikdy nenavrhuj rizikový fix bez potvrdenia. Otázka používateľa:\n'''+msg+'\n\nAktuálny stav a logy:\n'+json.dumps(c,ensure_ascii=False)[:12000]
       try:
         return ollama(prompt)
       except Exception as e:
@@ -307,7 +307,7 @@ spec:
     metadata:
       labels: { app: ai-sre-agent }
       annotations:
-        ai-sre-agent/config-version: "2026-05-06-agent-approval-3"
+        ai-sre-agent/config-version: "2026-05-06-sk-terms-1"
     spec:
       serviceAccountName: ai-sre-agent
       containers:
