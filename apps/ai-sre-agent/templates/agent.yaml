@@ -162,6 +162,8 @@ spec:
   template:
     metadata:
       labels: { app: ai-sre-agent }
+      annotations:
+        ai-sre-agent/config-version: "2026-05-06-1"
     spec:
       serviceAccountName: ai-sre-agent
       containers:
