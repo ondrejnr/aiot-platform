@@ -3,7 +3,7 @@ signoz:
     installCustomStorageClass: false
     persistence:
       size: 10Gi
-      storageClass: local-path
+      storageClass: nfs
     resources:
       requests:
         cpu: 100m
@@ -38,7 +38,7 @@ signoz:
             key: secret
     persistence:
       size: 5Gi
-      storageClass: local-path
+      storageClass: nfs
     livenessProbe:
       enabled: true
       port: http
@@ -86,7 +86,7 @@ signoz:
   zookeeper:
     persistence:
       size: 5Gi
-      storageClass: local-path
+      storageClass: nfs
     livenessProbe:
       timeoutSeconds: 30
       periodSeconds: 30
