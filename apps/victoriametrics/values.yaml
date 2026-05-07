@@ -19,8 +19,26 @@ victoria-metrics-k8s-stack:
   kubeEtcd:
     enabled: false
   defaultRules:
+    # Disable rule groups for components that are not exposed/scraped on this k3d cluster.
+    groups:
+      kubeScheduler:
+        create: false
+      kubeControllerManager:
+        create: false
+      kubeProxy:
+        create: false
+      etcd:
+        create: false
     rules:
-      kubeScheduler: false
-      kubeControllerManager: false
-      kubeProxy: false
-      etcd: false
+      # k3d cluster has high pod churn (CronJobs, Jobs, controller restarts, reboots).
+      # 24h window after a reboot easily exceeds the default 3x ratio. Bump to 10x to
+      # catch only truly anomalous churn while ignoring normal cluster turnover.
+      TooHighChurnRate24h:
+        create: true
+        spec:
+          expr: |-
+            (
+               sum(increase(vm_new_timeseries_created_total[24h])) by (instance, job, cluster)
+               >
+               (sum(vm_cache_entries{type="storage/hour_metric_ids"}) by (instance, job, cluster) * 10)
+            )
