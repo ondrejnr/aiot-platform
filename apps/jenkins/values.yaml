@@ -61,5 +61,5 @@ jenkins:
         memory: 2Gi
   persistence:
     enabled: true
-    storageClass: local-path
+    storageClass: nfs
     size: 20Gi
