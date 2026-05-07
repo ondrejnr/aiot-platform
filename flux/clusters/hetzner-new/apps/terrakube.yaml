@@ -1,0 +1,24 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: terrakube
+  namespace: terrakube
+spec:
+  suspend: false
+  interval: 30m
+  releaseName: terrakube
+  chart:
+    spec:
+      chart: ./apps/terrakube
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    createNamespace: true
+    timeout: 15m
+  upgrade:
+    cleanupOnFail: true
+    timeout: 15m

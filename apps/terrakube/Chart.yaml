@@ -1,0 +1,10 @@
+apiVersion: v2
+name: terrakube-overlay
+description: aiot-platform overlay for Terrakube (self-hosted Terraform Cloud-like)
+type: application
+version: 1.0.0
+appVersion: "2.31.0"
+dependencies:
+  - name: terrakube
+    version: "4.6.3"
+    repository: https://terrakube-io.github.io/terrakube-helm-chart

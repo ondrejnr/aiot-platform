@@ -1,0 +1,30 @@
+---
+# DB role+database "terrakube" sa vytvorí raz manuálne na primary podu (viď INSTALL_NOTES).
+# Tento template iba zabezpečí že secret existuje aj v "terrakube" ns
+# (Helm lookup zachová už existujúce hodnoty pri každom upgrade).
+{{- $tkExisting := lookup "v1" "Secret" "terrakube" "terrakube-db" -}}
+{{- if $tkExisting }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: terrakube-db
+  namespace: terrakube
+  annotations:
+    helm.sh/resource-policy: keep
+type: Opaque
+data:
+  password: {{ index $tkExisting.data "password" }}
+{{- else }}
+# Ak ešte neexistuje (prvý deploy bez pre-create), vytvoríme placeholder.
+# V tomto prípade musí byť heslo synchronizované s heslom v PG roli "terrakube".
+apiVersion: v1
+kind: Secret
+metadata:
+  name: terrakube-db
+  namespace: terrakube
+  annotations:
+    helm.sh/resource-policy: keep
+type: Opaque
+stringData:
+  password: "REPLACE-WITH-PG-ROLE-PASSWORD"
+{{- end }}

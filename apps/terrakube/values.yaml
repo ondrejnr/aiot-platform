@@ -1,0 +1,214 @@
+terrakube:
+  name: Terrakube
+
+  # ─── INGRESS ───────────────────────────────────────────────
+  ingress:
+    controller: generic
+    ui:
+      enabled: true
+      domain: terrakube.46.4.123.8.nip.io
+      path: /
+      pathType: Prefix
+      ingressClassName: nginx
+      useTls: true
+      tlsSecretName: terrakube-ui-tls
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    api:
+      enabled: true
+      domain: terrakube-api.46.4.123.8.nip.io
+      path: /
+      pathType: Prefix
+      ingressClassName: nginx
+      useTls: true
+      tlsSecretName: terrakube-api-tls
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    registry:
+      enabled: true
+      domain: terrakube-reg.46.4.123.8.nip.io
+      path: /
+      pathType: Prefix
+      ingressClassName: nginx
+      useTls: true
+      tlsSecretName: terrakube-reg-tls
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    dex:
+      enabled: true
+      path: /dex
+      pathType: Prefix
+
+  # ─── SECURITY ──────────────────────────────────────────────
+  security:
+    adminGroup: TERRAKUBE_ADMIN
+    # patSecret + internalSecret sú injektované cez existingSecret
+    # (vidíme nižšie cez api.env)
+    dexClientId: terrakube
+    dexClientScope: "email openid profile offline_access groups"
+    dexIssuer: https://terrakube-api.46.4.123.8.nip.io/dex
+
+  # ─── DEX (vstavaný) ────────────────────────────────────────
+  dex:
+    enabled: true
+    config:
+      issuer: https://terrakube-api.46.4.123.8.nip.io/dex
+      storage:
+        type: memory
+      oauth2:
+        responseTypes: ["code", "token", "id_token"]
+      web:
+        allowedOrigins: ["*"]
+      staticClients:
+        - id: terrakube
+          name: Terrakube
+          public: true
+          redirectURIs:
+            - https://terrakube.46.4.123.8.nip.io
+            - http://localhost:10001/login
+            - http://localhost:10000/login
+            - /device/callback
+      connectors:
+        - type: gitea
+          id: gitea
+          name: Gitea
+          config:
+            baseURL: https://gitea.46.4.123.8.nip.io
+            clientID: 236e26fd-fc38-46df-aec4-9c1adfd535c5
+            clientSecret: $GITEA_CLIENT_SECRET
+            redirectURI: https://terrakube-api.46.4.123.8.nip.io/dex/callback
+            useLoginAsID: false
+    envFrom:
+      - secretRef:
+          name: terrakube-dex-gitea
+
+  # ─── DATABASE (externý CNPG) ───────────────────────────────
+  postgres:
+    enabled: false   # vypnúť bitnami chart
+  api:
+    enabled: true
+    replicaCount: 1
+    serviceType: ClusterIP
+    defaultDatabase: false
+    nodeSelector:
+      role: apps
+    resources:
+      requests: { cpu: 200m, memory: 512Mi }
+      limits:   { cpu: 1000m, memory: 1Gi }
+    properties:
+      databaseType: POSTGRESQL
+      databaseHostname: pg-cluster-rw.databases.svc
+      databaseName: terrakube
+      databaseUser: terrakube
+      # databasePassword sa injektuje cez env z secret terrakube-db
+    env:
+      - name: org.terrakube.hostname
+        value: terrakube-api.46.4.123.8.nip.io
+      - name: AppDatabasePassword
+        valueFrom:
+          secretKeyRef:
+            name: terrakube-db
+            key: password
+      - name: PatSecret
+        valueFrom:
+          secretKeyRef:
+            name: terrakube-internal
+            key: patSecret
+      - name: InternalSecret
+        valueFrom:
+          secretKeyRef:
+            name: terrakube-internal
+            key: internalSecret
+
+  # ─── EXECUTOR ──────────────────────────────────────────────
+  executor:
+    enabled: true
+    replicaCount: 1
+    serviceType: ClusterIP
+    nodeSelector:
+      role: apps
+    resources:
+      requests: { cpu: 200m, memory: 512Mi }
+      limits:   { cpu: 2000m, memory: 2Gi }
+    properties:
+      toolsRepository: https://github.com/terrakube-io/terrakube-extensions
+      toolsBranch: main
+    env:
+      - name: InternalSecret
+        valueFrom:
+          secretKeyRef:
+            name: terrakube-internal
+            key: internalSecret
+
+  # ─── REGISTRY ──────────────────────────────────────────────
+  registry:
+    enabled: true
+    replicaCount: 1
+    serviceType: ClusterIP
+    nodeSelector:
+      role: apps
+    resources:
+      requests: { cpu: 100m, memory: 256Mi }
+      limits:   { cpu: 500m, memory: 512Mi }
+    env:
+      - name: InternalSecret
+        valueFrom:
+          secretKeyRef:
+            name: terrakube-internal
+            key: internalSecret
+
+  # ─── UI ────────────────────────────────────────────────────
+  ui:
+    enabled: true
+    replicaCount: 1
+    serviceType: ClusterIP
+    nodeSelector:
+      role: apps
+    resources:
+      requests: { cpu: 50m, memory: 128Mi }
+      limits:   { cpu: 200m, memory: 256Mi }
+
+  # ─── STORAGE (vstavaný MinIO + NFS) ────────────────────────
+  storage:
+    defaultStorage: true
+    aws:
+      endpoint: http://terrakube-minio:9000
+      bucketName: sample
+      region: us-east-1
+      # accessKey + secretKey idú cez minio sub-chart auth nižšie
+
+  minio:
+    enabled: true
+    persistence:
+      enabled: true
+      storageClass: nfs
+      size: 20Gi
+    auth:
+      existingSecret: terrakube-minio
+    defaultBuckets: "sample,registry,tfstate,tfoutput"
+    nodeSelector:
+      role: apps
+    resources:
+      requests: { cpu: 100m, memory: 256Mi }
+      limits:   { cpu: 500m, memory: 512Mi }
+
+  # ─── REDIS (vstavaný, malý) ────────────────────────────────
+  redis:
+    enabled: true
+    architecture: standalone
+    auth:
+      enabled: false
+    master:
+      persistence:
+        enabled: true
+        storageClass: nfs
+        size: 1Gi
+      nodeSelector:
+        role: apps
+      resources:
+        requests: { cpu: 50m, memory: 128Mi }
+        limits:   { cpu: 200m, memory: 256Mi }
