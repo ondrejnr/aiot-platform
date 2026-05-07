@@ -5,3 +5,10 @@ awx-operator:
     enabled: false  # bundled AWX disabled; we manage AWX CR ourselves
   rbac:
     create: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

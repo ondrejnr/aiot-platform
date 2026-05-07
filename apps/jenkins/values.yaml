@@ -52,6 +52,13 @@ jenkins:
                 allowAnonymousRead: false
     nodeSelector:
       node-role.kubernetes.io/worker: ""
+    resources:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
   persistence:
     enabled: true
     storageClass: local-path

@@ -11,6 +11,13 @@ spec:
     metadata:
       labels: { app: ollama }
     spec:
+      nodeSelector:
+        workload: ai
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: ai
+          effect: NoSchedule
       containers:
         - name: ollama
           image: ollama/ollama:0.6.8
@@ -30,11 +37,11 @@ spec:
               wait $pid
           resources:
             requests:
-              cpu: "4"
-              memory: 16Gi
+              cpu: "1"
+              memory: 12Gi
             limits:
-              cpu: "8"
-              memory: 32Gi
+              cpu: "4"
+              memory: 24Gi
           volumeMounts:
             - name: data
               mountPath: /root/.ollama
