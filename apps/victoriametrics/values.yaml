@@ -12,3 +12,15 @@ victoria-metrics-k8s-stack:
         - url: "http://am.monitoring.svc:9093"
   kubeControllerManager:
     enabled: false
+  kubeScheduler:
+    enabled: false
+  kubeProxy:
+    enabled: false
+  kubeEtcd:
+    enabled: false
+  defaultRules:
+    rules:
+      kubeScheduler: false
+      kubeControllerManager: false
+      kubeProxy: false
+      etcd: false
