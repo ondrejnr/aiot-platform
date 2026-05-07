@@ -39,28 +39,29 @@ gitea:
         successThreshold: 1
       nodeSelector:
         role: apps
-  config:
-    server:
-      DOMAIN: gitea.46.4.123.8.nip.io
-      SSH_DOMAIN: gitea.46.4.123.8.nip.io
-      ROOT_URL: https://gitea.46.4.123.8.nip.io/
-      PROTOCOL: http
-    database:
-      DB_TYPE: postgres
-      HOST: pg-cluster-rw.databases.svc.cluster.local:5432
-      NAME: gitea
-      USER: gitea
-      PASSWD: gitea
-      SSL_MODE: disable
-    service:
-      ALLOW_ONLY_EXTERNAL_REGISTRATION: true
-      SHOW_REGISTRATION_BUTTON: false
-      DISABLE_REGISTRATION: false
-    oauth2_client:
-      ENABLE_AUTO_REGISTRATION: true
-      ACCOUNT_LINKING: auto
-      USERNAME: nickname
-      UPDATE_AVATAR: true
+  gitea:
+    config:
+      server:
+        DOMAIN: gitea.46.4.123.8.nip.io
+        SSH_DOMAIN: gitea.46.4.123.8.nip.io
+        ROOT_URL: https://gitea.46.4.123.8.nip.io/
+        PROTOCOL: http
+      database:
+        DB_TYPE: postgres
+        HOST: pg-cluster-rw.databases.svc.cluster.local:5432
+        NAME: gitea
+        USER: gitea
+        PASSWD: gitea
+        SSL_MODE: disable
+      service:
+        ALLOW_ONLY_EXTERNAL_REGISTRATION: true
+        SHOW_REGISTRATION_BUTTON: false
+        DISABLE_REGISTRATION: false
+      oauth2_client:
+        ENABLE_AUTO_REGISTRATION: true
+        ACCOUNT_LINKING: auto
+        USERNAME: nickname
+        UPDATE_AVATAR: true
   ingress:
     enabled: true
     className: nginx
