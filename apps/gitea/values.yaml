@@ -60,7 +60,7 @@ gitea:
       oauth2_client:
         ENABLE_AUTO_REGISTRATION: true
         ACCOUNT_LINKING: auto
-        USERNAME: nickname
+        USERNAME: preferred_username
         UPDATE_AVATAR: true
   ingress:
     enabled: true
