@@ -90,7 +90,6 @@ terrakube:
             insecureEnableGroups: true
             getUserInfo: true
             userNameKey: email
-            promptType: none
     envFrom:
       - secretRef:
           name: terrakube-dex-authentik
