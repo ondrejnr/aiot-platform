@@ -18,7 +18,7 @@ redis:
 redpanda:
   topic: sensor-data
   storageSize: 10Gi
-  storageClass: nfs
+  storageClass: local-path
 
 sensorSimulator:
   replicas: 1
