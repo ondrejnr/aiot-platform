@@ -5,7 +5,7 @@ nfs-server-provisioner:
     size: 200Gi
   storageClass:
     create: true
-    defaultClass: false
+    defaultClass: true
     name: nfs
     allowVolumeExpansion: true
     reclaimPolicy: Delete
