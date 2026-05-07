@@ -4,6 +4,7 @@ terrakube:
   # ─── INGRESS ───────────────────────────────────────────────
   ingress:
     controller: generic
+    useTls: true
     ui:
       enabled: true
       domain: terrakube.46.4.123.8.nip.io
