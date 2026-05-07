@@ -104,6 +104,7 @@ terrakube:
       databaseHostname: pg-cluster-rw.databases.svc
       databaseName: terrakube
       databaseUser: terrakube
+      databasePassword: Ibm5ksY6VqOoN2kHdj1MXQCcMhSh
       # databasePassword sa injektuje cez env z secret terrakube-db
     env:
       - name: org.terrakube.hostname
