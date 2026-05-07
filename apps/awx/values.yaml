@@ -16,7 +16,7 @@ postgres:
   password: oXYg5X6K872w1Q24BGiiiMaWApHsISTM
   sslmode: prefer
 nodeSelector:
-  node-role.kubernetes.io/worker: ""
+  role: apps
 
 oidc:
   clientId: awx
