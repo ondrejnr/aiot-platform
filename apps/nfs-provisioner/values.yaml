@@ -1,0 +1,25 @@
+nfs-server-provisioner:
+  persistence:
+    enabled: true
+    storageClass: "local-path"
+    size: 200Gi
+  storageClass:
+    create: true
+    defaultClass: false
+    name: nfs
+    allowVolumeExpansion: true
+    reclaimPolicy: Delete
+    mountOptions:
+      - vers=4.1
+      - hard
+      - timeo=600
+      - retrans=2
+  nodeSelector:
+    role: monitoring
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi

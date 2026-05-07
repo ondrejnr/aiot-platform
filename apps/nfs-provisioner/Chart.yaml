@@ -1,0 +1,10 @@
+apiVersion: v2
+name: nfs-provisioner-overlay
+description: in-cluster NFS server + dynamic provisioner for aiot-platform
+type: application
+version: 1.0.0
+appVersion: "4.0.18"
+dependencies:
+  - name: nfs-server-provisioner
+    version: "1.8.0"
+    repository: https://kvaps.github.io/charts
