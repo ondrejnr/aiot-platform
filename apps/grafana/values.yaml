@@ -2,7 +2,7 @@ grafana:
   assertNoLeakedSecrets: false
   persistence:
     enabled: true
-    storageClassName: local-path
+    storageClassName: nfs
     size: 5Gi
   admin:
     existingSecret: grafana-admin
