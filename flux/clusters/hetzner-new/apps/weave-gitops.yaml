@@ -51,3 +51,25 @@ spec:
       tls:
         - hosts: [flux.46.4.123.8.nip.io]
           secretName: weave-gitops-tls
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: weave-gitops
+            patch: |
+              - op: add
+                path: /spec/template/spec/initContainers
+                value:
+                  - name: wait-authentik
+                    image: curlimages/curl:8.5.0
+                    command:
+                      - sh
+                      - -c
+                      - |
+                        until curl -sk -f -o /dev/null http://authentik-server.authentik.svc.cluster.local/-/health/ready/; do
+                          echo "[init] waiting for authentik..."; sleep 5;
+                        done
+                        until curl -sk -f -o /dev/null https://authentik.46.4.123.8.nip.io/application/o/weave-gitops/.well-known/openid-configuration; do
+                          echo "[init] waiting for authentik OIDC provider..."; sleep 5;
+                        done
