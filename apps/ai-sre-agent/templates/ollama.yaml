@@ -11,13 +11,6 @@ spec:
     metadata:
       labels: { app: ollama }
     spec:
-      nodeSelector:
-        workload: ai
-      tolerations:
-        - key: workload
-          operator: Equal
-          value: ai
-          effect: NoSchedule
       containers:
         - name: ollama
           image: ollama/ollama:0.6.8
