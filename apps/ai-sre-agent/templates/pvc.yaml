@@ -14,8 +14,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: ai-sre-agent-audit
 spec:
-  accessModes: [ReadWriteOnce]
-  storageClassName: local-path
+  accessModes: [ReadWriteMany]
+  storageClassName: nfs
   resources:
     requests:
       storage: 5Gi
