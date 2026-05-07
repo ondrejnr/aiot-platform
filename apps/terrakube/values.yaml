@@ -91,7 +91,7 @@ terrakube:
     enabled: false   # vypnúť bitnami chart
   api:
     enabled: true
-    replicaCount: 1
+    replicaCount: "1"
     serviceType: ClusterIP
     defaultDatabase: false
     nodeSelector:
@@ -127,7 +127,7 @@ terrakube:
   # ─── EXECUTOR ──────────────────────────────────────────────
   executor:
     enabled: true
-    replicaCount: 1
+    replicaCount: "1"
     serviceType: ClusterIP
     nodeSelector:
       role: apps
@@ -147,7 +147,7 @@ terrakube:
   # ─── REGISTRY ──────────────────────────────────────────────
   registry:
     enabled: true
-    replicaCount: 1
+    replicaCount: "1"
     serviceType: ClusterIP
     nodeSelector:
       role: apps
@@ -164,7 +164,7 @@ terrakube:
   # ─── UI ────────────────────────────────────────────────────
   ui:
     enabled: true
-    replicaCount: 1
+    replicaCount: "1"
     serviceType: ClusterIP
     nodeSelector:
       role: apps
