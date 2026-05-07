@@ -1,5 +1,5 @@
 terrakube:
-  name: terrakube
+  name: Terrakube
 
   # ─── INGRESS ───────────────────────────────────────────────
   ingress:
@@ -97,8 +97,8 @@ terrakube:
     nodeSelector:
       role: apps
     resources:
-      requests: { cpu: 200m, memory: 512Mi }
-      limits:   { cpu: 1000m, memory: 1Gi }
+      requests: { cpu: 200m, memory: 1Gi }
+      limits:   { cpu: 1500m, memory: 2Gi }
     properties:
       databaseType: POSTGRESQL
       databaseHostname: pg-cluster-rw.databases.svc
@@ -132,7 +132,7 @@ terrakube:
     nodeSelector:
       role: apps
     resources:
-      requests: { cpu: 200m, memory: 512Mi }
+      requests: { cpu: 200m, memory: 1Gi }
       limits:   { cpu: 2000m, memory: 2Gi }
     properties:
       toolsRepository: https://github.com/terrakube-io/terrakube-extensions
@@ -152,8 +152,8 @@ terrakube:
     nodeSelector:
       role: apps
     resources:
-      requests: { cpu: 100m, memory: 256Mi }
-      limits:   { cpu: 500m, memory: 512Mi }
+      requests: { cpu: 100m, memory: 768Mi }
+      limits:   { cpu: 500m, memory: 1Gi }
     env:
       - name: InternalSecret
         valueFrom:
