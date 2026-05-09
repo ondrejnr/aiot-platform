@@ -66,7 +66,7 @@ data:
     batch_size   = int(os.getenv("BATCH_SIZE", "1000"))
     batch_ms     = int(os.getenv("BATCH_MS", "20"))
     queue_max    = int(os.getenv("QUEUE_MAX", "200000"))
-    stream_maxlen= int(os.getenv("STREAM_MAXLEN", "2000000"))
+    stream_maxlen= int(os.getenv("STREAM_MAXLEN", "500000"))
     writers      = int(os.getenv("WRITERS", "4"))
     sub_qos      = int(os.getenv("MQTT_QOS", "1"))
 
@@ -98,9 +98,16 @@ data:
                 await pipe.execute()
                 counter["out"] += len(items)
             except Exception as exc:
+                # OOM / connection / timeout: drop the batch instead of blocking.
+                # Stream MAXLEN + maxmemory=noeviction means producer must shed load.
+                msg = str(exc)
                 counter["errors"] += 1
-                print(f"writer{idx} error: {exc}", flush=True)
-                await asyncio.sleep(0.5)
+                counter["drop"] += len(items)
+                if counter["errors"] % 50 == 1:
+                    print(f"writer{idx} drop {len(items)} after error: {msg[:200]}", flush=True)
+                # Short backoff only on connection-level errors, not on OOM
+                if "OOM" not in msg and "command not allowed" not in msg:
+                    await asyncio.sleep(0.2)
 
     async def reporter(q):
         while not STOP.is_set():

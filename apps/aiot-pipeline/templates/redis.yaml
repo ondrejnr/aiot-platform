@@ -22,7 +22,25 @@ spec:
         - name: redis
           image: redis:7-alpine
           imagePullPolicy: IfNotPresent
-          args: ["redis-server", "--appendonly", "yes"]
+          # Loadtest-tuned: no persistence (no RDB/AOF IO storms),
+          # hard memory cap with noeviction so XADD fails fast = backpressure
+          # to mqtt-to-redis instead of OOMKilling the whole pod.
+          args:
+            - "redis-server"
+            - "--save"
+            - ""
+            - "--appendonly"
+            - "no"
+            - "--maxmemory"
+            - "1500mb"
+            - "--maxmemory-policy"
+            - "noeviction"
+            - "--tcp-backlog"
+            - "4096"
+            - "--timeout"
+            - "0"
+            - "--tcp-keepalive"
+            - "60"
           ports:
             - name: redis
               containerPort: 6379
@@ -34,18 +52,22 @@ spec:
               command: ["redis-cli", "ping"]
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 5
           livenessProbe:
             exec:
               command: ["redis-cli", "ping"]
-            initialDelaySeconds: 20
-            periodSeconds: 20
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
           resources:
             requests:
-              cpu: 50m
-              memory: 128Mi
-            limits:
               cpu: 500m
-              memory: 512Mi
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 2Gi
       volumes:
         - name: data
           emptyDir: {}
