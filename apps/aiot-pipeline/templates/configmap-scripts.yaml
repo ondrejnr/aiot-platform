@@ -202,12 +202,12 @@ data:
                 bootstrap_servers=brokers.split(","),
                 value_serializer=None,
                 key_serializer=None,
-                linger_ms=20,
-                batch_size=262144,
-                buffer_memory=128 * 1024 * 1024,
-                compression_type="gzip",
+                linger_ms=5,
+                batch_size=524288,
+                buffer_memory=256 * 1024 * 1024,
+                compression_type="lz4",
                 acks=1,
-                max_in_flight_requests_per_connection=5,
+                max_in_flight_requests_per_connection=10,
             )
             print(f"redis stream {stream} -> redpanda {brokers}/{topic}", flush=True)
             while True:
