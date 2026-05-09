@@ -8,6 +8,8 @@ metadata:
     {{- include "aiot.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/component: emqx
@@ -19,7 +21,8 @@ spec:
     spec:
       containers:
         - name: emqx
-          image: emqx/emqx-enterprise:5.8.4
+          # Open Source variant - no concurrent-session license limit.
+          image: emqx/emqx:5.8.4
           imagePullPolicy: IfNotPresent
           env:
             - name: EMQX_NAME
@@ -30,27 +33,25 @@ spec:
               value: admin
             - name: EMQX_DASHBOARD__DEFAULT_PASSWORD
               value: AiotEmqx2026!
-            - name: EMQX_DASHBOARD__SSO__OIDC__ENABLE
+            # High-throughput tuning
+            - name: EMQX_LISTENERS__TCP__DEFAULT__ACCEPTORS
+              value: "64"
+            - name: EMQX_LISTENERS__TCP__DEFAULT__MAX_CONNECTIONS
+              value: "infinity"
+            - name: EMQX_LISTENERS__TCP__DEFAULT__MAX_CONN_RATE
+              value: "5000"
+            - name: EMQX_LISTENERS__TCP__DEFAULT__MESSAGES_RATE
+              value: "infinity"
+            - name: EMQX_LISTENERS__TCP__DEFAULT__BYTES_RATE
+              value: "infinity"
+            # Per-session mailbox: default 1000 caused mailbox_overflow under load
+            - name: EMQX_FORCE_SHUTDOWN__MAX_MAILBOX_SIZE
+              value: "1000000"
+            - name: EMQX_FORCE_SHUTDOWN__MAX_HEAP_SIZE
+              value: "32MB"
+            # Disable SysMon overload alarms tripping needlessly
+            - name: EMQX_SYSMON__VM__BUSY_DIST_PORT
               value: "true"
-            - name: EMQX_DASHBOARD__SSO__OIDC__BACKEND
-              value: oidc
-            - name: EMQX_DASHBOARD__SSO__OIDC__PROVIDER
-              value: generic
-            - name: EMQX_DASHBOARD__SSO__OIDC__ISSUER
-              value: https://authentik.46.4.123.8.nip.io/application/o/emqx/
-            - name: EMQX_DASHBOARD__SSO__OIDC__CLIENTID
-              value: emqx
-            - name: EMQX_DASHBOARD__SSO__OIDC__SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: aiot-emqx-oidc
-                  key: client-secret
-            - name: EMQX_DASHBOARD__SSO__OIDC__SCOPES
-              value: '["openid","profile","email"]'
-            - name: EMQX_DASHBOARD__SSO__OIDC__DASHBOARD_ADDR
-              value: https://emqx.46.4.123.8.nip.io
-            - name: EMQX_DASHBOARD__SSO__OIDC__PREFERRED_AUTH_METHODS
-              value: '["client_secret_post","client_secret_basic"]'
           ports:
             - name: mqtt
               containerPort: 1883
@@ -68,8 +69,8 @@ spec:
             periodSeconds: 20
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 500m
+              memory: 1Gi
             limits:
-              cpu: 1500m
-              memory: 1536Mi
+              cpu: "4"
+              memory: 4Gi

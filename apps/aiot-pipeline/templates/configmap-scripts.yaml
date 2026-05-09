@@ -117,11 +117,12 @@ data:
         except queue.Full:
             counter["drop"] += 1
 
+    import uuid
     while True:
         try:
             r.ping()
             client = mqtt.Client(
-                client_id="",
+                client_id=f"mqtt-to-redis-{uuid.uuid4().hex[:10]}",
                 protocol=mqtt.MQTTv5,
                 callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
             )
