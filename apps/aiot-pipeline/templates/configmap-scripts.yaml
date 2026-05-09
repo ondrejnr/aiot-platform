@@ -49,12 +49,13 @@ data:
             last = time.monotonic()
         time.sleep(interval)
   mqtt_to_redis.py: |
-    # MQTT -> Redis Stream bridge.
-    # Uses MQTT v5 shared subscription so multiple replicas split the load,
-    # and a background writer thread that flushes XADDs in pipelined batches.
-    import os, queue, threading, time
-    import paho.mqtt.client as mqtt
-    import redis
+    # Async MQTT -> Redis Stream bridge using gmqtt + redis.asyncio.
+    # MQTT v5 shared subscription so replicas split the load.
+    # N writer tasks drain an asyncio.Queue and flush pipelined XADDs in batches.
+    import asyncio, os, signal, time, uuid
+    from gmqtt import Client as MQTTClient
+    from gmqtt.mqtt.constants import MQTTv5
+    import redis.asyncio as aioredis
 
     mqtt_host    = os.getenv("MQTT_HOST", "aiot-emqx")
     mqtt_port    = int(os.getenv("MQTT_PORT", "1883"))
@@ -62,87 +63,108 @@ data:
     share_group  = os.getenv("MQTT_SHARE_GROUP", "g1")
     redis_host   = os.getenv("REDIS_HOST", "aiot-redis")
     stream       = os.getenv("REDIS_STREAM", "sensor_data")
-    batch_size   = int(os.getenv("BATCH_SIZE", "500"))
+    batch_size   = int(os.getenv("BATCH_SIZE", "1000"))
     batch_ms     = int(os.getenv("BATCH_MS", "20"))
-    queue_max    = int(os.getenv("QUEUE_MAX", "100000"))
+    queue_max    = int(os.getenv("QUEUE_MAX", "200000"))
     stream_maxlen= int(os.getenv("STREAM_MAXLEN", "2000000"))
+    writers      = int(os.getenv("WRITERS", "4"))
+    sub_qos      = int(os.getenv("MQTT_QOS", "1"))
 
     sub_topic = f"$share/{share_group}/{topic}"
-    r = redis.Redis(host=redis_host, port=6379, decode_responses=False, socket_keepalive=True)
-    q = queue.Queue(maxsize=queue_max)
     counter = {"in": 0, "out": 0, "drop": 0, "errors": 0}
+    STOP = asyncio.Event()
 
-    def writer():
+    async def writer(idx, q, r):
+        # Drain up to batch_size or until batch_ms elapses, then pipeline XADD.
         while True:
-            items = []
-            deadline = time.monotonic() + batch_ms / 1000.0
             try:
-                items.append(q.get(timeout=1.0))
-            except queue.Empty:
-                continue
+                first = await q.get()
+            except asyncio.CancelledError:
+                return
+            items = [first]
+            deadline = asyncio.get_event_loop().time() + batch_ms / 1000.0
             while len(items) < batch_size:
-                remaining = deadline - time.monotonic()
-                if remaining <= 0:
+                timeout = deadline - asyncio.get_event_loop().time()
+                if timeout <= 0:
                     break
                 try:
-                    items.append(q.get(timeout=remaining))
-                except queue.Empty:
+                    items.append(await asyncio.wait_for(q.get(), timeout=timeout))
+                except asyncio.TimeoutError:
                     break
             try:
                 pipe = r.pipeline(transaction=False)
                 for payload in items:
                     pipe.xadd(stream, {b"payload": payload}, maxlen=stream_maxlen, approximate=True)
-                pipe.execute()
+                await pipe.execute()
                 counter["out"] += len(items)
             except Exception as exc:
                 counter["errors"] += 1
-                print(f"writer error: {exc}", flush=True)
-                time.sleep(0.5)
+                print(f"writer{idx} error: {exc}", flush=True)
+                await asyncio.sleep(0.5)
 
-    def reporter():
-        while True:
-            time.sleep(10)
+    async def reporter(q):
+        while not STOP.is_set():
+            await asyncio.sleep(10)
             print(
                 f"mqtt->redis stats in={counter['in']} out={counter['out']} "
                 f"drop={counter['drop']} errors={counter['errors']} q={q.qsize()}",
                 flush=True,
             )
 
-    for _ in range(int(os.getenv("WRITERS", "2"))):
-        threading.Thread(target=writer, daemon=True).start()
-    threading.Thread(target=reporter, daemon=True).start()
+    async def run():
+        r = aioredis.Redis(host=redis_host, port=6379, decode_responses=False)
+        await r.ping()
+        q = asyncio.Queue(maxsize=queue_max)
 
-    def on_connect(client, userdata, flags, reasonCode, properties=None):
-        print(f"connected to MQTT rc={reasonCode}; subscribing {sub_topic}", flush=True)
-        client.subscribe(sub_topic, qos=1)
+        def on_connect(client, flags, rc, properties):
+            print(f"connected to MQTT rc={rc}; subscribing {sub_topic} qos={sub_qos}", flush=True)
+            client.subscribe(sub_topic, qos=sub_qos)
 
-    def on_disconnect(client, userdata, *args, **kwargs):
-        print(f"disconnected from MQTT: {args} {kwargs}", flush=True)
+        def on_disconnect(client, packet, exc=None):
+            print(f"disconnected from MQTT exc={exc}", flush=True)
 
-    def on_message(client, userdata, msg):
-        counter["in"] += 1
-        try:
-            q.put_nowait(msg.payload)
-        except queue.Full:
-            counter["drop"] += 1
+        def on_message(client, topic_, payload, qos, properties):
+            counter["in"] += 1
+            try:
+                q.put_nowait(bytes(payload))
+            except asyncio.QueueFull:
+                counter["drop"] += 1
+            return 0
 
-    import uuid
-    while True:
-        try:
-            r.ping()
-            client = mqtt.Client(
-                client_id=f"mqtt-to-redis-{uuid.uuid4().hex[:10]}",
-                protocol=mqtt.MQTTv5,
-                callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-            )
+        tasks = [asyncio.create_task(writer(i, q, r)) for i in range(writers)]
+        tasks.append(asyncio.create_task(reporter(q)))
+
+        while not STOP.is_set():
+            client = MQTTClient(f"mqtt-to-redis-{uuid.uuid4().hex[:10]}")
             client.on_connect = on_connect
             client.on_disconnect = on_disconnect
             client.on_message = on_message
-            client.connect(mqtt_host, mqtt_port, keepalive=120)
-            client.loop_forever()
-        except Exception as exc:
-            print(f"mqtt->redis reconnect after error: {exc}", flush=True)
-            time.sleep(3)
+            try:
+                await client.connect(mqtt_host, mqtt_port, version=MQTTv5, keepalive=120)
+                await STOP.wait()
+                await client.disconnect()
+                break
+            except Exception as exc:
+                print(f"mqtt->redis reconnect after error: {exc}", flush=True)
+                try:
+                    await client.disconnect()
+                except Exception:
+                    pass
+                await asyncio.sleep(3)
+
+        for t in tasks:
+            t.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        await r.aclose()
+
+    def _stop(*_):
+        STOP.set()
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        loop.add_signal_handler(sig, _stop)
+    loop.run_until_complete(run())
   redis_to_redpanda.py: |
     # Redis Stream -> Redpanda bridge with batched XREAD/XACK and batched produce.
     import os, socket, time

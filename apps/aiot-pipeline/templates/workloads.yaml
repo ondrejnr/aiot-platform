@@ -70,7 +70,7 @@ spec:
           image: {{ $pythonImage }}
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
-          args: ["pip install --no-cache-dir paho-mqtt redis >/tmp/pip.log 2>&1 && python /app/mqtt_to_redis.py"]
+          args: ["pip install --no-cache-dir gmqtt 'redis[hiredis]' >/tmp/pip.log 2>&1 && python /app/mqtt_to_redis.py"]
           env:
             - name: MQTT_HOST
               value: aiot-emqx
