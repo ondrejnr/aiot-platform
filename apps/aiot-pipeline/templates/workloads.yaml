@@ -122,7 +122,7 @@ spec:
           image: {{ $pythonImage }}
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
-          args: ["pip install --no-cache-dir redis kafka-python >/tmp/pip.log 2>&1 && python /app/redis_to_redpanda.py"]
+          args: ["pip install --no-cache-dir redis kafka-python lz4 >/tmp/pip.log 2>&1 && python /app/redis_to_redpanda.py"]
           env:
             - name: REDIS_HOST
               value: aiot-redis
