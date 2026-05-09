@@ -114,7 +114,7 @@ data:
 
     def on_connect(client, userdata, flags, reasonCode, properties=None):
         print(f"connected to MQTT rc={reasonCode}; subscribing {sub_topic}", flush=True)
-        client.subscribe(sub_topic, qos=0)
+        client.subscribe(sub_topic, qos=1)
 
     def on_disconnect(client, userdata, *args, **kwargs):
         print(f"disconnected from MQTT: {args} {kwargs}", flush=True)

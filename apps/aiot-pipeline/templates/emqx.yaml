@@ -52,6 +52,14 @@ spec:
             # Disable SysMon overload alarms tripping needlessly
             - name: EMQX_SYSMON__VM__BUSY_DIST_PORT
               value: "true"
+            - name: EMQX_MQTT__MAX_INFLIGHT
+              value: "32768"
+            - name: EMQX_MQTT__MAX_MQUEUE_LEN
+              value: "1000000"
+            - name: EMQX_MQTT__SHARED_SUBSCRIPTION_STRATEGY
+              value: "sticky"
+            - name: EMQX_MQTT__MQUEUE_DEFAULT_PRIORITY
+              value: "highest"
           ports:
             - name: mqtt
               containerPort: 1883
