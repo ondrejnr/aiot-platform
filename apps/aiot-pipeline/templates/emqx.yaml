@@ -46,9 +46,9 @@ spec:
               value: "infinity"
             # Per-session mailbox: default 1000 caused mailbox_overflow under load
             - name: EMQX_FORCE_SHUTDOWN__MAX_MAILBOX_SIZE
-              value: "1000000"
+              value: "10000000"
             - name: EMQX_FORCE_SHUTDOWN__MAX_HEAP_SIZE
-              value: "32MB"
+              value: "512MB"
             # Disable SysMon overload alarms tripping needlessly
             - name: EMQX_SYSMON__VM__BUSY_DIST_PORT
               value: "true"
