@@ -38,7 +38,7 @@ spec:
               value: https://authentik.46.4.123.8.nip.io/application/o/emqx/
             - name: EMQX_DASHBOARD__SSO__OIDC__CLIENTID
               value: emqx
-            - name: EMQX_DASHBOARD__SSO__OIDC__CLIENTSECRET
+            - name: EMQX_DASHBOARD__SSO__OIDC__SECRET
               valueFrom:
                 secretKeyRef:
                   name: aiot-emqx-oidc
