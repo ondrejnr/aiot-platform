@@ -183,7 +183,7 @@ data:
                 linger_ms=20,
                 batch_size=262144,
                 buffer_memory=128 * 1024 * 1024,
-                compression_type="lz4",
+                compression_type="gzip",
                 acks=1,
                 max_in_flight_requests_per_connection=5,
             )
