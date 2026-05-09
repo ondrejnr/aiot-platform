@@ -85,11 +85,11 @@ spec:
               mountPath: /app
           resources:
             requests:
-              cpu: 50m
-              memory: 96Mi
+              cpu: 200m
+              memory: 1Gi
             limits:
-              cpu: 300m
-              memory: 256Mi
+              cpu: 2
+              memory: 1Gi
       volumes:
         - name: scripts
           configMap:
@@ -134,11 +134,11 @@ spec:
               mountPath: /app
           resources:
             requests:
-              cpu: 50m
-              memory: 128Mi
+              cpu: 200m
+              memory: 256Mi
             limits:
-              cpu: 500m
-              memory: 384Mi
+              cpu: 2
+              memory: 1Gi
       volumes:
         - name: scripts
           configMap:
@@ -184,11 +184,11 @@ spec:
               mountPath: /app
           resources:
             requests:
-              cpu: 50m
-              memory: 128Mi
+              cpu: 200m
+              memory: 256Mi
             limits:
-              cpu: 500m
-              memory: 384Mi
+              cpu: 2
+              memory: 1Gi
       volumes:
         - name: scripts
           configMap:

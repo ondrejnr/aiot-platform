@@ -26,8 +26,8 @@ sensorSimulator:
 
 bridges:
   mqttToRedis:
-    replicas: 1
+    replicas: 4
   redisToRedpanda:
-    replicas: 1
+    replicas: 3
   pgSink:
-    replicas: 1
+    replicas: 4

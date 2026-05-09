@@ -21,6 +21,8 @@ data:
     sensors = [f"sensor-{i:03d}" for i in range(1, 11)]
     locations = ["lab", "warehouse", "office", "outside", "plant"]
     print(f"publishing MQTT telemetry to {host}:{port}/{topic}", flush=True)
+    n = 0
+    last = time.monotonic()
     while True:
         payload = {
             "ts": datetime.now(timezone.utc).isoformat(),
@@ -31,59 +33,131 @@ data:
             "pressure": round(random.uniform(995.0, 1028.0), 2),
             "battery": round(random.uniform(3.35, 4.20), 3),
         }
-        client.publish(topic, json.dumps(payload), qos=1)
-        print(json.dumps(payload), flush=True)
+        client.publish(topic, json.dumps(payload), qos=0)
+        n += 1
+        if time.monotonic() - last >= 30:
+            print(f"sensor-sim published total={n}", flush=True)
+            last = time.monotonic()
         time.sleep(interval)
   mqtt_to_redis.py: |
-    import json, os, time
-    from datetime import datetime, timezone
+    # MQTT -> Redis Stream bridge.
+    # Uses MQTT v5 shared subscription so multiple replicas split the load,
+    # and a background writer thread that flushes XADDs in pipelined batches.
+    import os, queue, threading, time
     import paho.mqtt.client as mqtt
     import redis
 
-    mqtt_host = os.getenv("MQTT_HOST", "aiot-emqx")
-    mqtt_port = int(os.getenv("MQTT_PORT", "1883"))
-    topic = os.getenv("MQTT_TOPIC", "aiot/sensors/telemetry")
-    redis_host = os.getenv("REDIS_HOST", "aiot-redis")
-    stream = os.getenv("REDIS_STREAM", "sensor_data")
-    r = redis.Redis(host=redis_host, port=6379, decode_responses=True)
+    mqtt_host    = os.getenv("MQTT_HOST", "aiot-emqx")
+    mqtt_port    = int(os.getenv("MQTT_PORT", "1883"))
+    topic        = os.getenv("MQTT_TOPIC", "aiot/sensors/telemetry")
+    share_group  = os.getenv("MQTT_SHARE_GROUP", "g1")
+    redis_host   = os.getenv("REDIS_HOST", "aiot-redis")
+    stream       = os.getenv("REDIS_STREAM", "sensor_data")
+    batch_size   = int(os.getenv("BATCH_SIZE", "500"))
+    batch_ms     = int(os.getenv("BATCH_MS", "20"))
+    queue_max    = int(os.getenv("QUEUE_MAX", "100000"))
+    stream_maxlen= int(os.getenv("STREAM_MAXLEN", "2000000"))
 
-    def on_connect(client, userdata, flags, rc):
-        print(f"connected to MQTT rc={rc}; subscribing {topic}", flush=True)
-        client.subscribe(topic, qos=1)
+    sub_topic = f"$share/{share_group}/{topic}"
+    r = redis.Redis(host=redis_host, port=6379, decode_responses=False, socket_keepalive=True)
+    q = queue.Queue(maxsize=queue_max)
+    counter = {"in": 0, "out": 0, "drop": 0, "errors": 0}
+
+    def writer():
+        while True:
+            items = []
+            deadline = time.monotonic() + batch_ms / 1000.0
+            try:
+                items.append(q.get(timeout=1.0))
+            except queue.Empty:
+                continue
+            while len(items) < batch_size:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    break
+                try:
+                    items.append(q.get(timeout=remaining))
+                except queue.Empty:
+                    break
+            try:
+                pipe = r.pipeline(transaction=False)
+                for payload in items:
+                    pipe.xadd(stream, {b"payload": payload}, maxlen=stream_maxlen, approximate=True)
+                pipe.execute()
+                counter["out"] += len(items)
+            except Exception as exc:
+                counter["errors"] += 1
+                print(f"writer error: {exc}", flush=True)
+                time.sleep(0.5)
+
+    def reporter():
+        while True:
+            time.sleep(10)
+            print(
+                f"mqtt->redis stats in={counter['in']} out={counter['out']} "
+                f"drop={counter['drop']} errors={counter['errors']} q={q.qsize()}",
+                flush=True,
+            )
+
+    for _ in range(int(os.getenv("WRITERS", "2"))):
+        threading.Thread(target=writer, daemon=True).start()
+    threading.Thread(target=reporter, daemon=True).start()
+
+    def on_connect(client, userdata, flags, reasonCode, properties=None):
+        print(f"connected to MQTT rc={reasonCode}; subscribing {sub_topic}", flush=True)
+        client.subscribe(sub_topic, qos=0)
+
+    def on_disconnect(client, userdata, *args, **kwargs):
+        print(f"disconnected from MQTT: {args} {kwargs}", flush=True)
 
     def on_message(client, userdata, msg):
+        counter["in"] += 1
         try:
-            payload = json.loads(msg.payload.decode("utf-8"))
-            payload["mqtt_topic"] = msg.topic
-            payload["mqtt_received_at"] = datetime.now(timezone.utc).isoformat()
-            r.xadd(stream, {"payload": json.dumps(payload)}, maxlen=100000, approximate=True)
-            print(f"mqtt->redis {payload.get('sensor_id')}", flush=True)
-        except Exception as exc:
-            print(f"mqtt->redis error: {exc}", flush=True)
+            q.put_nowait(msg.payload)
+        except queue.Full:
+            counter["drop"] += 1
 
     while True:
         try:
             r.ping()
-            client = mqtt.Client(client_id="mqtt-to-redis")
+            client = mqtt.Client(
+                client_id="",
+                protocol=mqtt.MQTTv5,
+                callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+            )
             client.on_connect = on_connect
+            client.on_disconnect = on_disconnect
             client.on_message = on_message
-            client.connect(mqtt_host, mqtt_port, 60)
+            client.connect(mqtt_host, mqtt_port, keepalive=120)
             client.loop_forever()
         except Exception as exc:
             print(f"mqtt->redis reconnect after error: {exc}", flush=True)
-            time.sleep(5)
+            time.sleep(3)
   redis_to_redpanda.py: |
-    import json, os, socket, time
+    # Redis Stream -> Redpanda bridge with batched XREAD/XACK and batched produce.
+    import os, socket, time
     import redis
     from kafka import KafkaProducer
 
-    redis_host = os.getenv("REDIS_HOST", "aiot-redis")
-    stream = os.getenv("REDIS_STREAM", "sensor_data")
-    group = os.getenv("REDIS_GROUP", "redpanda-bridge")
-    consumer_name = socket.gethostname()
-    brokers = os.getenv("KAFKA_BROKERS", "aiot-redpanda:9092")
-    topic = os.getenv("KAFKA_TOPIC", "sensor-data")
-    r = redis.Redis(host=redis_host, port=6379, decode_responses=True)
+    redis_host  = os.getenv("REDIS_HOST", "aiot-redis")
+    stream      = os.getenv("REDIS_STREAM", "sensor_data")
+    group       = os.getenv("REDIS_GROUP", "redpanda-bridge")
+    consumer    = socket.gethostname()
+    brokers     = os.getenv("KAFKA_BROKERS", "aiot-redpanda:9092")
+    topic       = os.getenv("KAFKA_TOPIC", "sensor-data")
+    batch_count = int(os.getenv("BATCH_COUNT", "2000"))
+    block_ms    = int(os.getenv("BLOCK_MS", "200"))
+
+    r = redis.Redis(host=redis_host, port=6379, decode_responses=False, socket_keepalive=True)
+    counter = {"in": 0, "out": 0, "errors": 0}
+    last_report = time.monotonic()
+
+    def report():
+        global last_report
+        now = time.monotonic()
+        if now - last_report >= 10:
+            print(f"redis->redpanda in={counter['in']} out={counter['out']} errors={counter['errors']}", flush=True)
+            last_report = now
 
     while True:
         try:
@@ -94,31 +168,49 @@ data:
                     raise
             producer = KafkaProducer(
                 bootstrap_servers=brokers.split(","),
-                value_serializer=lambda value: json.dumps(value).encode("utf-8"),
-                linger_ms=100,
+                value_serializer=None,
+                key_serializer=None,
+                linger_ms=20,
+                batch_size=262144,
+                buffer_memory=128 * 1024 * 1024,
+                compression_type="lz4",
+                acks=1,
+                max_in_flight_requests_per_connection=5,
             )
             print(f"redis stream {stream} -> redpanda {brokers}/{topic}", flush=True)
             while True:
-                rows = r.xreadgroup(group, consumer_name, {stream: ">"}, count=100, block=5000)
+                rows = r.xreadgroup(group, consumer, {stream: b">"}, count=batch_count, block=block_ms)
+                if not rows:
+                    report()
+                    continue
+                ids = []
                 for _, messages in rows:
                     for msg_id, fields in messages:
-                        payload = json.loads(fields.get("payload", "{}"))
-                        producer.send(topic, payload)
-                        r.xack(stream, group, msg_id)
-                        print(f"redis->redpanda {payload.get('sensor_id')}", flush=True)
-                producer.flush()
+                        payload = fields.get(b"payload", b"{}")
+                        # use sensor_id-ish key for partition spread; fall back to None
+                        producer.send(topic, value=payload)
+                        ids.append(msg_id)
+                counter["in"] += len(ids)
+                if ids:
+                    r.xack(stream, group, *ids)
+                    counter["out"] += len(ids)
+                report()
         except Exception as exc:
+            counter["errors"] += 1
             print(f"redis->redpanda reconnect after error: {exc}", flush=True)
-            time.sleep(5)
+            time.sleep(3)
   pg_sink.py: |
+    # Redpanda -> Postgres sink with batch INSERT (execute_values) per poll.
     import json, os, time
     from kafka import KafkaConsumer
     import psycopg2
     import psycopg2.extras
 
-    brokers = os.getenv("KAFKA_BROKERS", "aiot-redpanda:9092")
-    topic = os.getenv("KAFKA_TOPIC", "sensor-data")
-    table = os.getenv("PG_TABLE", "sensor_data")
+    brokers   = os.getenv("KAFKA_BROKERS", "aiot-redpanda:9092")
+    topic     = os.getenv("KAFKA_TOPIC", "sensor-data")
+    table     = os.getenv("PG_TABLE", "sensor_data")
+    batch_max = int(os.getenv("BATCH_MAX", "2000"))
+    poll_ms   = int(os.getenv("POLL_MS", "200"))
 
     create_sql = f"""
     create table if not exists {table} (
@@ -138,7 +230,7 @@ data:
     """
     insert_sql = f"""
     insert into {table} (ts, sensor_id, location, temperature, humidity, pressure, battery, payload)
-    values (%s, %s, %s, %s, %s, %s, %s, %s)
+    values %s
     """
 
     def pg_connect():
@@ -148,6 +240,13 @@ data:
             dbname=os.getenv("PGDATABASE"),
             user=os.getenv("PGUSER"),
             password=os.getenv("PGPASSWORD"),
+        )
+
+    def to_row(payload):
+        return (
+            payload.get("ts"), payload.get("sensor_id"), payload.get("location"),
+            payload.get("temperature"), payload.get("humidity"), payload.get("pressure"),
+            payload.get("battery"), psycopg2.extras.Json(payload),
         )
 
     while True:
@@ -161,22 +260,39 @@ data:
                 topic,
                 bootstrap_servers=brokers.split(","),
                 group_id="pg-sink",
-                auto_offset_reset="earliest",
+                auto_offset_reset="latest",
                 enable_auto_commit=False,
                 value_deserializer=lambda value: json.loads(value.decode("utf-8")),
+                max_poll_records=batch_max,
+                fetch_max_bytes=20 * 1024 * 1024,
+                max_partition_fetch_bytes=10 * 1024 * 1024,
             )
             print(f"redpanda {brokers}/{topic} -> postgres {os.getenv('PGHOST')}/{os.getenv('PGDATABASE')}.{table}", flush=True)
-            for msg in consumer:
-                payload = msg.value
-                with conn.cursor() as cur:
-                    cur.execute(insert_sql, (
-                        payload.get("ts"), payload.get("sensor_id"), payload.get("location"),
-                        payload.get("temperature"), payload.get("humidity"), payload.get("pressure"),
-                        payload.get("battery"), psycopg2.extras.Json(payload),
-                    ))
-                conn.commit()
-                consumer.commit()
-                print(f"redpanda->pg {payload.get('sensor_id')}", flush=True)
+            total = 0
+            last_report = time.monotonic()
+            while True:
+                polled = consumer.poll(timeout_ms=poll_ms, max_records=batch_max)
+                rows = []
+                for tp, msgs in polled.items():
+                    for msg in msgs:
+                        try:
+                            rows.append(to_row(msg.value))
+                        except Exception as exc:
+                            print(f"pg-sink skip bad row: {exc}", flush=True)
+                if rows:
+                    with conn.cursor() as cur:
+                        psycopg2.extras.execute_values(cur, insert_sql, rows, page_size=len(rows))
+                    conn.commit()
+                    consumer.commit()
+                    total += len(rows)
+                now = time.monotonic()
+                if now - last_report >= 10:
+                    print(f"pg-sink total={total}", flush=True)
+                    last_report = now
         except Exception as exc:
             print(f"pg-sink reconnect after error: {exc}", flush=True)
-            time.sleep(5)
+            try:
+                conn.close()
+            except Exception:
+                pass
+            time.sleep(3)
