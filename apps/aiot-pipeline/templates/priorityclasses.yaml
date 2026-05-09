@@ -13,7 +13,7 @@ metadata:
   labels:
     {{- include "aiot.labels" . | nindent 4 }}
 description: "AIoT data plane (EMQX, Redpanda, Redis, Postgres). Do not evict."
-value: 1500000000
+value: 999999000
 preemptionPolicy: PreemptLowerPriority
 globalDefault: false
 ---
