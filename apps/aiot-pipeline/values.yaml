@@ -38,6 +38,14 @@ priorityClass:
   data: aiot-data-critical          # EMQX, Redpanda, Redis
   pipeline: aiot-pipeline-high      # bridges + sensor-simulator
 
+# Retention policy.
+# - PG: declarative daily partitions, drop partitions older than pgDays.
+# - Redpanda: retention by time AND bytes per partition (whichever fires first).
+retention:
+  pgDays: 7
+  redpandaMs: 86400000              # 24h
+  redpandaBytesPerPartition: 1073741824  # 1GiB/partition * 24 = 24GiB cap
+
 # Loadtest namespace guardrails.
 # Hard-cap CPU/memory so a runaway emqtt-bench cannot DOS the cluster.
 loadtest:

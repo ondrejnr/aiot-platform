@@ -1,0 +1,131 @@
+{{- /*
+Daily maintenance:
+- create the next-day partition (idempotent)
+- drop partitions older than {{ .Values.retention.pgDays }} days
+- ensure Redpanda topic retention (ms + bytes) is set
+Runs at 03:15 UTC every day.
+*/ -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: aiot-pg-partition-maint
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: maintenance
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  schedule: "15 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        spec:
+          restartPolicy: OnFailure
+          priorityClassName: {{ .Values.priorityClass.pipeline }}
+          containers:
+            - name: psql
+              image: postgres:17-alpine
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - secretRef:
+                    name: aiot-pg-credentials
+              env:
+                - name: RETENTION_DAYS
+                  value: {{ .Values.retention.pgDays | quote }}
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  psql -v ON_ERROR_STOP=1 <<SQL
+                  -- create next 3 days of partitions if missing
+                  do \$\$
+                  declare d date := current_date;
+                  begin
+                    for i in 0..3 loop
+                      execute format(
+                        'create table if not exists sensor_data_%s partition of sensor_data for values from (%L) to (%L)',
+                        to_char(d + i, 'YYYYMMDD'),
+                        (d + i)::timestamptz,
+                        (d + i + 1)::timestamptz
+                      );
+                    end loop;
+                  end \$\$;
+
+                  -- drop partitions older than RETENTION_DAYS
+                  do \$\$
+                  declare r record;
+                  declare cutoff date := current_date - ${RETENTION_DAYS}::int;
+                  begin
+                    for r in
+                      select c.relname
+                      from pg_inherits i
+                      join pg_class c on c.oid = i.inhrelid
+                      join pg_class p on p.oid = i.inhparent
+                      where p.relname = 'sensor_data'
+                        and c.relname ~ '^sensor_data_[0-9]{8}\$'
+                        and to_date(substring(c.relname from 13), 'YYYYMMDD') < cutoff
+                    loop
+                      raise notice 'dropping old partition %', r.relname;
+                      execute format('drop table if exists %I', r.relname);
+                    end loop;
+                  end \$\$;
+                  SQL
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+---
+{{- /*
+Apply Redpanda topic retention via rpk-as-Job.
+Idempotent (alter-config). Runs once per chart upgrade.
+*/ -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: aiot-redpanda-retention
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: redpanda-init
+    {{- include "aiot.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      priorityClassName: {{ .Values.priorityClass.pipeline }}
+      containers:
+        - name: rpk
+          image: redpandadata/redpanda:v24.2.4
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              # Wait for brokers to be ready
+              for i in $(seq 1 30); do
+                if rpk -X brokers=aiot-redpanda:9092 cluster info >/dev/null 2>&1; then break; fi
+                echo "waiting for redpanda... ($i/30)"; sleep 2
+              done
+              # Apply retention to sensor-data topic
+              rpk -X brokers=aiot-redpanda:9092 topic alter-config sensor-data \
+                --set retention.ms={{ .Values.retention.redpandaMs }} \
+                --set retention.bytes={{ .Values.retention.redpandaBytesPerPartition }} \
+                --set segment.bytes=134217728 \
+                --set compression.type=producer
+              rpk -X brokers=aiot-redpanda:9092 topic describe sensor-data
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

@@ -28,10 +28,12 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              psql -v ON_ERROR_STOP=1 -c "
+              # Idempotent schema: declarative RANGE-partitioned by ts (daily).
+              # PK must include partition key in PG; (id, ts) keeps id unique within day.
+              psql -v ON_ERROR_STOP=1 <<'SQL'
               create table if not exists sensor_data (
-                id bigserial primary key,
-                ts timestamptz,
+                id bigint generated always as identity,
+                ts timestamptz not null,
                 sensor_id text,
                 location text,
                 temperature double precision,
@@ -39,8 +41,23 @@ spec:
                 pressure double precision,
                 battery double precision,
                 payload jsonb not null,
-                ingested_at timestamptz not null default now()
-              );
-              create index if not exists sensor_data_ts_idx on sensor_data (ts desc);
+                ingested_at timestamptz not null default now(),
+                primary key (id, ts)
+              ) partition by range (ts);
+              create index if not exists sensor_data_ts_idx        on sensor_data (ts desc);
               create index if not exists sensor_data_sensor_id_idx on sensor_data (sensor_id);
-              "
+
+              -- Pre-create today + next 2 days (CronJob keeps it rolling forward)
+              do $$
+              declare d date := current_date - 1;
+              begin
+                for i in 0..3 loop
+                  execute format(
+                    'create table if not exists sensor_data_%s partition of sensor_data for values from (%L) to (%L)',
+                    to_char(d + i, 'YYYYMMDD'),
+                    (d + i)::timestamptz,
+                    (d + i + 1)::timestamptz
+                  );
+                end loop;
+              end $$;
+              SQL
