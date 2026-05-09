@@ -4,12 +4,13 @@ headlamp:
     inClusterContextName: main
     extraArgs:
       - "-metrics-enabled"
-    # K3s API server is not configured to trust Authentik OIDC tokens.
-    # Keep Headlamp in in-cluster mode and authenticate to the cluster with a service-account token.
     oidc:
+      externalSecret:
+        enabled: true
+        name: headlamp-oidc
       secret:
         create: false
-        name: oidc
+        name: headlamp-oidc
       clientID: ""
       clientSecret: ""
       issuerURL: ""
