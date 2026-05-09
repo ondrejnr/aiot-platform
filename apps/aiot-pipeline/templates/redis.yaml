@@ -17,6 +17,7 @@ spec:
         app.kubernetes.io/component: redis
         {{- include "aiot.labels" . | nindent 8 }}
     spec:
+      priorityClassName: {{ .Values.priorityClass.data }}
       containers:
         - name: redis
           image: redis:7-alpine

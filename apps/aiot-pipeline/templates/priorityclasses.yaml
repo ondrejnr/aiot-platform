@@ -1,0 +1,40 @@
+{{- /*
+PriorityClasses for the AIoT pipeline.
+
+- aiot-data-critical: data plane (EMQX, Redpanda, Redis, Postgres). MUST stay running.
+  Higher than rancher-critical so a runaway loadtest cannot evict the pipeline brokers.
+- aiot-pipeline-high: bridges (mqtt-to-redis, redis-to-redpanda, pg-sink) and sensor-simulator.
+- loadtest-low: load generator pods. First to be evicted under pressure.
+*/ -}}
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: aiot-data-critical
+  labels:
+    {{- include "aiot.labels" . | nindent 4 }}
+description: "AIoT data plane (EMQX, Redpanda, Redis, Postgres). Do not evict."
+value: 1500000000
+preemptionPolicy: PreemptLowerPriority
+globalDefault: false
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: aiot-pipeline-high
+  labels:
+    {{- include "aiot.labels" . | nindent 4 }}
+description: "AIoT pipeline workers. Evictable only after low-priority workloads."
+value: 100000
+preemptionPolicy: PreemptLowerPriority
+globalDefault: false
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: loadtest-low
+  labels:
+    {{- include "aiot.labels" . | nindent 4 }}
+description: "Load-test pods. First to be evicted when the cluster is under pressure."
+value: -100
+preemptionPolicy: Never
+globalDefault: false

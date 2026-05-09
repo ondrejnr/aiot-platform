@@ -1,0 +1,73 @@
+{{- if .Values.loadtest.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.loadtest.namespace }}
+  labels:
+    {{- include "aiot.labels" . | nindent 4 }}
+    aiot.io/role: loadgen
+    pod-security.kubernetes.io/enforce: baseline
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: loadtest-quota
+  namespace: {{ .Values.loadtest.namespace }}
+  labels:
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  hard:
+    requests.cpu: {{ .Values.loadtest.quota.requestsCpu | quote }}
+    requests.memory: {{ .Values.loadtest.quota.requestsMemory | quote }}
+    limits.cpu: {{ .Values.loadtest.quota.limitsCpu | quote }}
+    limits.memory: {{ .Values.loadtest.quota.limitsMemory | quote }}
+    pods: {{ .Values.loadtest.quota.pods | quote }}
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: loadtest-limits
+  namespace: {{ .Values.loadtest.namespace }}
+  labels:
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "500m"
+        memory: "256Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+      max:
+        cpu: "2"
+        memory: "1Gi"
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: loadtest-isolation
+  namespace: {{ .Values.loadtest.namespace }}
+  labels:
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  # Loadtest pods may only egress to the AIoT pipeline namespace and DNS.
+  # They cannot reach kube-system, flux-system or any other workload.
+  podSelector: {}
+  policyTypes: ["Ingress", "Egress"]
+  ingress: []
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ .Values.global.namespace | quote }}
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+{{- end }}

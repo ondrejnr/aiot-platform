@@ -18,6 +18,7 @@ spec:
         app.kubernetes.io/component: redpanda
         {{- include "aiot.labels" . | nindent 8 }}
     spec:
+      priorityClassName: {{ .Values.priorityClass.data }}
       containers:
         - name: redpanda
           image: docker.redpanda.com/redpandadata/redpanda:v24.3.5

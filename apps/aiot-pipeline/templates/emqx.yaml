@@ -19,6 +19,7 @@ spec:
         app.kubernetes.io/component: emqx
         {{- include "aiot.labels" . | nindent 8 }}
     spec:
+      priorityClassName: {{ .Values.priorityClass.data }}
       containers:
         - name: emqx
           # Open Source variant - no concurrent-session license limit.

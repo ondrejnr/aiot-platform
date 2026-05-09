@@ -18,6 +18,7 @@ spec:
         app.kubernetes.io/component: sensor-simulator
         {{- include "aiot.labels" . | nindent 8 }}
     spec:
+      priorityClassName: {{ .Values.priorityClass.pipeline }}
       containers:
         - name: app
           image: {{ $pythonImage }}
@@ -65,6 +66,7 @@ spec:
         app.kubernetes.io/component: mqtt-to-redis
         {{- include "aiot.labels" . | nindent 8 }}
     spec:
+      priorityClassName: {{ .Values.priorityClass.pipeline }}
       containers:
         - name: app
           image: {{ $pythonImage }}
@@ -114,6 +116,7 @@ spec:
         app.kubernetes.io/component: redis-to-redpanda
         {{- include "aiot.labels" . | nindent 8 }}
     spec:
+      priorityClassName: {{ .Values.priorityClass.pipeline }}
       containers:
         - name: app
           image: {{ $pythonImage }}
@@ -163,6 +166,7 @@ spec:
         app.kubernetes.io/component: pg-sink
         {{- include "aiot.labels" . | nindent 8 }}
     spec:
+      priorityClassName: {{ .Values.priorityClass.pipeline }}
       containers:
         - name: app
           image: {{ $pythonImage }}
