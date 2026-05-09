@@ -30,6 +30,8 @@ spec:
               value: admin
             - name: EMQX_DASHBOARD__DEFAULT_PASSWORD
               value: AiotEmqx2026!
+            - name: EMQX_DASHBOARD__SSO__OIDC__ENABLE
+              value: "true"
             - name: EMQX_DASHBOARD__SSO__OIDC__BACKEND
               value: oidc
             - name: EMQX_DASHBOARD__SSO__OIDC__PROVIDER
