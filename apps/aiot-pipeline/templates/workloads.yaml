@@ -172,7 +172,7 @@ spec:
           image: {{ $pythonImage }}
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
-          args: ["pip install --no-cache-dir kafka-python 'psycopg[binary]==3.2.*' >/tmp/pip.log 2>&1 && python /app/pg_sink.py"]
+          args: ["pip install --no-cache-dir kafka-python lz4 'psycopg[binary]==3.2.*' >/tmp/pip.log 2>&1 && python /app/pg_sink.py"]
           envFrom:
             - secretRef:
                 name: aiot-pg-credentials
