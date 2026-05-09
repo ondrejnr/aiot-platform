@@ -3,7 +3,7 @@ global:
   namespace: aiot
 
 postgres:
-  host: pg-cluster-rw.databases.svc.cluster.local
+  host: pg-cluster-pooler-rw.databases.svc.cluster.local
   port: 5432
   database: aiot
   user: appuser
@@ -30,7 +30,7 @@ bridges:
   redisToRedpanda:
     replicas: 3
   pgSink:
-    replicas: 4
+    replicas: 12
 
 # PriorityClass names applied to pipeline pods.
 # These are created cluster-wide by templates/priorityclasses.yaml.

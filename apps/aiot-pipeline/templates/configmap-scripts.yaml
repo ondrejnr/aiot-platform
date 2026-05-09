@@ -232,10 +232,14 @@ data:
             print(f"redis->redpanda reconnect after error: {exc}", flush=True)
             time.sleep(3)
   pg_sink.py: |
-    # Redpanda -> Postgres sink using COPY FROM STDIN (CSV) for max throughput.
-    import csv, io, json, os, time
+    # Redpanda -> Postgres sink using psycopg3 BINARY COPY for max throughput.
+    # Connects through PgBouncer (transaction pooling) at PGHOST.
+    import json, os, time
+    from datetime import datetime
     from kafka import KafkaConsumer
-    import psycopg2
+    import psycopg
+    from psycopg import sql
+    from psycopg.types.json import Jsonb
 
     brokers   = os.getenv("KAFKA_BROKERS", "aiot-redpanda:9092")
     topic     = os.getenv("KAFKA_TOPIC", "sensor-data")
@@ -259,48 +263,34 @@ data:
     create index if not exists {table}_ts_idx on {table} (ts desc);
     create index if not exists {table}_sensor_id_idx on {table} (sensor_id);
     """
-    copy_sql = (
-        f"COPY {table} (ts, sensor_id, location, temperature, humidity, "
-        f"pressure, battery, payload) FROM STDIN WITH (FORMAT csv)"
-    )
 
-    def pg_connect():
-        return psycopg2.connect(
-            host=os.getenv("PGHOST"),
-            port=int(os.getenv("PGPORT", "5432")),
-            dbname=os.getenv("PGDATABASE"),
-            user=os.getenv("PGUSER"),
-            password=os.getenv("PGPASSWORD"),
+    def pg_dsn():
+        return (
+            f"host={os.getenv('PGHOST')} port={os.getenv('PGPORT', '5432')} "
+            f"dbname={os.getenv('PGDATABASE')} user={os.getenv('PGUSER')} "
+            f"password={os.getenv('PGPASSWORD')}"
         )
 
-    def make_buffer(messages):
-        buf = io.StringIO()
-        w = csv.writer(buf, quoting=csv.QUOTE_MINIMAL)
-        for msg in messages:
-            try:
-                p = msg.value
-                w.writerow([
-                    p.get("ts"),
-                    p.get("sensor_id"),
-                    p.get("location"),
-                    p.get("temperature"),
-                    p.get("humidity"),
-                    p.get("pressure"),
-                    p.get("battery"),
-                    json.dumps(p, separators=(",", ":")),
-                ])
-            except Exception as exc:
-                print(f"pg-sink skip bad row: {exc}", flush=True)
-        buf.seek(0)
-        return buf
+    def parse_ts(v):
+        if not v:
+            return None
+        # 2026-05-09T12:34:56.789Z or +00:00
+        try:
+            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+        except Exception:
+            return None
+
+    copy_stmt = (
+        f"COPY {table} (ts, sensor_id, location, temperature, humidity, "
+        f"pressure, battery, payload) FROM STDIN WITH (FORMAT BINARY)"
+    )
 
     while True:
         try:
-            conn = pg_connect()
-            conn.autocommit = True
-            with conn.cursor() as cur:
-                cur.execute(create_sql)
-            conn.autocommit = False
+            # autocommit conn for DDL only; main conn does COPY in transaction
+            with psycopg.connect(pg_dsn(), autocommit=True) as ddl:
+                ddl.execute(create_sql)
+            conn = psycopg.connect(pg_dsn(), autocommit=False)
             consumer = KafkaConsumer(
                 topic,
                 bootstrap_servers=brokers.split(","),
@@ -312,21 +302,42 @@ data:
                 fetch_max_bytes=32 * 1024 * 1024,
                 max_partition_fetch_bytes=10 * 1024 * 1024,
             )
-            print(f"redpanda {brokers}/{topic} -> postgres {os.getenv('PGHOST')}/{os.getenv('PGDATABASE')}.{table} (COPY mode, batch={batch_max})", flush=True)
+            print(
+                f"redpanda {brokers}/{topic} -> postgres {os.getenv('PGHOST')}/"
+                f"{os.getenv('PGDATABASE')}.{table} (psycopg3 binary COPY, batch={batch_max})",
+                flush=True,
+            )
             total = 0
             last_report = time.monotonic()
             while True:
                 polled = consumer.poll(timeout_ms=poll_ms, max_records=batch_max)
-                msgs = []
-                for tp, ms in polled.items():
-                    msgs.extend(ms)
-                if msgs:
-                    buf = make_buffer(msgs)
+                rows = []
+                for tp, msgs in polled.items():
+                    for msg in msgs:
+                        try:
+                            p = msg.value
+                            rows.append((
+                                parse_ts(p.get("ts")),
+                                p.get("sensor_id"),
+                                p.get("location"),
+                                p.get("temperature"),
+                                p.get("humidity"),
+                                p.get("pressure"),
+                                p.get("battery"),
+                                Jsonb(p),
+                            ))
+                        except Exception as exc:
+                            print(f"pg-sink skip bad row: {exc}", flush=True)
+                if rows:
                     with conn.cursor() as cur:
-                        cur.copy_expert(copy_sql, buf)
+                        with cur.copy(copy_stmt) as cp:
+                            cp.set_types(["timestamptz", "text", "text",
+                                          "float8", "float8", "float8", "float8", "jsonb"])
+                            for r in rows:
+                                cp.write_row(r)
                     conn.commit()
                     consumer.commit()
-                    total += len(msgs)
+                    total += len(rows)
                 now = time.monotonic()
                 if now - last_report >= 10:
                     print(f"pg-sink total={total}", flush=True)
