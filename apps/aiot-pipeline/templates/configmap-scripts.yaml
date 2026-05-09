@@ -15,8 +15,17 @@ data:
     port = int(os.getenv("MQTT_PORT", "1883"))
     topic = os.getenv("MQTT_TOPIC", "aiot/sensors/telemetry")
     interval = float(os.getenv("SENSOR_INTERVAL_SECONDS", "2"))
-    client = mqtt.Client(client_id="sensor-simulator")
-    client.connect(host, port, 60)
+    client = mqtt.Client(
+        client_id="sensor-simulator",
+        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
+    )
+    while True:
+        try:
+            client.connect(host, port, 60)
+            break
+        except Exception as exc:
+            print(f"sensor-sim waiting for {host}:{port}: {exc}", flush=True)
+            time.sleep(3)
     client.loop_start()
     sensors = [f"sensor-{i:03d}" for i in range(1, 11)]
     locations = ["lab", "warehouse", "office", "outside", "plant"]
