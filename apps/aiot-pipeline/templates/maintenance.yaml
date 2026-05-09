@@ -39,39 +39,28 @@ spec:
               args:
                 - |
                   set -e
-                  psql -v ON_ERROR_STOP=1 <<SQL
-                  -- create next 3 days of partitions if missing
-                  do \$\$
-                  declare d date := current_date;
-                  begin
-                    for i in 0..3 loop
-                      execute format(
-                        'create table if not exists sensor_data_%s partition of sensor_data for values from (%L) to (%L)',
-                        to_char(d + i, 'YYYYMMDD'),
-                        (d + i)::timestamptz,
-                        (d + i + 1)::timestamptz
-                      );
-                    end loop;
-                  end \$\$;
+                  psql -v ON_ERROR_STOP=1 -v retention_days="${RETENTION_DAYS}" <<'SQL'
+                  -- Pre-create next 4 days of partitions (idempotent)
+                  with days as (
+                    select generate_series(current_date, current_date + 3, '1 day'::interval)::date as d
+                  )
+                  select format(
+                    'create table if not exists sensor_data_%s partition of sensor_data for values from (%L) to (%L);',
+                    to_char(d, 'YYYYMMDD'), d::timestamptz, (d + 1)::timestamptz
+                  )
+                  from days
+                  \gexec
 
-                  -- drop partitions older than RETENTION_DAYS
-                  do \$\$
-                  declare r record;
-                  declare cutoff date := current_date - ${RETENTION_DAYS}::int;
-                  begin
-                    for r in
-                      select c.relname
-                      from pg_inherits i
-                      join pg_class c on c.oid = i.inhrelid
-                      join pg_class p on p.oid = i.inhparent
-                      where p.relname = 'sensor_data'
-                        and c.relname ~ '^sensor_data_[0-9]{8}\$'
-                        and to_date(substring(c.relname from 13), 'YYYYMMDD') < cutoff
-                    loop
-                      raise notice 'dropping old partition %', r.relname;
-                      execute format('drop table if exists %I', r.relname);
-                    end loop;
-                  end \$\$;
+                  -- Drop partitions older than retention_days
+                  select format('drop table if exists %I;', c.relname)
+                  from pg_inherits i
+                  join pg_class c on c.oid = i.inhrelid
+                  join pg_class p on p.oid = i.inhparent
+                  where p.relname = 'sensor_data'
+                    and c.relname ~ '^sensor_data_[0-9]{8}$'
+                    and to_date(substring(c.relname from 13), 'YYYYMMDD')
+                        < (current_date - (:'retention_days')::int)
+                  \gexec
                   SQL
               resources:
                 requests:

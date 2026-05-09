@@ -47,17 +47,14 @@ spec:
               create index if not exists sensor_data_ts_idx        on sensor_data (ts desc);
               create index if not exists sensor_data_sensor_id_idx on sensor_data (sensor_id);
 
-              -- Pre-create today + next 2 days (CronJob keeps it rolling forward)
-              do $$
-              declare d date := current_date - 1;
-              begin
-                for i in 0..3 loop
-                  execute format(
-                    'create table if not exists sensor_data_%s partition of sensor_data for values from (%L) to (%L)',
-                    to_char(d + i, 'YYYYMMDD'),
-                    (d + i)::timestamptz,
-                    (d + i + 1)::timestamptz
-                  );
-                end loop;
-              end $$;
+              -- Pre-create yesterday + today + next 2 days using \gexec (no DO blocks)
+              with days as (
+                select generate_series(current_date - 1, current_date + 2, '1 day'::interval)::date as d
+              )
+              select format(
+                'create table if not exists sensor_data_%s partition of sensor_data for values from (%L) to (%L);',
+                to_char(d, 'YYYYMMDD'), d::timestamptz, (d + 1)::timestamptz
+              )
+              from days
+              \gexec
               SQL
