@@ -54,7 +54,7 @@ data:
     # N writer tasks drain an asyncio.Queue and flush pipelined XADDs in batches.
     import asyncio, os, signal, time, uuid
     from gmqtt import Client as MQTTClient
-    from gmqtt.mqtt.constants import MQTTv5
+    from gmqtt.mqtt.constants import MQTTv50
     import redis.asyncio as aioredis
 
     mqtt_host    = os.getenv("MQTT_HOST", "aiot-emqx")
@@ -140,7 +140,7 @@ data:
             client.on_disconnect = on_disconnect
             client.on_message = on_message
             try:
-                await client.connect(mqtt_host, mqtt_port, version=MQTTv5, keepalive=120)
+                await client.connect(mqtt_host, mqtt_port, version=MQTTv50, keepalive=120)
                 await STOP.wait()
                 await client.disconnect()
                 break
