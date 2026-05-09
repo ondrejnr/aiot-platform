@@ -48,7 +48,7 @@ spec:
             - name: EMQX_FORCE_SHUTDOWN__MAX_MAILBOX_SIZE
               value: "10000000"
             - name: EMQX_FORCE_SHUTDOWN__MAX_HEAP_SIZE
-              value: "512MB"
+              value: "2GB"
             # Disable SysMon overload alarms tripping needlessly
             - name: EMQX_SYSMON__VM__BUSY_DIST_PORT
               value: "true"
@@ -69,8 +69,8 @@ spec:
             periodSeconds: 20
           resources:
             requests:
-              cpu: 500m
-              memory: 1Gi
-            limits:
-              cpu: "4"
+              cpu: "2"
               memory: 4Gi
+            limits:
+              cpu: "6"
+              memory: 8Gi
