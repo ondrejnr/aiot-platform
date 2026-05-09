@@ -254,22 +254,8 @@ data:
     batch_max = int(os.getenv("BATCH_MAX", "5000"))
     poll_ms   = int(os.getenv("POLL_MS", "200"))
 
-    create_sql = f"""
-    create table if not exists {table} (
-      id bigserial primary key,
-      ts timestamptz,
-      sensor_id text,
-      location text,
-      temperature double precision,
-      humidity double precision,
-      pressure double precision,
-      battery double precision,
-      payload jsonb not null,
-      ingested_at timestamptz not null default now()
-    );
-    create index if not exists {table}_ts_idx on {table} (ts desc);
-    create index if not exists {table}_sensor_id_idx on {table} (sensor_id);
-    """
+    # Schema is owned by the db-init Job (declarative partitioned table).
+    # pg-sink only INSERTs via COPY; do NOT run DDL here.
 
     def pg_dsn():
         return (
@@ -294,9 +280,6 @@ data:
 
     while True:
         try:
-            # autocommit conn for DDL only; main conn does COPY in transaction
-            with psycopg.connect(pg_dsn(), autocommit=True) as ddl:
-                ddl.execute(create_sql)
             conn = psycopg.connect(pg_dsn(), autocommit=False)
             consumer = KafkaConsumer(
                 topic,
