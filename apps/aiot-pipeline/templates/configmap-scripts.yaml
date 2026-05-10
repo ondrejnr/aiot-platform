@@ -7,7 +7,7 @@ metadata:
     {{- include "aiot.labels" . | nindent 4 }}
 data:
   sensor_simulator.py: |
-    import json, os, random, time
+    import json, os, random, socket, time, hashlib
     from datetime import datetime, timezone
     import paho.mqtt.client as mqtt
 
@@ -15,8 +15,15 @@ data:
     port = int(os.getenv("MQTT_PORT", "1883"))
     topic = os.getenv("MQTT_TOPIC", "aiot/sensors/telemetry")
     interval = float(os.getenv("SENSOR_INTERVAL_SECONDS", "2"))
+    pool_size = int(os.getenv("SENSOR_POOL_SIZE", "50"))
+    hostname = socket.gethostname()
+    # Stable index per pod -> exactly one sensor_id per replica
+    h = int(hashlib.sha1(hostname.encode()).hexdigest(), 16)
+    sensor_id = f"sensor-{(h % pool_size) + 1:03d}"
+    location = ["lab", "warehouse", "office", "outside", "plant"][h % 5]
+    client_id = f"sensor-sim-{hostname}"
     client = mqtt.Client(
-        client_id="sensor-simulator",
+        client_id=client_id,
         callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
     )
     while True:
@@ -24,19 +31,17 @@ data:
             client.connect(host, port, 60)
             break
         except Exception as exc:
-            print(f"sensor-sim waiting for {host}:{port}: {exc}", flush=True)
+            print(f"{client_id} waiting for {host}:{port}: {exc}", flush=True)
             time.sleep(3)
     client.loop_start()
-    sensors = [f"sensor-{i:03d}" for i in range(1, 11)]
-    locations = ["lab", "warehouse", "office", "outside", "plant"]
-    print(f"publishing MQTT telemetry to {host}:{port}/{topic}", flush=True)
+    print(f"{client_id} publishing as {sensor_id}@{location} -> {host}:{port}/{topic}", flush=True)
     n = 0
     last = time.monotonic()
     while True:
         payload = {
             "ts": datetime.now(timezone.utc).isoformat(),
-            "sensor_id": random.choice(sensors),
-            "location": random.choice(locations),
+            "sensor_id": sensor_id,
+            "location": location,
             "temperature": round(random.uniform(18.0, 31.0), 2),
             "humidity": round(random.uniform(35.0, 78.0), 2),
             "pressure": round(random.uniform(995.0, 1028.0), 2),
@@ -45,7 +50,7 @@ data:
         client.publish(topic, json.dumps(payload), qos=0)
         n += 1
         if time.monotonic() - last >= 30:
-            print(f"sensor-sim published total={n}", flush=True)
+            print(f"{sensor_id} published total={n}", flush=True)
             last = time.monotonic()
         time.sleep(interval)
   mqtt_to_redis.py: |
