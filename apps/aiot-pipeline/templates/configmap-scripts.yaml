@@ -15,12 +15,15 @@ data:
     port = int(os.getenv("MQTT_PORT", "1883"))
     topic = os.getenv("MQTT_TOPIC", "aiot/sensors/telemetry")
     interval = float(os.getenv("SENSOR_INTERVAL_SECONDS", "2"))
-    pool_size = int(os.getenv("SENSOR_POOL_SIZE", "50"))
     hostname = socket.gethostname()
-    # Stable index per pod -> exactly one sensor_id per replica
-    h = int(hashlib.sha1(hostname.encode()).hexdigest(), 16)
-    sensor_id = f"sensor-{(h % pool_size) + 1:03d}"
-    location = ["lab", "warehouse", "office", "outside", "plant"][h % 5]
+    # StatefulSet ordinal -> sensor_id (POD_NAME = aiot-sensor-simulator-N)
+    pod_name = os.getenv("POD_NAME", hostname)
+    try:
+        ordinal = int(pod_name.rsplit("-", 1)[-1])
+    except ValueError:
+        ordinal = int(hashlib.sha1(hostname.encode()).hexdigest(), 16) % 1000
+    sensor_id = f"sensor-{ordinal + 1:03d}"
+    location = ["lab", "warehouse", "office", "outside", "plant"][ordinal % 5]
     client_id = f"sensor-sim-{hostname}"
     client = mqtt.Client(
         client_id=client_id,

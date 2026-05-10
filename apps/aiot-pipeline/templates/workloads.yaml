@@ -1,6 +1,6 @@
 {{- $pythonImage := "python:3.12-slim" -}}
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
   name: aiot-sensor-simulator
   namespace: {{ .Values.global.namespace }}
@@ -8,7 +8,25 @@ metadata:
     app.kubernetes.io/component: sensor-simulator
     {{- include "aiot.labels" . | nindent 4 }}
 spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/component: sensor-simulator
+  ports:
+    - name: noop
+      port: 1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: aiot-sensor-simulator
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: sensor-simulator
+    {{- include "aiot.labels" . | nindent 4 }}
+spec:
+  serviceName: aiot-sensor-simulator
   replicas: {{ .Values.sensorSimulator.replicas }}
+  podManagementPolicy: Parallel
   selector:
     matchLabels:
       app.kubernetes.io/component: sensor-simulator
@@ -32,6 +50,10 @@ spec:
               value: {{ .Values.mqtt.topic | quote }}
             - name: SENSOR_INTERVAL_SECONDS
               value: {{ .Values.sensorSimulator.intervalSeconds | quote }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           volumeMounts:
             - name: scripts
               mountPath: /app
