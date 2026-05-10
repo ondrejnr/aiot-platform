@@ -53,6 +53,7 @@ grafana:
         isDefault: true
         editable: true
       - name: AIoT-Postgres
+        uid: AIoT-Postgres
         type: postgres
         access: proxy
         url: pg-cluster-rw.databases.svc:5432
