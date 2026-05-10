@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aiot-dashboards
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+data:
+  aiot-sensors.json: |-
+{{ .Files.Get "dashboards/aiot-sensors.json" | indent 4 }}

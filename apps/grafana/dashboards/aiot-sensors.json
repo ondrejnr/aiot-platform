@@ -1,0 +1,241 @@
+{
+  "title": "AIoT Sensors",
+  "uid": "aiot-sensors",
+  "schemaVersion": 39,
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "sensor",
+        "type": "query",
+        "datasource": {
+          "type": "postgres",
+          "uid": "AIoT-Postgres"
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "query": "SELECT DISTINCT sensor_id FROM sensor_data WHERE ts > now() - interval '1 hour' ORDER BY 1",
+        "sort": 1
+      },
+      {
+        "name": "location",
+        "type": "query",
+        "datasource": {
+          "type": "postgres",
+          "uid": "AIoT-Postgres"
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "multi": true,
+        "query": "SELECT DISTINCT location FROM sensor_data WHERE ts > now() - interval '1 hour' ORDER BY 1",
+        "sort": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Active sensors (5m)",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "AIoT-Postgres"
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT count(DISTINCT sensor_id) FROM sensor_data WHERE ts > now() - interval '5 minutes'",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Msgs/min (5m avg)",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "AIoT-Postgres"
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT count(*)/5 FROM sensor_data WHERE ts > now() - interval '5 minutes'",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Total rows",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "AIoT-Postgres"
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT count(*) FROM sensor_data",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Last sample age (s)",
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "AIoT-Postgres"
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT EXTRACT(EPOCH FROM (now()-max(ts))) FROM sensor_data",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Temperature (C)",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "AIoT-Postgres"
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT ts AS time, sensor_id||'/'||location AS metric, temperature FROM sensor_data WHERE $__timeFilter(ts) AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY ts",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Humidity (%)",
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "AIoT-Postgres"
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT ts AS time, sensor_id||'/'||location AS metric, humidity FROM sensor_data WHERE $__timeFilter(ts) AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY ts",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "Pressure (hPa)",
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "AIoT-Postgres"
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT ts AS time, sensor_id||'/'||location AS metric, pressure FROM sensor_data WHERE $__timeFilter(ts) AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY ts",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Battery (V)",
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "AIoT-Postgres"
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT ts AS time, sensor_id||'/'||location AS metric, battery FROM sensor_data WHERE $__timeFilter(ts) AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY ts",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "type": "table",
+      "title": "Latest reading per sensor/location",
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "AIoT-Postgres"
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT DISTINCT ON (sensor_id, location) ts AS \"time\", sensor_id, location, temperature, humidity, pressure, battery FROM sensor_data WHERE ts > now() - interval '10 minutes' AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY sensor_id, location, ts DESC",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

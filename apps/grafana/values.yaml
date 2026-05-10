@@ -52,3 +52,30 @@ grafana:
         url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc:8429
         isDefault: true
         editable: true
+      - name: AIoT-Postgres
+        type: postgres
+        access: proxy
+        url: pg-cluster-rw.databases.svc:5432
+        database: aiot
+        user: grafana_ro
+        secureJsonData:
+          password: Gr4f4n4R0_2026!
+        jsonData:
+          sslmode: disable
+          postgresVersion: 1600
+          timescaledb: false
+        editable: true
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: aiot
+        orgId: 1
+        folder: AIoT
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/aiot
+  dashboardsConfigMaps:
+    aiot: aiot-dashboards
