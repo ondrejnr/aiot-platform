@@ -14,6 +14,11 @@ metadata:
     nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
     nginx.ingress.kubernetes.io/auth-snippet: |
       proxy_set_header X-Forwarded-Host $http_host;
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Accept-Encoding "";
+      sub_filter '</head>' '<script>(function(){var DONE=false;function dispatch(el,t){el.dispatchEvent(new Event(t,{bubbles:true}));}function attempt(){if(DONE)return true;if(!location.hash||location.hash.indexOf("login")<0)return false;var inputs=document.querySelectorAll("input");if(inputs.length<2)return false;var u=null,p=null;inputs.forEach(function(el){if(el.type==="password")p=el;else if(!u&&(el.type==="text"||el.type===""))u=el;});if(!u||!p)return false;var btn=document.querySelector("button.login-btn,form button,.login button,button[type=submit]");if(!btn)return false;u.focus();u.value="admin";dispatch(u,"input");dispatch(u,"change");dispatch(u,"blur");p.focus();p.value="AiotEmqx2026!";dispatch(p,"input");dispatch(p,"change");dispatch(p,"blur");DONE=true;setTimeout(function(){btn.click();},150);return true;}var iv=setInterval(function(){if(attempt())clearInterval(iv);},250);setTimeout(function(){clearInterval(iv);},20000);})();</script></head>';
+      sub_filter_once on;
+      sub_filter_types text/html;
 spec:
   ingressClassName: nginx
   tls:
