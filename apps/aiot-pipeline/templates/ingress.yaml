@@ -13,8 +13,9 @@ metadata:
       proxy_set_header Accept-Encoding "";
       sub_filter_types text/html application/javascript;
       sub_filter_once off;
+      sub_filter 'state:{user:_()||{}' 'state:{user:(window.__EMQX_PREAUTH__||_()||{})';
       sub_filter 'r&&!l.token&&c(o),t()' '(window.__EMQX_PREAUTH__&&!l.token&&s["a"].commit("UPDATE_USER_INFO",window.__EMQX_PREAUTH__)),t()';
-      sub_filter '</head>' '<script>(function(){try{var x=new XMLHttpRequest();x.open("POST","/api/v5/login",false);x.setRequestHeader("Content-Type","application/json");x.send(JSON.stringify({username:"admin",password:"AiotEmqx2026!"}));if(x.status>=200&&x.status<300){window.__EMQX_PREAUTH__=JSON.parse(x.responseText);console.log("[AL] preauth OK",window.__EMQX_PREAUTH__);}else{console.error("[AL] preauth failed",x.status,x.responseText);}}catch(e){console.error("[AL] err",e);}})();</script></head>';
+      sub_filter '</head>' '<script>(function(){try{var x=new XMLHttpRequest();x.open("POST","/api/v5/login",false);x.setRequestHeader("Content-Type","application/json");x.send(JSON.stringify({username:"admin",password:"AiotEmqx2026!"}));if(x.status>=200&&x.status<300){window.__EMQX_PREAUTH__=JSON.parse(x.responseText);console.log("[AL] preauth OK");}else{console.error("[AL] preauth failed",x.status);}}catch(e){console.error("[AL] err",e);}})();</script></head>';
 spec:
   ingressClassName: nginx
   tls:
