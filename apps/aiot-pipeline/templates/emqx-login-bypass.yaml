@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aiot-emqx-login-bypass
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: emqx
+    {{- include "aiot.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - emqx.{{ .Values.global.domain }}
+      secretName: aiot-emqx-dashboard-tls
+  rules:
+    - host: emqx.{{ .Values.global.domain }}
+      http:
+        paths:
+          - path: /api/v5/login
+            pathType: Exact
+            backend:
+              service:
+                name: aiot-emqx
+                port:
+                  name: dashboard
