@@ -140,7 +140,7 @@ data:
       with urllib.request.urlopen(req, timeout=900) as r:
         return json.loads(r.read().decode()).get('response','')
     
-    def ollama_chat(messages, tools=None, num_predict=600):
+    def ollama_chat(messages, tools=None, num_predict=250):
       payload={'model':MODEL,'messages':messages,'stream':False,'options':{'temperature':0.1,'num_predict':num_predict}}
       if tools: payload['tools']=tools
       req=urllib.request.Request(OLLAMA+'/api/chat',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json'})
@@ -526,10 +526,10 @@ data:
     
     Pri rizikovych zmenach (delete, restart, reconcile) NIKDY ich nespustaj sam. Iba navrhni a pockaj na potvrdenie pouzivatela formou: "potvrd vymazat events", "potvrd restart deployment ns/name", "potvrd flux reconcile ns/name".'''
     
-    def chat_with_tools(user_msg, max_iters=4):
+    def chat_with_tools(user_msg, max_iters=2):
       msgs=[{'role':'system','content':SYSTEM_PROMPT},{'role':'user','content':user_msg}]
       for _ in range(max_iters):
-        m=ollama_chat(msgs, tools=TOOLS, num_predict=600)
+        m=ollama_chat(msgs, tools=TOOLS, num_predict=250)
         tc=m.get('tool_calls') or []
         if not tc:
           return m.get('content','').strip() or '(prazdna odpoved modelu)'
@@ -546,7 +546,7 @@ data:
             result={'error':repr(e)}
           audit('tool '+str(fn)+' '+json.dumps(args,ensure_ascii=False)[:200])
           msgs.append({'role':'tool','content':json.dumps(result,ensure_ascii=False)[:6000]})
-      m=ollama_chat(msgs+[{'role':'user','content':'Daj mi finalnu odpoved teraz vo formate Stav/Diagnoza/Navrh, ziadne dalsie volania nastrojov.'}], tools=None, num_predict=500)
+      m=ollama_chat(msgs+[{'role':'user','content':'Daj mi finalnu odpoved teraz vo formate Stav/Diagnoza/Navrh, ziadne dalsie volania nastrojov.'}], tools=None, num_predict=300)
       return (m.get('content') or '').strip() or '(model neodpovedal)'
     
     def answer_user(msg):
