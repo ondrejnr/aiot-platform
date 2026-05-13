@@ -495,3 +495,5 @@ aiot-platform/
 > bootstrapping a clean cluster. **`manifests/`** is a private nightly snapshot
 > that may contain unredacted Secrets — do **not** apply it on a foreign
 > cluster.
+# noop 1778647677
+<!-- noop 1778647677 -->
