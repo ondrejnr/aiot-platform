@@ -5,7 +5,7 @@ metadata:
   labels: { app: ai-sre-agent }
 data:
   app.py: |-
-    import os, ssl, json, time, urllib.request, urllib.parse, traceback, html
+    import os, ssl, json, time, urllib.request, urllib.parse, traceback, html, threading
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
     
     TOKEN=open('/var/run/secrets/kubernetes.io/serviceaccount/token').read().strip()
@@ -620,7 +620,28 @@ data:
           if self.path=='/api/chat':
             msg=json.loads(raw or '{}').get('message','')[:4000]
             audit('chat '+msg.replace('\n',' ')[:300])
-            return self.send_json({'answer':answer_user(msg)})
+            self.send_response(200)
+            self.send_header('Content-Type','application/json; charset=utf-8')
+            self.send_header('Transfer-Encoding','chunked')
+            self.send_header('X-Accel-Buffering','no')
+            self.send_header('Cache-Control','no-cache')
+            self.end_headers()
+            def _wc(b):
+              try:
+                self.wfile.write(('%x\r\n' % len(b)).encode())
+                self.wfile.write(b); self.wfile.write(b'\r\n'); self.wfile.flush()
+              except Exception: pass
+            _stop=threading.Event()
+            def _ka():
+              while not _stop.wait(20): _wc(b' ')
+            _t=threading.Thread(target=_ka,daemon=True); _t.start()
+            try: ans=answer_user(msg)
+            except Exception: ans='ERROR\n'+traceback.format_exc()
+            finally: _stop.set(); _t.join(timeout=1)
+            _wc(json.dumps({'answer':ans},ensure_ascii=False).encode())
+            try: self.wfile.write(b'0\r\n\r\n'); self.wfile.flush()
+            except Exception: pass
+            return
           if self.path=='/api/feedback':
             try: d=json.loads(raw or '{}')
             except Exception: d={}
@@ -724,6 +745,8 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
     nginx.ingress.kubernetes.io/proxy-next-upstream: "off"
     nginx.ingress.kubernetes.io/proxy-next-upstream-tries: "0"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
 spec:
   ingressClassName: nginx
   tls:
