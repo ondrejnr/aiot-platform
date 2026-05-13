@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: ./apps/grafana
-      reconcileStrategy: Revision
+      reconcileStrategy: ChartVersion
       sourceRef:
         kind: GitRepository
         name: flux-system

@@ -16,7 +16,7 @@ spec:
   chart:
     spec:
       chart: ./apps/node-problem-detector
-      reconcileStrategy: Revision
+      reconcileStrategy: ChartVersion
       sourceRef:
         kind: GitRepository
         name: flux-system

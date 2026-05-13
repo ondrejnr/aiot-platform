@@ -16,7 +16,7 @@ spec:
   chart:
     spec:
       chart: ./apps/nfs-provisioner
-      reconcileStrategy: Revision
+      reconcileStrategy: ChartVersion
       sourceRef:
         kind: GitRepository
         name: flux-system
