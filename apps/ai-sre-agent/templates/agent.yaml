@@ -475,67 +475,6 @@ data:
         out.append({'name':n.get('metadata',{}).get('name'),'ready':conds.get('Ready'),'roles':[k.split('/')[-1] for k in (n.get('metadata',{}).get('labels',{}) or {}) if k.startswith('node-role.kubernetes.io/')]})
       return {'count':len(out),'nodes':out}
     
-    def parse_quantity(q):
-      if q is None: return 0.0
-      s=str(q).strip()
-      try:
-        if s.endswith('m'): return float(s[:-1]) / 1000.0
-        units={'Ki':1024,'Mi':1024**2,'Gi':1024**3,'Ti':1024**4,'K':1000,'M':1000**2,'G':1000**3,'T':1000**4}
-        for u,m in units.items():
-          if s.endswith(u): return float(s[:-len(u)]) * m
-        return float(s)
-      except Exception:
-        return 0.0
-    
-    def resource_status():
-      nodes=k8s('GET','/api/v1/nodes').get('items',[])
-      pods=k8s('GET','/api/v1/pods?limit=1000').get('items',[])
-      node_req={}
-      for n in nodes:
-        name=n.get('metadata',{}).get('name')
-        alloc=n.get('status',{}).get('allocatable',{})
-        node_req[name]={'cpu_alloc':parse_quantity(alloc.get('cpu')),'mem_alloc':parse_quantity(alloc.get('memory')),'cpu_req':0.0,'mem_req':0.0,'pods':0}
-      for p in pods:
-        node=p.get('spec',{}).get('nodeName')
-        if node not in node_req: continue
-        if p.get('status',{}).get('phase') in ('Succeeded','Failed'): continue
-        node_req[node]['pods']+=1
-        for c in p.get('spec',{}).get('containers',[]) or []:
-          req=(c.get('resources',{}) or {}).get('requests',{}) or {}
-          node_req[node]['cpu_req'] += parse_quantity(req.get('cpu'))
-          node_req[node]['mem_req'] += parse_quantity(req.get('memory'))
-      lines=[]
-      total_cpu_req=total_cpu_alloc=total_mem_req=total_mem_alloc=0.0
-      for name in sorted(node_req):
-        r=node_req[name]
-        total_cpu_req+=r['cpu_req']; total_cpu_alloc+=r['cpu_alloc']; total_mem_req+=r['mem_req']; total_mem_alloc+=r['mem_alloc']
-        cpu_pct=(r['cpu_req']/r['cpu_alloc']*100) if r['cpu_alloc'] else 0
-        mem_pct=(r['mem_req']/r['mem_alloc']*100) if r['mem_alloc'] else 0
-        lines.append('- %s: CPU requests %.2f/%.2f cores (%.0f%%), RAM requests %.1f/%.1f GiB (%.0f%%), active pods %s' % (name,r['cpu_req'],r['cpu_alloc'],cpu_pct,r['mem_req']/1024**3,r['mem_alloc']/1024**3,mem_pct,r['pods']))
-      cluster_cpu=(total_cpu_req/total_cpu_alloc*100) if total_cpu_alloc else 0
-      cluster_mem=(total_mem_req/total_mem_alloc*100) if total_mem_alloc else 0
-      warn=[]
-      for name,r in node_req.items():
-        if r['cpu_alloc'] and r['cpu_req']/r['cpu_alloc'] > 0.8: warn.append('%s má vysoké CPU requests' % name)
-        if r['mem_alloc'] and r['mem_req']/r['mem_alloc'] > 0.8: warn.append('%s má vysoké RAM requests' % name)
-      try:
-        ev=tool_get_events({})
-        disk_events=[e for e in ev.get('events',[]) if 'disk' in (e.get('message','')+e.get('reason','')).lower() or 'ephemeral' in (e.get('message','')+e.get('reason','')).lower()]
-      except Exception:
-        disk_events=[]
-      disk_txt='Nenašiel som aktuálne Warning eventy indikujúce disk pressure/ephemeral storage problém.' if not disk_events else 'Diskové warning eventy: '+json.dumps(disk_events[:5],ensure_ascii=False)
-      action='Netreba zasahovať.' if not warn and not disk_events else ('; '.join(warn) or 'Skontrolovať uvedené diskové warning eventy.')
-      return ('Stav:
-- Cluster má %s nodeov. Podľa Kubernetes allocatable/requested zdrojov je CPU requests %.1f/%.1f cores (%.0f%%) a RAM requests %.1f/%.1f GiB (%.0f%%).
-
-Diagnóza:
-%s
-- %s
-
-Návrh:
-- %s' % (len(nodes), total_cpu_req,total_cpu_alloc,cluster_cpu,total_mem_req/1024**3,total_mem_alloc/1024**3,cluster_mem,'
-'.join(lines),disk_txt,action))
-    
     def tool_get_ingresses(args):
       ns=args.get('namespace') or ''
       path='/apis/networking.k8s.io/v1/namespaces/'+urllib.parse.quote(ns)+'/ingresses' if ns else '/apis/networking.k8s.io/v1/ingresses'
@@ -626,8 +565,6 @@ Návrh:
         target=low.replace('potvrd flux reconcile ','').strip()
         if '/' not in target: return 'Formát: potvrď flux reconcile namespace/name'
         ns,name=target.split('/',1); return reconcile_hr(ns,name)
-      if any(w in low for w in ['cpu','ram','disk','diskov','zdroje','resource','resources','vyuzitie','využitie']):
-        return resource_status()
       try:
         return chat_with_tools(msg)
       except Exception as e:
