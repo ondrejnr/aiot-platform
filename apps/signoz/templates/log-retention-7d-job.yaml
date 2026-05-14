@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: signoz-log-retention-7d
+  namespace: signoz
+  labels:
+    app.kubernetes.io/name: signoz-log-retention
+    app.kubernetes.io/part-of: signoz
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "20"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: signoz-log-retention
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: clickhouse-client
+          image: docker.io/clickhouse/clickhouse-server:25.5.6
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: CLICKHOUSE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: signoz-clickhouse-operator
+                  key: username
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: signoz-clickhouse-operator
+                  key: password
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              until clickhouse-client --host signoz-clickhouse --port 9000 --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --query "SELECT 1" >/dev/null; do
+                echo "waiting for ClickHouse"
+                sleep 5
+              done
+
+              cat >/tmp/signoz-log-retention.sql <<SQL
+              ALTER TABLE signoz_logs.logs_v2 MODIFY COLUMN _retention_days UInt16 DEFAULT 7;
+              ALTER TABLE signoz_logs.distributed_logs_v2 MODIFY COLUMN _retention_days UInt16 DEFAULT 7;
+              ALTER TABLE signoz_logs.logs_v2_resource MODIFY COLUMN _retention_days UInt16 DEFAULT 7;
+              ALTER TABLE signoz_logs.distributed_logs_v2_resource MODIFY COLUMN _retention_days UInt16 DEFAULT 7;
+              ALTER TABLE signoz_logs.logs_v2 UPDATE _retention_days = 7 WHERE _retention_days > 7;
+              ALTER TABLE signoz_logs.logs_v2_resource UPDATE _retention_days = 7 WHERE _retention_days > 7;
+              SQL
+
+              clickhouse-client --host signoz-clickhouse --port 9000 --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --multiquery < /tmp/signoz-log-retention.sql
+              clickhouse-client --host signoz-clickhouse --port 9000 --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --query "SELECT 1"

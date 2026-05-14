@@ -1,0 +1,25 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alloy
+  namespace: observability-logs
+spec:
+  suspend: false
+  interval: 30m
+  releaseName: alloy
+  dependsOn:
+    - name: loki
+      namespace: observability-logs
+  chart:
+    spec:
+      chart: ./apps/alloy
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    createNamespace: true
+  upgrade:
+    cleanupOnFail: true
