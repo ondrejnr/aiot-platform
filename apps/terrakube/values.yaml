@@ -183,12 +183,15 @@ terrakube:
 
   # ─── STORAGE (vstavaný MinIO + NFS) ────────────────────────
   storage:
-    defaultStorage: true
-    aws:
+    # Chart defaultStorage používa minio.defaultBuckets aj ako runtime bucket
+    # a ignoruje auth.existingSecret pri generovaní API/executor/registry secretov.
+    # Preto používame explicitný MinIO backend s jedným runtime bucketom sample.
+    defaultStorage: false
+    minio:
       endpoint: http://terrakube-minio:9000
       bucketName: sample
-      region: us-east-1
-      # accessKey + secretKey idú cez minio sub-chart auth nižšie
+      accessKey: admin
+      secretKey: sa75t8wxrh45GRjZCPh5HNnn
 
   minio:
     enabled: true
