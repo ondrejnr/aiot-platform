@@ -21,7 +21,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: kubectl
-          image: docker.io/bitnami/kubectl:1.31.5
+          image: docker.io/rancher/k3s:v1.31.5-k3s1
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
