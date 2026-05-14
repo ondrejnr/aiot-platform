@@ -183,15 +183,9 @@ terrakube:
 
   # ─── STORAGE (vstavaný MinIO + NFS) ────────────────────────
   storage:
-    # Chart defaultStorage používa minio.defaultBuckets aj ako runtime bucket
-    # a ignoruje auth.existingSecret pri generovaní API/executor/registry secretov.
-    # Preto používame explicitný MinIO backend s jedným runtime bucketom sample.
-    defaultStorage: false
-    minio:
-      endpoint: http://terrakube-minio:9000
-      bucketName: sample
-      accessKey: admin
-      secretKey: sa75t8wxrh45GRjZCPh5HNnn
+    # Musí zostať true: upstream chart viaže MinIO subchart na storage.defaultStorage.
+    # Runtime bucket je minio.defaultBuckets nižšie; používame jediný bucket sample.
+    defaultStorage: true
 
   minio:
     enabled: true
@@ -200,8 +194,12 @@ terrakube:
       storageClass: nfs
       size: 20Gi
     auth:
+      # existingSecret používa Bitnami MinIO; rootUser/rootPassword tu držíme rovnaké,
+      # lebo Terrakube chart ich používa pri generovaní API/executor/registry secretov.
+      rootUser: admin
+      rootPassword: 3e5d675df1aaa70614450032890c9fe3
       existingSecret: terrakube-minio
-    defaultBuckets: "sample,registry,tfstate,tfoutput"
+    defaultBuckets: "sample"
     nodeSelector:
       role: apps
     resources:
