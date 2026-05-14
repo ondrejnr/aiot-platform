@@ -17,31 +17,16 @@ spec:
       labels:
         app.kubernetes.io/name: signoz-log-retention
     spec:
+      serviceAccountName: signoz-log-retention
       restartPolicy: OnFailure
       containers:
-        - name: clickhouse-client
-          image: docker.io/clickhouse/clickhouse-server:25.5.6
+        - name: kubectl
+          image: docker.io/bitnami/kubectl:1.31.5
           imagePullPolicy: IfNotPresent
-          env:
-            - name: CLICKHOUSE_USER
-              valueFrom:
-                secretKeyRef:
-                  name: signoz-clickhouse-operator
-                  key: username
-            - name: CLICKHOUSE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: signoz-clickhouse-operator
-                  key: password
           command:
-            - /bin/bash
+            - /bin/sh
             - -ec
             - |
-              until clickhouse-client --host signoz-clickhouse --port 9000 --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --query "SELECT 1" >/dev/null; do
-                echo "waiting for ClickHouse"
-                sleep 5
-              done
-
               cat >/tmp/signoz-log-retention.sql <<SQL
               ALTER TABLE signoz_logs.logs_v2 MODIFY COLUMN _retention_days UInt16 DEFAULT 7;
               ALTER TABLE signoz_logs.distributed_logs_v2 MODIFY COLUMN _retention_days UInt16 DEFAULT 7;
@@ -51,5 +36,14 @@ spec:
               ALTER TABLE signoz_logs.logs_v2_resource UPDATE _retention_days = 7 WHERE _retention_days > 7;
               SQL
 
-              clickhouse-client --host signoz-clickhouse --port 9000 --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --multiquery < /tmp/signoz-log-retention.sql
-              clickhouse-client --host signoz-clickhouse --port 9000 --user "$CLICKHOUSE_USER" --password "$CLICKHOUSE_PASSWORD" --query "SELECT 1"
+              POD="chi-signoz-clickhouse-cluster-0-0-0"
+              for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+                if kubectl exec -n signoz "$POD" -- clickhouse-client --query "SELECT 1" >/dev/null 2>&1; then
+                  break
+                fi
+                echo "waiting for local ClickHouse client in $POD"
+                sleep 5
+              done
+
+              kubectl exec -i -n signoz "$POD" -- clickhouse-client --multiquery < /tmp/signoz-log-retention.sql
+              kubectl exec -n signoz "$POD" -- clickhouse-client --query "SELECT 1"
