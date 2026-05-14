@@ -14,6 +14,8 @@ jenkins:
         - jenkins.46.4.123.8.nip.io
         secretName: jenkins-tls
     installLatestPlugins: true
+    image:
+      tag: "2.555.2-jdk21"
     installPlugins:
     - kubernetes
     - workflow-aggregator
@@ -36,6 +38,10 @@ jenkins:
                   wellKnown:
                     wellKnownOpenIDConfigurationUrl: https://authentik.46.4.123.8.nip.io/application/o/jenkins/.well-known/openid-configuration
                 userNameField: preferred_username
+                userIdStrategy:
+                  caseSensitive: {}
+                groupIdStrategy:
+                  caseSensitive: {}
                 fullNameFieldName: name
                 emailFieldName: email
                 groupsFieldName: groups
