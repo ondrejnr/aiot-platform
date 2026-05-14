@@ -68,6 +68,7 @@ gitea:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+      nginx.ingress.kubernetes.io/proxy-body-size: 500m
     hosts:
     - host: gitea.46.4.123.8.nip.io
       paths:

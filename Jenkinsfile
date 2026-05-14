@@ -1,0 +1,93 @@
+pipeline {
+  agent {
+    kubernetes {
+      defaultContainer "git"
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  restartPolicy: Never
+  containers:
+    - name: git
+      image: alpine/git:2.49.1
+      command:
+        - cat
+      tty: true
+    - name: helm
+      image: alpine/helm:3.17.3
+      command:
+        - cat
+      tty: true
+    - name: tofu
+      image: ghcr.io/opentofu/opentofu:1.9.1
+      command:
+        - cat
+      tty: true
+    - name: flux
+      image: ghcr.io/fluxcd/flux-cli:v2.6.4
+      command:
+        - cat
+      tty: true
+"""
+    }
+  }
+
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+    buildDiscarder(logRotator(numToKeepStr: "20"))
+  }
+
+  stages {
+    stage("Checkout from Gitea") {
+      steps {
+        checkout scm
+        sh "git log --oneline -1"
+      }
+    }
+
+    stage("OpenTofu validate/plan") {
+      steps {
+        container("tofu") {
+          dir("terraform/observability-gitops") {
+            sh "tofu fmt -check -recursive"
+            sh "tofu init -backend=false"
+            sh "tofu validate"
+            sh "tofu plan -input=false -lock=false -out=tfplan"
+            sh "tofu show -no-color tfplan | sed -n '1,160p'"
+          }
+        }
+      }
+    }
+
+    stage("Helm validate GitOps charts") {
+      steps {
+        container("helm") {
+          sh """
+set -eu
+for chart in apps/loki apps/alloy apps/signoz apps/k8s-infra; do
+  echo "== $chart =="
+  helm dependency build "$chart"
+  helm lint "$chart"
+  helm template "ci-${chart##*/}" "$chart" >/tmp/"${chart##*/}".yaml
+done
+"""
+        }
+      }
+    }
+
+    stage("Flux reconcile") {
+      steps {
+        container("flux") {
+          sh """
+set -eu
+flux reconcile source git flux-system -n flux-system
+flux reconcile kustomization flux-system -n flux-system
+flux get hr -A | grep -E "loki|alloy|signoz|k8s-infra"
+"""
+        }
+      }
+    }
+  }
+}

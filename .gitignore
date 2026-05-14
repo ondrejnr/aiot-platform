@@ -16,5 +16,13 @@ kubeconfig*
 
 # Helm dependencies (downloaded by helm dep update)
 apps/*/Chart.lock
+apps/*/charts/
 apps/*/charts/*.tgz
-terraform/
+
+# OpenTofu/Terraform local state
+.terraform/
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+terraform/observability-gitops/tfplan

@@ -10,8 +10,8 @@ spec:
   ref:
     branch: main
   secretRef:
-    name: flux-system
-  url: ssh://git@github.com/ondrejnr/aiot-platform
+    name: gitea-aiot-platform
+  url: http://gitea-http.gitea.svc.cluster.local:3000/aiot-iac/aiot-platform.git
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

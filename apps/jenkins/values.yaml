@@ -21,6 +21,7 @@ jenkins:
     - workflow-aggregator
     - git
     - configuration-as-code
+    - job-dsl
     - dark-theme
     - oic-auth
     additionalExistingSecrets:
@@ -56,6 +57,30 @@ jenkins:
             authorizationStrategy:
               loggedInUsersCanDoAnything:
                 allowAnonymousRead: false
+        gitops-pipeline-job: |
+          jobs:
+            - script: >
+                pipelineJob('aiot-platform-gitops') {
+                  description('Gitea -> Jenkins -> OpenTofu/Helm -> Flux pipeline for aiot-platform')
+                  triggers {
+                    scm('H/2 * * * *')
+                  }
+                  definition {
+                    cpsScm {
+                      scm {
+                        git {
+                          remote {
+                            url('http://gitea-http.gitea.svc.cluster.local:3000/aiot-iac/aiot-platform.git')
+                            credentials("gitea-git-token")
+                          }
+                          branch('*/main')
+                        }
+                      }
+                      scriptPath('Jenkinsfile')
+                      lightweight(true)
+                    }
+                  }
+                }
     nodeSelector:
       node-role.kubernetes.io/worker: ""
     resources:
