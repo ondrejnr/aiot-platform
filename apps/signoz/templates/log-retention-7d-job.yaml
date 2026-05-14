@@ -32,8 +32,8 @@ spec:
               ALTER TABLE signoz_logs.distributed_logs_v2 MODIFY COLUMN _retention_days UInt16 DEFAULT 7;
               ALTER TABLE signoz_logs.logs_v2_resource MODIFY COLUMN _retention_days UInt16 DEFAULT 7;
               ALTER TABLE signoz_logs.distributed_logs_v2_resource MODIFY COLUMN _retention_days UInt16 DEFAULT 7;
-              ALTER TABLE signoz_logs.logs_v2 UPDATE _retention_days = 7 WHERE _retention_days > 7;
-              ALTER TABLE signoz_logs.logs_v2_resource UPDATE _retention_days = 7 WHERE _retention_days > 7;
+              ALTER TABLE signoz_logs.logs_v2 MODIFY TTL toDateTime(timestamp / 1000000000) + toIntervalDay(7);
+              ALTER TABLE signoz_logs.logs_v2_resource MODIFY TTL (toDateTime(seen_at_ts_bucket_start) + toIntervalDay(7)) + toIntervalSecond(1800);
               SQL
 
               POD="chi-signoz-clickhouse-cluster-0-0-0"
