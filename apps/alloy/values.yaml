@@ -104,6 +104,11 @@ alloy:
         loki.source.file "pod_logs" {
           targets    = discovery.relabel.pod_logs.output
           forward_to = [loki.process.pod_logs.receiver]
+
+          file_match {
+            enabled     = true
+            sync_period = "10s"
+          }
         }
 
         loki.process "pod_logs" {
