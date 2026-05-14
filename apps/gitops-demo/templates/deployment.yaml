@@ -23,6 +23,8 @@ spec:
         - name: podinfo
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - ./podinfo
           args:
             - --port=9898
             - --level=info
