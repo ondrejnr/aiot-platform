@@ -1,0 +1,22 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gitops-demo
+  namespace: gitops-demo
+spec:
+  suspend: false
+  interval: 30m
+  releaseName: gitops-demo
+  chart:
+    spec:
+      chart: ./apps/gitops-demo
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    createNamespace: true
+  upgrade:
+    cleanupOnFail: true
