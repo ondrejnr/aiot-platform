@@ -66,12 +66,18 @@ spec:
         container("helm") {
           sh """
 set -eu
-for chart in apps/loki apps/alloy apps/signoz apps/k8s-infra; do
-  echo "== \$chart =="
-  helm dependency build "\$chart"
-  helm lint "\$chart"
-  helm template "ci-\${chart##*/}" "\$chart" >/tmp/"\${chart##*/}".yaml
-done
+helm dependency build apps/loki
+helm lint apps/loki
+helm template ci-loki apps/loki >/tmp/loki.yaml
+helm dependency build apps/alloy
+helm lint apps/alloy
+helm template ci-alloy apps/alloy >/tmp/alloy.yaml
+helm dependency build apps/signoz
+helm lint apps/signoz
+helm template ci-signoz apps/signoz >/tmp/signoz.yaml
+helm dependency build apps/k8s-infra
+helm lint apps/k8s-infra
+helm template ci-k8s-infra apps/k8s-infra >/tmp/k8s-infra.yaml
 """
         }
       }
