@@ -7,6 +7,9 @@ apiVersion: v1
 kind: Pod
 spec:
   serviceAccountName: jenkins
+  securityContext:
+    runAsUser: 1000
+    fsGroup: 1000
   restartPolicy: Never
   containers:
     - name: git
