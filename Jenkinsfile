@@ -100,5 +100,62 @@ flux get hr -A | grep -E "loki|alloy|signoz|k8s-infra"
         }
       }
     }
+
+    stage("Observability self-check") {
+      steps {
+        container("flux") {
+          sh '''
+set -eu
+
+fail() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+LOKI_URL="http://loki-gateway.observability-logs.svc.cluster.local"
+CLICKHOUSE_SELECTOR="clickhouse.altinity.com/chi=signoz-clickhouse,clickhouse.altinity.com/ready=yes"
+
+echo "Checking Alloy DaemonSet readiness..."
+ALLOY_DESIRED="$(kubectl -n observability-logs get ds alloy -o jsonpath='{.status.desiredNumberScheduled}')"
+ALLOY_READY="$(kubectl -n observability-logs get ds alloy -o jsonpath='{.status.numberReady}')"
+echo "Alloy ready pods: ${ALLOY_READY}/${ALLOY_DESIRED}"
+[ "${ALLOY_DESIRED}" -gt 0 ] || fail "Alloy desired pod count is zero"
+[ "${ALLOY_READY}" = "${ALLOY_DESIRED}" ] || fail "Alloy is not ready on all scheduled nodes"
+
+echo "Checking SigNoz k8s-infra agent readiness..."
+K8S_INFRA_DESIRED="$(kubectl -n signoz get ds k8s-infra-otel-agent -o jsonpath='{.status.desiredNumberScheduled}')"
+K8S_INFRA_READY="$(kubectl -n signoz get ds k8s-infra-otel-agent -o jsonpath='{.status.numberReady}')"
+echo "k8s-infra ready pods: ${K8S_INFRA_READY}/${K8S_INFRA_DESIRED}"
+[ "${K8S_INFRA_DESIRED}" -gt 0 ] || fail "k8s-infra desired pod count is zero"
+[ "${K8S_INFRA_READY}" = "${K8S_INFRA_DESIRED}" ] || fail "k8s-infra agent is not ready on all scheduled nodes"
+
+echo "Checking Loki API and recent aiot logs collected by Alloy..."
+wget -qO- "${LOKI_URL}/loki/api/v1/labels" >/tmp/loki-labels.json
+grep -q '"namespace"' /tmp/loki-labels.json || fail "Loki labels endpoint does not expose namespace label"
+wget -qO- "${LOKI_URL}/loki/api/v1/query_range?query=%7Bsource%3D%22alloy%22%2Cnamespace%3D%22aiot%22%7D" >/tmp/loki-aiot.json
+if grep -q '"result":\[\]' /tmp/loki-aiot.json; then
+  fail "Loki has no logs for namespace aiot with source=alloy"
+fi
+grep -q '"source":"alloy"' /tmp/loki-aiot.json || fail "Loki query did not return Alloy-sourced logs"
+grep -q '"namespace":"aiot"' /tmp/loki-aiot.json || fail "Loki query did not return aiot namespace logs"
+echo "Loki check passed."
+
+echo "Checking SigNoz ClickHouse recent logs and 7-day retention..."
+CLICKHOUSE_POD="$(kubectl -n signoz get pod -l "${CLICKHOUSE_SELECTOR}" -o jsonpath='{.items[0].metadata.name}')"
+[ -n "${CLICKHOUSE_POD}" ] || fail "No ready SigNoz ClickHouse pod found"
+echo "Using ClickHouse pod: ${CLICKHOUSE_POD}"
+SIGNOZ_RECENT_LOGS="$(kubectl -n signoz exec "${CLICKHOUSE_POD}" -c clickhouse -- clickhouse-client -q "SELECT count() FROM signoz_logs.logs_v2 WHERE timestamp >= toUnixTimestamp64Nano(now64(9) - INTERVAL 10 MINUTE)")"
+echo "SigNoz logs in last 10 minutes: ${SIGNOZ_RECENT_LOGS}"
+[ "${SIGNOZ_RECENT_LOGS}" -gt 0 ] || fail "SigNoz has no logs in the last 10 minutes"
+kubectl -n signoz exec "${CLICKHOUSE_POD}" -c clickhouse -- clickhouse-client -q "SHOW CREATE TABLE signoz_logs.logs_v2" >/tmp/signoz-logs-ddl.txt
+grep -q '_retention_days.*DEFAULT 7' /tmp/signoz-logs-ddl.txt || fail "SigNoz logs_v2 _retention_days default is not 7"
+grep -q 'toIntervalDay(7)' /tmp/signoz-logs-ddl.txt || fail "SigNoz logs_v2 TTL is not 7 days"
+echo "SigNoz check passed."
+
+echo "Observability self-check passed."
+'''
+        }
+      }
+    }
   }
 }
