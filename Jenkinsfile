@@ -67,10 +67,10 @@ spec:
           sh """
 set -eu
 for chart in apps/loki apps/alloy apps/signoz apps/k8s-infra; do
-  echo "== $chart =="
-  helm dependency build "$chart"
-  helm lint "$chart"
-  helm template "ci-${chart##*/}" "$chart" >/tmp/"${chart##*/}".yaml
+  echo "== \$chart =="
+  helm dependency build "\$chart"
+  helm lint "\$chart"
+  helm template "ci-\${chart##*/}" "\$chart" >/tmp/"\${chart##*/}".yaml
 done
 """
         }
