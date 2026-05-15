@@ -42,7 +42,6 @@ spec:
     stage("Checkout from Gitea") {
       steps {
         checkout scm
-        sh "git log --oneline -1"
       }
     }
 
