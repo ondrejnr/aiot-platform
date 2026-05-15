@@ -76,6 +76,7 @@ jenkins:
                 pipelineJob('aiot-platform-gitops') {
                   description('Gitea -> Jenkins -> OpenTofu/Helm -> Flux pipeline for aiot-platform')
                   triggers {
+                    cron("* * * * *")
                     scm('H/2 * * * *')
                   }
                   definition {
@@ -93,8 +94,7 @@ jenkins:
                       lightweight(true)
                     }
                   }
-                };
-                queue("aiot-platform-gitops")
+                }
     nodeSelector:
       node-role.kubernetes.io/worker: ""
     resources:
