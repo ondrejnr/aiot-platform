@@ -67,6 +67,10 @@ spec:
         container("helm") {
           sh """
 set -eu
+mkdir -p /tmp/helm/cache /tmp/helm/config /tmp/helm/data
+export HELM_CACHE_HOME=/tmp/helm/cache
+export HELM_CONFIG_HOME=/tmp/helm/config
+export HELM_DATA_HOME=/tmp/helm/data
 helm dependency build apps/loki
 helm lint apps/loki
 helm template ci-loki apps/loki >/tmp/loki.yaml
