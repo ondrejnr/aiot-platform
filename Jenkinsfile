@@ -133,7 +133,7 @@ echo "Checking Loki API and recent aiot logs collected by Alloy..."
 wget -qO- "${LOKI_URL}/loki/api/v1/labels" >/tmp/loki-labels.json
 grep -q '"namespace"' /tmp/loki-labels.json || fail "Loki labels endpoint does not expose namespace label"
 wget -qO- "${LOKI_URL}/loki/api/v1/query_range?query=%7Bsource%3D%22alloy%22%2Cnamespace%3D%22aiot%22%7D" >/tmp/loki-aiot.json
-if grep -q '"result":\[\]' /tmp/loki-aiot.json; then
+if grep -Fq '"result":[]' /tmp/loki-aiot.json; then
   fail "Loki has no logs for namespace aiot with source=alloy"
 fi
 grep -q '"source":"alloy"' /tmp/loki-aiot.json || fail "Loki query did not return Alloy-sourced logs"
