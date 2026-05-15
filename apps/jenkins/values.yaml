@@ -80,7 +80,8 @@ jenkins:
                       lightweight(true)
                     }
                   }
-                }
+                };
+                queue("aiot-platform-gitops")
     nodeSelector:
       node-role.kubernetes.io/worker: ""
     resources:
