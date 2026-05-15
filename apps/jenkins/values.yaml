@@ -27,6 +27,8 @@ jenkins:
     additionalExistingSecrets:
     - name: jenkins-oidc
       keyName: clientSecret
+    - name: gitea-git-token
+      keyName: password
     JCasC:
       configScripts:
         oidc-auth: |
@@ -57,6 +59,17 @@ jenkins:
             authorizationStrategy:
               loggedInUsersCanDoAnything:
                 allowAnonymousRead: false
+        gitea-git-credentials: |
+          credentials:
+            system:
+              domainCredentials:
+              - credentials:
+                - usernamePassword:
+                    id: gitea-git-token
+                    description: Gitea aiot-platform read token
+                    scope: GLOBAL
+                    username: gitea_admin
+                    password: ${gitea-git-token-password}
         gitops-pipeline-job: |
           jobs:
             - script: >
