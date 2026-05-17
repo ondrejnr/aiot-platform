@@ -13,6 +13,7 @@ jenkins:
       - hosts:
         - jenkins.46.4.123.8.nip.io
         secretName: jenkins-tls
+    installLatestPlugins: true
     overwritePlugins: true
     overwritePluginsFromImage: true
     image:
