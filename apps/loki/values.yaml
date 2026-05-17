@@ -17,8 +17,8 @@ loki:
     limits_config:
       allow_structured_metadata: true
       volume_enabled: true
-      retention_period: 168h
-      max_query_lookback: 168h
+      retention_period: 48h
+      max_query_lookback: 48h
     compactor:
       working_directory: /var/loki/compactor
       retention_enabled: true

@@ -1,2 +1,0 @@
-{"service":"headlamp","symptom":"frequent logout or token needed","cause":"session ttl too short / token expired","fix":"increase Headlamp session ttl and use long-lived service account token","verify":"Headlamp login persists and deployment args contain session ttl"}
-{"service":"ingress","symptom":"502 or 503","cause":"service has no ready endpoints or backend protocol mismatch","fix":"check endpoints, readiness, service targetPort, ingress backend protocol annotation","verify":"curl ingress URL returns HTTP 200"}

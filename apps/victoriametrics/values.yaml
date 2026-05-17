@@ -5,7 +5,7 @@ victoria-metrics-k8s-stack:
     enabled: false
   vmsingle:
     spec:
-      retentionPeriod: "7d"
+      retentionPeriod: "2d"
   vmalert:
     spec:
       notifiers:
