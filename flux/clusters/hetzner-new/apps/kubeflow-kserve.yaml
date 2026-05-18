@@ -34,6 +34,19 @@ spec:
   path: ./manifests/kustomize/env/cert-manager/platform-agnostic-k8s-native
   prune: true
   wait: true
+  patches:
+    - target:
+        kind: ConfigMap
+        name: kfp-launcher
+        namespace: kubeflow
+      patch: |
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: kfp-launcher
+          namespace: kubeflow
+        data:
+          defaultPipelineRoot: minio://mlpipeline/v2/artifacts
   dependsOn:
     - name: kubeflow-pipelines-crds
   sourceRef:
