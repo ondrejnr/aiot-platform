@@ -162,14 +162,27 @@ def api_summary(): return {"summary": summary(), "latest": latest(50), "predicti
 def api_chat(req: ChatRequest):
     started=time.time()
     question = (req.question or "").strip()
-    rows=latest(50)
-    ctx = {"summary": summary(), "latest": rows, "predictions": {}}
     q_lower=question.lower()
-    if any(word in q_lower for word in ["model", "mlflow", "predik", "inference", "údrž", "udrz"]):
-        ctx["predictions"] = predictions()
-    fast=fast_answer(question, ctx)
-    if fast:
-        return {"answer": fast, "source": "local-rules", "seconds": round(time.time() - started, 3)}
+    external_words=["extern", "api", "lokal", "lokál"]
+    prediction_words=["model", "mlflow", "predik", "inference", "údrž", "udrz"]
+    risk_words=["rizik", "naj", "kritick", "critical", "warning", "prečo", "preco", "senzor"]
+    status_words=["stav", "koľko", "kolko", "pocet", "počet", "beží", "bezi", "funguje", "zhrn", "sumar"]
+
+    if any(word in q_lower for word in external_words):
+        answer="Áno. Control Center používa lokálne dáta z Postgresu, lokálne predikcie z MLflow/inference API a lokálny Ollama model; externé LLM API sa nepoužíva."
+        return {"answer": answer, "source": "local-rules", "seconds": round(time.time() - started, 3)}
+    if any(word in q_lower for word in prediction_words):
+        ctx={"summary": {}, "latest": [], "predictions": predictions()}
+        return {"answer": answer_predictions(ctx), "source": "local-rules", "seconds": round(time.time() - started, 3)}
+
+    rows=latest(50)
+    if not question or any(word in q_lower for word in risk_words):
+        return {"answer": answer_risk(rows), "source": "local-rules", "seconds": round(time.time() - started, 3)}
+    if any(word in q_lower for word in status_words):
+        ctx={"summary": summary(), "latest": rows, "predictions": {}}
+        return {"answer": answer_status(ctx), "source": "local-rules", "seconds": round(time.time() - started, 3)}
+
+    ctx = {"summary": summary(), "latest": rows, "predictions": {}}
     try:
         r = requests.post(
             f"{OLLAMA_URL}/api/chat",
