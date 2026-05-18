@@ -67,7 +67,8 @@ data:
                 X=pd.DataFrame(rows)[["temperature","humidity","pressure","battery"]].fillna(0)
                 preds=model.predict(X)
                 for row,pred in zip(rows,preds):
-                    fallback,label=rule(row); risk=int(float(pred)*100) if float(pred)<=1 else int(float(pred)); risk=max(0,min(100,risk or fallback))
+                    fallback,_=rule(row); risk=int(float(pred)*100) if float(pred)<=1 else int(float(pred)); risk=max(0,min(100,risk or fallback))
+                    label="critical" if risk>=80 else "warning" if risk>=50 else "ok"
                     items.append({"sensor_id":row.get("sensor_id"),"risk":risk,"label":label,"source":"mlflow"})
                 return {"status":"ok","model_version":_version,"items":items}
             except Exception as exc:
