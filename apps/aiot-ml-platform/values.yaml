@@ -5,7 +5,7 @@ global:
 localAI:
   namespace: local-ai
   image: ollama/ollama:0.6.8
-  model: qwen2.5:7b
+  model: llama3.1:8b
   embeddingModel: nomic-embed-text
   pvcSize: 20Gi
   resources:
