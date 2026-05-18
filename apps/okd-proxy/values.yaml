@@ -1,9 +1,0 @@
-# k3d-side ingress proxy for OpenShift Local (CRC) router VM
-namespace: okd-public
-routerEndpoint: 192.168.130.11
-clusterIssuer: letsencrypt-prod
-hosts:
-  - console-okd.46.4.123.8.nip.io
-  - oauth-okd.46.4.123.8.nip.io
-  - downloads-okd.46.4.123.8.nip.io
-tlsSecret: okd-public-tls
