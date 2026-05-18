@@ -22,30 +22,30 @@ subsets:
       - name: https
         port: 443
         protocol: TCP
+{{- range .Values.hosts }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: okd-public
-  namespace: {{ .Values.namespace }}
+  name: okd-{{ . | replace "." "-" }}
+  namespace: {{ $.Values.namespace }}
   annotations:
-    cert-manager.io/cluster-issuer: {{ .Values.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ $.Values.clusterIssuer }}
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/proxy-ssl-server-name: "on"
-    nginx.ingress.kubernetes.io/proxy-ssl-name: "$host"
+    nginx.ingress.kubernetes.io/proxy-ssl-name: {{ . | quote }}
     nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_ssl_name {{ . }};
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        {{- range .Values.hosts }}
         - {{ . }}
-        {{- end }}
-      secretName: {{ .Values.tlsSecret }}
+      secretName: okd-{{ . | replace "." "-" }}-tls
   rules:
-    {{- range .Values.hosts }}
     - host: {{ . }}
       http:
         paths:
@@ -56,4 +56,4 @@ spec:
                 name: okd-router
                 port:
                   name: https
-    {{- end }}
+{{- end }}
