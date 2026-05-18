@@ -5,7 +5,7 @@ global:
 localAI:
   namespace: local-ai
   image: ollama/ollama:0.6.8
-  model: qwen2.5:3b
+  model: qwen2.5:7b
   embeddingModel: nomic-embed-text
   pvcSize: 20Gi
   resources:
@@ -14,7 +14,7 @@ localAI:
       memory: 2Gi
     limits:
       cpu: "4"
-      memory: 8Gi
+      memory: 12Gi
 
 mlflow:
   namespace: mlflow
