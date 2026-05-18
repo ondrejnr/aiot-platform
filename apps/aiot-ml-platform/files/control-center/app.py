@@ -61,9 +61,21 @@ def api_summary(): return {"summary": summary(), "latest": latest(50), "predicti
 def api_chat(req: ChatRequest):
     question = (req.question or "").strip()
     ctx = {"summary": summary(), "latest": latest(15), "predictions": predictions()}
-    prompt = "Si lokálny AIOT asistent. Odpovedaj stručne po slovensky iba z týchto dát.\nDATA:\n" + json.dumps(ctx, ensure_ascii=False, default=str) + "\nOTÁZKA: " + question
+    prompt = "DATA:\n" + json.dumps(ctx, ensure_ascii=False, default=str) + "\nOTÁZKA: " + question
     try:
-        r = requests.post(f"{OLLAMA_URL}/api/chat", json={"model": OLLAMA_MODEL, "messages":[{"role":"user","content":prompt}], "stream": False}, timeout=180)
+        r = requests.post(
+            f"{OLLAMA_URL}/api/chat",
+            json={
+                "model": OLLAMA_MODEL,
+                "messages": [
+                    {"role": "system", "content": "Si lokálny AIOT asistent. Odpovedaj stručne po slovensky, max 6 viet, iba z poskytnutých dát."},
+                    {"role": "user", "content": prompt},
+                ],
+                "stream": False,
+                "options": {"temperature": 0.2, "num_predict": 160, "num_ctx": 2048},
+            },
+            timeout=180,
+        )
         r.raise_for_status()
         return {"answer": r.json().get("message",{}).get("content", "Bez odpovede.")}
     except Exception as exc:
