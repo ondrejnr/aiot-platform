@@ -60,7 +60,7 @@ spec:
   interval: 30m
   path: ./config/default
   prune: true
-  wait: true
+  wait: false
   patches:
     - target:
         kind: Deployment
