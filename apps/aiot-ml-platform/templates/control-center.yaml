@@ -41,6 +41,8 @@ spec:
               value: {{ .Values.localAI.numThread | quote }}
             - name: INFERENCE_URL
               value: http://aiot-maintenance-api.aiot.svc.cluster.local:8080
+            - name: INFERENCE_MODEL_NAME
+              value: {{ .Values.inference.modelName | quote }}
           ports:
             - name: http
               containerPort: 8080

@@ -15,6 +15,7 @@ OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama.local-ai.svc.cluster.local:1
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
 OLLAMA_NUM_THREAD = int(os.getenv("OLLAMA_NUM_THREAD", "4"))
 INFERENCE_URL = os.getenv("INFERENCE_URL", "http://aiot-maintenance-api.aiot.svc.cluster.local:8080")
+INFERENCE_MODEL_NAME = os.getenv("INFERENCE_MODEL_NAME", "aiot-maintenance-predictor")
 
 
 def pg_conn():
@@ -113,15 +114,17 @@ def answer_predictions(ctx):
     data=ctx.get("predictions") or {}
     items=data.get("items") or []
     source=data.get("source") or data.get("status") or "neznámy"
+    version=data.get("model_version")
+    model=f"{INFERENCE_MODEL_NAME}" + (f" v{version}" if version else "")
     if not items:
-        return f"Predikčný API endpoint je dostupný, ale nevrátil položky; stav: {source}."
+        return f"Predikčný API endpoint používa lokálny MLflow model {model}, ale nevrátil položky; stav: {source}."
     top=items[:3]
     bits=[]
     for p in top:
         label=p.get("label") or p.get("status") or "n/a"
         score=p.get("risk") or p.get("risk_score") or p.get("score")
         bits.append(f"{p.get('sensor_id')}={label}" + (f" ({score})" if score is not None else ""))
-    return f"Predikcie idú lokálne cez MLflow model; zdroj={source}. Najvyššie položky: " + "; ".join(bits) + "."
+    return f"Predikcie idú lokálne cez MLflow model {model}; zdroj={source}. Najvyššie položky: " + "; ".join(bits) + "."
 
 
 def fast_answer(question, ctx):
