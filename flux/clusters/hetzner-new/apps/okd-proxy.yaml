@@ -1,0 +1,22 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: okd-proxy
+  namespace: okd-public
+spec:
+  suspend: false
+  interval: 30m
+  releaseName: okd-proxy
+  chart:
+    spec:
+      chart: ./apps/okd-proxy
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    createNamespace: true
+  upgrade:
+    cleanupOnFail: true
