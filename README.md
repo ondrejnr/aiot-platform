@@ -4,13 +4,15 @@
 ![Flux](https://img.shields.io/badge/Flux-v2.6.4-5468ff?logo=flux&logoColor=white)
 ![Cluster](https://img.shields.io/badge/cluster-hetzner--new%20k3d-success)
 ![Nodes](https://img.shields.io/badge/nodes-5%20k3d%20containers-success)
-![Domain](https://img.shields.io/badge/domain-46.4.123.8.nip.io-blue)
+![Domain](https://img.shields.io/badge/domain-custom%20wildcard%20DNS-blue)
 ![AI](https://img.shields.io/badge/local%20AI-Ollama%20%2B%20MLflow%20%2B%20Kubeflow-purple)
 ![GitOps](https://img.shields.io/badge/source--of--truth-Flux%20%2B%20Gitea-brightgreen)
 
-> **Industrial AIoT platform** running on the active `hetzner-new` cluster: a self-hosted stack for MQTT sensor ingestion, streaming, storage, local ML training, local LLM-assisted operations and platform observability. The current runtime avoids external LLM APIs for the Control Center and uses local Ollama models.
+> **Industrial AIoT platform** for self-hosted telemetry ingestion, streaming, storage, local ML, local LLM-assisted operations and full platform observability. The Control Center is designed to run without external LLM APIs and uses local Ollama models for fallback answers.
 
 The repository is mirrored to GitHub and the internal Gitea instance. Flux reads the internal Gitea repository and reconciles the cluster from `flux/clusters/hetzner-new`.
+
+Deployment-specific public IP addresses and DNS names are intentionally omitted from this public README. Examples use `*.aiot.example.com` as a placeholder for the real wildcard domain.
 
 ---
 
@@ -18,10 +20,10 @@ The repository is mirrored to GitHub and the internal Gitea instance. Flux reads
 
 | Area | Current value |
 |---|---|
-| Active cluster | `hetzner-new` on Hetzner host `46.4.123.8` |
+| Active cluster | `hetzner-new` self-hosted k3d/k3s cluster |
 | Kubernetes | k3d/k3s `v1.31.5+k3s1` |
 | Nodes | `1` k3d server + `4` k3d agents |
-| Public DNS | `*.46.4.123.8.nip.io` |
+| Public DNS | wildcard DNS, represented here as `*.aiot.example.com` |
 | GitOps | Flux `v2.6.4`, internal Gitea source |
 | Primary repo path on host | `/root/aiot-platform` |
 | Active GitOps path | `flux/clusters/hetzner-new` |
@@ -35,15 +37,15 @@ The repository is mirrored to GitHub and the internal Gitea instance. Flux reads
 
 ---
 
-## Why this platform exists
+## Platform capabilities
 
-Industrial telemetry becomes useful only when it becomes a decision. AIOT is built around this path:
+AIOT turns industrial telemetry into operational decisions:
 
 1. **Collect** — sensors and simulators publish MQTT telemetry into EMQX.
 2. **Buffer** — Redis Streams absorb bursts and provide backpressure.
 3. **Stream** — Redpanda keeps a Kafka-compatible event log.
 4. **Persist** — Postgres stores the operational history.
-5. **Learn** — scheduled training produces MLflow maintenance models.
+5. **Learn** — scheduled model jobs produce MLflow maintenance models.
 6. **Predict** — the inference API serves latest predictive-maintenance labels.
 7. **Operate** — Control Center shows current risk and answers operational questions locally.
 
@@ -110,17 +112,17 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    USER(["Internet users\n*.46.4.123.8.nip.io"])
-    HOST["Hetzner host\naiot-hetzner-01\n46.4.123.8"]
+    USER(["Internet users\npublic HTTPS endpoints"])
+    HOST["Self-hosted Hetzner node\nk3d/k3s runtime"]
 
     subgraph DOCKER["Docker network k3d-aiot-hetzner"]
-        LB["k3d serverlb\n172.18.0.3"]
-        S0["k3d-aiot-hetzner-server-0\ncontrol-plane\n172.18.0.4"]
-        A0["agent-0\napps\n172.18.0.7"]
-        A1["agent-1\nAI workload\n172.18.0.2"]
-        A2["agent-2\napps\n172.18.0.6"]
-        A3["agent-3\nmonitoring\n172.18.0.5"]
-        CHEF["chef-automate\nDocker container\n172.18.0.8"]
+        LB["k3d serverlb\ningress entrypoint"]
+        S0["k3d server\ncontrol-plane"]
+        A0["agent-0\napps"]
+        A1["agent-1\nAI workload"]
+        A2["agent-2\napps"]
+        A3["agent-3\nmonitoring"]
+        CHEF["chef-automate\nexternal Docker service"]
     end
 
     USER -->|80/443| LB
@@ -133,17 +135,17 @@ flowchart TB
     A0 -.ingress endpoint.-> CHEF
 ```
 
-| Node | Role labels | Internal IP | Runtime |
+| Node | Role labels | Runtime | Main placement |
 |---|---|---|---|
-| `k3d-aiot-hetzner-server-0` | control-plane | `172.18.0.4` | k3s/containerd |
-| `k3d-aiot-hetzner-agent-0` | `role=apps` | `172.18.0.7` | k3s/containerd |
-| `k3d-aiot-hetzner-agent-1` | `role=ai`, `workload=ai` | `172.18.0.2` | k3s/containerd |
-| `k3d-aiot-hetzner-agent-2` | `role=apps` | `172.18.0.6` | k3s/containerd |
-| `k3d-aiot-hetzner-agent-3` | `role=monitoring` | `172.18.0.5` | k3s/containerd |
+| `k3d-aiot-hetzner-server-0` | control-plane | k3s/containerd | Kubernetes API and control plane |
+| `k3d-aiot-hetzner-agent-0` | `role=apps` | k3s/containerd | application workloads |
+| `k3d-aiot-hetzner-agent-1` | `role=ai`, `workload=ai` | k3s/containerd | local AI/ML workloads |
+| `k3d-aiot-hetzner-agent-2` | `role=apps` | k3s/containerd | application workloads |
+| `k3d-aiot-hetzner-agent-3` | `role=monitoring` | k3s/containerd | observability workloads |
 
 ---
 
-## Services currently represented by this repo
+## Platform services
 
 ### GitOps-managed services
 
@@ -159,7 +161,7 @@ These are reconciled by Flux from `apps/*` and `flux/clusters/hetzner-new/apps/*
 | AIOT pipeline | `aiot/aiot-pipeline` | EMQX, Redis, Redpanda, bridges, pg-sink, sensor simulator, Redpanda Console |
 | AIOT workbench | `aiot/cloudbeaver` | browser DB client for Postgres |
 | AIOT vector DB | `qdrant/qdrant` | vector database for AI/semantic workloads |
-| AI/ML platform | `aiot-ml/aiot-ml-platform` | Ollama, MLflow, Control Center, maintenance API, training CronJob, namespaces and ingresses |
+| AI/ML platform | `aiot-ml/aiot-ml-platform` | Ollama, MLflow, Control Center, maintenance API, model CronJob, namespaces and ingresses |
 | Local AI | `local-ai/ollama` | local Ollama runtime and model PVC |
 | ML registry | `mlflow/mlflow` | MLflow tracking server and artifact serving |
 | ML pipelines | Flux Kustomizations `kubeflow-pipelines*` | Kubeflow Pipelines UI/API stack |
@@ -195,42 +197,44 @@ A small number of important runtime objects are not installed from a Flux `HelmR
 | Namespace | File | Purpose |
 |---|---|---|
 | `authentik` | `ops/current-cluster/manual-services/authentik.yaml` | Authentik SSO server, worker, Redis and ingress. Secret objects are intentionally omitted. |
-| `chef` | `ops/current-cluster/manual-services/chef-automate-proxy.yaml` | Kubernetes `Service`/`Endpoints`/`Ingress` proxy to the Docker `chef-automate` container at `172.18.0.8`. |
+| `chef` | `ops/current-cluster/manual-services/chef-automate-proxy.yaml` | Kubernetes `Service`/`Endpoints`/`Ingress` proxy to the Docker `chef-automate` service on the private Docker network. |
 | `loadtest` | `ops/current-cluster/manual-services/loadtest-emqtt-bench.yaml` | Optional EMQX benchmark publisher, currently scaled to `0`. |
 
 ### Not active anymore
 
-The following appeared in older README/snapshot exports but are **not** active services on `hetzner-new`: Argo CD, Rancher/Fleet, K8sGPT/Robusta, Open-WebUI/RAG worker, n8n, Mattermost, Longhorn, Tekton/Konflux, old GCP/OCI worker nodes and the old `35.241.255.137.nip.io` domain.
+The following appeared in older README/snapshot exports but are **not** active services on `hetzner-new`: Argo CD, Rancher/Fleet, K8sGPT/Robusta, Open-WebUI/RAG worker, n8n, Mattermost, Longhorn, Tekton/Konflux, old GCP/OCI worker nodes and older public DNS exports.
 
 ---
 
-## Public endpoints
+## External access
 
-| Service | URL | Notes |
+The real deployment uses a private wildcard domain. Public documentation uses `*.aiot.example.com` as a safe placeholder.
+
+| Service | Public route pattern | Notes |
 |---|---|---|
-| AIOT Control Center | <https://aiot-control.46.4.123.8.nip.io/> | local AI/ML dashboard and fast operational chat |
-| EMQX Dashboard | <https://emqx.46.4.123.8.nip.io/> | EMQX dashboard, Enterprise image for dashboard SSO |
-| Redpanda Console | <https://redpanda.46.4.123.8.nip.io/> | Kafka/Redpanda topic UI |
-| CloudBeaver | <https://cloudbeaver.46.4.123.8.nip.io/> | DB workbench |
-| MLflow | <https://mlflow.46.4.123.8.nip.io/> | model registry and artifacts |
-| Kubeflow Pipelines | <https://kubeflow.46.4.123.8.nip.io/> | KFP UI |
-| Authentik | <https://authentik.46.4.123.8.nip.io/> | SSO provider |
-| Dex | <https://dex.46.4.123.8.nip.io/> | OIDC helper |
-| Gitea | <https://gitea.46.4.123.8.nip.io/> | internal Git mirror/source for Flux |
-| Jenkins | <https://jenkins.46.4.123.8.nip.io/> | CI/CD |
-| Flux UI | <https://flux.46.4.123.8.nip.io/> | Weave GitOps |
-| Grafana | <https://grafana.46.4.123.8.nip.io/> | dashboards |
-| SigNoz | <https://signoz.46.4.123.8.nip.io/> | observability UI |
-| Zabbix | <https://zabbix.46.4.123.8.nip.io/> | monitoring UI |
-| Headlamp | <https://headlamp.46.4.123.8.nip.io/> | Kubernetes UI |
-| AWX | <https://awx.46.4.123.8.nip.io/> | Ansible automation |
-| pgAdmin | <https://pgadmin.46.4.123.8.nip.io/> | Postgres administration |
-| Qdrant | <https://qdrant.46.4.123.8.nip.io/> | vector DB API/UI |
-| Terrakube UI | <https://terrakube.46.4.123.8.nip.io/> | IaC UI |
-| Terrakube API | <https://terrakube-api.46.4.123.8.nip.io/> | IaC API |
-| Terrakube Registry | <https://terrakube-reg.46.4.123.8.nip.io/> | module/provider registry |
-| Chef Automate | <https://chef.46.4.123.8.nip.io/> | external Docker service exposed through K8s ingress |
-| Puppet Enterprise | <https://pe.46.4.123.8.nip.io/> | PE console/proxy |
+| AIOT Control Center | `https://aiot-control.aiot.example.com/` | local AI/ML dashboard and fast operational chat |
+| EMQX Dashboard | `https://emqx.aiot.example.com/` | EMQX dashboard, Enterprise image for dashboard SSO |
+| Redpanda Console | `https://redpanda.aiot.example.com/` | Kafka/Redpanda topic UI |
+| CloudBeaver | `https://cloudbeaver.aiot.example.com/` | DB workbench |
+| MLflow | `https://mlflow.aiot.example.com/` | model registry and artifacts |
+| Kubeflow Pipelines | `https://kubeflow.aiot.example.com/` | KFP UI |
+| Authentik | `https://authentik.aiot.example.com/` | SSO provider |
+| Dex | `https://dex.aiot.example.com/` | OIDC helper |
+| Gitea | `https://gitea.aiot.example.com/` | internal Git mirror/source for Flux |
+| Jenkins | `https://jenkins.aiot.example.com/` | CI/CD |
+| Flux UI | `https://flux.aiot.example.com/` | Weave GitOps |
+| Grafana | `https://grafana.aiot.example.com/` | dashboards |
+| SigNoz | `https://signoz.aiot.example.com/` | observability UI |
+| Zabbix | `https://zabbix.aiot.example.com/` | monitoring UI |
+| Headlamp | `https://headlamp.aiot.example.com/` | Kubernetes UI |
+| AWX | `https://awx.aiot.example.com/` | Ansible automation |
+| pgAdmin | `https://pgadmin.aiot.example.com/` | Postgres administration |
+| Qdrant | `https://qdrant.aiot.example.com/` | vector DB API/UI |
+| Terrakube UI | `https://terrakube.aiot.example.com/` | IaC UI |
+| Terrakube API | `https://terrakube-api.aiot.example.com/` | IaC API |
+| Terrakube Registry | `https://terrakube-reg.aiot.example.com/` | module/provider registry |
+| Chef Automate | `https://chef.aiot.example.com/` | external Docker service exposed through K8s ingress |
+| Puppet Enterprise | `https://pe.aiot.example.com/` | PE console/proxy |
 
 ---
 
@@ -244,7 +248,7 @@ The following appeared in older README/snapshot exports but are **not** active s
 | Stream | Redpanda | topic `sensor-data`, 3 replicas, 10 Gi PVC, 24h/size retention |
 | Consumers | bridges + pg-sink | `mqtt-to-redis=8`, `redis-to-redpanda=8`, `pg-sink=12` |
 | Database | CNPG Postgres + PgBouncer | service `pg-cluster-pooler-rw.databases.svc.cluster.local:5432` |
-| ML training | `aiot-maintenance-train` | daily CronJob at `05 02 * * *`, 7-day lookback |
+| ML model jobs | `aiot-maintenance-train` | daily CronJob at `05 02 * * *`, 7-day lookback |
 | ML serving | `aiot-maintenance-api` | FastAPI, latest MLflow model `aiot-maintenance-predictor` |
 | Operator UI | `aiot-control-center` | dashboard + local-rule fast chat + local Ollama fallback |
 
@@ -272,8 +276,8 @@ The current Control Center uses fast deterministic local rules for common operat
 
 ```mermaid
 flowchart LR
-    DEV["Developer / Copilot"] --> GH["GitHub\nondrejnr/aiot-platform"]
-    DEV --> GITEA["Internal Gitea\naiot-iac/aiot-platform"]
+    DEV["Developer / automation"] --> GH["GitHub\npublic mirror"]
+    DEV --> GITEA["Internal Gitea\nFlux source"]
     GITEA --> FLUX["Flux source-controller"]
     FLUX --> KUST["Flux kustomize-controller"]
     KUST --> HELM["Flux helm-controller"]
@@ -287,6 +291,7 @@ Rules:
 - Push operational changes to both GitHub and internal Gitea.
 - Use `apps/<name>` for chart changes and `flux/clusters/hetzner-new/apps/<name>.yaml` for Flux release wiring.
 - ConfigMap-backed Python apps use checksum annotations so code changes roll pods.
+- Keep deployment-specific public IPs, real domains and secrets out of public documentation.
 - Avoid printing secrets with `kubectl describe` or unmasked Helm values.
 
 ---
@@ -310,19 +315,16 @@ Rules:
 
 ---
 
-## Day-2 operations
+## Operations model
 
-| Task | Command / path |
-|---|---|
-| Check Flux state | `flux get all -A` |
-| Reconcile source | `flux reconcile source git flux-system` |
-| Reconcile root | `flux reconcile ks flux-system` |
-| Reconcile one release | `flux reconcile hr <release> -n <namespace> --force` |
-| Validate chart rendering | `helm template <name> apps/<name>` |
-| Check Control Center | `https://aiot-control.46.4.123.8.nip.io/` |
-| Check MLflow | `https://mlflow.46.4.123.8.nip.io/` |
-| Check Kubeflow | `https://kubeflow.46.4.123.8.nip.io/` |
-| Stop load test before pipeline changes | scale `loadtest/emqtt-bench-pub` to `0` |
+The platform is operated as a GitOps-managed environment rather than as a collection of manual scripts.
+
+- **Source of truth:** Helm charts and Flux resources under `apps/` and `flux/clusters/hetzner-new/` define the active platform state.
+- **Release discipline:** application changes are rendered and validated before reconciliation.
+- **Runtime ownership:** Flux manages the core platform; explicitly documented live snapshots cover the few manually integrated services.
+- **Access model:** public routes are exposed through ingress and protected by SSO/forward-auth where appropriate; real route domains stay environment-specific.
+- **Reliability controls:** Redis backpressure, bounded retention, PgBouncer, resource placement and observability are part of the default operating posture.
+- **AI locality:** Control Center uses local rules and local Ollama fallback so operational chat does not depend on external LLM APIs.
 
 ---
 
