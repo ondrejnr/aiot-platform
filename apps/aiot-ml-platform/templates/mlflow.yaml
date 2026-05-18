@@ -44,7 +44,7 @@ spec:
               set -e
               python -m pip install --no-cache-dir "mlflow=={{ .Values.mlflow.version }}" >/tmp/mlflow-pip.log 2>&1
               mkdir -p /mlflow/artifacts
-              exec mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////mlflow/mlflow.db --default-artifact-root /mlflow/artifacts --serve-artifacts
+              exec mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////mlflow/mlflow.db --artifacts-destination /mlflow/artifacts --serve-artifacts
           ports:
             - name: http
               containerPort: 5000

@@ -36,7 +36,7 @@ data:
         return df
 
     def main():
-        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI); mlflow.set_experiment("aiot-maintenance")
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI); mlflow.set_experiment(os.getenv("EXPERIMENT_NAME","aiot-maintenance-proxied"))
         df=add_target(load_data())
         if len(df)<100:
             print(f"Not enough rows for training: {len(df)}"); sys.exit(0)

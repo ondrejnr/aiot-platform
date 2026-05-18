@@ -41,6 +41,8 @@ spec:
                   value: http://mlflow.mlflow.svc.cluster.local:5000
                 - name: MODEL_NAME
                   value: {{ .Values.inference.modelName | quote }}
+                - name: EXPERIMENT_NAME
+                  value: aiot-maintenance-proxied
                 - name: LOOKBACK_DAYS
                   value: {{ .Values.training.lookbackDays | quote }}
                 - name: MAX_ROWS
