@@ -8,50 +8,257 @@ metadata:
     app.kubernetes.io/component: trainer
 data:
   train.py: |
-    import os, sys
-    import mlflow, mlflow.sklearn
+    import json
+    import os
+    import sys
+    import tempfile
+    from pathlib import Path
+
+    import mlflow
+    import mlflow.data
+    import mlflow.sklearn
     import pandas as pd
     import psycopg2
+    import psutil
+    from mlflow.models import infer_signature
     from sklearn.ensemble import RandomForestClassifier
-    from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
+    from sklearn.metrics import (
+        accuracy_score,
+        classification_report,
+        confusion_matrix,
+        f1_score,
+        precision_score,
+        recall_score,
+        roc_auc_score,
+    )
     from sklearn.model_selection import train_test_split
 
-    LOOKBACK_DAYS=int(os.getenv("LOOKBACK_DAYS","7")); MAX_ROWS=int(os.getenv("MAX_ROWS","200000"))
-    MLFLOW_TRACKING_URI=os.getenv("MLFLOW_TRACKING_URI","http://mlflow.mlflow.svc.cluster.local:5000")
-    MODEL_NAME=os.getenv("MODEL_NAME","aiot-maintenance-predictor")
+    LOOKBACK_DAYS = int(os.getenv("LOOKBACK_DAYS", "7"))
+    MAX_ROWS = int(os.getenv("MAX_ROWS", "200000"))
+    MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow.mlflow.svc.cluster.local:5000")
+    MODEL_NAME = os.getenv("MODEL_NAME", "aiot-maintenance-predictor")
+    EXPERIMENT_NAME = os.getenv("EXPERIMENT_NAME", "aiot-maintenance-proxied")
+    FEATURES = ["temperature", "humidity", "pressure", "battery"]
 
     def dsn():
-        return "host={host} port={port} dbname={db} user={user} password={pwd}".format(host=os.getenv("PGHOST"), port=os.getenv("PGPORT","5432"), db=os.getenv("PGDATABASE"), user=os.getenv("PGUSER"), pwd=os.getenv("PGPASSWORD"))
+        return "host={host} port={port} dbname={db} user={user} password={pwd}".format(
+            host=os.getenv("PGHOST"),
+            port=os.getenv("PGPORT", "5432"),
+            db=os.getenv("PGDATABASE"),
+            user=os.getenv("PGUSER"),
+            pwd=os.getenv("PGPASSWORD"),
+        )
 
     def load_data():
-        sql=f"""select ts, sensor_id, location, temperature, humidity, pressure, battery from sensor_data where ts > now() - interval '{LOOKBACK_DAYS} days' order by ts desc limit {MAX_ROWS}"""
+        sql = f"""
+        select ts, sensor_id, location, temperature, humidity, pressure, battery
+        from sensor_data
+        where ts > now() - interval '{LOOKBACK_DAYS} days'
+        order by ts desc
+        limit {MAX_ROWS}
+        """
         with psycopg2.connect(dsn()) as conn:
             return pd.read_sql(sql, conn)
 
     def add_target(df):
-        df=df.copy()
-        for c in ["temperature","humidity","pressure","battery"]: df[c]=pd.to_numeric(df[c], errors="coerce")
-        df=df.dropna(subset=["temperature","humidity","pressure","battery"])
-        df["target"]=((df["temperature"]>29.0)|(df["humidity"]>75.0)|(df["pressure"]<998.0)|(df["pressure"]>1025.0)|(df["battery"]<3.50)).astype(int)
+        df = df.copy()
+        for col in FEATURES:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df = df.dropna(subset=FEATURES)
+        df["target"] = (
+            (df["temperature"] > 29.0)
+            | (df["humidity"] > 75.0)
+            | (df["pressure"] < 998.0)
+            | (df["pressure"] > 1025.0)
+            | (df["battery"] < 3.50)
+        ).astype(int)
         return df
 
-    def main():
-        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI); mlflow.set_experiment(os.getenv("EXPERIMENT_NAME","aiot-maintenance-proxied"))
-        df=add_target(load_data())
-        if len(df)<100:
-            print(f"Not enough rows for training: {len(df)}"); sys.exit(0)
-        X=df[["temperature","humidity","pressure","battery"]].fillna(0); y=df["target"]
-        stratify=y if y.nunique()>1 else None
-        X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=42,stratify=stratify)
-        model=RandomForestClassifier(n_estimators=160,max_depth=8,min_samples_split=4,class_weight="balanced",n_jobs=-1,random_state=42)
-        model.fit(X_train,y_train); pred=model.predict(X_test)
-        proba=model.predict_proba(X_test)[:,1] if len(model.classes_)>1 else pred
-        metrics={"accuracy":accuracy_score(y_test,pred),"f1":f1_score(y_test,pred,zero_division=0),"precision":precision_score(y_test,pred,zero_division=0),"recall":recall_score(y_test,pred,zero_division=0)}
-        if y_test.nunique()>1: metrics["roc_auc"]=roc_auc_score(y_test,proba)
-        with mlflow.start_run():
-            mlflow.log_param("rows",len(df)); mlflow.log_param("lookback_days",LOOKBACK_DAYS); mlflow.log_param("features",list(X.columns)); mlflow.log_param("model_type","RandomForestClassifier")
-            for k,v in metrics.items(): mlflow.log_metric(k,float(v))
-            mlflow.sklearn.log_model(model,"model",registered_model_name=MODEL_NAME)
-        print({"rows":len(df),"positive_rate":float(y.mean()),"metrics":metrics})
+    def data_profile(df):
+        profile = {
+            "rows": int(len(df)),
+            "lookback_days": LOOKBACK_DAYS,
+            "max_rows": MAX_ROWS,
+            "positive_rate": float(df["target"].mean()) if len(df) else 0.0,
+            "target_counts": {str(k): int(v) for k, v in df["target"].value_counts().sort_index().items()},
+            "features": FEATURES,
+            "feature_summary": {},
+        }
+        if "ts" in df.columns and len(df):
+            profile["time_range"] = {
+                "min_ts": str(df["ts"].min()),
+                "max_ts": str(df["ts"].max()),
+            }
+        for col in FEATURES:
+            s = pd.to_numeric(df[col], errors="coerce")
+            profile["feature_summary"][col] = {
+                "min": float(s.min()),
+                "mean": float(s.mean()),
+                "max": float(s.max()),
+                "std": float(s.std()) if len(s) > 1 else 0.0,
+            }
+        return profile
 
-    if __name__ == "__main__": main()
+    def log_system_snapshot(step):
+        try:
+            cpu = psutil.cpu_percent(interval=None)
+            mem = psutil.virtual_memory()
+            mlflow.log_metric("system/cpu_utilization_percentage", float(cpu), step=step)
+            mlflow.log_metric("system/system_memory_usage_megabytes", float((mem.total - mem.available) / 1024 / 1024), step=step)
+            mlflow.log_metric("system/system_memory_usage_percentage", float(mem.percent), step=step)
+        except Exception as exc:
+            print(f"system metrics skipped: {exc}")
+
+    def log_dataset_lineage(df):
+        try:
+            sample = df[FEATURES + ["target"]].sample(min(len(df), 1000), random_state=42)
+            dataset = mlflow.data.from_pandas(
+                sample,
+                source="postgresql://aiot/sensor_data",
+                name="sensor_data_training_sample",
+            )
+            mlflow.log_input(dataset, context="training")
+        except Exception as exc:
+            print(f"dataset lineage skipped: {exc}")
+
+    def log_artifacts(df, X_test, y_test, pred, proba, model, metrics, profile):
+        feature_importance = pd.DataFrame(
+            {"feature": FEATURES, "importance": [float(v) for v in model.feature_importances_]}
+        ).sort_values("importance", ascending=False)
+        pred_sample = X_test.copy()
+        pred_sample["target"] = list(y_test)
+        pred_sample["prediction"] = list(pred)
+        pred_sample["failure_probability"] = list(proba)
+        pred_sample = pred_sample.head(250)
+        cm = confusion_matrix(y_test, pred, labels=[0, 1])
+        report_text = classification_report(y_test, pred, labels=[0, 1], zero_division=0)
+        model_card = f"""# AIOT maintenance predictor
+
+    ## Purpose
+    Predicts elevated maintenance risk for AIOT sensor records from telemetry features.
+
+    ## Training data
+    - Source table: `sensor_data`
+    - Lookback window: {LOOKBACK_DAYS} days
+    - Training rows after cleanup: {len(df)}
+    - Positive rate: {profile['positive_rate']:.4f}
+
+    ## Features
+    {', '.join(FEATURES)}
+
+    ## Metrics
+    """
+        for key, value in sorted(metrics.items()):
+            model_card += f"- {key}: {float(value):.6f}\n"
+        model_card += "\n## Artifact inventory\n- `model/`: MLflow sklearn model\n- `reports/metrics.json`: scalar metric snapshot\n- `reports/dataset-summary.json`: training data profile\n- `reports/confusion-matrix.json`: binary confusion matrix\n- `reports/classification-report.txt`: sklearn classification report\n- `reports/feature-importance.json`: feature importance table\n- `reports/prediction-sample.json`: prediction sample table\n"
+
+        mlflow.log_dict(metrics, "reports/metrics.json")
+        mlflow.log_dict(profile, "reports/dataset-summary.json")
+        mlflow.log_dict({"labels": [0, 1], "matrix": cm.astype(int).tolist()}, "reports/confusion-matrix.json")
+        mlflow.log_text(report_text, "reports/classification-report.txt")
+        mlflow.log_text(model_card, "reports/model-card.md")
+        mlflow.log_table(feature_importance, "reports/feature-importance.json")
+        mlflow.log_table(pred_sample, "reports/prediction-sample.json")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            feature_importance.to_csv(tmp_path / "feature-importance.csv", index=False)
+            pred_sample.to_csv(tmp_path / "prediction-sample.csv", index=False)
+            mlflow.log_artifacts(str(tmp_path), artifact_path="exports")
+
+    def main():
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        mlflow.set_experiment(EXPERIMENT_NAME)
+        mlflow.set_system_metrics_sampling_interval(1)
+        mlflow.set_system_metrics_samples_before_logging(1)
+
+        with mlflow.start_run(log_system_metrics=True) as run:
+            mlflow.set_tags(
+                {
+                    "aiot.component": "maintenance-trainer",
+                    "aiot.model_name": MODEL_NAME,
+                    "aiot.experiment": EXPERIMENT_NAME,
+                }
+            )
+            log_system_snapshot(0)
+
+            with mlflow.start_span("load-training-data") as span:
+                raw_df = load_data()
+                df = add_target(raw_df)
+                span.set_inputs({"lookback_days": LOOKBACK_DAYS, "max_rows": MAX_ROWS})
+                span.set_outputs({"raw_rows": len(raw_df), "training_rows": len(df)})
+
+            if len(df) < 100:
+                print(f"Not enough rows for training: {len(df)}")
+                mlflow.log_metric("rows", len(df))
+                return
+
+            X = df[FEATURES].fillna(0)
+            y = df["target"]
+            stratify = y if y.nunique() > 1 else None
+            X_train, X_test, y_train, y_test = train_test_split(
+                X,
+                y,
+                test_size=0.2,
+                random_state=42,
+                stratify=stratify,
+            )
+            model = RandomForestClassifier(
+                n_estimators=160,
+                max_depth=8,
+                min_samples_split=4,
+                class_weight="balanced",
+                n_jobs=-1,
+                random_state=42,
+            )
+
+            with mlflow.start_span("fit-random-forest") as span:
+                span.set_inputs({"train_rows": len(X_train), "features": FEATURES})
+                model.fit(X_train, y_train)
+                span.set_outputs({"n_estimators": model.n_estimators, "classes": [int(c) for c in model.classes_]})
+
+            pred = model.predict(X_test)
+            proba = model.predict_proba(X_test)[:, 1] if len(model.classes_) > 1 else pred
+            metrics = {
+                "accuracy": accuracy_score(y_test, pred),
+                "f1": f1_score(y_test, pred, zero_division=0),
+                "precision": precision_score(y_test, pred, zero_division=0),
+                "recall": recall_score(y_test, pred, zero_division=0),
+            }
+            if y_test.nunique() > 1:
+                metrics["roc_auc"] = roc_auc_score(y_test, proba)
+            metrics = {k: float(v) for k, v in metrics.items()}
+            profile = data_profile(df)
+
+            mlflow.log_params(
+                {
+                    "rows": len(df),
+                    "lookback_days": LOOKBACK_DAYS,
+                    "features": ",".join(FEATURES),
+                    "model_type": "RandomForestClassifier",
+                    "experiment_name": EXPERIMENT_NAME,
+                }
+            )
+            mlflow.log_metrics(metrics)
+            log_system_snapshot(1)
+            log_dataset_lineage(df)
+            log_artifacts(df, X_test, y_test, pred, proba, model, metrics, profile)
+
+            signature = infer_signature(X_train.head(20), model.predict_proba(X_train.head(20)))
+            mlflow.sklearn.log_model(
+                model,
+                "model",
+                registered_model_name=MODEL_NAME,
+                signature=signature,
+                input_example=X_train.head(5),
+            )
+
+            with mlflow.start_span("training-summary") as span:
+                span.set_inputs({"run_id": run.info.run_id, "model_name": MODEL_NAME})
+                span.set_outputs({"metrics": metrics, "artifact_root": mlflow.get_artifact_uri()})
+
+            log_system_snapshot(2)
+            print({"run_id": run.info.run_id, "rows": len(df), "positive_rate": profile["positive_rate"], "metrics": metrics})
+
+    if __name__ == "__main__":
+        main()

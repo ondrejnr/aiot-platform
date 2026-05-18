@@ -31,7 +31,7 @@ spec:
               args:
                 - |
                   set -e
-                  python -m pip install --no-cache-dir pandas scikit-learn psycopg2-binary "mlflow=={{ .Values.mlflow.version }}" >/tmp/train-pip.log 2>&1
+                  python -m pip install --no-cache-dir pandas scikit-learn psycopg2-binary psutil "mlflow=={{ .Values.mlflow.version }}" >/tmp/train-pip.log 2>&1
                   exec python /app/train.py
               envFrom:
                 - secretRef:
