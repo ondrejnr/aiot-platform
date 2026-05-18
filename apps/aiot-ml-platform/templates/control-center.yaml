@@ -13,6 +13,8 @@ spec:
       app.kubernetes.io/component: control-center
   template:
     metadata:
+      annotations:
+        checksum/control-center-code: {{ .Files.Get "files/control-center/app.py" | sha256sum }}
       labels:
         app.kubernetes.io/component: control-center
         app.kubernetes.io/part-of: aiot-ml-platform

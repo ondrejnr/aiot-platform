@@ -13,6 +13,8 @@ spec:
       app.kubernetes.io/component: maintenance-api
   template:
     metadata:
+      annotations:
+        checksum/inference-code: {{ include (print $.Template.BasePath "/inference-code.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/component: maintenance-api
         app.kubernetes.io/part-of: aiot-ml-platform
