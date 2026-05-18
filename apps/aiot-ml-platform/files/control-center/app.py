@@ -131,10 +131,10 @@ def fast_answer(question, ctx):
         return answer_risk(rows)
     if any(word in q for word in ["rizik", "naj", "kritick", "critical", "warning", "prečo", "preco", "senzor"]):
         return answer_risk(rows)
-    if any(word in q for word in ["extern", "api", "lokal", "lokál"]):
-        return "Áno. Control Center používa lokálne dáta z Postgresu, lokálne predikcie z MLflow/inference API a lokálny Ollama model; externé LLM API sa nepoužíva."
     if any(word in q for word in ["model", "mlflow", "predik", "inference", "údrž", "udrz"]):
         return answer_predictions(ctx)
+    if any(word in q for word in ["extern", "api", "lokal", "lokál"]):
+        return "Áno. Control Center používa lokálne dáta z Postgresu, lokálne predikcie z MLflow/inference API a lokálny Ollama model; externé LLM API sa nepoužíva."
     if any(word in q for word in ["stav", "koľko", "kolko", "pocet", "počet", "beží", "bezi", "funguje", "zhrn", "sumar"]):
         return answer_status(ctx)
     return None
@@ -168,12 +168,12 @@ def api_chat(req: ChatRequest):
     risk_words=["rizik", "naj", "kritick", "critical", "warning", "prečo", "preco", "senzor"]
     status_words=["stav", "koľko", "kolko", "pocet", "počet", "beží", "bezi", "funguje", "zhrn", "sumar"]
 
-    if any(word in q_lower for word in external_words):
-        answer="Áno. Control Center používa lokálne dáta z Postgresu, lokálne predikcie z MLflow/inference API a lokálny Ollama model; externé LLM API sa nepoužíva."
-        return {"answer": answer, "source": "local-rules", "seconds": round(time.time() - started, 3)}
     if any(word in q_lower for word in prediction_words):
         ctx={"summary": {}, "latest": [], "predictions": predictions()}
         return {"answer": answer_predictions(ctx), "source": "local-rules", "seconds": round(time.time() - started, 3)}
+    if any(word in q_lower for word in external_words):
+        answer="Áno. Control Center používa lokálne dáta z Postgresu, lokálne predikcie z MLflow/inference API a lokálny Ollama model; externé LLM API sa nepoužíva."
+        return {"answer": answer, "source": "local-rules", "seconds": round(time.time() - started, 3)}
 
     rows=latest(50)
     if not question or any(word in q_lower for word in risk_words):
