@@ -1,0 +1,22 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: aiot-ml-platform
+  namespace: aiot-ml
+spec:
+  suspend: false
+  interval: 30m
+  releaseName: aiot-ml-platform
+  chart:
+    spec:
+      chart: ./apps/aiot-ml-platform
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    createNamespace: true
+  upgrade:
+    cleanupOnFail: true

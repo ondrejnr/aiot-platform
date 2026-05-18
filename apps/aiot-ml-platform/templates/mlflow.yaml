@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mlflow-data
+  namespace: {{ .Values.mlflow.namespace }}
+  labels:
+    {{- include "aiotml.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mlflow
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: {{ .Values.global.storageClass | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.mlflow.pvcSize | quote }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow
+  namespace: {{ .Values.mlflow.namespace }}
+  labels:
+    {{- include "aiotml.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mlflow
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: mlflow
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: mlflow
+        app.kubernetes.io/part-of: aiot-ml-platform
+    spec:
+      containers:
+        - name: mlflow
+          image: {{ .Values.mlflow.image | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              python -m pip install --no-cache-dir "mlflow=={{ .Values.mlflow.version }}" >/tmp/mlflow-pip.log 2>&1
+              mkdir -p /mlflow/artifacts
+              exec mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:////mlflow/mlflow.db --default-artifact-root /mlflow/artifacts --serve-artifacts
+          ports:
+            - name: http
+              containerPort: 5000
+          resources:
+            {{- toYaml .Values.mlflow.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /mlflow
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 150
+            periodSeconds: 15
+            failureThreshold: 20
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 240
+            periodSeconds: 30
+            failureThreshold: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mlflow-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow
+  namespace: {{ .Values.mlflow.namespace }}
+  labels:
+    {{- include "aiotml.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mlflow
+spec:
+  selector:
+    app.kubernetes.io/component: mlflow
+  ports:
+    - name: http
+      port: 5000
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mlflow
+  namespace: {{ .Values.mlflow.namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [{{ .Values.mlflow.host | quote }}]
+      secretName: mlflow-tls
+  rules:
+    - host: {{ .Values.mlflow.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mlflow
+                port:
+                  number: 5000

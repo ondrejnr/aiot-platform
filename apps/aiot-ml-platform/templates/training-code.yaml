@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aiot-maintenance-trainer-code
+  namespace: {{ .Values.training.namespace }}
+  labels:
+    {{- include "aiotml.labels" . | nindent 4 }}
+    app.kubernetes.io/component: trainer
+data:
+  train.py: |
+    import os, sys
+    import mlflow, mlflow.sklearn
+    import pandas as pd
+    import psycopg2
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
+    from sklearn.model_selection import train_test_split
+
+    LOOKBACK_DAYS=int(os.getenv("LOOKBACK_DAYS","7")); MAX_ROWS=int(os.getenv("MAX_ROWS","200000"))
+    MLFLOW_TRACKING_URI=os.getenv("MLFLOW_TRACKING_URI","http://mlflow.mlflow.svc.cluster.local:5000")
+    MODEL_NAME=os.getenv("MODEL_NAME","aiot-maintenance-predictor")
+
+    def dsn():
+        return "host={host} port={port} dbname={db} user={user} password={pwd}".format(host=os.getenv("PGHOST"), port=os.getenv("PGPORT","5432"), db=os.getenv("PGDATABASE"), user=os.getenv("PGUSER"), pwd=os.getenv("PGPASSWORD"))
+
+    def load_data():
+        sql=f"""select ts, sensor_id, location, temperature, humidity, pressure, battery from sensor_data where ts > now() - interval '{LOOKBACK_DAYS} days' order by ts desc limit {MAX_ROWS}"""
+        with psycopg2.connect(dsn()) as conn:
+            return pd.read_sql(sql, conn)
+
+    def add_target(df):
+        df=df.copy()
+        for c in ["temperature","humidity","pressure","battery"]: df[c]=pd.to_numeric(df[c], errors="coerce")
+        df=df.dropna(subset=["temperature","humidity","pressure","battery"])
+        df["target"]=((df["temperature"]>29.0)|(df["humidity"]>75.0)|(df["pressure"]<998.0)|(df["pressure"]>1025.0)|(df["battery"]<3.50)).astype(int)
+        return df
+
+    def main():
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI); mlflow.set_experiment("aiot-maintenance")
+        df=add_target(load_data())
+        if len(df)<100:
+            print(f"Not enough rows for training: {len(df)}"); sys.exit(0)
+        X=df[["temperature","humidity","pressure","battery"]].fillna(0); y=df["target"]
+        stratify=y if y.nunique()>1 else None
+        X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=42,stratify=stratify)
+        model=RandomForestClassifier(n_estimators=160,max_depth=8,min_samples_split=4,class_weight="balanced",n_jobs=-1,random_state=42)
+        model.fit(X_train,y_train); pred=model.predict(X_test)
+        proba=model.predict_proba(X_test)[:,1] if len(model.classes_)>1 else pred
+        metrics={"accuracy":accuracy_score(y_test,pred),"f1":f1_score(y_test,pred,zero_division=0),"precision":precision_score(y_test,pred,zero_division=0),"recall":recall_score(y_test,pred,zero_division=0)}
+        if y_test.nunique()>1: metrics["roc_auc"]=roc_auc_score(y_test,proba)
+        with mlflow.start_run():
+            mlflow.log_param("rows",len(df)); mlflow.log_param("lookback_days",LOOKBACK_DAYS); mlflow.log_param("features",list(X.columns)); mlflow.log_param("model_type","RandomForestClassifier")
+            for k,v in metrics.items(): mlflow.log_metric(k,float(v))
+            mlflow.sklearn.log_model(model,"model",registered_model_name=MODEL_NAME)
+        print({"rows":len(df),"positive_rate":float(y.mean()),"metrics":metrics})
+
+    if __name__ == "__main__": main()

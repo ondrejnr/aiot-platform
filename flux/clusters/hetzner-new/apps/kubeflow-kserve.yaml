@@ -1,0 +1,66 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: kubeflow-pipelines
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://github.com/kubeflow/pipelines.git
+  ref:
+    tag: 2.15.0
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-pipelines-crds
+  namespace: flux-system
+spec:
+  interval: 30m
+  path: ./manifests/kustomize/cluster-scoped-resources
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-pipelines
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-pipelines
+  namespace: flux-system
+spec:
+  interval: 30m
+  path: ./manifests/kustomize/env/cert-manager/platform-agnostic-k8s-native
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-pipelines-crds
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-pipelines
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: kserve
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://github.com/kserve/kserve.git
+  ref:
+    tag: v0.15.2
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kserve
+  namespace: flux-system
+spec:
+  interval: 30m
+  path: ./config/default
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: kserve

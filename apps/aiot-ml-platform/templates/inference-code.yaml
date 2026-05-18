@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aiot-maintenance-api-code
+  namespace: {{ .Values.inference.namespace }}
+  labels:
+    {{- include "aiotml.labels" . | nindent 4 }}
+    app.kubernetes.io/component: maintenance-api
+data:
+  service.py: |
+    import os, threading
+    import mlflow
+    from mlflow.tracking import MlflowClient
+    import pandas as pd
+    import psycopg
+    from psycopg.rows import dict_row
+    from fastapi import FastAPI
+
+    app = FastAPI(title="AIOT Maintenance Inference API")
+    MODEL_NAME=os.getenv("MODEL_NAME","aiot-maintenance-predictor")
+    MLFLOW_TRACKING_URI=os.getenv("MLFLOW_TRACKING_URI","http://mlflow.mlflow.svc.cluster.local:5000")
+    _model=None; _version=None; _lock=threading.Lock()
+
+    def pg_conn():
+        return psycopg.connect(host=os.getenv("PGHOST"), port=int(os.getenv("PGPORT","5432")), dbname=os.getenv("PGDATABASE"), user=os.getenv("PGUSER"), password=os.getenv("PGPASSWORD"), row_factory=dict_row, connect_timeout=5)
+
+    def rule(row):
+        temp=float(row.get("temperature") or 0); hum=float(row.get("humidity") or 0); pressure=float(row.get("pressure") or 0); battery=float(row.get("battery") or 0)
+        risk=max(0,min(40,(temp-26)*8))+max(0,min(20,(hum-70)*4))+(20 if pressure<998 or pressure>1025 else 0)+max(0,min(20,(3.6-battery)*60))
+        risk=int(max(0,min(100,risk))); label="critical" if risk>=80 else "warning" if risk>=50 else "ok"
+        return risk,label
+
+    def load_model():
+        global _model,_version
+        with _lock:
+            if _model is not None: return _model
+            try:
+                mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+                versions=MlflowClient().search_model_versions(f"name='{MODEL_NAME}'")
+                if not versions: return None
+                latest=sorted(versions,key=lambda v:int(v.version))[-1]
+                _version=latest.version
+                _model=mlflow.pyfunc.load_model(f"models:/{MODEL_NAME}/{latest.version}")
+                return _model
+            except Exception:
+                return None
+
+    def latest_rows(limit=50):
+        with pg_conn() as conn, conn.cursor() as cur:
+            cur.execute("""select distinct on (sensor_id) sensor_id, location, ts, temperature, humidity, pressure, battery from sensor_data order by sensor_id, ts desc limit %s""", (limit,))
+            return [dict(r) for r in cur.fetchall()]
+
+    @app.get("/healthz")
+    def healthz(): return {"ok": True, "model_loaded": _model is not None, "model_version": _version}
+
+    @app.post("/reload")
+    def reload_model():
+        global _model,_version
+        with _lock: _model=None; _version=None
+        return {"loaded": load_model() is not None, "model_version": _version}
+
+    @app.get("/predict/latest")
+    def predict_latest():
+        rows=latest_rows(50); model=load_model(); items=[]
+        if model is not None and rows:
+            try:
+                X=pd.DataFrame(rows)[["temperature","humidity","pressure","battery"]].fillna(0)
+                preds=model.predict(X)
+                for row,pred in zip(rows,preds):
+                    fallback,label=rule(row); risk=int(float(pred)*100) if float(pred)<=1 else int(float(pred)); risk=max(0,min(100,risk or fallback))
+                    items.append({"sensor_id":row.get("sensor_id"),"risk":risk,"label":label,"source":"mlflow"})
+                return {"status":"ok","model_version":_version,"items":items}
+            except Exception as exc:
+                return {"status":"degraded","error":str(exc),"items":[]}
+        for row in rows:
+            risk,label=rule(row); items.append({"sensor_id":row.get("sensor_id"),"risk":risk,"label":label,"source":"rules"})
+        return {"status":"rules","model_version":None,"items":items}

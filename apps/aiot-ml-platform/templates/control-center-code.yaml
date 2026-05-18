@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aiot-control-center-code
+  namespace: {{ .Values.controlCenter.namespace }}
+  labels:
+    {{- include "aiotml.labels" . | nindent 4 }}
+    app.kubernetes.io/component: control-center
+data:
+  app.py: |-
+{{ .Files.Get "files/control-center/app.py" | indent 4 }}

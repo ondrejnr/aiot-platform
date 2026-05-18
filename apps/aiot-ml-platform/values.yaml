@@ -1,0 +1,75 @@
+global:
+  domain: 46.4.123.8.nip.io
+  storageClass: nfs
+
+localAI:
+  namespace: local-ai
+  image: ollama/ollama:0.6.8
+  model: llama3.2:1b
+  embeddingModel: nomic-embed-text
+  pvcSize: 20Gi
+  resources:
+    requests:
+      cpu: "500m"
+      memory: 2Gi
+    limits:
+      cpu: "4"
+      memory: 8Gi
+
+mlflow:
+  namespace: mlflow
+  image: python:3.11-slim
+  version: "2.21.3"
+  pvcSize: 20Gi
+  host: mlflow.46.4.123.8.nip.io
+  resources:
+    requests:
+      cpu: "200m"
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+
+controlCenter:
+  namespace: aiot
+  host: aiot-control.46.4.123.8.nip.io
+  image: python:3.11-slim
+  resources:
+    requests:
+      cpu: "100m"
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+inference:
+  namespace: aiot
+  image: python:3.11-slim
+  modelName: aiot-maintenance-predictor
+  resources:
+    requests:
+      cpu: "100m"
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+training:
+  namespace: aiot
+  image: python:3.11-slim
+  schedule: "5 2 * * *"
+  suspend: false
+  lookbackDays: 7
+  maxRows: 200000
+  resources:
+    requests:
+      cpu: "500m"
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+
+kubeflow:
+  ingress:
+    enabled: true
+    host: kubeflow.46.4.123.8.nip.io
