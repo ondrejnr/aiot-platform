@@ -2,10 +2,14 @@ import json, os
 import psycopg
 from psycopg.rows import dict_row
 import requests
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
 
 app = FastAPI(title="AIOT Control Center")
+
+class ChatRequest(BaseModel):
+    question: str = ""
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama.local-ai.svc.cluster.local:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
 INFERENCE_URL = os.getenv("INFERENCE_URL", "http://aiot-maintenance-api.aiot.svc.cluster.local:8080")
@@ -54,8 +58,8 @@ def healthz(): return {"ok": True}
 def api_summary(): return {"summary": summary(), "latest": latest(50), "predictions": predictions()}
 
 @app.post("/api/chat")
-async def api_chat(req: Request):
-    question = (await req.json()).get("question", "").strip()
+def api_chat(req: ChatRequest):
+    question = (req.question or "").strip()
     ctx = {"summary": summary(), "latest": latest(15), "predictions": predictions()}
     prompt = "Si lokálny AIOT asistent. Odpovedaj stručne po slovensky iba z týchto dát.\nDATA:\n" + json.dumps(ctx, ensure_ascii=False, default=str) + "\nOTÁZKA: " + question
     try:
