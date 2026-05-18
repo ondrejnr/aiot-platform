@@ -1,4 +1,11 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aiot-ml
+  labels:
+    app.kubernetes.io/part-of: aiot-ml-platform
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
