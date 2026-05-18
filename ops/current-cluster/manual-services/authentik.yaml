@@ -1,0 +1,801 @@
+# authentik runtime objects
+# Snapshot generated from the live hetzner-new cluster. Do not apply blindly; secrets are intentionally omitted.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: authentik
+  name: authentik
+spec:
+  finalizers:
+  - kubernetes
+
+---
+apiVersion: v1
+data:
+  master.conf: 'dir /data
+
+    # User-supplied master configuration:
+
+    rename-command FLUSHDB ""
+
+    rename-command FLUSHALL ""
+
+    # End of master configuration'
+  redis.conf: '# User-supplied common configuration:
+
+    appendonly no
+
+    save ""
+
+    # End of common configuration'
+  replica.conf: 'dir /data
+
+    # User-supplied replica configuration:
+
+    rename-command FLUSHDB ""
+
+    rename-command FLUSHALL ""
+
+    # End of replica configuration'
+  users.acl: ''
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.2.1
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: redis-22.0.4
+  name: authentik-redis-configuration
+  namespace: authentik
+
+---
+apiVersion: v1
+data:
+  ping_liveness_local.sh: "#!/bin/bash\n\n[[ -f $REDIS_PASSWORD_FILE ]] && export\
+    \ REDIS_PASSWORD=\"$(< \"${REDIS_PASSWORD_FILE}\")\"\n[[ -n \"$REDIS_PASSWORD\"\
+    \ ]] && export REDISCLI_AUTH=\"$REDIS_PASSWORD\"\nresponse=$(\n  timeout -s 15\
+    \ $1 \\\n  redis-cli \\\n    -h localhost \\\n    -p $REDIS_PORT \\\n    ping\n\
+    )\nif [ \"$?\" -eq \"124\" ]; then\n  echo \"Timed out\"\n  exit 1\nfi\nresponseFirstWord=$(echo\
+    \ $response | head -n1 | awk '{print $1;}')\nif [ \"$response\" != \"PONG\" ]\
+    \ && [ \"$responseFirstWord\" != \"LOADING\" ] && [ \"$responseFirstWord\" !=\
+    \ \"MASTERDOWN\" ]; then\n  echo \"$response\"\n  exit 1\nfi"
+  ping_liveness_local_and_master.sh: 'script_dir="$(dirname "$0")"
+
+    exit_status=0
+
+    "$script_dir/ping_liveness_local.sh" $1 || exit_status=$?
+
+    "$script_dir/ping_liveness_master.sh" $1 || exit_status=$?
+
+    exit $exit_status'
+  ping_liveness_master.sh: "#!/bin/bash\n\n[[ -f $REDIS_MASTER_PASSWORD_FILE ]] &&\
+    \ export REDIS_MASTER_PASSWORD=\"$(< \"${REDIS_MASTER_PASSWORD_FILE}\")\"\n[[\
+    \ -n \"$REDIS_MASTER_PASSWORD\" ]] && export REDISCLI_AUTH=\"$REDIS_MASTER_PASSWORD\"\
+    \nresponse=$(\n  timeout -s 15 $1 \\\n  redis-cli \\\n    -h $REDIS_MASTER_HOST\
+    \ \\\n    -p $REDIS_MASTER_PORT_NUMBER \\\n    ping\n)\nif [ \"$?\" -eq \"124\"\
+    \ ]; then\n  echo \"Timed out\"\n  exit 1\nfi\nresponseFirstWord=$(echo $response\
+    \ | head -n1 | awk '{print $1;}')\nif [ \"$response\" != \"PONG\" ] && [ \"$responseFirstWord\"\
+    \ != \"LOADING\" ]; then\n  echo \"$response\"\n  exit 1\nfi"
+  ping_readiness_local.sh: "#!/bin/bash\n\n[[ -f $REDIS_PASSWORD_FILE ]] && export\
+    \ REDIS_PASSWORD=\"$(< \"${REDIS_PASSWORD_FILE}\")\"\n[[ -n \"$REDIS_PASSWORD\"\
+    \ ]] && export REDISCLI_AUTH=\"$REDIS_PASSWORD\"\nresponse=$(\n  timeout -s 15\
+    \ $1 \\\n  redis-cli \\\n    -h localhost \\\n    -p $REDIS_PORT \\\n    ping\n\
+    )\nif [ \"$?\" -eq \"124\" ]; then\n  echo \"Timed out\"\n  exit 1\nfi\nif [ \"\
+    $response\" != \"PONG\" ]; then\n  echo \"$response\"\n  exit 1\nfi"
+  ping_readiness_local_and_master.sh: 'script_dir="$(dirname "$0")"
+
+    exit_status=0
+
+    "$script_dir/ping_readiness_local.sh" $1 || exit_status=$?
+
+    "$script_dir/ping_readiness_master.sh" $1 || exit_status=$?
+
+    exit $exit_status'
+  ping_readiness_master.sh: "#!/bin/bash\n\n[[ -f $REDIS_MASTER_PASSWORD_FILE ]] &&\
+    \ export REDIS_MASTER_PASSWORD=\"$(< \"${REDIS_MASTER_PASSWORD_FILE}\")\"\n[[\
+    \ -n \"$REDIS_MASTER_PASSWORD\" ]] && export REDISCLI_AUTH=\"$REDIS_MASTER_PASSWORD\"\
+    \nresponse=$(\n  timeout -s 15 $1 \\\n  redis-cli \\\n    -h $REDIS_MASTER_HOST\
+    \ \\\n    -p $REDIS_MASTER_PORT_NUMBER \\\n    ping\n)\nif [ \"$?\" -eq \"124\"\
+    \ ]; then\n  echo \"Timed out\"\n  exit 1\nfi\nif [ \"$response\" != \"PONG\"\
+    \ ]; then\n  echo \"$response\"\n  exit 1\nfi"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.2.1
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: redis-22.0.4
+  name: authentik-redis-health
+  namespace: authentik
+
+---
+apiVersion: v1
+data:
+  start-master.sh: "#!/bin/bash\n\n[[ -f $REDIS_PASSWORD_FILE ]] && export REDIS_PASSWORD=\"\
+    $(< \"${REDIS_PASSWORD_FILE}\")\"\nif [[ -f /opt/bitnami/redis/mounted-etc/master.conf\
+    \ ]];then\n    cp /opt/bitnami/redis/mounted-etc/master.conf /opt/bitnami/redis/etc/master.conf\n\
+    fi\nif [[ -f /opt/bitnami/redis/mounted-etc/redis.conf ]];then\n    cp /opt/bitnami/redis/mounted-etc/redis.conf\
+    \ /opt/bitnami/redis/etc/redis.conf\nfi\nif [[ -f /opt/bitnami/redis/mounted-etc/users.acl\
+    \ ]];then\n    cp /opt/bitnami/redis/mounted-etc/users.acl /opt/bitnami/redis/etc/users.acl\n\
+    fi\nARGS=(\"--port\" \"${REDIS_PORT}\")\nARGS+=(\"--protected-mode\" \"no\")\n\
+    ARGS+=(\"--include\" \"/opt/bitnami/redis/etc/redis.conf\")\nARGS+=(\"--include\"\
+    \ \"/opt/bitnami/redis/etc/master.conf\")\nexec redis-server \"${ARGS[@]}\"\n"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.2.1
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: redis-22.0.4
+  name: authentik-redis-scripts
+  namespace: authentik
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: serviceAccount
+    app.kubernetes.io/part-of: authentik
+    app.kubernetes.io/version: 2.1.0
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: serviceAccount-2.1.0
+  name: authentik
+  namespace: authentik
+
+---
+apiVersion: v1
+automountServiceAccountToken: false
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.2.1
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: redis-22.0.4
+  name: authentik-redis-master
+  namespace: authentik
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: serviceAccount
+    app.kubernetes.io/part-of: authentik
+    app.kubernetes.io/version: 2.1.0
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: serviceAccount-2.1.0
+  name: authentik
+  namespace: authentik
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  - services
+  - configmaps
+  verbs:
+  - get
+  - create
+  - delete
+  - list
+  - patch
+- apiGroups:
+  - extensions
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - create
+  - delete
+  - list
+  - patch
+- apiGroups:
+  - extensions
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - create
+  - delete
+  - list
+  - patch
+- apiGroups:
+  - traefik.containo.us
+  - traefik.io
+  resources:
+  - middlewares
+  verbs:
+  - get
+  - create
+  - delete
+  - list
+  - patch
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - httproutes
+  verbs:
+  - get
+  - create
+  - delete
+  - list
+  - patch
+- apiGroups:
+  - monitoring.coreos.com
+  resources:
+  - servicemonitors
+  verbs:
+  - get
+  - create
+  - delete
+  - list
+  - patch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - list
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: serviceAccount
+    app.kubernetes.io/part-of: authentik
+    app.kubernetes.io/version: 2.1.0
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: serviceAccount-2.1.0
+  name: authentik
+  namespace: authentik
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: authentik
+subjects:
+- kind: ServiceAccount
+  name: authentik
+  namespace: authentik
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.2.1
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: redis-22.0.4
+  name: authentik-redis-headless
+  namespace: authentik
+spec:
+  ports:
+  - name: tcp-redis
+    port: 6379
+    protocol: TCP
+    targetPort: redis
+  selector:
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/name: redis
+  sessionAffinity: None
+  type: ClusterIP
+  clusterIP: None
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.2.1
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: redis-22.0.4
+  name: authentik-redis-master
+  namespace: authentik
+spec:
+  ports:
+  - name: tcp-redis
+    port: 6379
+    protocol: TCP
+    targetPort: redis
+  selector:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/name: redis
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: authentik
+    app.kubernetes.io/part-of: authentik
+    app.kubernetes.io/version: 2025.10.0
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: authentik-2025.10.0
+  name: authentik-server
+  namespace: authentik
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 9000
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/name: authentik
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.2.1
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: redis-22.0.4
+  name: authentik-redis-master
+  namespace: authentik
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: master
+      app.kubernetes.io/instance: authentik
+      app.kubernetes.io/name: redis
+  serviceName: authentik-redis-headless
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: 75ae09f201e0ec9a0b86c3e5e93dff2b26c3c5c39c9df2a348d764c5e423867e
+        checksum/health: aff24913d801436ea469d8d374b2ddb3ec4c43ee7ab24663d5f8ff1a1b6991a9
+        checksum/scripts: bdec350b84a1ace7cc118db113a21c9f160bde3425b07714e1c0c1da722621cf
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: master
+        app.kubernetes.io/instance: authentik
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/version: 8.2.1
+        helm.sh/chart: redis-22.0.4
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: master
+                  app.kubernetes.io/instance: authentik
+                  app.kubernetes.io/name: redis
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - -ec
+        - /opt/bitnami/scripts/start-scripts/start-master.sh
+        command:
+        - /bin/bash
+        env:
+        - name: BITNAMI_DEBUG
+          value: 'false'
+        - name: REDIS_REPLICATION_MODE
+          value: master
+        - name: ALLOW_EMPTY_PASSWORD
+          value: 'yes'
+        - name: REDIS_TLS_ENABLED
+          value: 'no'
+        - name: REDIS_PORT
+          value: '6379'
+        image: docker.io/library/redis:8.2.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -ec
+            - /health/ping_liveness_local.sh 30
+          failureThreshold: 15
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 31
+        name: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -ec
+            - /health/ping_readiness_local.sh 30
+          failureThreshold: 15
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 31
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsGroup: 1001
+          runAsNonRoot: true
+          runAsUser: 1001
+          seLinuxOptions: {}
+          seccompProfile:
+            type: RuntimeDefault
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /opt/bitnami/scripts/start-scripts
+          name: start-scripts
+        - mountPath: /health
+          name: health
+        - mountPath: /data
+          name: redis-data
+        - mountPath: /opt/bitnami/redis/mounted-etc
+          name: config
+        - mountPath: /opt/bitnami/redis/etc/
+          name: empty-dir
+          subPath: app-conf-dir
+        - mountPath: /tmp
+          name: empty-dir
+          subPath: tmp-dir
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+      serviceAccount: authentik-redis-master
+      serviceAccountName: authentik-redis-master
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 493
+          name: authentik-redis-scripts
+        name: start-scripts
+      - configMap:
+          defaultMode: 493
+          name: authentik-redis-health
+        name: health
+      - configMap:
+          defaultMode: 420
+          name: authentik-redis-configuration
+        name: config
+      - emptyDir: {}
+        name: empty-dir
+      - emptyDir: {}
+        name: redis-data
+  updateStrategy:
+    type: RollingUpdate
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: authentik
+    app.kubernetes.io/part-of: authentik
+    app.kubernetes.io/version: 2025.10.0
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: authentik-2025.10.0
+  name: authentik-server
+  namespace: authentik
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: server
+      app.kubernetes.io/instance: authentik
+      app.kubernetes.io/name: authentik
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-05-11T09:10:26+02:00'
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: server
+        app.kubernetes.io/instance: authentik
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: authentik
+        app.kubernetes.io/part-of: authentik
+        app.kubernetes.io/version: 2025.10.0
+        helm.sh/chart: authentik-2025.10.0
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: server
+                  app.kubernetes.io/instance: authentik
+                  app.kubernetes.io/name: authentik
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - server
+        env:
+        - name: AUTHENTIK_LISTEN__HTTP
+          value: 0.0.0.0:9000
+        - name: AUTHENTIK_LISTEN__HTTPS
+          value: 0.0.0.0:9443
+        - name: AUTHENTIK_LISTEN__METRICS
+          value: 0.0.0.0:9300
+        envFrom:
+        - secretRef:
+            name: authentik
+        - secretRef:
+            name: authentik-bootstrap
+        image: ghcr.io/goauthentik/server:2025.10.4
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /-/health/live/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: server
+        ports:
+        - containerPort: 9000
+          name: http
+          protocol: TCP
+        - containerPort: 9443
+          name: https
+          protocol: TCP
+        - containerPort: 9300
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /-/health/ready/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources: {}
+        startupProbe:
+          failureThreshold: 60
+          httpGet:
+            path: /-/health/live/
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 15
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: authentik
+    app.kubernetes.io/part-of: authentik
+    app.kubernetes.io/version: 2025.10.0
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: authentik-2025.10.0
+  name: authentik-worker
+  namespace: authentik
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: worker
+      app.kubernetes.io/instance: authentik
+      app.kubernetes.io/name: authentik
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-05-06T17:41:16+02:00'
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: worker
+        app.kubernetes.io/instance: authentik
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: authentik
+        app.kubernetes.io/part-of: authentik
+        app.kubernetes.io/version: 2025.10.0
+        helm.sh/chart: authentik-2025.10.0
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: worker
+                  app.kubernetes.io/instance: authentik
+                  app.kubernetes.io/name: authentik
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - worker
+        env:
+        - name: AUTHENTIK_LISTEN__HTTP
+          value: 0.0.0.0:9000
+        - name: AUTHENTIK_LISTEN__METRICS
+          value: 0.0.0.0:9300
+        envFrom:
+        - secretRef:
+            name: authentik
+        - secretRef:
+            name: authentik-bootstrap
+        image: ghcr.io/goauthentik/server:2025.10.4
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - ak
+            - healthcheck
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 15
+        name: worker
+        ports:
+        - containerPort: 9000
+          name: http
+          protocol: TCP
+        - containerPort: 9300
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - ak
+            - healthcheck
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 15
+        resources: {}
+        startupProbe:
+          exec:
+            command:
+            - ak
+            - healthcheck
+          failureThreshold: 60
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 15
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: authentik
+      serviceAccountName: authentik
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: authentik
+    app.kubernetes.io/part-of: authentik
+    app.kubernetes.io/version: 2025.10.0
+    argocd.argoproj.io/instance: authentik
+    helm.sh/chart: authentik-2025.10.0
+  name: authentik-server
+  namespace: authentik
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: authentik.46.4.123.8.nip.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: authentik-server
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - authentik.46.4.123.8.nip.io
+    secretName: authentik-tls

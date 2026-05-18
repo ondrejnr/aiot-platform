@@ -1,130 +1,107 @@
 # aiot-platform
 
-![Kubernetes](https://img.shields.io/badge/kubernetes-v1.32.13-326ce5?logo=kubernetes&logoColor=white)
-![Nodes](https://img.shields.io/badge/nodes-5%20(3%20GCP%20%2B%202%20OCI)-success)
-![Namespaces](https://img.shields.io/badge/namespaces-80-blue)
-![Backup](https://img.shields.io/badge/k8up-Cloudflare%20R2-f38020?logo=cloudflare&logoColor=white)
-![LLM](https://img.shields.io/badge/LLM-Open--WebUI%20%2B%20RAG-ff6f00)
-![K8sGPT](https://img.shields.io/badge/self--monitoring-K8sGPT-purple)
-![Config](https://img.shields.io/badge/config-Chef%20%7C%20Puppet%20%7C%20Ansible-red)
-![Status](https://img.shields.io/badge/status-production-brightgreen)
+![Kubernetes](https://img.shields.io/badge/k3s-v1.31.5%2Bk3s1-326ce5?logo=kubernetes&logoColor=white)
+![Flux](https://img.shields.io/badge/Flux-v2.6.4-5468ff?logo=flux&logoColor=white)
+![Cluster](https://img.shields.io/badge/cluster-hetzner--new%20k3d-success)
+![Nodes](https://img.shields.io/badge/nodes-5%20k3d%20containers-success)
+![Domain](https://img.shields.io/badge/domain-46.4.123.8.nip.io-blue)
+![AI](https://img.shields.io/badge/local%20AI-Ollama%20%2B%20MLflow%20%2B%20Kubeflow-purple)
+![GitOps](https://img.shields.io/badge/source--of--truth-Flux%20%2B%20Gitea-brightgreen)
 
-> **Industrial AIoT platform** — an end-to-end system for **collecting, storing, and evaluating industrial sensor data with AI and large language models (LLMs)**. Field devices stream telemetry over MQTT, data is persisted and indexed, and a RAG-enabled LLM interface lets operators **ask questions about production data in natural language**.
+> **Industrial AIoT platform** running on the active `hetzner-new` cluster: a self-hosted stack for MQTT sensor ingestion, streaming, storage, local ML training, local LLM-assisted operations and platform observability. The current runtime avoids external LLM APIs for the Control Center and uses local Ollama models.
 
-The platform was built to answer practical questions from the shop floor — *"Which machine is drifting out of spec?"*, *"What caused yesterday's anomaly?"* — by exposing operational data through an LLM layer (Open-WebUI + Qdrant RAG) grounded in the platform's own MQTT/Postgres history.
-
-## Why this platform exists
-
-Industrial data is useless unless it becomes a **decision**. AIoT is designed around that chain:
-
-1. **Collect** — MQTT ingestion from sensors and PLCs, retained in a time-series–friendly Postgres (CloudNativePG)
-2. **Enrich** — digital-twin service aligns raw telemetry with asset metadata; embeddings stored in Qdrant for semantic retrieval
-3. **Ask** — operators and engineers interact with the whole system through an LLM chat (Open-WebUI) that uses RAG over platform data and can call the inference service as a tool
-
-Everything runs on a self-hosted, multi-cloud Kubernetes cluster (GCP + OCI), with **Chef Automate**, **Puppet Enterprise**, and **Ansible/Semaphore** keeping hosts and agents in a known state, and **k8up** + an etcd-snapshot CronJob guaranteeing disaster recovery to Cloudflare R2.
-
-## Self-operating cluster — K8sGPT
-
-A unique property of this platform is that the cluster **monitors and reasons about itself**. Namespace **`k8sgpt`** runs:
-
-- **K8sGPT Operator** — continuously analyses every namespace for misconfigurations, failing pods, broken probes, stuck PVCs, CrashLoopBackOff patterns, and RBAC gaps
-- **LLM-backed diagnostics** — findings are explained in plain English through an LLM (local or Groq), so an alert reads *"pod X is restarting because liveness probe targets an unreachable port — check service `Y`"* instead of a raw Kubernetes event
-- **Anomaly detector** (`k8sgpt-anomaly-detector`) — ML-based trend detection over metrics and logs
-- **Robusta bridge** (`k8sgpt-robusta-bridge`) — forwards events to Robusta for automated playbook execution (restart, scale, cordon, notify) when the diagnosis matches a known remediation
-- **Scheduled reports** — `ai-health-report` and `ai-log-analyzer` CronJobs produce daily summaries of cluster health; `monitoring-watchdog` keeps the pipeline itself alive
-
-The result is an **AI-supervised cluster**: the same LLM technology that answers operator questions about production data also watches the Kubernetes control plane and workloads, flags regressions, and can auto-remediate common issues.
-
-```mermaid
-flowchart LR
-    subgraph K8S["☸️ Kubernetes cluster"]
-        EV[/"Events · Logs<br/>Metrics · Probes"/]
-    end
-
-    EV --> OP
-    subgraph K8SGPT["🤖 K8sGPT namespace"]
-        OP["K8sGPT Operator<br/>scans all namespaces"]
-        AN["Anomaly Detector<br/>ML on metrics"]
-        LLM{{"🧠 LLM<br/>Groq / local"}}
-        BR["Robusta bridge<br/>auto-remediation"]
-        RPT["Scheduled reports<br/>ai-health · ai-log"]
-    end
-
-    OP --> LLM
-    AN --> LLM
-    LLM -->|plain English<br/>diagnosis| BOT
-    LLM -->|match playbook| BR
-    LLM --> RPT
-    BR -.restart · scale · cordon.-> K8S
-    BOT <==>|human replies| ENG(["👷 Engineers"])
-
-    classDef k8s fill:#dbeafe,stroke:#1d4ed8,color:#1e3a8a
-    classDef gpt fill:#f3e8ff,stroke:#7e22ce,color:#581c87
-    classDef llm fill:#fef2f2,stroke:#dc2626,color:#7f1d1d
-    class EV k8s
-    class OP,AN,BR,BOT,RPT gpt
-    class LLM llm
-```
+The repository is mirrored to GitHub and the internal Gitea instance. Flux reads the internal Gitea repository and reconciles the cluster from `flux/clusters/hetzner-new`.
 
 ---
 
-## Platform at a glance
+## Current status
+
+| Area | Current value |
+|---|---|
+| Active cluster | `hetzner-new` on Hetzner host `46.4.123.8` |
+| Kubernetes | k3d/k3s `v1.31.5+k3s1` |
+| Nodes | `1` k3d server + `4` k3d agents |
+| Public DNS | `*.46.4.123.8.nip.io` |
+| GitOps | Flux `v2.6.4`, internal Gitea source |
+| Primary repo path on host | `/root/aiot-platform` |
+| Active GitOps path | `flux/clusters/hetzner-new` |
+| Active app charts | `apps/*` |
+| Storage classes | `nfs` for shared app storage, `local-path` for node-local workloads |
+| SSO | Authentik + selected forward-auth/OIDC integrations |
+| Local AI | Ollama `gemma3:1b` chat fallback + `nomic-embed-text` embeddings |
+| ML | MLflow `2.21.3`, Kubeflow Pipelines `2.15.0`, KServe `v0.15.2` |
+
+> Historical exports under `namespaces/`, `cluster-wide/` and `manifests/` are legacy references from older clusters. They are not the active source of truth for `hetzner-new`.
+
+---
+
+## Why this platform exists
+
+Industrial telemetry becomes useful only when it becomes a decision. AIOT is built around this path:
+
+1. **Collect** — sensors and simulators publish MQTT telemetry into EMQX.
+2. **Buffer** — Redis Streams absorb bursts and provide backpressure.
+3. **Stream** — Redpanda keeps a Kafka-compatible event log.
+4. **Persist** — Postgres stores the operational history.
+5. **Learn** — scheduled training produces MLflow maintenance models.
+6. **Predict** — the inference API serves latest predictive-maintenance labels.
+7. **Operate** — Control Center shows current risk and answers operational questions locally.
+
+---
+
+## Platform architecture
 
 ```mermaid
 flowchart LR
-    subgraph EDGE["🏭 EDGE / FIELD"]
-        S1[("📡<br/>Sensors<br/>PLCs")]
-        S2[("⚙️<br/>Simulator<br/>(aiot)")]
+    subgraph FIELD["Field / simulators"]
+        SIM["sensor-simulator\n10 replicas"]
+        DEV["MQTT devices"]
     end
 
-    subgraph INGEST["📥 INGESTION"]
-        MQ[("EMQX<br/>MQTT broker")]
-        N8[("n8n<br/>flows")]
-        SINK[["pg-sink"]]
+    subgraph INGEST["Ingestion namespace aiot"]
+        EMQX["EMQX\n3-node StatefulSet"]
+        M2R["mqtt-to-redis\n8 replicas"]
+        REDIS["Redis Streams\nbackpressure"]
+        R2R["redis-to-redpanda\n8 replicas"]
+        RP["Redpanda\n3-node StatefulSet"]
+        PGS["pg-sink\n12 replicas"]
     end
 
-    subgraph STORE["🗄️ STORAGE LAYER"]
-        PG[("CloudNativePG<br/>pg-ha · 3 replicas")]
-        QD[("Qdrant<br/>vectors / RAG")]
+    subgraph DATA["Data layer"]
+        PG["CNPG Postgres\npg-cluster + PgBouncer"]
+        QD["Qdrant"]
     end
 
-    subgraph LLM["💬 LLM LAYER"]
-        OW[["Open-WebUI<br/>chat"]]
-        RAG[["rag-worker<br/>+ indexer"]]
+    subgraph AI["Local AI / ML"]
+        OLLAMA["Ollama\ngemma3:1b + embeddings"]
+        MLFLOW["MLflow\nmodel registry"]
+        KFP["Kubeflow Pipelines"]
+        KS["KServe"]
+        TRAIN["maintenance-train\nCronJob"]
+        API["maintenance-api\nFastAPI inference"]
     end
 
-    subgraph OPS["🛡️ SELF-OPERATING"]
-        KG{{"K8sGPT<br/>AI-supervised cluster"}}
+    subgraph UI["Operator UIs"]
+        CC["AIOT Control Center"]
+        CB["CloudBeaver"]
+        RPC["Redpanda Console"]
+        EMQXD["EMQX Dashboard"]
     end
 
-    S1 & S2 -->|MQTT| MQ
-    MQ --> SINK
-    N8 --> SINK
-    SINK --> PG
-    PG --> KF
-    ML --> KS
-    PG --> RAG
-    RAG --> QD
-    QD --> OW
-
-    KG -.watches.-> INGEST
-    KG -.watches.-> STORE
-    KG -.watches.-> AI
-    KG -.watches.-> LLM
-    KG ==alerts==> MM
-
-    classDef edge fill:#fef3c7,stroke:#d97706,color:#78350f
-    classDef ingest fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
-    classDef store fill:#e0e7ff,stroke:#4f46e5,color:#312e81
-    classDef ai fill:#fce7f3,stroke:#db2777,color:#831843
-    classDef llm fill:#fef2f2,stroke:#dc2626,color:#7f1d1d
-    classDef ops fill:#ecfdf5,stroke:#059669,color:#064e3b
-    class S1,S2 edge
-    class MQ,N8,SINK ingest
-    class PG,QD store
-    class KF,ML,KS ai
-    class OW,RAG llm
-    class KG,MM ops
+    DEV --> EMQX
+    SIM --> EMQX
+    EMQX --> M2R --> REDIS --> R2R --> RP --> PGS --> PG
+    PG --> TRAIN --> MLFLOW --> API
+    PG --> API
+    PG --> CC
+    API --> CC
+    OLLAMA --> CC
+    PG --> CB
+    RP --> RPC
+    EMQX --> EMQXD
+    QD -.vector store.-> CC
+    KFP -.pipelines.-> TRAIN
+    KS -.model serving platform.-> API
 ```
 
 ---
@@ -133,367 +110,227 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    USER(["🌐 Internet users<br/>*.35.241.255.137.nip.io"])
+    USER(["Internet users\n*.46.4.123.8.nip.io"])
+    HOST["Hetzner host\naiot-hetzner-01\n46.4.123.8"]
 
-    subgraph GCP["☁️ GCP · europe-west1-b"]
-        HA{{"HAProxy<br/>SNI router"}}
-        M["🎛️ aiot-master<br/>control-plane<br/>10.132.0.2"]
-        W1["⚙️ aiot-worker-01<br/>10.132.0.3<br/>Chef · Puppet · PE"]
-        W2["⚙️ aiot-worker-02<br/>10.132.0.4<br/>pg-ha · storage"]
+    subgraph DOCKER["Docker network k3d-aiot-hetzner"]
+        LB["k3d serverlb\n172.18.0.3"]
+        S0["k3d-aiot-hetzner-server-0\ncontrol-plane\n172.18.0.4"]
+        A0["agent-0\napps\n172.18.0.7"]
+        A1["agent-1\nAI workload\n172.18.0.2"]
+        A2["agent-2\napps\n172.18.0.6"]
+        A3["agent-3\nmonitoring\n172.18.0.5"]
+        CHEF["chef-automate\nDocker container\n172.18.0.8"]
     end
 
-    subgraph OCI["🔶 OCI · eu-frankfurt-1"]
-        O1["⚙️ oci-e5-node1<br/>172.16.200.10"]
-        O2["⚙️ oci-e5-node2<br/>172.16.200.11<br/>SigNoz · ClickHouse"]
-    end
-
-    WG{{"🔐 WireGuard mesh"}}
-
-    USER --> HA
-    HA -->|80/443 SNI| W1
-    HA -->|80/443 SNI| W2
-    HA -->|SSH fallback| M
-
-    M <-.-> W1 & W2
-    M <==> WG
-    WG <==> O1 & O2
-
-    classDef gcp fill:#e0f2fe,stroke:#0369a1,color:#0c4a6e
-    classDef oci fill:#fef3c7,stroke:#ea580c,color:#7c2d12
-    classDef tun fill:#f3e8ff,stroke:#9333ea,color:#581c87
-    classDef ext fill:#f3f4f6,stroke:#6b7280
-    class M,W1,W2,HA gcp
-    class O1,O2 oci
-    class WG tun
-    class USER ext
+    USER -->|80/443| LB
+    HOST --> DOCKER
+    LB --> S0
+    S0 <--> A0
+    S0 <--> A1
+    S0 <--> A2
+    S0 <--> A3
+    A0 -.ingress endpoint.-> CHEF
 ```
 
-| Node             | Role           | IP (internal)         | OS                | Location              |
-| ---------------- | -------------- | --------------------- | ----------------- | --------------------- |
-| aiot-master      | control-plane  | 10.132.0.2            | CentOS Stream 9   | GCP `europe-west1-b`  |
-| aiot-worker-01   | worker         | 10.132.0.3            | CentOS Stream 9   | GCP `europe-west1-b`  |
-| aiot-worker-02   | worker         | 10.132.0.4            | CentOS Stream 9   | GCP `europe-west1-b`  |
-| oci-e5-node1     | worker         | 172.16.200.10 (WG)    | Oracle Linux 9.7  | OCI `eu-frankfurt-1`  |
-| oci-e5-node2     | worker         | 172.16.200.11 (WG)    | Oracle Linux 9.7  | OCI `eu-frankfurt-1`  |
-
-- **Kubernetes**: v1.32.13 (vanilla kubeadm)
-- **CNI**: Flannel v0.27.4 — pod CIDR `10.244.0.0/16`, VXLAN overlay (port 8472), with stock kube-proxy in iptables mode
-- **Multi-cloud**: OCI nodes join the GCP control plane over a **WireGuard** tunnel; the OCI tenancy is independent of the GCP project and survives GCP outages
-- **Public entrypoint**: single IP `35.241.255.137` → **HAProxy** on master → SNI-based TCP proxy to workers' `nginx-ingress` DaemonSet (ports 80/443), with SSH fallback on port 443
-- **TLS**: `cert-manager` + Let's Encrypt (HTTP-01), ClusterIssuer `letsencrypt-prod`
-- **Storage**: single `local-path` StorageClass (Rancher local-path provisioner) — data is pinned to the node hosting the PVC; **k8up restic backups + etcd snapshots are the only HA/DR path**
+| Node | Role labels | Internal IP | Runtime |
+|---|---|---|---|
+| `k3d-aiot-hetzner-server-0` | control-plane | `172.18.0.4` | k3s/containerd |
+| `k3d-aiot-hetzner-agent-0` | `role=apps` | `172.18.0.7` | k3s/containerd |
+| `k3d-aiot-hetzner-agent-1` | `role=ai`, `workload=ai` | `172.18.0.2` | k3s/containerd |
+| `k3d-aiot-hetzner-agent-2` | `role=apps` | `172.18.0.6` | k3s/containerd |
+| `k3d-aiot-hetzner-agent-3` | `role=monitoring` | `172.18.0.5` | k3s/containerd |
 
 ---
 
-## The AI data-processing pipeline
+## Services currently represented by this repo
 
-The AIoT workflow moves sensor data from the edge into Postgres + Qdrant, and exposes it through a RAG-enabled chat interface.
+### GitOps-managed services
 
-### 1. Ingestion — `emqx`, `aiot`
+These are reconciled by Flux from `apps/*` and `flux/clusters/hetzner-new/apps/*.yaml`.
 
-- **EMQX** (namespace `emqx`) terminates **MQTT** from field devices (sensor simulators in `aiot/sensor-simulator`)
-- **n8n** (namespace `n8n`) orchestrates low-code integration flows (HTTP, webhooks, cron)
-- **pg-sink** (in `aiot`) persists raw telemetry into the `aiot` database on `pg-ha`
+| Category | Namespace / release | What runs there |
+|---|---|---|
+| Ingress/TLS | `ingress-nginx`, `cert-manager` | public ingress controller, Let's Encrypt ClusterIssuer |
+| GitOps | `flux-system` | Flux source, kustomize, helm and notification controllers |
+| GitOps UI | `flux-ui/weave-gitops` | Flux web UI |
+| Source control | `gitea/gitea` | internal Git source used by Flux and Jenkins |
+| CI/CD | `jenkins/jenkins` | GitOps validation and Flux reconcile pipeline |
+| AIOT pipeline | `aiot/aiot-pipeline` | EMQX, Redis, Redpanda, bridges, pg-sink, sensor simulator, Redpanda Console |
+| AIOT workbench | `aiot/cloudbeaver` | browser DB client for Postgres |
+| AIOT vector DB | `qdrant/qdrant` | vector database for AI/semantic workloads |
+| AI/ML platform | `aiot-ml/aiot-ml-platform` | Ollama, MLflow, Control Center, maintenance API, training CronJob, namespaces and ingresses |
+| Local AI | `local-ai/ollama` | local Ollama runtime and model PVC |
+| ML registry | `mlflow/mlflow` | MLflow tracking server and artifact serving |
+| ML pipelines | Flux Kustomizations `kubeflow-pipelines*` | Kubeflow Pipelines UI/API stack |
+| Model serving platform | Flux Kustomization `kserve` | KServe controller with localmodel controller disabled |
+| Postgres operator | `cnpg-system/cnpg` | CloudNativePG operator |
+| Postgres UI | `databases/pgadmin` | pgAdmin for database administration |
+| SSO helper | `auth/dex` | Dex OIDC helper used by selected tools |
+| Observability | `monitoring/prometheus`, `monitoring/alertmanager` | kube-prometheus stack and Alertmanager |
+| Metrics platform | `victoriametrics/victoriametrics` | VictoriaMetrics operator, vmagent, vmsingle, vmalert, Grafana subchart, node exporter |
+| Dashboards | `grafana/grafana` | Grafana UI |
+| Logs | `observability-logs/loki`, `observability-logs/alloy` | Loki storage and Alloy log collector |
+| Traces/APM/logs | `signoz/signoz`, `signoz/k8s-infra` | SigNoz, ClickHouse, OpenTelemetry collector/agent |
+| Probes | `blackbox-exporter/blackbox-exporter` | external HTTP/TCP blackbox checks |
+| Events | `event-exporter/event-exporter` | Kubernetes event exporter |
+| OTel operator | `opentelemetry-operator-system/opentelemetry-operator` | OpenTelemetry CRDs/operator |
+| Zabbix | `zabbix/zabbix` | Zabbix server/web/webservice |
+| Alert bridge | `prometheus-event-bridge/prometheus-event-bridge` | Prometheus event integration |
+| Backups | `k8up-system/k8up` | K8up operator |
+| Shared storage | `nfs-provisioner/nfs-provisioner` | NFS dynamic provisioner backed by local-path |
+| Secrets | `kube-system/sealed-secrets` | Sealed Secrets controller |
+| Node health | `node-problem-detector/node-problem-detector` | node problem detection daemonset |
+| Scheduling hygiene | `descheduler/descheduler` | descheduler |
+| Platform UI | `headlamp/headlamp` | Kubernetes web UI |
+| Automation | `awx/awx`, `awx/awx-operator` | AWX and operator |
+| IaC platform | `terrakube/terrakube` | Terrakube UI/API/executor/registry/minio/openldap/redis |
+| Configuration mgmt | `puppet/puppet` | Puppet server/PuppetDB stack |
+| PE console proxy | `pe-console/pe-console` | Puppet Enterprise console ingress/proxy |
 
-### 2. Storage — `aiot`, `cnpg-system`
+### Runtime services captured as live snapshots
 
-- Partitioning and cleanup handled by CronJobs: `pg-partition-mgr`, `pg-sensor-cleanup`, `sensor-data-retention`, `postgres-backup`
-- Secondary index/feature store: **Qdrant** (namespace `aiot`) for vector embeddings used by RAG
+A small number of important runtime objects are not installed from a Flux `HelmRelease`. They are captured under `ops/current-cluster/manual-services/` so the repo still documents the whole live cluster.
 
-### 3. RAG / LLM — `aiot`
+| Namespace | File | Purpose |
+|---|---|---|
+| `authentik` | `ops/current-cluster/manual-services/authentik.yaml` | Authentik SSO server, worker, Redis and ingress. Secret objects are intentionally omitted. |
+| `chef` | `ops/current-cluster/manual-services/chef-automate-proxy.yaml` | Kubernetes `Service`/`Endpoints`/`Ingress` proxy to the Docker `chef-automate` container at `172.18.0.8`. |
+| `loadtest` | `ops/current-cluster/manual-services/loadtest-emqtt-bench.yaml` | Optional EMQX benchmark publisher, currently scaled to `0`. |
 
-- **Qdrant** — vector DB for embeddings of sensor metadata, asset descriptions, and historical alerts
-- **rag-worker** + **qdrant-indexer** — ingest fresh telemetry summaries and operator notes into Qdrant
-- **Open-WebUI** — chat UI on `chat.35.241.255.137.nip.io`, talks to external LLM providers (Groq via `inference-connector`)
-- **inference-connector** — thin proxy that exposes a uniform API to the LLM layer
-- **api-gateway** — business-level REST/HTTP endpoints on `api.35.241.255.137.nip.io`
+### Not active anymore
 
----
-
-## Configuration management
-
-```mermaid
-flowchart TB
-    subgraph HOSTS["🖥️ All 6 cluster nodes"]
-        H[" "]
-    end
-
-    subgraph PUPPET["🎩 Puppet Enterprise (desired state)"]
-        direction LR
-        P1["Packages · kernel<br/>sysctl · systemd"]
-        P2["Agents: noop=true<br/>Patch Mgmt group"]
-    end
-
-    subgraph CHEF["🍴 Chef Automate (compliance)"]
-        direction LR
-        C1["InSpec scans<br/>Automate reporting"]
-    end
-
-    subgraph ANS["🟣 Ansible via Semaphore (operations)"]
-        direction LR
-        A1["Health · uptime · disk"]
-        A2["Firewall audit<br/>Reboot planner<br/>Cert check"]
-    end
-
-    PUPPET -->|host-level state| H
-    CHEF -->|compliance + events| H
-    ANS -->|ad-hoc operations| H
-
-    classDef p fill:#fef2f2,stroke:#dc2626,color:#7f1d1d
-    classDef c fill:#fff7ed,stroke:#ea580c,color:#7c2d12
-    classDef a fill:#faf5ff,stroke:#9333ea,color:#581c87
-    classDef h fill:#f1f5f9,stroke:#475569
-    class P1,P2 p
-    class C1,C2 c
-    class A1,A2 a
-    class H h
-```
-
-### Chef Automate — `chef`, `chef-webhook`
-
-- **Chef Automate** runs **outside Kubernetes**, as a systemd service (`chef-automate.service`) on `aiot-worker-01`, exposed on port `8443` and published under `chef.35.241.255.137.nip.io`
-- **Chef Infra Server** drives node convergence across all 6 cluster nodes + test VMs
-- Compliance scans are exported under `inspec-scans` namespace for long-term retention
-
-### Puppet Enterprise — `chef` ns (`pe.*` ingress), host-level
-
-- **Puppet Enterprise 2023.x** runs on `aiot-worker-01` as a full PE stack (systemd units: `pe-nginx`, `pe-puppetserver`, `pe-postgresql`, `pe-puppetdb`, `pe-orchestration-services`, `pe-ace-server`, `pe-bolt-server`, `pe-host-action-collector`, `pe-console-services`)
-- Console at `pe.35.241.255.137.nip.io` (admin)
-- **All 6 cluster nodes** are managed agents (`noop=true`), plus demo VMs
-- **Patch Management** node group (`aae9e4cd-fed5-4f07-8149-98a699a3b692`) with tasks: `agent_health`, `clean_cache`, `last_boot_time`, `patch_server`, `refresh_fact`
-- Puppet and Chef run **side by side**: Puppet handles host-level state (packages, kernel params, systemd units, file drops), Chef handles application-layer state and compliance reporting
-
-### Ansible via Semaphore — `semaphore`
-
-- **Semaphore UI** (namespace `semaphore`) wraps Ansible playbooks with scheduling, history, and audit log
-- Playbooks cover **operational tasks** (not drift remediation — that's Puppet/Chef):
-  - Health check, uptime, disk usage, gather facts, ping
-  - WireGuard check, firewall audit, housekeeping
-  - OS check (report), OS update apply, reboot planner, certs check
-- Inventory synced from the cluster node list
-
-### Jenkins + Gitea — `jenkins`, `gitea`
-
-- **Gitea** — self-hosted Git (namespace `gitea`), the primary source for CI repos (e.g. `aiot-pipeline-demo`)
-- **Jenkins** — multibranch + classic pipelines, builds container images, pushes to the internal registry (namespace `registry`, NodePort 30500), 
-- Credentials (Gitea PAT, registry, Docker Hub) stored in Jenkins domain credentials
+The following appeared in older README/snapshot exports but are **not** active services on `hetzner-new`: Argo CD, Rancher/Fleet, K8sGPT/Robusta, Open-WebUI/RAG worker, n8n, Mattermost, Longhorn, Tekton/Konflux, old GCP/OCI worker nodes and the old `35.241.255.137.nip.io` domain.
 
 ---
 
-## Backup & disaster recovery — `k8up`, `etcd-backup`
+## Public endpoints
 
-Backup is a **first-class concern** because `local-path` storage has no replication. The platform uses **two independent backup tracks** writing to the same Cloudflare R2 bucket (`s3://aiot-velero`):
+| Service | URL | Notes |
+|---|---|---|
+| AIOT Control Center | <https://aiot-control.46.4.123.8.nip.io/> | local AI/ML dashboard and fast operational chat |
+| EMQX Dashboard | <https://emqx.46.4.123.8.nip.io/> | EMQX dashboard, Enterprise image for dashboard SSO |
+| Redpanda Console | <https://redpanda.46.4.123.8.nip.io/> | Kafka/Redpanda topic UI |
+| CloudBeaver | <https://cloudbeaver.46.4.123.8.nip.io/> | DB workbench |
+| MLflow | <https://mlflow.46.4.123.8.nip.io/> | model registry and artifacts |
+| Kubeflow Pipelines | <https://kubeflow.46.4.123.8.nip.io/> | KFP UI |
+| Authentik | <https://authentik.46.4.123.8.nip.io/> | SSO provider |
+| Dex | <https://dex.46.4.123.8.nip.io/> | OIDC helper |
+| Gitea | <https://gitea.46.4.123.8.nip.io/> | internal Git mirror/source for Flux |
+| Jenkins | <https://jenkins.46.4.123.8.nip.io/> | CI/CD |
+| Flux UI | <https://flux.46.4.123.8.nip.io/> | Weave GitOps |
+| Grafana | <https://grafana.46.4.123.8.nip.io/> | dashboards |
+| SigNoz | <https://signoz.46.4.123.8.nip.io/> | observability UI |
+| Zabbix | <https://zabbix.46.4.123.8.nip.io/> | monitoring UI |
+| Headlamp | <https://headlamp.46.4.123.8.nip.io/> | Kubernetes UI |
+| AWX | <https://awx.46.4.123.8.nip.io/> | Ansible automation |
+| pgAdmin | <https://pgadmin.46.4.123.8.nip.io/> | Postgres administration |
+| Qdrant | <https://qdrant.46.4.123.8.nip.io/> | vector DB API/UI |
+| Terrakube UI | <https://terrakube.46.4.123.8.nip.io/> | IaC UI |
+| Terrakube API | <https://terrakube-api.46.4.123.8.nip.io/> | IaC API |
+| Terrakube Registry | <https://terrakube-reg.46.4.123.8.nip.io/> | module/provider registry |
+| Chef Automate | <https://chef.46.4.123.8.nip.io/> | external Docker service exposed through K8s ingress |
+| Puppet Enterprise | <https://pe.46.4.123.8.nip.io/> | PE console/proxy |
+
+---
+
+## AIOT data path
+
+| Stage | Components | Current settings |
+|---|---|---|
+| MQTT | EMQX | 3 replicas in `aiot`, dashboard at `emqx.*` |
+| Simulation | `aiot-sensor-simulator` | 10 replicas, interval 2 seconds |
+| Buffer | Redis Streams | stream `sensor_data`, hardened for backpressure |
+| Stream | Redpanda | topic `sensor-data`, 3 replicas, 10 Gi PVC, 24h/size retention |
+| Consumers | bridges + pg-sink | `mqtt-to-redis=8`, `redis-to-redpanda=8`, `pg-sink=12` |
+| Database | CNPG Postgres + PgBouncer | service `pg-cluster-pooler-rw.databases.svc.cluster.local:5432` |
+| ML training | `aiot-maintenance-train` | daily CronJob at `05 02 * * *`, 7-day lookback |
+| ML serving | `aiot-maintenance-api` | FastAPI, latest MLflow model `aiot-maintenance-predictor` |
+| Operator UI | `aiot-control-center` | dashboard + local-rule fast chat + local Ollama fallback |
+
+---
+
+## Local AI / ML
+
+The current Control Center uses fast deterministic local rules for common operational questions and only falls back to Ollama for open-ended questions.
+
+| Component | Current setting |
+|---|---|
+| Ollama image | `ollama/ollama:0.6.8` |
+| Chat fallback model | `gemma3:1b` |
+| Embedding model | `nomic-embed-text` |
+| Ollama keep-alive | `30m` |
+| Ollama CPU limit | `8` cores |
+| MLflow version | `2.21.3` |
+| Registered model | `aiot-maintenance-predictor` |
+| Current validated model version | `2` |
+| Correct MLflow experiment | `aiot-maintenance-proxied` |
+
+---
+
+## GitOps workflow
 
 ```mermaid
 flowchart LR
-    subgraph SRC["☸️ Cluster sources"]
-        PVC[("PVCs<br/>stateful pods")]
-        ETCDB[/"etcd database<br/>(control-plane)"/]
-        REPO[("This Git repo<br/>= manifests + helm values")]
-    end
-
-    K8UP[["k8up Operator<br/>k8up-system"]]
-    SCHED["Schedule CRs<br/>(aiot, jenkins, gitea, ...)"]
-    ETCDCJ["CronJob<br/>etcd-snapshot 02:30 UTC"]
-
-    R2[("☁️ Cloudflare R2<br/>s3://aiot-velero")]
-
-    PVC --> K8UP
-    SCHED --> K8UP
-    K8UP -- restic --> R2
-    ETCDB --> ETCDCJ
-    ETCDCJ -- mc cp --> R2
-    REPO -. clone + apply .-> NEW
-
-    R2 ==restore==> NEW["🆕 New cluster<br/>install/ scripts + restic restore"]
-
-    classDef src fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
-    classDef tool fill:#fef3c7,stroke:#d97706,color:#78350f
-    classDef store fill:#ffedd5,stroke:#ea580c,color:#7c2d12
-    classDef new fill:#dcfce7,stroke:#16a34a,color:#14532d
-    class PVC,ETCDB,REPO src
-    class K8UP,SCHED,ETCDCJ tool
-    class R2 store
-    class NEW new
+    DEV["Developer / Copilot"] --> GH["GitHub\nondrejnr/aiot-platform"]
+    DEV --> GITEA["Internal Gitea\naiot-iac/aiot-platform"]
+    GITEA --> FLUX["Flux source-controller"]
+    FLUX --> KUST["Flux kustomize-controller"]
+    KUST --> HELM["Flux helm-controller"]
+    HELM --> K8S["hetzner-new cluster"]
+    JENKINS["Jenkins GitOps job"] -.validates.-> GITEA
 ```
 
-### k8up (PVC / file-system backup)
+Rules:
 
-- **Operator**: helm release [`k8up`](cluster-wide/helm-values/k8up-system_k8up.yaml) in namespace `k8up-system` (chart `k8up-4.9.0`).
-- **Backend**: `restic` repository in Cloudflare R2 bucket `aiot-velero`, endpoint `https://<acct>.r2.cloudflarestorage.com`. Credentials in `r2-creds` and `k8up-repo` Secrets per namespace.
-- **Schedules** (`Schedule.k8up.io` CRs, all named `aiot`):
-  - `aiot`, `jenkins`, `gitea`, `backrest`, `semaphore`, `signoz`, `victoriametrics` namespaces
-  - **Backup**: daily at 03:10 UTC (`keepJobs: 2`)
-  - **Prune**: daily at 04:10 UTC (retention `keepDaily: 2`)
-- **Per-pod hooks**: `PreBackupPod` resources let stateful workloads (e.g. CNPG postgres, Jenkins) take application-consistent snapshots before restic runs.
-- **Restore**: create a `Restore.k8up.io` CR pointing at a snapshot ID — k8up spawns a restic-restore pod that writes back into the target PVC. See [k8up docs](https://k8up.io) for the CR schema.
-
-### etcd-backup
-
-- Namespace **`etcd-backup`** runs `CronJob/etcd-snapshot` (schedule `30 2 * * *`).
-- Init-container `snapshot` (`registry.k8s.io/etcd:3.5.16-0`) runs `etcdctl snapshot save` against the local etcd via `--endpoints=https://127.0.0.1:2379` (host network, control-plane node selector).
-- Main container `upload` (`minio/mc:latest`) uploads to `s3://aiot-velero/etcd-snapshots/etcd-<TS>.db` and prunes objects older than 7 days.
-- Last verified run: **today** — confirm with `kubectl -n etcd-backup get jobs` and `mc ls r2/aiot-velero/etcd-snapshots/`.
-
-### Restore strategy
-
-| Scenario | Recovery path |
-|---|---|
-| Single failed PVC | `Restore.k8up.io` CR → restic restore from R2 |
-| Lost worker node | Cordon/drain → reprovision VM → `00-vm-prereqs.sh` → `kubeadm join` → workloads reschedule |
-| Complete cluster loss | New VMs → `install/` scripts (00→05) → for stateful data: per-namespace `Restore.k8up.io` CRs |
-| Control-plane corruption | Reinstall master via `01-init-master.sh` with `--ignore-preflight-errors` then `etcdctl snapshot restore` from R2 |
-
-> **NOTE**: Velero is **not** installed. An older deployment used Velero + a custom UI (`vui.*.nip.io`); both have been retired in favour of k8up.
+- The active Flux source is internal Gitea, not GitHub directly.
+- Push operational changes to both GitHub and internal Gitea.
+- Use `apps/<name>` for chart changes and `flux/clusters/hetzner-new/apps/<name>.yaml` for Flux release wiring.
+- ConfigMap-backed Python apps use checksum annotations so code changes roll pods.
+- Avoid printing secrets with `kubectl describe` or unmasked Helm values.
 
 ---
-
-## Public services
-
-All services are published under `*.35.241.255.137.nip.io` with Let's Encrypt certificates.
-
-| Category          | Endpoint (hostname)                            | Namespace         | Notes                                  |
-| ----------------- | ---------------------------------------------- | ----------------- | -------------------------------------- |
-| AI / chat         | `chat.*`                                       | `aiot`            | Open-WebUI                             |
-| RAG API           | `rag.*`, `qdrant.*`                            | `aiot`            |                                        |
-| IoT core          | `api.*`, `twin.*`, `ngrok.*`                   | `aiot`            | API gateway, Digital Twin              |
-| CI / SCM          | `jenkins.*`, `gitea.*`                         | `jenkins`, `gitea`|                                        |
-| Config mgmt       | `pe.*`, `chef.*`, `webhook.*`                  | host / `chef-webhook` | Puppet Enterprise, Chef Automate  |
-| Automation UI     | `semaphore.*`                                  | `semaphore`       | Ansible via Semaphore                  |
-| DB / data         | `pgadmin.*`, `cloudbeaver.*`, `emqx.*`         | `aiot`, `emqx`    |                                        |
-| Observability     | `grafana.*`, `prometheus.*`, `vm.*`, `signoz.*`| `monitoring`, `victoriametrics`, `signoz` |                         |
-
----
-
-## Installing this cluster on fresh VMs
-
-A complete bootstrap workflow lives in [`install/`](install/) — a numbered set
-of idempotent shell scripts that take **brand-new Linux VMs** to a fully
-running aiot-platform cluster.
-
-```bash
-# === On EVERY node (master + workers) ===
-sudo bash bootstrap/00-vm-prereqs.sh        # containerd, kubeadm, kubelet, helm
-
-# === On master only ===
-sudo bash bootstrap/01-kubeadm-init.sh       # kubeadm init from infra/kubeadm-config.yaml
-                                          # → prints `kubeadm join` token; run on workers
-
-# === On master, after all workers joined ===
-sudo bash bootstrap/02-flannel.sh         # CNI: Flannel v0.27.4
-sudo bash bootstrap/03-sealed-secrets.sh  # sealed-secrets controller
-
-# === Optional: restore Secrets + PVC data ===
-export AWS_ACCESS_KEY_ID=…  AWS_SECRET_ACCESS_KEY=…  R2_ENDPOINT=https://….r2.cloudflarestorage.com
-./_legacy/install/06-k8up-restore.sh restore <namespace> <pvc> [snapshot]
-```
-
-Or simply:
-
-```bash
-make prereqs       # 00
-make init          # 01
-make all           # 02 → 03 → 04 → 05
-make restore       # 06 (optional)
-make status        # show health
-```
-
-Helm release catalogue (chart, version, repo, values file) is declared in
-[`_legacy/install/helm-charts.csv`](_legacy/install/helm-charts.csv). Cluster topology
-(API endpoints, node CIDR, certs SANs) is declared in
-[`infra/kubeadm-config.yaml`](infra/kubeadm-config.yaml). The Flannel manifest
-is fetched from upstream and patched in-place by [`bootstrap/02-flannel.sh`](bootstrap/02-flannel.sh) — memory limits are set on all containers and `KUBERNETES_SERVICE_HOST` is hard-coded to the master IP so OCI nodes reach the API server directly over WireGuard (bypassing the kube-proxy ClusterIP DNAT path that fails on multi-cloud nodes).
-
-See [`INSTALL.md`](INSTALL.md) for the full guide, recovery
-procedures, and what is **not** in the repo (secrets, WireGuard mesh, external
-services).
 
 ## Repository layout
 
-```
-aiot-platform/
-├── README.md                ← this file
-├── Makefile                 ← `make prereqs|init|cni|platform|helm|apply|all|status`
-├── .gitignore
-│
-├── bootstrap/               ← FRESH-VM BOOTSTRAP — installs everything below
-│   ├── 00-vm-prereqs.sh        (containerd + kubeadm + kubelet + helm)
-│   ├── 01-kubeadm-init.sh      (kubeadm init from infra/kubeadm-config.yaml)
-│   ├── 02-flannel.sh           (Flannel v0.27.4 CNI)
-│   ├── 03-sealed-secrets.sh    (sealed-secrets controller)
-│
-
-├── infra/                   ← host-level / platform files
-│   ├── kubeadm-config.yaml     (cluster-init source of truth)
-│   ├── kubelet-config.yaml
-│   ├── kube-apiserver.yaml
-│   ├── etcd.yaml
-│   ├── cni-flannel.conflist    (Flannel CNI config — installed by /opt/cni/bin)
-│   ├── haproxy/                (HAProxy SNI proxy on master, ports 80/443)
-│   ├── registry/               (internal Docker registry config)
-│   ├── gcp-instances.yaml
-│   └── gcp-firewall-rules.yaml
-│
-├── cluster-wide/            ← cluster-scoped resources (snapshot)
-│   ├── crds.txt                (CRD name list)
-│   ├── clusterroles.yaml
-│   ├── clusterrolebindings.yaml
-│   ├── clusterissuers.yaml
-│   ├── ingressclasses.yaml
-│   ├── storageclasses.yaml
-│   ├── priorityclasses.yaml
-│   ├── persistentvolumes.yaml
-│   ├── nodes.yaml
-│   ├── helm-releases.yaml      (all Helm releases + chart versions)
-│   ├── images.txt              (every container image currently used)
-│   └── helm-values/            (14 files: <ns>_<release>.yaml — `helm get values`)
-│
-├── namespaces/              ← 80 namespaces, sanitized snapshot (no secrets)
-│   └── <ns>/
-│       ├── deployments.yaml
-│       ├── statefulsets.yaml
-│       ├── daemonsets.yaml
-│       ├── cronjobs.yaml
-│       ├── jobs.yaml
-│       ├── services.yaml
-│       ├── ingresses.yaml
-│       ├── configmaps.yaml
-│       ├── pvcs.yaml
-│       ├── pdb.yaml
-│       ├── hpa.yaml
-│       ├── networkpolicies.yaml
-│       ├── serviceaccounts.yaml
-│       ├── rbac.yaml                        (Roles + RoleBindings)
-│       ├── secrets.sanitized.yaml           (data values redacted)
-│       ├── certificates.yaml                (cert-manager)
-│       ├── issuers.yaml                     (cert-manager)
-│       ├── servicemonitors.yaml             (prometheus-operator)
-│       ├── podmonitors.yaml                 (prometheus-operator)
-│       └── istio-*.yaml                     (gateways, virtualservices,
-│                                             destinationrules, authorizationpolicies,
-│                                             peerauthentications, telemetries,
-│                                             envoyfilters)
-│
-├── manifests/               ← parallel raw snapshot written by nightly cron
-│   ├── _cluster/               (namespaces.yaml, clusterroles, CRDs index, ...)
-│   ├── _crds/                  (144 individual CRD YAMLs)
-│   └── <ns>/                   (raw kubectl get -oyaml dumps incl. secrets)
-│                               NOTE: not sanitized — used internally only,
-│                                     not for re-installation onto a new cluster.
-│
-├── cloudflare/              ← Cloudflare DNS snapshot (zone records)
-│   └── dns/
-│
-├── cluster/                 ← misc cluster-level dumps
-│   └── versions.md             (kubectl/flannel/helm versions, node list)
-│
-└── inventory/               ← Ansible / Semaphore inventory snapshot
-    └── semaphore-configmaps.yaml
+```text
+.
+├── apps/                         # active Helm umbrella charts
+├── flux/clusters/hetzner-new/     # active Flux cluster source
+│   ├── apps/                      # HelmRelease/Kustomization wiring
+│   └── flux-system/               # Flux bootstrap manifests
+├── ops/current-cluster/           # current live snapshots for non-Flux runtime objects
+├── secrets/                       # SOPS/SealedSecret-related material and notes
+├── Jenkinsfile                    # GitOps validation pipeline
+├── INSTALL.md                     # current operational install/restore notes
+├── namespaces/                    # legacy snapshot export, not active source of truth
+├── cluster-wide/                  # legacy snapshot export, not active source of truth
+└── manifests/                     # legacy snapshot export, not active source of truth
 ```
 
-> Use **`namespaces/`** + **`cluster-wide/`** + **`infra/`** + **`install/`** for
-> bootstrapping a clean cluster. **`manifests/`** is a private nightly snapshot
-> that may contain unredacted Secrets — do **not** apply it on a foreign
-> cluster.
-# noop 1778647677
-<!-- noop 1778647677 -->
+---
+
+## Day-2 operations
+
+| Task | Command / path |
+|---|---|
+| Check Flux state | `flux get all -A` |
+| Reconcile source | `flux reconcile source git flux-system` |
+| Reconcile root | `flux reconcile ks flux-system` |
+| Reconcile one release | `flux reconcile hr <release> -n <namespace> --force` |
+| Validate chart rendering | `helm template <name> apps/<name>` |
+| Check Control Center | `https://aiot-control.46.4.123.8.nip.io/` |
+| Check MLflow | `https://mlflow.46.4.123.8.nip.io/` |
+| Check Kubeflow | `https://kubeflow.46.4.123.8.nip.io/` |
+| Stop load test before pipeline changes | scale `loadtest/emqtt-bench-pub` to `0` |
+
+---
+
+## Safety notes
+
+- Before changing the ingestion pipeline, stop the load generator and let Redis/Redpanda drain.
+- Redis backpressure is intentional; do not remove memory limits/backpressure handling without load testing.
+- KServe localmodel controller is intentionally disabled in this cluster.
+- Kubeflow ingress requires additional NetworkPolicies for ingress-nginx and ACME solver traffic.
+- MLflow must serve artifacts through the tracking server; do not switch back to local artifact URIs for inference pods.
+- `authentik` and `chef` runtime objects are captured in `ops/current-cluster/manual-services/` but secrets are omitted.

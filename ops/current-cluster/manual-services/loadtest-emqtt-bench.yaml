@@ -1,0 +1,79 @@
+# loadtest emqtt-bench publisher (scaled to zero)
+# Snapshot generated from the live hetzner-new cluster. Do not apply blindly; secrets are intentionally omitted.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: emqtt-bench-pub
+  name: emqtt-bench-pub
+  namespace: loadtest
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: emqtt-bench-pub
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: '2026-05-09T07:51:02+02:00'
+      creationTimestamp: null
+      labels:
+        app: emqtt-bench-pub
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: emqtt-bench-pub
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - -c
+        - '50'
+        - -i
+        - '30'
+        - -I
+        - '10'
+        - -t
+        - aiot/sensors/telemetry
+        - -q
+        - '0'
+        - -V
+        - '5'
+        - --prefix
+        - iot-$(hostname)-
+        command:
+        - /bin/sh
+        - -c
+        env:
+        - name: RANDOM_DUMMY
+          value: '1'
+        image: emqx/emqtt-bench:0.4.27
+        imagePullPolicy: IfNotPresent
+        name: bench
+        resources:
+          limits:
+            cpu: '1'
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      priorityClassName: loadtest-low
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
