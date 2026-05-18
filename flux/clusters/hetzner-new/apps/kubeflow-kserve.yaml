@@ -61,6 +61,18 @@ spec:
   path: ./config/default
   prune: true
   wait: true
+  patches:
+    - target:
+        kind: Deployment
+        name: kserve-localmodel-controller-manager
+      patch: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: kserve-localmodel-controller-manager
+          namespace: kserve
+        spec:
+          replicas: 0
   sourceRef:
     kind: GitRepository
     name: kserve
