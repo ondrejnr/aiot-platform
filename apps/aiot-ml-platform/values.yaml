@@ -5,15 +5,16 @@ global:
 localAI:
   namespace: local-ai
   image: ollama/ollama:0.6.8
-  model: llama3.1:8b
+  model: gemma3:1b
   embeddingModel: nomic-embed-text
+  numThread: 8
   pvcSize: 20Gi
   resources:
     requests:
       cpu: "500m"
       memory: 2Gi
     limits:
-      cpu: "4"
+      cpu: "8"
       memory: 12Gi
 
 mlflow:

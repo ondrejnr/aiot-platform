@@ -1,4 +1,4 @@
-import json, os
+import json, os, time
 import psycopg
 from psycopg.rows import dict_row
 import requests
@@ -10,18 +10,23 @@ app = FastAPI(title="AIOT Control Center")
 
 class ChatRequest(BaseModel):
     question: str = ""
+
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama.local-ai.svc.cluster.local:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
+OLLAMA_NUM_THREAD = int(os.getenv("OLLAMA_NUM_THREAD", "4"))
 INFERENCE_URL = os.getenv("INFERENCE_URL", "http://aiot-maintenance-api.aiot.svc.cluster.local:8080")
+
 
 def pg_conn():
     return psycopg.connect(host=os.getenv("PGHOST"), port=int(os.getenv("PGPORT", "5432")), dbname=os.getenv("PGDATABASE"), user=os.getenv("PGUSER"), password=os.getenv("PGPASSWORD"), row_factory=dict_row, connect_timeout=5)
+
 
 def risk(row):
     temp=float(row.get("temperature") or 0); hum=float(row.get("humidity") or 0); pressure=float(row.get("pressure") or 0); battery=float(row.get("battery") or 0)
     value=max(0,min(40,(temp-26)*8))+max(0,min(20,(hum-70)*4))+(20 if pressure<998 or pressure>1025 else 0)+max(0,min(20,(3.6-battery)*60))
     value=int(max(0,min(100,value)))
     return ("critical" if value>=80 else "warning" if value>=50 else "ok", value)
+
 
 def summary():
     with pg_conn() as conn, conn.cursor() as cur:
@@ -33,16 +38,24 @@ def summary():
         """)
         return dict(cur.fetchone() or {})
 
+
 def latest(limit=50):
     with pg_conn() as conn, conn.cursor() as cur:
         cur.execute("""
-            select distinct on (sensor_id) sensor_id, location, ts, temperature, humidity, pressure, battery
-            from sensor_data order by sensor_id, ts desc limit %s
+            select sensor_id, location, ts, temperature, humidity, pressure, battery
+            from (
+                select distinct on (sensor_id) sensor_id, location, ts, temperature, humidity, pressure, battery
+                from sensor_data
+                order by sensor_id, ts desc
+            ) s
+            order by ts desc
+            limit %s
         """, (limit,))
         rows=[dict(r) for r in cur.fetchall()]
     for r in rows:
         st, rv = risk(r); r["status"] = st; r["risk"] = rv; r["ts"] = r["ts"].isoformat() if r.get("ts") else None
     return sorted(rows, key=lambda x: x["risk"], reverse=True)
+
 
 def predictions():
     try:
@@ -51,35 +64,132 @@ def predictions():
     except Exception as exc:
         return {"status":"degraded","error":str(exc),"items":[]}
 
+
+def fmt(value, suffix=""):
+    if value is None:
+        return "n/a"
+    if isinstance(value, float):
+        return f"{value:.1f}{suffix}"
+    return f"{value}{suffix}"
+
+
+def risk_reasons(row):
+    reasons=[]
+    temp=float(row.get("temperature") or 0); hum=float(row.get("humidity") or 0); pressure=float(row.get("pressure") or 0); battery=float(row.get("battery") or 0)
+    if temp > 26:
+        reasons.append(f"vyššia teplota {fmt(temp, ' °C')}")
+    if hum > 70:
+        reasons.append(f"vyššia vlhkosť {fmt(hum, ' %')}")
+    if pressure < 998 or pressure > 1025:
+        reasons.append(f"tlak mimo rozsahu {fmt(pressure, ' hPa')}")
+    if battery < 3.6:
+        reasons.append(f"nižšia batéria {fmt(battery, ' V')}")
+    return reasons or ["hodnoty sú v norme; riziko vzniká len z kombinácie menších odchýlok"]
+
+
+def answer_risk(rows):
+    if not rows:
+        return "Nemám aktuálne senzorové dáta."
+    top=rows[:3]
+    lines=[]
+    for r in top:
+        reasons=", ".join(risk_reasons(r)[:3])
+        lines.append(f"{r.get('sensor_id')} ({r.get('location')}) má riziko {r.get('risk')} % / {r.get('status')}: {reasons}")
+    critical=sum(1 for r in rows if r.get("status") == "critical")
+    warning=sum(1 for r in rows if r.get("status") == "warning")
+    return "Najrizikovejšie senzory: " + "; ".join(lines) + f". Súhrn: critical={critical}, warning={warning}, sledovaných senzorov={len(rows)}."
+
+
+def answer_status(ctx):
+    rows=ctx["latest"]
+    s=ctx["summary"]
+    critical=sum(1 for r in rows if r.get("status") == "critical")
+    warning=sum(1 for r in rows if r.get("status") == "warning")
+    ok=sum(1 for r in rows if r.get("status") == "ok")
+    return f"Za posledných 24 h mám {s.get('samples') or 0} vzoriek z {s.get('sensors') or len(rows)} senzorov. Aktuálny stav: OK={ok}, warning={warning}, critical={critical}; posledná vzorka je {s.get('latest')}."
+
+
+def answer_predictions(ctx):
+    data=ctx.get("predictions") or {}
+    items=data.get("items") or []
+    source=data.get("source") or data.get("status") or "neznámy"
+    if not items:
+        return f"Predikčný API endpoint je dostupný, ale nevrátil položky; stav: {source}."
+    top=items[:3]
+    bits=[]
+    for p in top:
+        label=p.get("label") or p.get("status") or "n/a"
+        score=p.get("risk") or p.get("risk_score") or p.get("score")
+        bits.append(f"{p.get('sensor_id')}={label}" + (f" ({score})" if score is not None else ""))
+    return f"Predikcie idú lokálne cez MLflow model; zdroj={source}. Najvyššie položky: " + "; ".join(bits) + "."
+
+
+def fast_answer(question, ctx):
+    q=(question or "").lower()
+    rows=ctx["latest"]
+    if not q:
+        return answer_risk(rows)
+    if any(word in q for word in ["rizik", "naj", "kritick", "critical", "warning", "prečo", "preco", "senzor"]):
+        return answer_risk(rows)
+    if any(word in q for word in ["extern", "api", "lokal", "lokál"]):
+        return "Áno. Control Center používa lokálne dáta z Postgresu, lokálne predikcie z MLflow/inference API a lokálny Ollama model; externé LLM API sa nepoužíva."
+    if any(word in q for word in ["model", "mlflow", "predik", "inference", "údrž", "udrz"]):
+        return answer_predictions(ctx)
+    if any(word in q for word in ["stav", "koľko", "kolko", "pocet", "počet", "beží", "bezi", "funguje", "zhrn", "sumar"]):
+        return answer_status(ctx)
+    return None
+
+
+def compact_prompt(ctx, question):
+    rows=ctx["latest"][:5]
+    facts="; ".join([
+        f"{r.get('sensor_id')} {r.get('location')} stav={r.get('status')} riziko={r.get('risk')} temp={fmt(r.get('temperature'),'°C')} vlhkost={fmt(r.get('humidity'),'%')} tlak={fmt(r.get('pressure'),'hPa')} bateria={fmt(r.get('battery'),'V')}"
+        for r in rows
+    ])
+    s=ctx["summary"]
+    return f"SÚHRN: vzorky_24h={s.get('samples')}, senzory={s.get('sensors')}, posledna_vzorka={s.get('latest')}. TOP_SENZORY: {facts}. OTÁZKA: {question}"
+
+
 @app.get("/healthz")
 def healthz(): return {"ok": True}
+
 
 @app.get("/api/summary")
 def api_summary(): return {"summary": summary(), "latest": latest(50), "predictions": predictions()}
 
+
 @app.post("/api/chat")
 def api_chat(req: ChatRequest):
+    started=time.time()
     question = (req.question or "").strip()
-    ctx = {"summary": summary(), "latest": latest(15), "predictions": predictions()}
-    prompt = "DATA:\n" + json.dumps(ctx, ensure_ascii=False, default=str) + "\nOTÁZKA: " + question
+    rows=latest(50)
+    ctx = {"summary": summary(), "latest": rows, "predictions": {}}
+    q_lower=question.lower()
+    if any(word in q_lower for word in ["model", "mlflow", "predik", "inference", "údrž", "udrz"]):
+        ctx["predictions"] = predictions()
+    fast=fast_answer(question, ctx)
+    if fast:
+        return {"answer": fast, "source": "local-rules", "seconds": round(time.time() - started, 3)}
     try:
         r = requests.post(
             f"{OLLAMA_URL}/api/chat",
             json={
                 "model": OLLAMA_MODEL,
                 "messages": [
-                    {"role": "system", "content": "Si lokálny AIOT asistent. Odpovedaj stručne po slovensky, max 6 viet, iba z poskytnutých dát."},
-                    {"role": "user", "content": prompt},
+                    {"role": "system", "content": "Si lokálny AIOT asistent. Odpovedaj výlučne po slovensky, stručne, max 3 vety, iba z poskytnutých faktov."},
+                    {"role": "user", "content": compact_prompt(ctx, question)},
                 ],
                 "stream": False,
-                "options": {"temperature": 0.2, "num_predict": 160, "num_ctx": 2048},
+                "keep_alive": "30m",
+                "options": {"temperature": 0.1, "num_predict": 70, "num_ctx": 512, "num_thread": OLLAMA_NUM_THREAD},
             },
-            timeout=180,
+            timeout=60,
         )
         r.raise_for_status()
-        return {"answer": r.json().get("message",{}).get("content", "Bez odpovede.")}
+        return {"answer": r.json().get("message",{}).get("content", "Bez odpovede."), "source": OLLAMA_MODEL, "seconds": round(time.time() - started, 3)}
     except Exception as exc:
-        return {"answer": "Lokálny LLM zatiaľ nie je dostupný: " + str(exc)}
+        return {"answer": "Lokálny LLM zatiaľ nie je dostupný: " + str(exc), "source": "error", "seconds": round(time.time() - started, 3)}
+
 
 @app.get("/", response_class=HTMLResponse)
 def home():

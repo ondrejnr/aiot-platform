@@ -37,6 +37,8 @@ spec:
               value: http://ollama.local-ai.svc.cluster.local:11434
             - name: OLLAMA_MODEL
               value: {{ .Values.localAI.model | quote }}
+            - name: OLLAMA_NUM_THREAD
+              value: {{ .Values.localAI.numThread | quote }}
             - name: INFERENCE_URL
               value: http://aiot-maintenance-api.aiot.svc.cluster.local:8080
           ports:
