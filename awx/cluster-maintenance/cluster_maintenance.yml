@@ -222,6 +222,8 @@
         cat > /usr/local/sbin/aiot-host-patch.sh <<'AIOT_HOST_PATCH_SCRIPT'
         #!/usr/bin/env bash
         set -u
+        export HOME="${HOME:-/root}"
+        export KUBECONFIG="${KUBECONFIG:-/root/.kube/config}"
 
         STATE_DIR="/var/lib/aiot-maintenance"
         STATUS_FILE="${STATE_DIR}/host-patch-status.env"
@@ -414,6 +416,8 @@
           --unit=aiot-host-patch \
           --description="AIOT background host patch launched from AWX" \
           --collect \
+          --setenv=HOME=/root \
+          --setenv=KUBECONFIG=/root/.kube/config \
           --property=Type=simple \
           --property=Nice=5 \
           /usr/local/sbin/aiot-host-patch.sh
