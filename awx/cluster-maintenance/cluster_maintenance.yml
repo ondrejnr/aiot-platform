@@ -41,7 +41,7 @@
         echo "=== CLUSTER HEALTH ==="
         kubectl get nodes -o wide 2>/dev/null || true
         BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk 'BEGIN{c=0} $4!="Running" && $4!="Completed" {c++} END{print c+0}')
-        BAD_HR=$(flux get hr -A 2>/dev/null | awk 'BEGIN{c=0} NR>1 && $5!="True" {c++} END{print c+0}')
+        BAD_HR=$(flux get hr -A --no-header 2>/dev/null | awk 'BEGIN{c=0} $5!="True" {c++} END{print c+0}')
         echo "bad_pods=$BAD_PODS"
         echo "bad_helmreleases=$BAD_HR"
         if [ "$BAD_PODS" = "0" ] && [ "$BAD_HR" = "0" ]; then
@@ -51,7 +51,7 @@
           echo "--- bad pods ---"
           kubectl get pods -A --no-headers 2>/dev/null | awk '$4!="Running" && $4!="Completed" {print}' | head -50 || true
           echo "--- bad helmreleases ---"
-          flux get hr -A 2>/dev/null | awk 'NR==1 || $5!="True"' | head -50 || true
+          flux get hr -A --no-header 2>/dev/null | awk '$5!="True" {print}' | head -n 50 || true
         fi
         echo
 
@@ -170,7 +170,7 @@
 
         echo "=== PRE-CHECK: CLUSTER MUST BE HEALTHY ==="
         BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk 'BEGIN{c=0} $4!="Running" && $4!="Completed" {c++} END{print c+0}')
-        BAD_HR=$(flux get hr -A 2>/dev/null | awk 'BEGIN{c=0} NR>1 && $5!="True" {c++} END{print c+0}')
+        BAD_HR=$(flux get hr -A --no-header 2>/dev/null | awk 'BEGIN{c=0} $5!="True" {c++} END{print c+0}')
         echo "bad_pods=$BAD_PODS"
         echo "bad_helmreleases=$BAD_HR"
         if [ "$BAD_PODS" != "0" ] || [ "$BAD_HR" != "0" ]; then
@@ -261,7 +261,7 @@
         echo
         echo "=== PRE-CHECK: CLUSTER MUST BE HEALTHY ==="
         BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk 'BEGIN{c=0} $4!="Running" && $4!="Completed" {c++} END{print c+0}')
-        BAD_HR=$(flux get hr -A 2>/dev/null | awk 'BEGIN{c=0} NR>1 && $5!="True" {c++} END{print c+0}')
+        BAD_HR=$(flux get hr -A --no-header 2>/dev/null | awk 'BEGIN{c=0} $5!="True" {c++} END{print c+0}')
         echo "bad_pods=$BAD_PODS"
         echo "bad_helmreleases=$BAD_HR"
         if [ "$BAD_PODS" != "0" ] || [ "$BAD_HR" != "0" ]; then
