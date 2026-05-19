@@ -105,6 +105,27 @@
         fi
         echo
 
+        echo "=== BACKGROUND PATCH JOB STATUS ==="
+        PATCH_STATUS_FILE=/var/lib/aiot-maintenance/host-patch-status.env
+        PATCH_LOG_FILE=/var/log/aiot-host-patch.log
+        PATCH_UNIT_STATE=$(systemctl show -p ActiveState --value aiot-host-patch.service 2>/dev/null)
+        PATCH_UNIT_SUBSTATE=$(systemctl show -p SubState --value aiot-host-patch.service 2>/dev/null)
+        if [ -z "$PATCH_UNIT_STATE" ]; then PATCH_UNIT_STATE=unknown; fi
+        if [ -z "$PATCH_UNIT_SUBSTATE" ]; then PATCH_UNIT_SUBSTATE=unknown; fi
+        echo "patch_unit_state=${PATCH_UNIT_STATE}"
+        echo "patch_unit_substate=${PATCH_UNIT_SUBSTATE}"
+        if [ -f "$PATCH_STATUS_FILE" ]; then
+          echo "--- status file ---"
+          cat "$PATCH_STATUS_FILE"
+        else
+          echo "patch_status=never_started"
+        fi
+        if [ -f "$PATCH_LOG_FILE" ]; then
+          echo "--- last 80 patch log lines ---"
+          if ! tail -80 "$PATCH_LOG_FILE"; then :; fi
+        fi
+        echo
+
         echo "=== CURRENT RUNTIME / KUBERNETES / GITOPS VERSIONS ==="
         docker --version 2>/dev/null || true
         containerd --version 2>/dev/null || true
@@ -159,82 +180,253 @@
         fail_msg: "Safety stop: choose YES in the AWX survey to patch all DNF-managed Hetzner packages."
       when: maintenance_action == "patch_all"
 
-    - name: Patch all DNF-managed Hetzner packages
+    - name: Start background patch of all DNF-managed Hetzner packages
       ansible.builtin.shell: |
         set -o pipefail
         echo "=== HETZNER 02 - OPATCHOVAT CELY HETZNER ==="
         date
         echo "patch_scope=dnf -y update"
-        echo "This patches OS, kernel and all DNF-managed packages, including Docker/containerd if DNF has updates for them."
+        echo "execution_model=background systemd unit"
+        echo "This starts the host patch outside the AWX job so Docker/AWX restarts do not mark this job failed."
+        echo "Result is reported by job 1 in BACKGROUND PATCH JOB STATUS."
         echo
 
-        echo "=== PRE-CHECK: CLUSTER MUST BE HEALTHY ==="
+        echo "=== PRE-CHECK: CLUSTER MUST BE HEALTHY BEFORE STARTING PATCH ==="
         BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk 'BEGIN{c=0} $4!="Running" && $4!="Completed" {c++} END{print c+0}')
         BAD_HR=$(flux get hr -A --no-header 2>/dev/null | awk 'BEGIN{c=0} $5!="True" {c++} END{print c+0}')
         echo "bad_pods=$BAD_PODS"
         echo "bad_helmreleases=$BAD_HR"
         if [ "$BAD_PODS" != "0" ] || [ "$BAD_HR" != "0" ]; then
-          echo "Cluster is not healthy. Refusing patch. Run job 1 first and fix warnings."
+          echo "Cluster is not healthy. Refusing to start patch. Run job 1 first and fix warnings."
           exit 2
         fi
         echo
 
-        echo "=== BEFORE PATCH ==="
-        echo "running_kernel=$(uname -r)"
-        docker --version 2>/dev/null || true
-        containerd --version 2>/dev/null || true
-        set +e
-        dnf -q check-update > /tmp/aiot-dnf-before-patch.txt 2>/tmp/aiot-dnf-before-patch.err
-        DNF_BEFORE_RC=$?
-        set -o pipefail
-        if [ "$DNF_BEFORE_RC" = "100" ]; then
-          BEFORE_COUNT=$(awk 'NF>=3 && $1 !~ /^(Obsoleting|Last)$/ {c++} END{print c+0}' /tmp/aiot-dnf-before-patch.txt)
-        else
-          BEFORE_COUNT=0
+        echo "=== CURRENT PATCH UNIT STATE ==="
+        PATCH_UNIT_STATE=$(systemctl show -p ActiveState --value aiot-host-patch.service 2>/dev/null)
+        PATCH_UNIT_SUBSTATE=$(systemctl show -p SubState --value aiot-host-patch.service 2>/dev/null)
+        if [ -z "$PATCH_UNIT_STATE" ]; then PATCH_UNIT_STATE=inactive; fi
+        if [ -z "$PATCH_UNIT_SUBSTATE" ]; then PATCH_UNIT_SUBSTATE=unknown; fi
+        echo "patch_unit_state=${PATCH_UNIT_STATE}"
+        echo "patch_unit_substate=${PATCH_UNIT_SUBSTATE}"
+        if [ "$PATCH_UNIT_STATE" = "active" ] || [ "$PATCH_UNIT_STATE" = "activating" ]; then
+          echo "Another aiot-host-patch.service run is already active. Refusing to start a second patch."
+          echo "VERDICT=PATCH_ALREADY_RUNNING"
+          exit 3
         fi
-        echo "updates_before=$BEFORE_COUNT"
+        if ! systemctl reset-failed aiot-host-patch.service >/dev/null 2>&1; then :; fi
         echo
 
-        echo "=== RUNNING DNF FULL UPDATE ==="
+        echo "=== INSTALLING BACKGROUND PATCH RUNNER ==="
+        install -d -m 0755 /var/lib/aiot-maintenance
+        cat > /usr/local/sbin/aiot-host-patch.sh <<'AIOT_HOST_PATCH_SCRIPT'
+        #!/usr/bin/env bash
+        set -u
+
+        STATE_DIR="/var/lib/aiot-maintenance"
+        STATUS_FILE="${STATE_DIR}/host-patch-status.env"
+        LOG_FILE="/var/log/aiot-host-patch.log"
+        LOCK_FILE="/run/aiot-host-patch.lock"
+
+        mkdir -p "$STATE_DIR"
+        touch "$LOG_FILE"
+        chmod 0644 "$LOG_FILE"
+        exec >> "$LOG_FILE" 2>&1
+
+        STARTED_AT="$(date -Is)"
+        DNF_CHECK_RC="not_run"
+        DNF_UPDATE_RC="not_run"
+        DNF_CONSISTENCY_RC="not_run"
+        DNF_AFTER_RC="not_run"
+        NEEDS_RESTARTING_RC="not_run"
+        UPDATES_BEFORE="unknown"
+        UPDATES_AFTER="unknown"
+        SECURITY_UPDATES_AFTER="unknown"
+        REBOOT_REQUIRED="unknown"
+        RUNNING_KERNEL_AT_START="$(uname -r 2>/dev/null)"
+        if [ -z "$RUNNING_KERNEL_AT_START" ]; then RUNNING_KERNEL_AT_START=unknown; fi
+        RUNNING_KERNEL_AT_END="unknown"
+        DOCKER_VERSION_AT_START="$(docker --version 2>/dev/null)"
+        if [ -z "$DOCKER_VERSION_AT_START" ]; then DOCKER_VERSION_AT_START=unknown; fi
+        DOCKER_VERSION_AT_END="unknown"
+        CONTAINERD_VERSION_AT_START="$(containerd --version 2>/dev/null)"
+        if [ -z "$CONTAINERD_VERSION_AT_START" ]; then CONTAINERD_VERSION_AT_START=unknown; fi
+        CONTAINERD_VERSION_AT_END="unknown"
+        MESSAGE="starting"
+        FINISH_STATUS="RUNNING"
+
+        log() {
+          printf '[%s] %s\n' "$(date -Is)" "$*"
+        }
+
+        write_status() {
+          local status="$1"
+          local finished_at="${2:-}"
+          {
+            printf 'status=%s\n' "$status"
+            printf 'message=%s\n' "$MESSAGE"
+            printf 'started_at=%s\n' "$STARTED_AT"
+            printf 'finished_at=%s\n' "$finished_at"
+            printf 'dnf_check_rc=%s\n' "$DNF_CHECK_RC"
+            printf 'dnf_update_rc=%s\n' "$DNF_UPDATE_RC"
+            printf 'dnf_consistency_rc=%s\n' "$DNF_CONSISTENCY_RC"
+            printf 'dnf_after_rc=%s\n' "$DNF_AFTER_RC"
+            printf 'needs_restarting_rc=%s\n' "$NEEDS_RESTARTING_RC"
+            printf 'updates_before=%s\n' "$UPDATES_BEFORE"
+            printf 'updates_after=%s\n' "$UPDATES_AFTER"
+            printf 'security_updates_after=%s\n' "$SECURITY_UPDATES_AFTER"
+            printf 'reboot_required=%s\n' "$REBOOT_REQUIRED"
+            printf 'running_kernel_at_start=%s\n' "$RUNNING_KERNEL_AT_START"
+            printf 'running_kernel_at_end=%s\n' "$RUNNING_KERNEL_AT_END"
+            printf 'docker_version_at_start=%s\n' "$DOCKER_VERSION_AT_START"
+            printf 'docker_version_at_end=%s\n' "$DOCKER_VERSION_AT_END"
+            printf 'containerd_version_at_start=%s\n' "$CONTAINERD_VERSION_AT_START"
+            printf 'containerd_version_at_end=%s\n' "$CONTAINERD_VERSION_AT_END"
+            printf 'log_file=%s\n' "$LOG_FILE"
+          } > "${STATUS_FILE}.tmp"
+          mv -f "${STATUS_FILE}.tmp" "$STATUS_FILE"
+        }
+
+        finish() {
+          local rc=$?
+          local finished_at
+          finished_at="$(date -Is)"
+          RUNNING_KERNEL_AT_END="$(uname -r 2>/dev/null)"
+          if [ -z "$RUNNING_KERNEL_AT_END" ]; then RUNNING_KERNEL_AT_END=unknown; fi
+          DOCKER_VERSION_AT_END="$(docker --version 2>/dev/null)"
+          if [ -z "$DOCKER_VERSION_AT_END" ]; then DOCKER_VERSION_AT_END=unknown; fi
+          CONTAINERD_VERSION_AT_END="$(containerd --version 2>/dev/null)"
+          if [ -z "$CONTAINERD_VERSION_AT_END" ]; then CONTAINERD_VERSION_AT_END=unknown; fi
+          if [ "$rc" = "0" ] && [ "$FINISH_STATUS" = "RUNNING" ]; then
+            FINISH_STATUS="COMPLETE"
+          fi
+          write_status "$FINISH_STATUS" "$finished_at"
+          log "finished status=$FINISH_STATUS rc=$rc reboot_required=$REBOOT_REQUIRED"
+          exit "$rc"
+        }
+        trap finish EXIT
+
+        log "starting AIOT host patch"
+        exec 9>"$LOCK_FILE"
+        if ! flock -n 9; then
+          MESSAGE="another patch process already holds lock"
+          FINISH_STATUS="ALREADY_RUNNING"
+          exit 75
+        fi
+
+        if ! command -v dnf >/dev/null 2>&1; then
+          MESSAGE="dnf command missing"
+          FINISH_STATUS="FAILED"
+          exit 127
+        fi
+
+        MESSAGE="checking available updates before patch"
+        write_status "$FINISH_STATUS" ""
+        dnf -q check-update > /tmp/aiot-dnf-before-patch.txt 2>/tmp/aiot-dnf-before-patch.err
+        DNF_CHECK_RC=$?
+        if [ "$DNF_CHECK_RC" = "100" ]; then
+          UPDATES_BEFORE=$(awk 'NF>=3 && $1 !~ /^(Obsoleting|Last)$/ {c++} END{print c+0}' /tmp/aiot-dnf-before-patch.txt)
+        elif [ "$DNF_CHECK_RC" = "0" ]; then
+          UPDATES_BEFORE=0
+        else
+          MESSAGE="dnf check-update failed before patch rc=$DNF_CHECK_RC"
+          FINISH_STATUS="FAILED"
+          exit "$DNF_CHECK_RC"
+        fi
+        log "updates_before=$UPDATES_BEFORE"
+
+        MESSAGE="running dnf -y update"
+        write_status "$FINISH_STATUS" ""
         dnf -y update
         DNF_UPDATE_RC=$?
         if [ "$DNF_UPDATE_RC" != "0" ]; then
-          echo "dnf_update_rc=$DNF_UPDATE_RC"
-          echo "VERDICT=PATCH_FAILED"
+          MESSAGE="dnf -y update failed rc=$DNF_UPDATE_RC"
+          FINISH_STATUS="FAILED"
           exit "$DNF_UPDATE_RC"
         fi
-        echo
+        log "dnf -y update completed"
 
-        echo "=== AFTER PATCH ==="
-        echo "running_kernel=$(uname -r)"
-        docker --version 2>/dev/null || true
-        containerd --version 2>/dev/null || true
-        set +e
+        MESSAGE="checking RPM database consistency"
+        write_status "$FINISH_STATUS" ""
+        dnf check
+        DNF_CONSISTENCY_RC=$?
+        if [ "$DNF_CONSISTENCY_RC" != "0" ]; then
+          MESSAGE="dnf check failed rc=$DNF_CONSISTENCY_RC"
+          FINISH_STATUS="FAILED"
+          exit "$DNF_CONSISTENCY_RC"
+        fi
+
+        MESSAGE="checking remaining updates after patch"
+        write_status "$FINISH_STATUS" ""
         dnf -q check-update > /tmp/aiot-dnf-after-patch.txt 2>/tmp/aiot-dnf-after-patch.err
         DNF_AFTER_RC=$?
-        set -o pipefail
         if [ "$DNF_AFTER_RC" = "100" ]; then
-          AFTER_COUNT=$(awk 'NF>=3 && $1 !~ /^(Obsoleting|Last)$/ {c++} END{print c+0}' /tmp/aiot-dnf-after-patch.txt)
+          UPDATES_AFTER=$(awk 'NF>=3 && $1 !~ /^(Obsoleting|Last)$/ {c++} END{print c+0}' /tmp/aiot-dnf-after-patch.txt)
+        elif [ "$DNF_AFTER_RC" = "0" ]; then
+          UPDATES_AFTER=0
         else
-          AFTER_COUNT=0
+          MESSAGE="dnf check-update failed after patch rc=$DNF_AFTER_RC"
+          FINISH_STATUS="FAILED"
+          exit "$DNF_AFTER_RC"
         fi
-        echo "updates_after=$AFTER_COUNT"
+        SECURITY_UPDATES_AFTER=$(dnf -q updateinfo list security updates 2>/dev/null | awk 'BEGIN{c=0} NF>0 {c++} END{print c+0}')
+        log "updates_after=$UPDATES_AFTER security_updates_after=$SECURITY_UPDATES_AFTER"
+
+        MESSAGE="checking reboot requirement"
+        write_status "$FINISH_STATUS" ""
+        if command -v needs-restarting >/dev/null 2>&1; then
+          needs-restarting -r > /tmp/aiot-needs-restarting-after-background-patch.txt 2>&1
+          NEEDS_RESTARTING_RC=$?
+          if [ "$NEEDS_RESTARTING_RC" = "1" ]; then
+            REBOOT_REQUIRED="yes"
+          elif [ "$NEEDS_RESTARTING_RC" = "0" ]; then
+            REBOOT_REQUIRED="no"
+          else
+            REBOOT_REQUIRED="unknown"
+          fi
+          cat /tmp/aiot-needs-restarting-after-background-patch.txt
+        fi
+
+        MESSAGE="checking k3d runtime after patch"
+        write_status "$FINISH_STATUS" ""
+        if ! kubectl get nodes >/dev/null 2>&1; then
+          log "Kubernetes API is not reachable after patch; trying known k3d container recovery"
+          if ! docker start k3d-aiot-hetzner-server-0 k3d-aiot-hetzner-agent-0 k3d-aiot-hetzner-agent-1 k3d-aiot-hetzner-agent-2 k3d-aiot-hetzner-agent-3 chef-automate; then
+            log "docker start recovery command failed"
+          fi
+          if ! docker restart k3d-aiot-hetzner-serverlb; then
+            log "docker restart serverlb recovery command failed"
+          fi
+        fi
+
+        MESSAGE="patch complete; run job 1 to verify and job 3 if reboot_required=yes"
+        FINISH_STATUS="COMPLETE"
+        exit 0
+        AIOT_HOST_PATCH_SCRIPT
+        chmod 0755 /usr/local/sbin/aiot-host-patch.sh
+        echo "runner=/usr/local/sbin/aiot-host-patch.sh"
+        echo "status_file=/var/lib/aiot-maintenance/host-patch-status.env"
+        echo "log_file=/var/log/aiot-host-patch.log"
         echo
 
-        echo "=== REBOOT CHECK AFTER PATCH ==="
-        if command -v needs-restarting >/dev/null 2>&1; then
-          set +e
-          needs-restarting -r > /tmp/aiot-needs-restarting-after-patch.txt 2>&1
-          NEEDS_RC=$?
-          set -o pipefail
-          cat /tmp/aiot-needs-restarting-after-patch.txt
-          if [ "$NEEDS_RC" = "1" ]; then echo "reboot_required=yes"; else echo "reboot_required=no"; fi
-        else
-          echo "needs-restarting=missing"
-          echo "reboot_required=unknown"
+        echo "=== STARTING BACKGROUND PATCH UNIT ==="
+        systemd-run \
+          --unit=aiot-host-patch \
+          --description="AIOT background host patch launched from AWX" \
+          --collect \
+          --property=Type=simple \
+          --property=Nice=5 \
+          /usr/local/sbin/aiot-host-patch.sh
+        SYSTEMD_RUN_RC=$?
+        if [ "$SYSTEMD_RUN_RC" != "0" ]; then
+          echo "systemd_run_rc=$SYSTEMD_RUN_RC"
+          echo "VERDICT=PATCH_START_FAILED"
+          exit "$SYSTEMD_RUN_RC"
         fi
+        if ! systemctl show aiot-host-patch.service -p ActiveState -p SubState -p FragmentPath --no-pager; then :; fi
         echo
-        echo "VERDICT=PATCH_COMPLETE"
+        echo "VERDICT=PATCH_STARTED_BACKGROUND"
+        echo "Next: wait for AWX to stay responsive, then run job 1 to check BACKGROUND PATCH JOB STATUS. If reboot_required=yes, run job 3."
       args:
         executable: /bin/bash
       register: patch_all_result
@@ -259,14 +451,17 @@
         echo "=== HETZNER 03 - REBOOT AK TREBA ==="
         date
         echo
-        echo "=== PRE-CHECK: CLUSTER MUST BE HEALTHY ==="
+        echo "=== CLUSTER STATUS BEFORE REBOOT (ADVISORY ONLY) ==="
         BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk 'BEGIN{c=0} $4!="Running" && $4!="Completed" {c++} END{print c+0}')
         BAD_HR=$(flux get hr -A --no-header 2>/dev/null | awk 'BEGIN{c=0} $5!="True" {c++} END{print c+0}')
         echo "bad_pods=$BAD_PODS"
         echo "bad_helmreleases=$BAD_HR"
         if [ "$BAD_PODS" != "0" ] || [ "$BAD_HR" != "0" ]; then
-          echo "Cluster is not healthy. Refusing reboot. Run job 1 first and fix warnings."
-          exit 2
+          echo "Cluster has warnings, but reboot is not blocked because host reboot can be required after Docker/kernel patching."
+          echo "--- bad pods ---"
+          kubectl get pods -A --no-headers 2>/dev/null | awk '$4!="Running" && $4!="Completed" {print}' | head -50
+          echo "--- bad helmreleases ---"
+          flux get hr -A --no-header 2>/dev/null | awk '$5!="True" {print}' | head -50
         fi
         echo
 
