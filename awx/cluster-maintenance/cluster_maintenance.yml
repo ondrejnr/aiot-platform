@@ -1,10 +1,10 @@
 ---
-- name: AIOT Cluster Maintenance
+- name: AIOT Hetzner Maintenance
   hosts: maintenance_hosts
   gather_facts: false
   become: true
   vars:
-    maintenance_action: health
+    maintenance_action: audit_all
     confirm_patch: "NO"
     confirm_reboot: "NO"
     reboot_delay_minutes: 1
@@ -13,286 +13,292 @@
     - name: Validate action
       ansible.builtin.assert:
         that:
-          - maintenance_action in ["health", "update_audit", "os_security_patch", "schedule_reboot", "post_reboot_check", "full_report", "runtime_audit", "cve_scan", "k8s_upgrade_readiness"]
-        fail_msg: "Unknown maintenance_action"
+          - maintenance_action in ["audit_all", "patch_all", "reboot_if_needed"]
+        fail_msg: "Unknown maintenance_action. Use audit_all, patch_all, or reboot_if_needed."
 
-    - name: Cluster health check
+    - name: Audit all available Hetzner updates
       ansible.builtin.shell: |
         set -o pipefail
-        echo "=== AIOT CLUSTER HEALTH ==="
+        echo "=== HETZNER 01 - ZISTIT AKTUALIZACIE CELEHO HETZNERA ==="
         date
         echo
-        echo "=== HOST ==="
-        uptime
-        free -h | head -2
-        df -h /
+        echo "patch_job_scope=dnf-managed host packages (OS, kernel, Docker/containerd RPM packages if available)"
+        echo "reported_not_auto_patched=k3d/k3s cluster version, Flux controllers, Helm app images"
         echo
-        echo "=== NODES ==="
-        kubectl get nodes -o wide
+
+        github_latest() {
+          repo="$1"
+          tag=$(curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+          if [ -n "$tag" ]; then echo "$tag"; else echo "unknown"; fi
+        }
+
+        echo "=== HOST HEALTH ==="
+        uptime || true
+        free -h | head -2 || true
+        df -h / /opt /var 2>/dev/null || df -h / || true
         echo
-        BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk "BEGIN{c=0} \$4!=\"Running\" && \$4!=\"Completed\" {c++} END{print c+0}")
-        BAD_HR=$(flux get hr -A 2>/dev/null | awk "BEGIN{c=0} NR>1 && \$5!=\"True\" {c++} END{print c+0}")
-        echo "=== SUMMARY ==="
+
+        echo "=== CLUSTER HEALTH ==="
+        kubectl get nodes -o wide 2>/dev/null || true
+        BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk 'BEGIN{c=0} $4!="Running" && $4!="Completed" {c++} END{print c+0}')
+        BAD_HR=$(flux get hr -A 2>/dev/null | awk 'BEGIN{c=0} NR>1 && $5!="True" {c++} END{print c+0}')
         echo "bad_pods=$BAD_PODS"
         echo "bad_helmreleases=$BAD_HR"
-        echo
-        echo "=== BAD PODS ==="
-        kubectl get pods -A --no-headers 2>/dev/null | awk "\$4!=\"Running\" && \$4!=\"Completed\" {print}" | head -50 || true
-        echo
-        echo "=== BAD HELMRELEASES ==="
-        flux get hr -A 2>/dev/null | awk "NR==1 || \$5!=\"True\"" || true
-        echo
-        echo "=== TOP CPU PODS ==="
-        kubectl top pod -A --sort-by=cpu 2>/dev/null | head -12 || true
-        echo
-        echo "=== TOP RAM PODS ==="
-        kubectl top pod -A --sort-by=memory 2>/dev/null | head -12 || true
-        echo
         if [ "$BAD_PODS" = "0" ] && [ "$BAD_HR" = "0" ]; then
-          echo "VERDICT=HEALTHY"
+          echo "cluster_health=healthy"
         else
-          echo "VERDICT=ATTENTION_REQUIRED"
+          echo "cluster_health=attention_required"
+          echo "--- bad pods ---"
+          kubectl get pods -A --no-headers 2>/dev/null | awk '$4!="Running" && $4!="Completed" {print}' | head -50 || true
+          echo "--- bad helmreleases ---"
+          flux get hr -A 2>/dev/null | awk 'NR==1 || $5!="True"' | head -50 || true
         fi
-      args:
-        executable: /bin/bash
-      register: health_result
-      changed_when: false
-      when: maintenance_action in ["health", "post_reboot_check", "full_report"]
-
-    - name: Print cluster health result
-      ansible.builtin.debug:
-        msg: "{{ health_result.stdout_lines }}"
-      when: health_result is defined and health_result.stdout is defined
-
-    - name: Update audit
-      ansible.builtin.shell: |
-        set -o pipefail
-        echo "=== AIOT UPDATE AUDIT ==="
-        date
         echo
-        echo "=== OS ==="
-        cat /etc/os-release | grep -E "^(NAME|VERSION)=|^PRETTY_NAME=" || true
+
+        echo "=== OS / DNF AVAILABLE UPDATES ==="
+        cat /etc/os-release | grep -E '^(NAME|VERSION)=|^PRETTY_NAME=' || true
         echo "running_kernel=$(uname -r)"
         echo "installed_kernels:"
         rpm -q kernel-core 2>/dev/null | sort -V | tail -5 || true
+        if command -v dnf >/dev/null 2>&1; then
+          set +e
+          dnf -q check-update > /tmp/aiot-dnf-check-update.txt 2>/tmp/aiot-dnf-check-update.err
+          DNF_RC=$?
+          set -o pipefail
+          if [ "$DNF_RC" = "0" ]; then
+            echo "all_os_updates_count=0"
+            echo "No DNF package updates available."
+          elif [ "$DNF_RC" = "100" ]; then
+            ALL_UPDATES_COUNT=$(awk 'NF>=3 && $1 !~ /^(Obsoleting|Last)$/ {c++} END{print c+0}' /tmp/aiot-dnf-check-update.txt)
+            echo "all_os_updates_count=$ALL_UPDATES_COUNT"
+            echo "--- first 80 DNF updates ---"
+            head -80 /tmp/aiot-dnf-check-update.txt
+          else
+            echo "all_os_updates_count=unknown"
+            echo "dnf_check_update_rc=$DNF_RC"
+            cat /tmp/aiot-dnf-check-update.err || true
+          fi
+          SECURITY_COUNT=$(dnf -q updateinfo list security updates 2>/dev/null | awk 'BEGIN{c=0} NF>0 {c++} END{print c+0}')
+          echo "security_updates_count=$SECURITY_COUNT"
+          echo "--- first 50 security advisories ---"
+          dnf -q updateinfo list security updates 2>/dev/null | head -50 || true
+          echo "--- runtime-related package updates ---"
+          grep -E '^(docker|containerd|kernel|runc|libseccomp|openssl|glibc|systemd|podman|buildah)' /tmp/aiot-dnf-check-update.txt 2>/dev/null || true
+        else
+          echo "dnf=missing"
+          echo "all_os_updates_count=unknown"
+          echo "security_updates_count=unknown"
+        fi
         echo
+
         echo "=== REBOOT CHECK ==="
         if command -v needs-restarting >/dev/null 2>&1; then
           set +e
-          needs-restarting -r
-          RC=$?
-          set -e
-          if [ "$RC" = "1" ]; then echo "reboot_required=yes"; else echo "reboot_required=no"; fi
+          needs-restarting -r > /tmp/aiot-needs-restarting.txt 2>&1
+          NEEDS_RC=$?
+          set -o pipefail
+          cat /tmp/aiot-needs-restarting.txt
+          if [ "$NEEDS_RC" = "1" ]; then echo "reboot_required=yes"; else echo "reboot_required=no"; fi
         else
           echo "needs-restarting=missing"
           echo "reboot_required=unknown"
         fi
         echo
-        echo "=== SECURITY UPDATES ==="
-        if command -v dnf >/dev/null 2>&1; then
-          SECURITY_COUNT=$(dnf -q updateinfo list security 2>/dev/null | awk "BEGIN{c=0} NF>0 {c++} END{print c+0}")
-          echo "security_updates_count=$SECURITY_COUNT"
-          dnf -q updateinfo list security 2>/dev/null | head -30 || true
-        else
-          echo "security_updates_count=unknown"
-        fi
-        echo
-        echo "=== KUBERNETES / RUNTIME ==="
-        kubectl get nodes -o custom-columns=NAME:.metadata.name,VERSION:.status.nodeInfo.kubeletVersion,KERNEL:.status.nodeInfo.kernelVersion,OS:.status.nodeInfo.osImage,CONTAINER:.status.nodeInfo.containerRuntimeVersion
-        echo
-        k3d version 2>/dev/null || true
-        flux --version 2>/dev/null || true
+
+        echo "=== CURRENT RUNTIME / KUBERNETES / GITOPS VERSIONS ==="
         docker --version 2>/dev/null || true
         containerd --version 2>/dev/null || true
+        k3d version 2>/dev/null || true
+        kubectl version --client 2>/dev/null || true
+        flux --version 2>/dev/null || true
+        helm version --short 2>/dev/null || true
         echo
-        echo "VERDICT=AUDIT_COMPLETE"
-      args:
-        executable: /bin/bash
-      register: audit_result
-      changed_when: false
-      when: maintenance_action in ["update_audit", "full_report"]
+        kubectl get nodes -o custom-columns=NAME:.metadata.name,VERSION:.status.nodeInfo.kubeletVersion,KERNEL:.status.nodeInfo.kernelVersion,OS:.status.nodeInfo.osImage,CONTAINER:.status.nodeInfo.containerRuntimeVersion 2>/dev/null || true
+        echo
+        echo "--- Flux controllers ---"
+        kubectl -n flux-system get deploy -o custom-columns=NAME:.metadata.name,IMAGE:.spec.template.spec.containers[0].image --no-headers 2>/dev/null || true
+        echo
 
-    - name: Print update audit result
-      ansible.builtin.debug:
-        msg: "{{ audit_result.stdout_lines }}"
-      when: audit_result is defined and audit_result.stdout is defined
+        echo "=== LATEST RELEASE CHECKS (ONLINE) ==="
+        echo "latest_k3d=$(github_latest k3d-io/k3d)"
+        echo "latest_k3s=$(github_latest k3s-io/k3s)"
+        echo "latest_flux=$(github_latest fluxcd/flux2)"
+        echo "latest_helm=$(github_latest helm/helm)"
+        echo "latest_trivy=$(github_latest aquasecurity/trivy)"
+        echo "latest_pluto=$(github_latest FairwindsOps/pluto)"
+        echo
 
-    - name: Runtime audit
-      ansible.builtin.shell: |
-        set -o pipefail
-        echo "=== AIOT RUNTIME AUDIT ==="
-        date
-        echo
-        echo "=== DOCKER CONTAINERS ==="
-        docker ps --format "table {% raw %}{{.Names}}\t{{.Status}}\t{{.Image}}{% endraw %}"
-        echo
-        echo "=== DOCKER STATS ==="
-        docker stats --no-stream --format "table {% raw %}{{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}{% endraw %}" || true
-        echo
-        echo "=== CHEF AUTOMATE NETWORK ==="
-        docker inspect chef-automate --format "{% raw %}{{range .NetworkSettings.Networks}}{{.IPAddress}}{{println}}{{end}}{% endraw %}" 2>/dev/null || true
-        CHEF_IP=$(docker inspect chef-automate --format "{% raw %}{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}{% endraw %}" 2>/dev/null || true)
-        if echo "$CHEF_IP" | grep -q "172.18.0.8"; then
-          echo "chef_automate_fixed_ip=ok"
+        echo "=== KUBERNETES DEPRECATED API CHECK ==="
+        if command -v pluto >/dev/null 2>&1; then
+          pluto detect-all-in-cluster || true
         else
-          echo "chef_automate_fixed_ip=check_required"
+          echo "pluto=missing"
         fi
         echo
-        echo "VERDICT=RUNTIME_AUDIT_COMPLETE"
+
+        if [ "$BAD_PODS" = "0" ] && [ "$BAD_HR" = "0" ]; then
+          echo "VERDICT=AUDIT_COMPLETE"
+        else
+          echo "VERDICT=AUDIT_COMPLETE_WITH_CLUSTER_WARNINGS"
+        fi
       args:
         executable: /bin/bash
-      register: runtime_result
+      register: audit_all_result
       changed_when: false
-      when: maintenance_action in ["runtime_audit", "full_report"]
+      when: maintenance_action == "audit_all"
 
-    - name: Print runtime audit result
+    - name: Print audit result
       ansible.builtin.debug:
-        msg: "{{ runtime_result.stdout_lines }}"
-      when: runtime_result is defined and runtime_result.stdout is defined
+        msg: "{{ audit_all_result.stdout_lines }}"
+      when: audit_all_result is defined and audit_all_result.stdout is defined
 
-    - name: Confirm OS security patch
+    - name: Confirm full Hetzner patch
       ansible.builtin.assert:
         that:
           - confirm_patch == "YES"
-        fail_msg: "Safety stop: set confirm_patch to YES to run OS security patch."
-      when: maintenance_action == "os_security_patch"
+        fail_msg: "Safety stop: set confirm_patch to YES to patch all DNF-managed Hetzner packages."
+      when: maintenance_action == "patch_all"
 
-    - name: OS security patch
+    - name: Patch all DNF-managed Hetzner packages
       ansible.builtin.shell: |
         set -o pipefail
-        echo "=== AIOT OS SECURITY PATCH ==="
+        echo "=== HETZNER 02 - OPATCHOVAT CELY HETZNER ==="
         date
-        echo "Pre-check: cluster must be healthy."
-        BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk "BEGIN{c=0} \$4!=\"Running\" && \$4!=\"Completed\" {c++} END{print c+0}")
-        BAD_HR=$(flux get hr -A 2>/dev/null | awk "BEGIN{c=0} NR>1 && \$5!=\"True\" {c++} END{print c+0}")
+        echo "patch_scope=dnf -y update"
+        echo "This patches OS, kernel and all DNF-managed packages, including Docker/containerd if DNF has updates for them."
+        echo
+
+        echo "=== PRE-CHECK: CLUSTER MUST BE HEALTHY ==="
+        BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk 'BEGIN{c=0} $4!="Running" && $4!="Completed" {c++} END{print c+0}')
+        BAD_HR=$(flux get hr -A 2>/dev/null | awk 'BEGIN{c=0} NR>1 && $5!="True" {c++} END{print c+0}')
         echo "bad_pods=$BAD_PODS"
         echo "bad_helmreleases=$BAD_HR"
         if [ "$BAD_PODS" != "0" ] || [ "$BAD_HR" != "0" ]; then
-          echo "Cluster is not healthy. Refusing patch."
+          echo "Cluster is not healthy. Refusing patch. Run job 1 first and fix warnings."
           exit 2
         fi
         echo
-        echo "Running dnf security update..."
-        dnf -y update --security
+
+        echo "=== BEFORE PATCH ==="
+        echo "running_kernel=$(uname -r)"
+        docker --version 2>/dev/null || true
+        containerd --version 2>/dev/null || true
+        set +e
+        dnf -q check-update > /tmp/aiot-dnf-before-patch.txt 2>/tmp/aiot-dnf-before-patch.err
+        DNF_BEFORE_RC=$?
+        set -o pipefail
+        if [ "$DNF_BEFORE_RC" = "100" ]; then
+          BEFORE_COUNT=$(awk 'NF>=3 && $1 !~ /^(Obsoleting|Last)$/ {c++} END{print c+0}' /tmp/aiot-dnf-before-patch.txt)
+        else
+          BEFORE_COUNT=0
+        fi
+        echo "updates_before=$BEFORE_COUNT"
         echo
-        echo "Reboot check after patch:"
+
+        echo "=== RUNNING DNF FULL UPDATE ==="
+        dnf -y update
+        DNF_UPDATE_RC=$?
+        if [ "$DNF_UPDATE_RC" != "0" ]; then
+          echo "dnf_update_rc=$DNF_UPDATE_RC"
+          echo "VERDICT=PATCH_FAILED"
+          exit "$DNF_UPDATE_RC"
+        fi
+        echo
+
+        echo "=== AFTER PATCH ==="
+        echo "running_kernel=$(uname -r)"
+        docker --version 2>/dev/null || true
+        containerd --version 2>/dev/null || true
+        set +e
+        dnf -q check-update > /tmp/aiot-dnf-after-patch.txt 2>/tmp/aiot-dnf-after-patch.err
+        DNF_AFTER_RC=$?
+        set -o pipefail
+        if [ "$DNF_AFTER_RC" = "100" ]; then
+          AFTER_COUNT=$(awk 'NF>=3 && $1 !~ /^(Obsoleting|Last)$/ {c++} END{print c+0}' /tmp/aiot-dnf-after-patch.txt)
+        else
+          AFTER_COUNT=0
+        fi
+        echo "updates_after=$AFTER_COUNT"
+        echo
+
+        echo "=== REBOOT CHECK AFTER PATCH ==="
         if command -v needs-restarting >/dev/null 2>&1; then
           set +e
-          needs-restarting -r
-          RC=$?
-          set -e
-          if [ "$RC" = "1" ]; then echo "reboot_required=yes"; else echo "reboot_required=no"; fi
+          needs-restarting -r > /tmp/aiot-needs-restarting-after-patch.txt 2>&1
+          NEEDS_RC=$?
+          set -o pipefail
+          cat /tmp/aiot-needs-restarting-after-patch.txt
+          if [ "$NEEDS_RC" = "1" ]; then echo "reboot_required=yes"; else echo "reboot_required=no"; fi
+        else
+          echo "needs-restarting=missing"
+          echo "reboot_required=unknown"
         fi
+        echo
         echo "VERDICT=PATCH_COMPLETE"
       args:
         executable: /bin/bash
-      register: patch_result
+      register: patch_all_result
       changed_when: true
-      when: maintenance_action == "os_security_patch"
+      when: maintenance_action == "patch_all"
 
     - name: Print patch result
       ansible.builtin.debug:
-        msg: "{{ patch_result.stdout_lines }}"
-      when: patch_result is defined and patch_result.stdout is defined
+        msg: "{{ patch_all_result.stdout_lines }}"
+      when: patch_all_result is defined and patch_all_result.stdout is defined
 
-    - name: Confirm reboot schedule
+    - name: Confirm reboot if needed
       ansible.builtin.assert:
         that:
           - confirm_reboot == "YES"
-        fail_msg: "Safety stop: set confirm_reboot to YES to schedule reboot."
-      when: maintenance_action == "schedule_reboot"
+        fail_msg: "Safety stop: set confirm_reboot to YES to reboot Hetzner only if needed."
+      when: maintenance_action == "reboot_if_needed"
 
-    - name: Schedule safe reboot
+    - name: Reboot Hetzner only if needed
       ansible.builtin.shell: |
         set -o pipefail
-        echo "=== AIOT SAFE REBOOT SCHEDULE ==="
+        echo "=== HETZNER 03 - REBOOT AK TREBA ==="
         date
-        BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk "BEGIN{c=0} \$4!=\"Running\" && \$4!=\"Completed\" {c++} END{print c+0}")
-        BAD_HR=$(flux get hr -A 2>/dev/null | awk "BEGIN{c=0} NR>1 && \$5!=\"True\" {c++} END{print c+0}")
+        echo
+        echo "=== PRE-CHECK: CLUSTER MUST BE HEALTHY ==="
+        BAD_PODS=$(kubectl get pods -A --no-headers 2>/dev/null | awk 'BEGIN{c=0} $4!="Running" && $4!="Completed" {c++} END{print c+0}')
+        BAD_HR=$(flux get hr -A 2>/dev/null | awk 'BEGIN{c=0} NR>1 && $5!="True" {c++} END{print c+0}')
         echo "bad_pods=$BAD_PODS"
         echo "bad_helmreleases=$BAD_HR"
         if [ "$BAD_PODS" != "0" ] || [ "$BAD_HR" != "0" ]; then
-          echo "Cluster is not healthy. Refusing reboot."
+          echo "Cluster is not healthy. Refusing reboot. Run job 1 first and fix warnings."
           exit 2
         fi
-        echo "Scheduling host reboot in ${reboot_delay_minutes} minute(s)."
-        shutdown -r +${reboot_delay_minutes} "AWX scheduled AIOT maintenance reboot"
-        echo "VERDICT=REBOOT_SCHEDULED"
-      args:
-        executable: /bin/bash
-      register: reboot_result
-      changed_when: true
-      when: maintenance_action == "schedule_reboot"
+        echo
 
-    - name: Print reboot schedule result
-      ansible.builtin.debug:
-        msg: "{{ reboot_result.stdout_lines }}"
-      when: reboot_result is defined and reboot_result.stdout is defined
-
-    - name: CVE scan lightweight
-      ansible.builtin.shell: |
-        set -o pipefail
-        echo "=== AIOT CVE SCAN LIGHTWEIGHT ==="
-        date
-        if ! command -v trivy >/dev/null 2>&1; then
-          echo "trivy=missing"
-          echo "Install trivy on host for full image CVE scans."
-          echo "VERDICT=CVE_SCAN_TOOL_MISSING"
-          exit 0
+        echo "=== REBOOT CHECK ==="
+        if ! command -v needs-restarting >/dev/null 2>&1; then
+          echo "needs-restarting=missing"
+          echo "reboot_required=unknown"
+          echo "VERDICT=REBOOT_CHECK_FAILED"
+          exit 2
         fi
-        kubectl get pods -A -o jsonpath="{range .items[*].spec.containers[*]}{.image}{\n}{end}" | sort -u > /tmp/aiot-images.txt
-        echo "unique_images=$(wc -l < /tmp/aiot-images.txt)"
-        echo "Scanning first 20 images for HIGH/CRITICAL vulnerabilities."
-        head -20 /tmp/aiot-images.txt | while read img; do
-          echo "--- IMAGE: $img"
-          trivy image --quiet --severity HIGH,CRITICAL --ignore-unfixed --no-progress "$img" | head -80 || true
-        done
-        echo "VERDICT=CVE_SCAN_COMPLETE"
-      args:
-        executable: /bin/bash
-      register: cve_result
-      changed_when: false
-      when: maintenance_action == "cve_scan"
-
-    - name: Print CVE scan result
-      ansible.builtin.debug:
-        msg: "{{ cve_result.stdout_lines }}"
-      when: cve_result is defined and cve_result.stdout is defined
-
-    - name: Kubernetes upgrade readiness
-      ansible.builtin.shell: |
+        set +e
+        needs-restarting -r > /tmp/aiot-needs-restarting-before-reboot.txt 2>&1
+        NEEDS_RC=$?
         set -o pipefail
-        echo "=== AIOT K8S UPGRADE READINESS ==="
-        date
-        echo
-        echo "=== CURRENT VERSIONS ==="
-        kubectl version --short 2>/dev/null || kubectl version 2>/dev/null || true
-        kubectl get nodes -o custom-columns=NAME:.metadata.name,VERSION:.status.nodeInfo.kubeletVersion
-        echo
-        echo "=== API RESOURCES SNAPSHOT ==="
-        kubectl api-resources --verbs=list --namespaced -o name | wc -l | awk "{print \"namespaced_api_resources=\"\$1}"
-        echo
-        if command -v pluto >/dev/null 2>&1; then
-          echo "=== PLUTO DEPRECATED API SCAN ==="
-          pluto detect-all-in-cluster || true
-        elif command -v kubent >/dev/null 2>&1; then
-          echo "=== KUBENT DEPRECATED API SCAN ==="
-          kubent || true
+        cat /tmp/aiot-needs-restarting-before-reboot.txt
+        if [ "$NEEDS_RC" = "1" ]; then
+          echo "reboot_required=yes"
+          echo "Scheduling host reboot in {{ reboot_delay_minutes | int }} minute(s)."
+          shutdown -r +{{ reboot_delay_minutes | int }} "AWX scheduled AIOT Hetzner maintenance reboot"
+          echo "VERDICT=REBOOT_SCHEDULED"
         else
-          echo "deprecated_api_scanner=missing"
-          echo "Install pluto or kubent on host for full deprecated API checks."
+          echo "reboot_required=no"
+          echo "No reboot needed. Nothing scheduled."
+          echo "VERDICT=REBOOT_NOT_NEEDED"
         fi
-        echo
-        echo "=== FLUX HEALTH ==="
-        flux get all -A 2>/dev/null | awk "NR==1 || \$0 ~ /False|failed|error|stalled/" | head -80 || true
-        echo "VERDICT=K8S_READINESS_AUDIT_COMPLETE"
       args:
         executable: /bin/bash
-      register: k8s_ready_result
-      changed_when: false
-      when: maintenance_action == "k8s_upgrade_readiness"
+      register: reboot_if_needed_result
+      changed_when: true
+      when: maintenance_action == "reboot_if_needed"
 
-    - name: Print Kubernetes readiness result
+    - name: Print reboot result
       ansible.builtin.debug:
-        msg: "{{ k8s_ready_result.stdout_lines }}"
-      when: k8s_ready_result is defined and k8s_ready_result.stdout is defined
+        msg: "{{ reboot_if_needed_result.stdout_lines }}"
+      when: reboot_if_needed_result is defined and reboot_if_needed_result.stdout is defined
