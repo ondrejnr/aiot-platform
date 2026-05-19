@@ -231,7 +231,7 @@
         LOCK_FILE="/run/aiot-host-patch.lock"
 
         mkdir -p "$STATE_DIR"
-        touch "$LOG_FILE"
+        : > "$LOG_FILE"
         chmod 0644 "$LOG_FILE"
         exec >> "$LOG_FILE" 2>&1
 
