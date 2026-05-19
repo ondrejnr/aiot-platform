@@ -77,9 +77,6 @@ jenkins:
             - script: >
                 pipelineJob('aiot-platform-gitops') {
                   description('Gitea -> Jenkins -> OpenTofu/Helm -> Flux pipeline for aiot-platform')
-                  triggers {
-                    scm('H/2 * * * *')
-                  }
                   definition {
                     cpsScm {
                       scm {
