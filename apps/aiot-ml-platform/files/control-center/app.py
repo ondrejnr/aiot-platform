@@ -256,7 +256,30 @@ def cluster_snapshot():
 
 
 LOG_NAMESPACES={"aiot", "aiot-ml", "local-ai", "mlflow", "signoz", "observability-logs", "victoriametrics", "grafana", "jenkins", "awx", "databases", "qdrant", "flux-system"}
-LOG_PATTERNS=["error", "exception", "traceback", "fatal", "panic", "timeout", "timed out", "connection refused", "oom", "killed", "crash", "failed", "failure", "denied", "back-off", "backoff", "unhealthy"]
+
+
+def log_line_is_problem(line):
+    low=line.lower()
+    if "errors=0" in low or "error_count=0" in low:
+        return False
+    if "running 'upgrade' action with timeout" in low or "with timeout of" in low:
+        return False
+    if "error_severity" in low and not re.search(r'"error_severity"\s*:\s*"(error|fatal|panic)"', low):
+        return False
+    if re.search(r'\blevel=(error|fatal|panic)\b', low):
+        return True
+    if re.search(r'"level"\s*:\s*"(error|fatal|panic)"', low):
+        return True
+    if re.search(r'"error_severity"\s*:\s*"(error|fatal|panic)"', low):
+        return True
+    if re.search(r'\b(traceback|exception|fatal|panic|oomkilled|crashloopbackoff|imagepullbackoff|errimagepull)\b', low):
+        return True
+    if re.search(r'(connection refused|timed out|i/o timeout|read timeout|write timeout|back-off|backoff|unhealthy|permission denied)', low):
+        return True
+    if re.search(r'\b(failed|failure|denied)\b', low):
+        return True
+    m=re.search(r'\berrors=(\d+)\b', low)
+    return bool(m and int(m.group(1)) > 0)
 
 
 def pod_service_name(pod):
@@ -281,21 +304,32 @@ def pod_is_bad(pod):
 
 def log_findings_for_pod(pod, tail_lines=80):
     meta=pod.get("metadata", {}) or {}
+    spec=pod.get("spec", {}) or {}
     ns=meta.get("namespace")
     name=meta.get("name")
     if not ns or not name:
         return None
-    path=f"/api/v1/namespaces/{ns}/pods/{name}/log?tailLines={tail_lines}&timestamps=true&allContainers=true"
-    res=k8s_get_text(path, timeout=8)
-    if res.get("_error"):
-        return {"pod": f"{ns}/{name}", "service": pod_service_name(pod), "errors": [res["_error"]], "matches": [], "restartCount": pod_restart_count(pod)}
+    containers=[c.get("name") for c in (spec.get("initContainers") or []) + (spec.get("containers") or []) if c.get("name")]
+    paths=[]
+    if len(containers) > 1:
+        paths=[f"/api/v1/namespaces/{ns}/pods/{name}/log?tailLines={tail_lines}&timestamps=true&container={container}" for container in containers]
+    else:
+        paths=[f"/api/v1/namespaces/{ns}/pods/{name}/log?tailLines={tail_lines}&timestamps=true"]
+    texts=[]; errors=[]
+    for path in paths:
+        res=k8s_get_text(path, timeout=8)
+        if res.get("_error"):
+            errors.append(res["_error"])
+        else:
+            texts.append(res.get("text") or "")
+    if errors and not texts:
+        return {"pod": f"{ns}/{name}", "service": pod_service_name(pod), "errors": errors, "matches": [], "restartCount": pod_restart_count(pod)}
     matches=[]
-    for line in (res.get("text") or "").splitlines()[-tail_lines:]:
-        low=line.lower()
-        if any(p in low for p in LOG_PATTERNS):
+    for line in "\n".join(texts).splitlines()[-tail_lines:]:
+        if log_line_is_problem(line):
             clean=re.sub(r"\s+", " ", line).strip()
             matches.append(clean[:240])
-    return {"pod": f"{ns}/{name}", "service": pod_service_name(pod), "errors": [], "matches": matches[-5:], "restartCount": pod_restart_count(pod)}
+    return {"pod": f"{ns}/{name}", "service": pod_service_name(pod), "errors": errors, "matches": matches[-5:], "restartCount": pod_restart_count(pod)}
 
 
 def logs_snapshot(question=""):
@@ -327,7 +361,7 @@ def logs_snapshot(question=""):
             continue
         if item.get("errors"):
             errors.append(item)
-        if item.get("matches") or item.get("restartCount", 0) >= 5:
+        if item.get("matches"):
             checked.append(item)
     checked=sorted(checked, key=lambda x: (len(x.get("matches") or []), x.get("restartCount", 0)), reverse=True)
     return {"policy": "read-only: only Kubernetes pods/log GET is used", "scanned_pods": len(candidates), "findings": checked[:10], "log_errors": errors[:8], "api_errors": [pods_resp.get("_error")] if pods_resp.get("_error") else []}
@@ -344,7 +378,7 @@ def answer_logs(question=""):
     else:
         lines.append(f"Našiel som podozrivé logy v {len(findings)} podoch:")
         for item in findings[:5]:
-            first=(item.get("matches") or ["bez novej error línie, ale má viac reštartov"])[-1]
+            first=(item.get("matches") or ["bez problematickej log línie"])[-1]
             lines.append(f"- {item['pod']} ({item.get('service')}, restarty={item.get('restartCount', 0)}): {first}")
     if snap.get("log_errors"):
         lines.append("Časť logov nešla načítať: " + "; ".join(f"{e['pod']}: {e['errors'][0]}" for e in snap["log_errors"][:3]))
