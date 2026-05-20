@@ -141,6 +141,46 @@ def answer_predictions(ctx):
 
 
 
+def prediction_score(item):
+    for key in ("risk", "risk_score", "score", "probability", "failure_probability"):
+        value = item.get(key)
+        if value is not None:
+            try:
+                return float(value)
+            except Exception:
+                return 0.0
+    return 0.0
+
+
+def answer_failure_probability(ctx):
+    data = ctx.get("predictions") or {}
+    items = data.get("items") or []
+    version = data.get("model_version")
+    model = f"{INFERENCE_MODEL_NAME}" + (f" v{version}" if version else "")
+    source = data.get("source") or data.get("status") or "mlflow"
+    if items:
+        top = sorted(items, key=prediction_score, reverse=True)[:3]
+        first = top[0]
+        first_score = prediction_score(first)
+        bits = []
+        for item in top[1:]:
+            bits.append(f"{item.get('sensor_id')} {prediction_score(item):.0f} % ({item.get('label') or item.get('status') or 'n/a'})")
+        extra = " Ďalšie najvyššie: " + "; ".join(bits) + "." if bits else ""
+        return (
+            f"Najväčšiu pravdepodobnosť zlyhania má {first.get('sensor_id')}: "
+            f"{first_score:.0f} % ({first.get('label') or first.get('status') or 'n/a'}). "
+            f"Zdroj: lokálny MLflow model {model}, stav={source}." + extra
+        )
+    rows = ctx.get("latest") or []
+    if rows:
+        top = sorted(rows, key=lambda x: x.get("risk", 0), reverse=True)[:3]
+        first = top[0]
+        rest = "; ".join(f"{r.get('sensor_id')} {r.get('risk')} % ({r.get('status')})" for r in top[1:])
+        extra = f" Ďalšie najvyššie: {rest}." if rest else ""
+        return f"Predikčný model nevrátil položky, preto používam aktuálny rizikový výpočet: {first.get('sensor_id')} má {first.get('risk')} % ({first.get('status')})." + extra
+    return f"Predikčný API endpoint {model} zatiaľ nevrátil položky a nemám ani aktuálne senzorové dáta."
+
+
 def answer_forecast(ctx):
     data=ctx.get("forecasts") or {}
     items=data.get("items") or []
@@ -526,6 +566,14 @@ def normalize_text(q):
     return "".join(ch for ch in text if not unicodedata.combining(ch)).lower()
 
 
+
+def is_sensor_failure_question(q):
+    text = normalize_text(q)
+    sensor_terms = ["senzor", "sensor"]
+    failure_terms = ["zlyhan", "poruch", "failure", "fail", "pravdepodob", "risk", "rizik"]
+    rank_terms = ["ktory", "ktore", "naj", "najvac", "najvyss", "top", "maximum"]
+    return any(w in text for w in sensor_terms) and any(w in text for w in failure_terms) and any(w in text for w in rank_terms)
+
 def is_log_question(q):
     text = normalize_text(q)
     return any(w in text for w in ["log", "logy", "logs", "logging", "traceback", "exception", "error", "chyby v logoch"])
@@ -562,6 +610,8 @@ def fast_answer(question, ctx):
         return answer_risk(rows)
     if is_write_request(q):
         return readonly_refusal()
+    if is_sensor_failure_question(q):
+        return answer_failure_probability({"predictions": predictions(), "latest": rows})
     if is_log_question(q):
         return answer_logs(q)
     if is_cluster_question(q):
@@ -618,12 +668,14 @@ def api_chat(req: ChatRequest):
     question = (req.question or "").strip()
     q_lower=question.lower()
     external_words=["extern", "api", "lokal", "lokál"]
-    prediction_words=["model", "mlflow", "predik", "inference", "údrž", "udrz"]
+    prediction_words=["model", "mlflow", "predik", "inference", "údrž", "udrz", "zlyhan", "poruch", "pravdepodob"]
     risk_words=["rizik", "naj", "kritick", "critical", "warning", "prečo", "preco", "senzor"]
     status_words=["stav", "koľko", "kolko", "pocet", "počet", "beží", "bezi", "funguje", "zhrn", "sumar"]
 
     if is_write_request(q_lower):
         return {"answer": readonly_refusal(), "source": "read-only-policy", "seconds": round(time.time() - started, 3)}
+    if is_sensor_failure_question(question):
+        return {"answer": answer_failure_probability({"predictions": predictions(), "latest": latest(50)}), "source": "sensor-failure-prediction", "seconds": round(time.time() - started, 3)}
     if is_log_question(q_lower):
         return {"answer": answer_logs(question), "source": "kubernetes-logs-read-only", "seconds": round(time.time() - started, 3)}
     if is_cluster_question(q_lower):
