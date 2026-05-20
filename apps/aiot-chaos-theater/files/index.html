@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIoT Chaos Theater</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="hero">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> LIVE READ-ONLY OBSERVER</div>
+        <h1>AIoT Chaos Theater</h1>
+        <p>Litmus spúšťa chaos. Theater ukazuje, ako sa chaos reálne šíri cez AIoT pipeline.</p>
+      </div>
+      <div class="hero-card">
+        <div class="muted">Aktuálny experiment</div>
+        <div id="heroExperiment" class="hero-title">načítavam…</div>
+        <div id="heroStatus" class="status-pill idle">waiting</div>
+        <div id="lastUpdated" class="tiny">—</div>
+      </div>
+    </header>
+
+    <section class="experiments" id="experiments"></section>
+
+    <main class="layout">
+      <section class="panel topology-panel">
+        <div class="panel-head">
+          <div>
+            <h2>Live mapa pipeline</h2>
+            <p>Komponenty menia stav podľa dostupnosti a chaos udalostí.</p>
+          </div>
+          <button id="replayBtn" class="ghost">▶ Replay poslednej timeline</button>
+        </div>
+        <div id="topology" class="topology"></div>
+      </section>
+
+      <aside class="panel impact-panel">
+        <h2>Dopad experimentu</h2>
+        <div id="impact" class="impact"></div>
+        <h3>Kroky workflow</h3>
+        <div id="workflowNodes" class="workflow-nodes"></div>
+      </aside>
+    </main>
+
+    <section class="panel timeline-panel">
+      <div class="panel-head">
+        <div>
+          <h2>Chaos timeline</h2>
+          <p>Ľudsky preložené Kubernetes, Argo a Litmus udalosti.</p>
+        </div>
+        <div class="legend">
+          <span><i class="dot green"></i>healthy</span>
+          <span><i class="dot yellow"></i>recovering</span>
+          <span><i class="dot red"></i>impacted</span>
+        </div>
+      </div>
+      <div id="timeline" class="timeline"></div>
+    </section>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: aiot-chaos-theater
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: aiot-chaos-theater
+    app.kubernetes.io/part-of: aiot-platform
+spec:
+  selector:
+    app.kubernetes.io/name: aiot-chaos-theater
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+---
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aiot-chaos-theater
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: aiot-chaos-theater
+    app.kubernetes.io/part-of: aiot-platform
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+{{- if .Values.ingress.auth.enabled }}
+    nginx.ingress.kubernetes.io/auth-url: http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx
+    nginx.ingress.kubernetes.io/auth-signin: https://authentik.{{ .Values.domain }}/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri
+    nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+    nginx.ingress.kubernetes.io/auth-snippet: |
+      proxy_set_header X-Forwarded-Host $http_host;
+{{- end }}
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}.{{ .Values.domain }}
+      secretName: {{ .Values.ingress.tlsSecret }}
+  rules:
+    - host: {{ .Values.ingress.host }}.{{ .Values.domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: aiot-chaos-theater
+                port:
+                  name: http
+{{- end }}

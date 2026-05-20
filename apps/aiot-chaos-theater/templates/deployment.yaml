@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiot-chaos-theater
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: aiot-chaos-theater
+    app.kubernetes.io/part-of: aiot-platform
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aiot-chaos-theater
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: aiot-chaos-theater
+        app.kubernetes.io/part-of: aiot-platform
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: aiot-chaos-theater
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: theater
+          image: {{ .Values.image | quote }}
+          imagePullPolicy: IfNotPresent
+          command: ["python", "/app/app.py"]
+          env:
+            - name: TARGET_NAMESPACE
+              value: {{ .Values.targetNamespace | quote }}
+            - name: DATABASE_NAMESPACE
+              value: {{ .Values.databaseNamespace | quote }}
+            - name: PORT
+              value: {{ .Values.service.port | quote }}
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          volumeMounts:
+            - name: app
+              mountPath: /app
+              readOnly: true
+      volumes:
+        - name: app
+          configMap:
+            name: aiot-chaos-theater-app

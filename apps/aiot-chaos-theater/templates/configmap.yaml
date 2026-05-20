@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aiot-chaos-theater-app
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: aiot-chaos-theater
+    app.kubernetes.io/part-of: aiot-platform
+data:
+  app.py: |-
+{{ .Files.Get "files/app.py" | indent 4 }}
+  index.html: |-
+{{ .Files.Get "files/index.html" | indent 4 }}
+  styles.css: |-
+{{ .Files.Get "files/styles.css" | indent 4 }}
+  app.js: |-
+{{ .Files.Get "files/app.js" | indent 4 }}
