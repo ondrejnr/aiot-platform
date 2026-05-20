@@ -29,7 +29,7 @@ data:
     TIME_FEATURES = ["hour_sin", "hour_cos", "dow_sin", "dow_cos"]
     FEATURE_SET_VERSION = "rolling_trend_time_v1"
     TARGET_HORIZON_MINUTES = int(os.getenv("TARGET_HORIZON_MINUTES", "30"))
-    MIN_EVENT_DURATION_MINUTES = int(os.getenv("MIN_EVENT_DURATION_MINUTES", "5"))
+    MIN_EVENT_DURATION_MINUTES = int(os.getenv("MIN_EVENT_DURATION_MINUTES", "14"))
     TARGET_DEFINITION = f"risk_in_next_{TARGET_HORIZON_MINUTES}m_min_duration_{MIN_EVENT_DURATION_MINUTES}m"
     LEGACY_TARGET_DEFINITION = "next_sample_threshold_state_per_sensor"
     _model = None

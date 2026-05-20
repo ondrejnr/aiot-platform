@@ -37,6 +37,10 @@ spec:
               value: http://mlflow.mlflow.svc.cluster.local:5000
             - name: MODEL_NAME
               value: {{ .Values.inference.modelName | quote }}
+            - name: TARGET_HORIZON_MINUTES
+              value: {{ .Values.training.targetHorizonMinutes | quote }}
+            - name: MIN_EVENT_DURATION_MINUTES
+              value: {{ .Values.training.minEventDurationMinutes | quote }}
           ports:
             - name: http
               containerPort: 8080
