@@ -1,4 +1,4 @@
-import json, os, time, unicodedata
+import json, os, time, unicodedata, re
 import psycopg
 from psycopg.rows import dict_row
 import requests
@@ -146,6 +146,21 @@ def k8s_get(path, timeout=7):
         return {"items": [], "_error": str(exc)}
 
 
+def k8s_get_text(path, timeout=10):
+    """Read-only Kubernetes text endpoint helper, used for pod logs only."""
+    try:
+        with open(K8S_TOKEN_PATH, "r", encoding="utf-8") as fh:
+            token = fh.read().strip()
+        url = f"https://{K8S_API}:{K8S_PORT}{path}"
+        verify = K8S_CA_PATH if os.path.exists(K8S_CA_PATH) else True
+        r = requests.get(url, headers={"Authorization": f"Bearer {token}"}, verify=verify, timeout=timeout)
+        if not r.ok:
+            return {"text": "", "_error": f"{r.status_code} {r.text[:160]}"}
+        return {"text": r.text}
+    except Exception as exc:
+        return {"text": "", "_error": str(exc)}
+
+
 def meta_name(item):
     m=item.get("metadata", {})
     ns=m.get("namespace")
@@ -240,6 +255,102 @@ def cluster_snapshot():
     }
 
 
+LOG_NAMESPACES={"aiot", "aiot-ml", "local-ai", "mlflow", "signoz", "observability-logs", "victoriametrics", "grafana", "jenkins", "awx", "databases", "qdrant", "flux-system"}
+LOG_PATTERNS=["error", "exception", "traceback", "fatal", "panic", "timeout", "timed out", "connection refused", "oom", "killed", "crash", "failed", "failure", "denied", "back-off", "backoff", "unhealthy"]
+
+
+def pod_service_name(pod):
+    labels=(pod.get("metadata", {}) or {}).get("labels", {}) or {}
+    return labels.get("app.kubernetes.io/name") or labels.get("app") or labels.get("component") or labels.get("app.kubernetes.io/component") or (pod.get("metadata", {}) or {}).get("name")
+
+
+def pod_restart_count(pod):
+    return sum(int(c.get("restartCount") or 0) for c in (pod.get("status", {}) or {}).get("containerStatuses", []) or [])
+
+
+def pod_is_bad(pod):
+    phase=(pod.get("status", {}) or {}).get("phase")
+    if phase not in ("Running", "Succeeded"):
+        return True
+    for c in (pod.get("status", {}) or {}).get("containerStatuses", []) or []:
+        waiting=((c.get("state") or {}).get("waiting") or {})
+        if waiting.get("reason") in {"CrashLoopBackOff", "ImagePullBackOff", "ErrImagePull", "CreateContainerConfigError", "RunContainerError"}:
+            return True
+    return False
+
+
+def log_findings_for_pod(pod, tail_lines=80):
+    meta=pod.get("metadata", {}) or {}
+    ns=meta.get("namespace")
+    name=meta.get("name")
+    if not ns or not name:
+        return None
+    path=f"/api/v1/namespaces/{ns}/pods/{name}/log?tailLines={tail_lines}&timestamps=true&allContainers=true"
+    res=k8s_get_text(path, timeout=8)
+    if res.get("_error"):
+        return {"pod": f"{ns}/{name}", "service": pod_service_name(pod), "errors": [res["_error"]], "matches": [], "restartCount": pod_restart_count(pod)}
+    matches=[]
+    for line in (res.get("text") or "").splitlines()[-tail_lines:]:
+        low=line.lower()
+        if any(p in low for p in LOG_PATTERNS):
+            clean=re.sub(r"\s+", " ", line).strip()
+            matches.append(clean[:240])
+    return {"pod": f"{ns}/{name}", "service": pod_service_name(pod), "errors": [], "matches": matches[-5:], "restartCount": pod_restart_count(pod)}
+
+
+def logs_snapshot(question=""):
+    text=normalize_text(question)
+    pods_resp=k8s_get("/api/v1/pods?limit=1000")
+    pods=pods_resp.get("items", [])
+    candidates=[]
+    seen=set()
+    for pod in pods:
+        meta=pod.get("metadata", {}) or {}
+        ns=meta.get("namespace")
+        name=meta.get("name")
+        if not ns or not name or (ns, name) in seen:
+            continue
+        phase=(pod.get("status", {}) or {}).get("phase")
+        if phase == "Succeeded":
+            continue
+        svc=normalize_text(pod_service_name(pod) or "")
+        pod_text=normalize_text(f"{ns} {name} {svc}")
+        explicit_target=any(token in pod_text for token in text.split() if len(token) >= 4 and token not in {"skontroluj", "logy", "sluzieb", "sluzby", "cluster", "clustr", "kluster", "klustr", "stav"})
+        if ns in LOG_NAMESPACES or pod_is_bad(pod) or explicit_target:
+            candidates.append(pod)
+            seen.add((ns, name))
+    candidates=sorted(candidates, key=lambda p: (not pod_is_bad(p), -pod_restart_count(p), (p.get("metadata", {}) or {}).get("namespace", ""), (p.get("metadata", {}) or {}).get("name", "")))[:45]
+    checked=[]; errors=[]
+    for pod in candidates:
+        item=log_findings_for_pod(pod)
+        if not item:
+            continue
+        if item.get("errors"):
+            errors.append(item)
+        if item.get("matches") or item.get("restartCount", 0) >= 5:
+            checked.append(item)
+    checked=sorted(checked, key=lambda x: (len(x.get("matches") or []), x.get("restartCount", 0)), reverse=True)
+    return {"policy": "read-only: only Kubernetes pods/log GET is used", "scanned_pods": len(candidates), "findings": checked[:10], "log_errors": errors[:8], "api_errors": [pods_resp.get("_error")] if pods_resp.get("_error") else []}
+
+
+def answer_logs(question=""):
+    snap=logs_snapshot(question)
+    if snap.get("api_errors"):
+        return "Logy neviem načítať: " + "; ".join(snap["api_errors"])
+    lines=[f"Skontroloval som posledných 80 riadkov logov z {snap['scanned_pods']} podov v read-only režime."]
+    findings=snap.get("findings") or []
+    if not findings:
+        lines.append("Nenašiel som výrazné ERROR/Exception/Fatal/Crash/Timeout signály v kontrolovaných službách.")
+    else:
+        lines.append(f"Našiel som podozrivé logy v {len(findings)} podoch:")
+        for item in findings[:5]:
+            first=(item.get("matches") or ["bez novej error línie, ale má viac reštartov"])[-1]
+            lines.append(f"- {item['pod']} ({item.get('service')}, restarty={item.get('restartCount', 0)}): {first}")
+    if snap.get("log_errors"):
+        lines.append("Časť logov nešla načítať: " + "; ".join(f"{e['pod']}: {e['errors'][0]}" for e in snap["log_errors"][:3]))
+    return "\n".join(lines)
+
+
 def answer_cluster():
     snap=cluster_snapshot()
     problems=[]
@@ -269,6 +380,11 @@ def normalize_text(q):
     return "".join(ch for ch in text if not unicodedata.combining(ch)).lower()
 
 
+def is_log_question(q):
+    text = normalize_text(q)
+    return any(w in text for w in ["log", "logy", "logs", "logging", "traceback", "exception", "error", "chyby v logoch"])
+
+
 def is_cluster_question(q):
     text = normalize_text(q)
     words=["cluster", "clustr", "kluster", "klustr", "k8s", "kubernetes", "kubernet", "pod", "pody", "node", "nod", "uzol", "uzly", "helm", "flux", "helmrelease", "kustomization", "jenkins", "awx", "signoz", "loki", "grafana", "redis", "redpanda", "cnpg", "postgres", "crash", "fail", "chyba", "chyby", "log", "event", "load"]
@@ -292,6 +408,8 @@ def fast_answer(question, ctx):
         return answer_risk(rows)
     if is_write_request(q):
         return readonly_refusal()
+    if is_log_question(q):
+        return answer_logs(q)
     if is_cluster_question(q):
         return answer_cluster()
     if any(word in q for word in ["rizik", "naj", "kritick", "critical", "warning", "prečo", "preco", "senzor"]):
@@ -327,9 +445,13 @@ def api_summary(): return {"summary": summary(), "latest": latest(50), "predicti
 def api_copilot_cluster(): return cluster_snapshot()
 
 
+@app.get("/api/copilot/logs")
+def api_copilot_logs(): return logs_snapshot("cluster logs")
+
+
 @app.get("/api/copilot/policy")
 def api_copilot_policy():
-    return {"mode": "read-only", "allowed": ["get", "list"], "blocked": ["create", "update", "patch", "delete", "exec", "scale", "restart", "reboot"]}
+    return {"mode": "read-only", "allowed": ["get", "list", "get pods/log"], "blocked": ["create", "update", "patch", "delete", "exec", "scale", "restart", "reboot"]}
 
 
 @app.post("/api/chat")
@@ -344,6 +466,8 @@ def api_chat(req: ChatRequest):
 
     if is_write_request(q_lower):
         return {"answer": readonly_refusal(), "source": "read-only-policy", "seconds": round(time.time() - started, 3)}
+    if is_log_question(q_lower):
+        return {"answer": answer_logs(question), "source": "kubernetes-logs-read-only", "seconds": round(time.time() - started, 3)}
     if is_cluster_question(q_lower):
         return {"answer": answer_cluster(), "source": "kubernetes-read-only", "seconds": round(time.time() - started, 3)}
     if any(word in q_lower for word in prediction_words):
@@ -398,6 +522,6 @@ def home():
     </style></head><body><header><h1>AIOT Copilot</h1><p>Jeden informačný chat pre senzory aj cluster. <span class='safe'>Read-only: nevie meniť cluster.</span></p></header>
     <section class='cards'><div class='card'><div class='n'>{s.get('sensors') or 0}</div><div class='label'>senzorov</div></div><div class='card'><div class='n'>{ok}</div><div class='label'>OK</div></div><div class='card'><div class='n'>{warn}</div><div class='label'>Warning</div></div><div class='card'><div class='n'>{crit}</div><div class='label'>Critical</div></div><div class='card'><div class='n'>{s.get('samples') or 0}</div><div class='label'>vzoriek 24h</div></div></section>
     <main><section><table><thead><tr><th>Senzor</th><th>Lokácia</th><th>Stav</th><th>Riziko</th><th>Teplota</th><th>Vlhkosť</th><th>Tlak</th><th>Batéria</th><th>Čas</th></tr></thead><tbody>{table}</tbody></table></section>
-    <aside class='panel'><h2>AIOT Copilot</h2><p class='safe'>Iba číta dáta: senzory, MLflow, Kubernetes, Flux/Helm eventy.</p><textarea id='q'>Aký je stav clusteru a čo failuje?</textarea><button onclick='ask()'>Spýtať sa</button><pre id='a'>Odpoveď sa zobrazí tu.</pre></aside></main>
+    <aside class='panel'><h2>AIOT Copilot</h2><p class='safe'>Iba číta dáta: senzory, MLflow, Kubernetes, Flux/Helm eventy a pod logy.</p><textarea id='q'>Skontroluj logy služieb na klustri</textarea><button onclick='ask()'>Spýtať sa</button><pre id='a'>Odpoveď sa zobrazí tu.</pre></aside></main>
     <script>async function ask(){{let a=document.getElementById('a');a.textContent='Pracujem...';let r=await fetch('/api/chat',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{question:document.getElementById('q').value}})}});let j=await r.json();a.textContent=j.answer||JSON.stringify(j,null,2);}}</script>
     </body></html>"""
