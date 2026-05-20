@@ -30,6 +30,8 @@ data:
     FEATURE_SET_VERSION = "rolling_trend_time_v1"
     _model = None
     _version = None
+    _model_score = None
+    _model_feature_set = None
     _lock = threading.Lock()
 
 
@@ -73,18 +75,37 @@ data:
 
 
     def load_model():
-        global _model, _version
+        global _model, _version, _model_score, _model_feature_set
         with _lock:
             if _model is not None:
                 return _model
             try:
                 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-                versions = MlflowClient().search_model_versions(f"name='{MODEL_NAME}'")
+                client = MlflowClient()
+                versions = [v for v in client.search_model_versions(f"name='{MODEL_NAME}'") if getattr(v, "status", "READY") == "READY"]
                 if not versions:
                     return None
-                latest = sorted(versions, key=lambda v: int(v.version))[-1]
-                _version = latest.version
-                _model = mlflow.pyfunc.load_model(f"models:/{MODEL_NAME}/{latest.version}")
+                valid = []
+                for v in versions:
+                    try:
+                        run = client.get_run(v.run_id)
+                        params = run.data.params
+                        metrics = run.data.metrics
+                        if params.get("target_definition") == "next_sample_threshold_state_per_sensor" and params.get("split_strategy") == "chronological_80_20":
+                            score = float(metrics.get("roc_auc", metrics.get("accuracy", 0.0)))
+                            valid.append((score, int(v.version), v, params))
+                    except Exception:
+                        continue
+                if valid:
+                    score, _, selected, params = sorted(valid, key=lambda x: (x[0], x[1]), reverse=True)[0]
+                    _model_score = score
+                    _model_feature_set = params.get("feature_set_version") or "base_features_legacy"
+                else:
+                    selected = sorted(versions, key=lambda v: int(v.version))[-1]
+                    _model_score = None
+                    _model_feature_set = None
+                _version = selected.version
+                _model = mlflow.pyfunc.load_model(f"models:/{MODEL_NAME}/{selected.version}")
                 return _model
             except Exception:
                 return None
@@ -160,16 +181,18 @@ data:
 
     @app.get("/healthz")
     def healthz():
-        return {"ok": True, "model_loaded": _model is not None, "model_version": _version, "feature_set_version": FEATURE_SET_VERSION, "feature_count": len(FEATURES)}
+        return {"ok": True, "model_loaded": _model is not None, "model_version": _version, "model_score": _model_score, "model_feature_set": _model_feature_set, "runtime_feature_set_version": FEATURE_SET_VERSION, "runtime_feature_count": len(FEATURES)}
 
 
     @app.post("/reload")
     def reload_model():
-        global _model, _version
+        global _model, _version, _model_score, _model_feature_set
         with _lock:
             _model = None
             _version = None
-        return {"loaded": load_model() is not None, "model_version": _version, "feature_set_version": FEATURE_SET_VERSION, "feature_count": len(FEATURES)}
+            _model_score = None
+            _model_feature_set = None
+        return {"loaded": load_model() is not None, "model_version": _version, "model_score": _model_score, "model_feature_set": _model_feature_set, "runtime_feature_set_version": FEATURE_SET_VERSION, "runtime_feature_count": len(FEATURES)}
 
 
     @app.get("/predict/latest")
@@ -179,15 +202,20 @@ data:
         items = []
         if model is not None and rows:
             try:
-                X = feature_df[FEATURES].fillna(0.0)
+                if _model_feature_set == FEATURE_SET_VERSION:
+                    X = feature_df[FEATURES].fillna(0.0)
+                    used_feature_set = FEATURE_SET_VERSION
+                else:
+                    X = feature_df[BASE_FEATURES].fillna(0.0)
+                    used_feature_set = _model_feature_set or "base_features_legacy"
                 try:
                     preds = model.predict(X)
-                    used_feature_set = FEATURE_SET_VERSION
                 except Exception:
-                    # Backward compatibility while old 4-feature model is still latest during rollout.
-                    X = feature_df[BASE_FEATURES].fillna(0.0)
-                    preds = model.predict(X)
-                    used_feature_set = "base_features_legacy"
+                    # Safe fallback if a registry model has missing/incorrect feature metadata.
+                    fallback_X = feature_df[BASE_FEATURES].fillna(0.0) if X.shape[1] != len(BASE_FEATURES) else feature_df[FEATURES].fillna(0.0)
+                    preds = model.predict(fallback_X)
+                    X = fallback_X
+                    used_feature_set = "fallback_" + ("base_features" if X.shape[1] == len(BASE_FEATURES) else FEATURE_SET_VERSION)
                 for row, pred in zip(rows, preds):
                     fallback, _ = rule(row)
                     value = float(pred)
@@ -195,7 +223,7 @@ data:
                     risk = max(0, min(100, risk or fallback))
                     label = "critical" if risk >= 80 else "warning" if risk >= 50 else "ok"
                     items.append({"sensor_id": row.get("sensor_id"), "risk": risk, "label": label, "source": "mlflow", "feature_set": used_feature_set})
-                return {"status": "ok", "model_version": _version, "feature_set_version": used_feature_set, "feature_count": int(X.shape[1]), "items": items}
+                return {"status": "ok", "model_version": _version, "model_score": _model_score, "model_feature_set": _model_feature_set, "feature_set_version": used_feature_set, "feature_count": int(X.shape[1]), "items": items}
             except Exception as exc:
                 return {"status": "degraded", "error": str(exc), "items": []}
         for row in rows:
