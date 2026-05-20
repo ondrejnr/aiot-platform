@@ -16,12 +16,12 @@ spec:
   chart:
     spec:
       chart: ./apps/aiot-pipeline
-      reconcileStrategy: Revision
+      reconcileStrategy: ChartVersion
       sourceRef:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-  timeout: 15m
+  timeout: 45m
   install:
     createNamespace: true
   upgrade:

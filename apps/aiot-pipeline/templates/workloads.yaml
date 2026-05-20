@@ -39,6 +39,7 @@ spec:
         {{- include "aiot.labels" . | nindent 8 }}
     spec:
       priorityClassName: {{ .Values.priorityClass.pipeline }}
+      terminationGracePeriodSeconds: 5
       containers:
         - name: app
           image: {{ $pythonImage }}
