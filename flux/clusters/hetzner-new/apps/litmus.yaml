@@ -47,6 +47,11 @@ spec:
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/ssl-redirect: "true"
         nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/configuration-snippet: |
+          proxy_set_header Accept-Encoding "";
+          sub_filter_once on;
+          sub_filter_types text/html;
+          sub_filter '</head>' '<script>try{(function(){function sso(){if(location.pathname==="/login"&&!new URLSearchParams(location.search).has("jwtToken")){location.replace("/auth/dex/login")}}sso();setInterval(sso,500);})();}catch(e){}</script></head>';
       host:
         name: litmus.46.4.123.8.nip.io
         frontend:
@@ -61,6 +66,13 @@ spec:
         graphqlServer:
           genericEnv:
             CHAOS_CENTER_UI_ENDPOINT: https://litmus.46.4.123.8.nip.io
+        authServer:
+          env:
+            DEX_ENABLED: "true"
+            DEX_OAUTH_CALLBACK_URL: https://litmus.46.4.123.8.nip.io/auth/dex/callback
+            DEX_OAUTH_CLIENT_ID: litmus
+            OIDC_ISSUER: https://authentik.46.4.123.8.nip.io/application/o/litmus/
+            OAUTH_JWT_EXP_MINS: "5"
     mongodb:
       enabled: true
       auth:
