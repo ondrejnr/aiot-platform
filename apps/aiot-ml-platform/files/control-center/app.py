@@ -278,8 +278,7 @@ def log_line_is_problem(line):
         return True
     if re.search(r'\b(failed|failure|denied)\b', low):
         return True
-    m=re.search(r'\berrors=(\d+)\b', low)
-    return bool(m and int(m.group(1)) > 0)
+    return False
 
 
 def pod_service_name(pod):
@@ -302,7 +301,7 @@ def pod_is_bad(pod):
     return False
 
 
-def log_findings_for_pod(pod, tail_lines=80):
+def log_findings_for_pod(pod, tail_lines=120, since_seconds=3600):
     meta=pod.get("metadata", {}) or {}
     spec=pod.get("spec", {}) or {}
     ns=meta.get("namespace")
@@ -312,9 +311,9 @@ def log_findings_for_pod(pod, tail_lines=80):
     containers=[c.get("name") for c in (spec.get("initContainers") or []) + (spec.get("containers") or []) if c.get("name")]
     paths=[]
     if len(containers) > 1:
-        paths=[f"/api/v1/namespaces/{ns}/pods/{name}/log?tailLines={tail_lines}&timestamps=true&container={container}" for container in containers]
+        paths=[f"/api/v1/namespaces/{ns}/pods/{name}/log?tailLines={tail_lines}&sinceSeconds={since_seconds}&timestamps=true&container={container}" for container in containers]
     else:
-        paths=[f"/api/v1/namespaces/{ns}/pods/{name}/log?tailLines={tail_lines}&timestamps=true"]
+        paths=[f"/api/v1/namespaces/{ns}/pods/{name}/log?tailLines={tail_lines}&sinceSeconds={since_seconds}&timestamps=true"]
     texts=[]; errors=[]
     for path in paths:
         res=k8s_get_text(path, timeout=8)
@@ -371,10 +370,10 @@ def answer_logs(question=""):
     snap=logs_snapshot(question)
     if snap.get("api_errors"):
         return "Logy neviem načítať: " + "; ".join(snap["api_errors"])
-    lines=[f"Skontroloval som posledných 80 riadkov logov z {snap['scanned_pods']} podov v read-only režime."]
+    lines=[f"Skontroloval som logy za poslednú hodinu z {snap['scanned_pods']} podov v read-only režime."]
     findings=snap.get("findings") or []
     if not findings:
-        lines.append("Nenašiel som výrazné ERROR/Exception/Fatal/Crash/Timeout signály v kontrolovaných službách.")
+        lines.append("Nenašiel som aktuálne ERROR/Exception/Fatal/Crash/Timeout signály v kontrolovaných službách.")
     else:
         lines.append(f"Našiel som podozrivé logy v {len(findings)} podoch:")
         for item in findings[:5]:
