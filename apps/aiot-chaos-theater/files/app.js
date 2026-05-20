@@ -1,6 +1,7 @@
 let currentState = null;
 let replayTimer = null;
 let replayIndex = -1;
+let selectedComponentId = null;
 
 const phaseClass = (phase) => {
   if (!phase || phase === 'never run') return 'idle';
@@ -44,17 +45,31 @@ function renderFocus(state) {
   document.getElementById('focus').innerHTML = items.map(([label, value, cls]) => `<div class="focus-item"><div class="focus-label">${esc(label)}</div><div class="focus-value ${cls}">${esc(value)}</div></div>`).join('');
 }
 
+function getSelectedComponent(state) {
+  const components = state.components || [];
+  const target = state.impact?.target || state.latestWorkflow?.target;
+  if (!selectedComponentId) selectedComponentId = target || components[0]?.id || null;
+  return components.find(c => c.id === selectedComponentId) || components.find(c => c.id === target) || components[0] || null;
+}
+
 function renderPipeline(state, highlight = null) {
   const target = state.impact?.target;
+  const selected = getSelectedComponent(state)?.id;
   document.getElementById('topology').innerHTML = (state.components || []).map(c => {
-    const cls = `${c.health || 'green'} ${c.id === target ? 'target' : ''} ${c.id === highlight ? 'replay-hit' : ''}`;
-    return `<article class="node ${cls}">
+    const cls = `${c.health || 'green'} ${c.id === target ? 'target' : ''} ${c.id === highlight ? 'replay-hit' : ''} ${c.id === selected ? 'selected' : ''}`;
+    return `<button class="node ${cls}" type="button" data-component="${esc(c.id)}" aria-label="Detail ${esc(c.title)}">
       <div class="node-icon">${c.icon || '◦'}</div>
       <div class="node-name">${esc(c.title)}</div>
       <div class="node-ready">${esc(c.ready)}/${esc(c.desired || '?')} ready</div>
       <div class="health">${healthText(c.health)}</div>
-    </article>`;
+    </button>`;
   }).join('');
+  document.querySelectorAll('.node[data-component]').forEach(node => {
+    node.addEventListener('click', () => {
+      selectedComponentId = node.getAttribute('data-component');
+      render(currentState);
+    });
+  });
 }
 
 function importantEvents(state) {
@@ -86,6 +101,52 @@ function renderTimeline(state, activeIndex = -1) {
   </div>`).join('');
 }
 
+function podStateClass(pod) {
+  if (pod.ready && pod.phase === 'Running') return 'ok';
+  if (pod.phase === 'Pending' || pod.phase === 'ContainerCreating') return 'wait';
+  return 'bad';
+}
+
+function renderComponentDetail(state) {
+  const comp = getSelectedComponent(state);
+  const el = document.getElementById('componentDetail');
+  if (!comp) {
+    el.innerHTML = '<div class="empty">Klikni na komponent v pipeline.</div>';
+    return;
+  }
+  const impact = state.impact || {};
+  const isTarget = comp.id === impact.target;
+  const pods = (comp.pods || []).slice(0, 10);
+  const more = (comp.pods || []).length > pods.length ? `<div class="tiny">+ ďalších ${(comp.pods || []).length - pods.length} podov</div>` : '';
+  const events = importantEvents(state).filter(e => e.component === comp.id).slice(-4);
+  const podRows = pods.length ? pods.map(p => `<div class="pod-row ${podStateClass(p)}">
+    <span class="pod-led"></span>
+    <span class="pod-name">${esc(shortPod(p.name))}</span>
+    <span>${esc(p.ready ? 'ready' : p.phase || 'not ready')}</span>
+    <span>${esc((p.restarts || 0) + ' restarts')}</span>
+  </div>`).join('') + more : '<div class="empty small-empty">Žiadne pody.</div>';
+  const impactHtml = isTarget ? `<div class="detail-box impact-box">
+      <div class="detail-label">Chaos zásah</div>
+      <div><b>Zmazaný:</b> ${esc(shortPod(impact.deletedPod))}</div>
+      <div><b>Náhrada:</b> ${esc(shortPod(impact.replacementPod))}</div>
+      <div><b>Výsledok:</b> ${esc(impact.verdict || 'prebieha')}${impact.score ? ' · ' + esc(impact.score) : ''}</div>
+    </div>` : `<div class="detail-box"><div class="detail-label">Chaos zásah</div><div>Momentálne bez zásahu.</div></div>`;
+  const eventHtml = events.length ? events.map(e => `<div class="mini-event"><span>${e.icon || '•'}</span><span>${fmtTime(e.time)}</span><b>${esc(e.title || e.reason)}</b></div>`).join('') : '<div class="tiny">Pre tento komponent nie sú posledné chaos udalosti.</div>';
+  el.innerHTML = `<div class="detail-head">
+      <div><div class="detail-kicker">Detail komponentu</div><h3>${comp.icon || ''} ${esc(comp.title)}</h3></div>
+      <div class="detail-status ${esc(comp.health || 'green')}">${healthText(comp.health)}</div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-box"><div class="detail-label">Stav</div><div class="detail-big">${esc(comp.ready)}/${esc(comp.desired || '?')}</div><div class="tiny">ready replík</div></div>
+      <div class="detail-box"><div class="detail-label">Workload</div><div>${esc(comp.namespace)} / ${esc(comp.name)}</div><div class="tiny">${esc(comp.kind)} · ${esc(comp.subtitle)}</div></div>
+      ${impactHtml}
+    </div>
+    <div class="detail-columns">
+      <div><div class="detail-label">Pody</div><div class="pod-list">${podRows}</div></div>
+      <div><div class="detail-label">Posledné udalosti</div><div class="mini-events">${eventHtml}</div></div>
+    </div>`;
+}
+
 function renderExperiments(state) {
   document.getElementById('experiments').innerHTML = (state.experiments || []).map(e => {
     const last = e.verdict ? `${e.verdict} ${e.score || ''}` : (e.status || 'never');
@@ -98,6 +159,7 @@ function render(state) {
   renderHero(state);
   renderFocus(state);
   renderPipeline(state);
+  renderComponentDetail(state);
   renderTimeline(state);
   renderExperiments(state);
 }
