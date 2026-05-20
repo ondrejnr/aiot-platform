@@ -21,8 +21,8 @@ redpanda:
   storageClass: local-path
 
 sensorSimulator:
-  replicas: 10
-  intervalSeconds: 2
+  replicas: 50
+  intervalSeconds: 10
 
 bridges:
   mqttToRedis:
@@ -42,7 +42,7 @@ priorityClass:
 # - PG: declarative daily partitions, drop partitions older than pgDays.
 # - Redpanda: retention by time AND bytes per partition (whichever fires first).
 retention:
-  pgDays: 7
+  pgDays: 30
   redpandaMs: 86400000              # 24h
   redpandaBytesPerPartition: 1073741824  # 1GiB/partition * 24 = 24GiB cap
 

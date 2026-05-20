@@ -16,6 +16,7 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
 OLLAMA_NUM_THREAD = int(os.getenv("OLLAMA_NUM_THREAD", "4"))
 INFERENCE_URL = os.getenv("INFERENCE_URL", "http://aiot-maintenance-api.aiot.svc.cluster.local:8080")
 INFERENCE_MODEL_NAME = os.getenv("INFERENCE_MODEL_NAME", "aiot-maintenance-predictor")
+FORECAST_MODEL_NAME = os.getenv("FORECAST_MODEL_NAME", "aiot-sensor-forecast-30m")
 K8S_API = os.getenv("KUBERNETES_SERVICE_HOST", "kubernetes.default.svc")
 K8S_PORT = os.getenv("KUBERNETES_SERVICE_PORT", "443")
 K8S_TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -65,6 +66,14 @@ def latest(limit=50):
 def predictions():
     try:
         r = requests.get(f"{INFERENCE_URL}/predict/latest", timeout=15)
+        return r.json() if r.ok else {"status":"degraded","items":[]}
+    except Exception as exc:
+        return {"status":"degraded","error":str(exc),"items":[]}
+
+
+def forecasts():
+    try:
+        r = requests.get(f"{INFERENCE_URL}/forecast/latest", timeout=20)
         return r.json() if r.ok else {"status":"degraded","items":[]}
     except Exception as exc:
         return {"status":"degraded","error":str(exc),"items":[]}
@@ -129,6 +138,30 @@ def answer_predictions(ctx):
         score=p.get("risk") or p.get("risk_score") or p.get("score")
         bits.append(f"{p.get('sensor_id')}={label}" + (f" ({score})" if score is not None else ""))
     return f"Predikcie idú lokálne cez MLflow model {model}; zdroj={source}. Najvyššie položky: " + "; ".join(bits) + "."
+
+
+
+def answer_forecast(ctx):
+    data=ctx.get("forecasts") or {}
+    items=data.get("items") or []
+    source=data.get("source") or data.get("status") or "neznámy"
+    version=data.get("model_version")
+    horizon=data.get("target_definition") or "sensor_values_plus_30m"
+    model=f"{FORECAST_MODEL_NAME}" + (f" v{version}" if version else "")
+    if not items:
+        return f"Forecast API pre {model} zatiaľ nevrátil položky; stav: {source}."
+    top=sorted(items, key=lambda x: x.get("predicted_risk", 0), reverse=True)[:3]
+    bits=[]
+    for p in top:
+        bits.append(
+            f"{p.get('sensor_id')} {p.get('label')} risk={p.get('predicted_risk')} %, "
+            f"T {fmt(p.get('temperature_now'),' °C')}→{fmt(p.get('temperature_forecast'),' °C')}, "
+            f"H {fmt(p.get('humidity_now'),' %')}→{fmt(p.get('humidity_forecast'),' %')}, "
+            f"P {fmt(p.get('pressure_now'),' hPa')}→{fmt(p.get('pressure_forecast'),' hPa')}, "
+            f"B {fmt(p.get('battery_now'),' V')}→{fmt(p.get('battery_forecast'),' V')}"
+        )
+    note="" if source == "mlflow" else " Zatiaľ je to bezpečný persistence fallback, kým MLflow model nenazbiera pozitívny skill."
+    return f"Forecast hodnôt ({horizon}) používa {model}; zdroj={source}.{note} Najvyššie budúce riziko: " + "; ".join(bits) + "."
 
 
 def k8s_get(path, timeout=7):
@@ -424,6 +457,12 @@ def is_cluster_question(q):
     return any(w in text for w in words)
 
 
+def is_forecast_question(q):
+    text = normalize_text(q)
+    words=["forecast", "predik", "predpoved", "buduc", "dopredu", "o 30", "30m", "hodnot", "teplot", "vlhkost", "tlak", "bateria", "battery"]
+    return any(w in text for w in words)
+
+
 def is_write_request(q):
     text = normalize_text(q)
     words=["restart", "restartni", "reboot", "delete", "zmaz", "vymaz", "scale", "skaluj", "patch", "apply", "nasad", "deploy", "upgrade", "update", "reconcile", "vytvor", "create", "edit", "uprav", "zmen", "kill", "drain", "cordon", "uncordon", "exec"]
@@ -445,6 +484,8 @@ def fast_answer(question, ctx):
         return answer_logs(q)
     if is_cluster_question(q):
         return answer_cluster()
+    if is_forecast_question(q):
+        return answer_forecast({"forecasts": forecasts()})
     if any(word in q for word in ["rizik", "naj", "kritick", "critical", "warning", "prečo", "preco", "senzor"]):
         return answer_risk(rows)
     if any(word in q for word in ["model", "mlflow", "predik", "inference", "údrž", "udrz"]):
@@ -471,7 +512,7 @@ def healthz(): return {"ok": True, "mode": "aiot-copilot-read-only"}
 
 
 @app.get("/api/summary")
-def api_summary(): return {"summary": summary(), "latest": latest(50), "predictions": predictions()}
+def api_summary(): return {"summary": summary(), "latest": latest(50), "predictions": predictions(), "forecasts": forecasts()}
 
 
 @app.get("/api/copilot/cluster")
@@ -503,6 +544,8 @@ def api_chat(req: ChatRequest):
         return {"answer": answer_logs(question), "source": "kubernetes-logs-read-only", "seconds": round(time.time() - started, 3)}
     if is_cluster_question(q_lower):
         return {"answer": answer_cluster(), "source": "kubernetes-read-only", "seconds": round(time.time() - started, 3)}
+    if is_forecast_question(q_lower):
+        return {"answer": answer_forecast({"forecasts": forecasts()}), "source": "sensor-forecast", "seconds": round(time.time() - started, 3)}
     if any(word in q_lower for word in prediction_words):
         ctx={"summary": {}, "latest": [], "predictions": predictions()}
         return {"answer": answer_predictions(ctx), "source": "local-rules", "seconds": round(time.time() - started, 3)}

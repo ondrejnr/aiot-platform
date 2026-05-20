@@ -7,54 +7,120 @@ metadata:
     {{- include "aiot.labels" . | nindent 4 }}
 data:
   sensor_simulator.py: |
-    import json, os, random, socket, time, hashlib
+    import json
+    import math
+    import os
+    import random
+    import socket
+    import time
     from datetime import datetime, timezone
+
     import paho.mqtt.client as mqtt
 
     host = os.getenv("MQTT_HOST", "aiot-emqx")
-    port = int(os.getenv("MQTT_PORT", "1883"))
     topic = os.getenv("MQTT_TOPIC", "aiot/sensors/telemetry")
-    interval = float(os.getenv("SENSOR_INTERVAL_SECONDS", "2"))
-    hostname = socket.gethostname()
-    # StatefulSet ordinal -> sensor_id (POD_NAME = aiot-sensor-simulator-N)
-    pod_name = os.getenv("POD_NAME", hostname)
+    interval = float(os.getenv("SENSOR_INTERVAL_SECONDS", "10"))
+    pod_name = os.getenv("POD_NAME", socket.gethostname())
     try:
         ordinal = int(pod_name.rsplit("-", 1)[-1])
-    except ValueError:
-        ordinal = int(hashlib.sha1(hostname.encode()).hexdigest(), 16) % 1000
+    except Exception:
+        ordinal = 0
+
+    locations = ["lab", "warehouse", "office", "outside", "plant"]
+    location = locations[ordinal % len(locations)]
     sensor_id = f"sensor-{ordinal + 1:03d}"
-    location = ["lab", "warehouse", "office", "outside", "plant"][ordinal % 5]
-    client_id = f"sensor-sim-{hostname}"
-    client = mqtt.Client(
-        client_id=client_id,
-        callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-    )
-    while True:
-        try:
-            client.connect(host, port, 60)
-            break
-        except Exception as exc:
-            print(f"{client_id} waiting for {host}:{port}: {exc}", flush=True)
-            time.sleep(3)
+    rng = random.Random(10_000 + ordinal)
+
+    profiles = {
+        "lab": {"temp": 22.0, "temp_amp": 1.0, "humidity": 45.0, "humidity_amp": 3.0, "pressure": 1013.0, "battery": 4.12},
+        "warehouse": {"temp": 20.5, "temp_amp": 2.0, "humidity": 53.0, "humidity_amp": 5.0, "pressure": 1012.0, "battery": 4.05},
+        "office": {"temp": 23.0, "temp_amp": 1.5, "humidity": 42.0, "humidity_amp": 4.0, "pressure": 1014.0, "battery": 4.10},
+        "outside": {"temp": 18.0, "temp_amp": 6.0, "humidity": 62.0, "humidity_amp": 10.0, "pressure": 1011.0, "battery": 4.00},
+        "plant": {"temp": 26.0, "temp_amp": 3.0, "humidity": 68.0, "humidity_amp": 7.0, "pressure": 1012.5, "battery": 4.02},
+    }
+    profile = profiles[location]
+    phase = rng.uniform(0, 2 * math.pi)
+    slow_phase = rng.uniform(0, 2 * math.pi)
+    temp_bias = rng.uniform(-1.2, 1.2)
+    humidity_bias = rng.uniform(-4.0, 4.0)
+    pressure_bias = rng.uniform(-2.0, 2.0)
+    battery_bias = rng.uniform(-0.08, 0.06)
+    drain_per_hour = rng.uniform(0.00008, 0.00025)
+    started = time.time()
+
+
+    def clamp(value, low, high):
+        return max(low, min(high, value))
+
+
+    def targets(now):
+        dt = datetime.fromtimestamp(now, tz=timezone.utc)
+        seconds = dt.hour * 3600 + dt.minute * 60 + dt.second
+        day = 2 * math.pi * seconds / 86400.0
+        weather = 2 * math.pi * now / (86400.0 * 3.0) + slow_phase
+        machine = 2 * math.pi * now / 5400.0 + phase
+
+        temp = (
+            profile["temp"]
+            + temp_bias
+            + profile["temp_amp"] * math.sin(day - 0.8 + phase * 0.15)
+            + 0.55 * math.sin(machine)
+            + 0.35 * math.sin(weather)
+        )
+        humidity = (
+            profile["humidity"]
+            + humidity_bias
+            - 1.35 * (temp - profile["temp"])
+            + profile["humidity_amp"] * math.sin(day + 1.4 + phase * 0.1)
+            + 1.5 * math.sin(weather + 0.6)
+        )
+        pressure = (
+            profile["pressure"]
+            + pressure_bias
+            + 4.0 * math.sin(weather)
+            + 0.7 * math.sin(2 * math.pi * now / 21600.0 + phase)
+        )
+        battery = profile["battery"] + battery_bias - ((now - started) / 3600.0) * drain_per_hour
+        if ordinal % 23 == 0:
+            battery -= 0.38
+        if ordinal % 31 == 0:
+            temp += 2.2
+            humidity += 4.5
+        return temp, humidity, pressure, battery
+
+
+    initial = targets(time.time())
+    state = {
+        "temperature": initial[0] + rng.uniform(-0.25, 0.25),
+        "humidity": initial[1] + rng.uniform(-0.8, 0.8),
+        "pressure": initial[2] + rng.uniform(-0.2, 0.2),
+        "battery": initial[3] + rng.uniform(-0.01, 0.01),
+    }
+
+    client = mqtt.Client(client_id=sensor_id)
+    client.connect(host, 1883, 60)
     client.loop_start()
-    print(f"{client_id} publishing as {sensor_id}@{location} -> {host}:{port}/{topic}", flush=True)
-    n = 0
-    last = time.monotonic()
+    print(f"Publishing realistic time-series telemetry as {sensor_id} at {interval}s interval from {location}", flush=True)
+
     while True:
+        now = time.time()
+        temp_t, hum_t, pressure_t, battery_t = targets(now)
+        # Smooth state update: values are predictable but still contain sensor noise.
+        state["temperature"] += 0.10 * (temp_t - state["temperature"]) + rng.gauss(0, 0.055)
+        state["humidity"] += 0.08 * (hum_t - state["humidity"]) + rng.gauss(0, 0.18)
+        state["pressure"] += 0.06 * (pressure_t - state["pressure"]) + rng.gauss(0, 0.035)
+        state["battery"] += 0.03 * (battery_t - state["battery"]) + rng.gauss(0, 0.0015)
+
         payload = {
-            "ts": datetime.now(timezone.utc).isoformat(),
             "sensor_id": sensor_id,
             "location": location,
-            "temperature": round(random.uniform(18.0, 31.0), 2),
-            "humidity": round(random.uniform(35.0, 78.0), 2),
-            "pressure": round(random.uniform(995.0, 1028.0), 2),
-            "battery": round(random.uniform(3.35, 4.20), 3),
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "temperature": round(clamp(state["temperature"], 10.0, 36.0), 2),
+            "humidity": round(clamp(state["humidity"], 25.0, 92.0), 2),
+            "pressure": round(clamp(state["pressure"], 985.0, 1035.0), 2),
+            "battery": round(clamp(state["battery"], 3.25, 4.22), 3),
         }
         client.publish(topic, json.dumps(payload), qos=0)
-        n += 1
-        if time.monotonic() - last >= 30:
-            print(f"{sensor_id} published total={n}", flush=True)
-            last = time.monotonic()
         time.sleep(interval)
   mqtt_to_redis.py: |
     # Async MQTT -> Redis Stream bridge using gmqtt + redis.asyncio.

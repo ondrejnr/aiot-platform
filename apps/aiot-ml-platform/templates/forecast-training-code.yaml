@@ -1,0 +1,313 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aiot-sensor-forecast-trainer-code
+  namespace: {{ .Values.training.namespace }}
+  labels:
+    {{- include "aiotml.labels" . | nindent 4 }}
+    app.kubernetes.io/component: sensor-forecast-trainer
+data:
+  train_forecast.py: |
+    import json
+    import math
+    import os
+    import re
+    import tempfile
+    from pathlib import Path
+
+    import mlflow
+    import mlflow.sklearn
+    import numpy as np
+    import pandas as pd
+    import psycopg2
+    from mlflow.models import infer_signature
+    from sklearn.ensemble import HistGradientBoostingRegressor
+    from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+    from sklearn.multioutput import MultiOutputRegressor
+
+    LOOKBACK_DAYS = int(os.getenv("LOOKBACK_DAYS", "30"))
+    MAX_ROWS = int(os.getenv("MAX_ROWS", "2500000"))
+    HORIZON_MINUTES = int(os.getenv("FORECAST_HORIZON_MINUTES", "30"))
+    RESAMPLE_MINUTES = int(os.getenv("RESAMPLE_MINUTES", "1"))
+    MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow.mlflow.svc.cluster.local:5000")
+    MODEL_NAME = os.getenv("MODEL_NAME", "aiot-sensor-forecast-30m")
+    EXPERIMENT_NAME = os.getenv("EXPERIMENT_NAME", "aiot-sensor-forecasting")
+    BASE_FEATURES = ["temperature", "humidity", "pressure", "battery"]
+    LAGS_MINUTES = [1, 5, 15, 30, 60]
+    ROLLING_WINDOWS_MINUTES = [5, 15, 60]
+    TIME_FEATURES = ["hour_sin", "hour_cos", "dow_sin", "dow_cos"]
+    LOCATION_CODES = {"lab": 0, "warehouse": 1, "office": 2, "outside": 3, "plant": 4}
+    FEATURE_SET_VERSION = "sensor_forecast_v1"
+    TARGET_DEFINITION = f"sensor_values_plus_{HORIZON_MINUTES}m"
+    TARGET_COLUMNS = [f"{col}_t_plus_{HORIZON_MINUTES}m" for col in BASE_FEATURES]
+
+
+    def dsn():
+        return "host={host} port={port} dbname={db} user={user} password={pwd}".format(
+            host=os.getenv("PGHOST"),
+            port=os.getenv("PGPORT", "5432"),
+            db=os.getenv("PGDATABASE"),
+            user=os.getenv("PGUSER"),
+            pwd=os.getenv("PGPASSWORD"),
+        )
+
+
+    def feature_columns():
+        cols = list(BASE_FEATURES)
+        for col in BASE_FEATURES:
+            for lag in LAGS_MINUTES:
+                cols.append(f"{col}_lag_{lag}m")
+                cols.append(f"{col}_delta_{lag}m")
+            for window in ROLLING_WINDOWS_MINUTES:
+                cols.append(f"{col}_roll_{window}m_mean")
+                cols.append(f"{col}_roll_{window}m_std")
+                cols.append(f"{col}_roll_{window}m_min")
+                cols.append(f"{col}_roll_{window}m_max")
+                cols.append(f"{col}_roll_{window}m_trend")
+        cols.extend(TIME_FEATURES)
+        cols.extend(["sensor_num", "location_code"])
+        return cols
+
+
+    FEATURES = feature_columns()
+
+
+    def load_minute_data():
+        sql = f"""
+        with raw as (
+            select ts, sensor_id, location, temperature, humidity, pressure, battery
+            from sensor_data
+            where ts > now() - interval '{LOOKBACK_DAYS} days'
+            order by ts desc
+            limit {MAX_ROWS}
+        )
+        select date_trunc('minute', ts) as ts,
+               sensor_id,
+               max(location) as location,
+               avg(temperature)::float as temperature,
+               avg(humidity)::float as humidity,
+               avg(pressure)::float as pressure,
+               avg(battery)::float as battery,
+               count(*)::int as samples
+        from raw
+        where sensor_id is not null
+        group by 1, 2
+        order by 1 asc, 2 asc
+        """
+        with psycopg2.connect(dsn()) as conn:
+            return pd.read_sql(sql, conn)
+
+
+    def sensor_number(sensor_id):
+        match = re.search(r"(\d+)$", str(sensor_id or ""))
+        return int(match.group(1)) if match else 0
+
+
+    def add_time_features(frame):
+        ts = pd.to_datetime(frame["ts"], utc=True)
+        seconds = ts.dt.hour * 3600 + ts.dt.minute * 60 + ts.dt.second
+        hour_angle = 2 * math.pi * seconds / 86400.0
+        dow_angle = 2 * math.pi * ts.dt.dayofweek / 7.0
+        frame["hour_sin"] = np.sin(hour_angle)
+        frame["hour_cos"] = np.cos(hour_angle)
+        frame["dow_sin"] = np.sin(dow_angle)
+        frame["dow_cos"] = np.cos(dow_angle)
+        return frame
+
+
+    def prepare_supervised(raw):
+        df = raw.copy()
+        df["ts"] = pd.to_datetime(df["ts"], utc=True, errors="coerce")
+        for col in BASE_FEATURES:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df = df.dropna(subset=["ts", "sensor_id"] + BASE_FEATURES).sort_values(["sensor_id", "ts"])
+        freq = f"{RESAMPLE_MINUTES}min"
+        df["ts"] = df["ts"].dt.floor(freq)
+        aggregations = {col: "mean" for col in BASE_FEATURES}
+        aggregations["location"] = "last"
+        df = df.groupby(["sensor_id", "ts"], as_index=False).agg(aggregations).sort_values(["sensor_id", "ts"])
+        frames = []
+        horizon_steps = max(1, int(round(HORIZON_MINUTES / RESAMPLE_MINUTES)))
+        for sensor_id, group in df.groupby("sensor_id", sort=False):
+            group = group.sort_values("ts").set_index("ts")
+            if len(group) < horizon_steps + 10:
+                continue
+            location = str(group["location"].dropna().iloc[-1]) if group["location"].notna().any() else "unknown"
+            idx = pd.date_range(group.index.min().floor(freq), group.index.max().floor(freq), freq=freq)
+            g = group[BASE_FEATURES].reindex(idx)
+            g[BASE_FEATURES] = g[BASE_FEATURES].interpolate(method="time", limit=3).ffill(limit=3).bfill(limit=1)
+            g = g.dropna(subset=BASE_FEATURES)
+            if len(g) < horizon_steps + 10:
+                continue
+            g["sensor_id"] = sensor_id
+            g["location"] = location
+            g["sensor_num"] = sensor_number(sensor_id) / 1000.0
+            g["location_code"] = LOCATION_CODES.get(location, -1)
+            for col in BASE_FEATURES:
+                for lag in LAGS_MINUTES:
+                    steps = max(1, int(round(lag / RESAMPLE_MINUTES)))
+                    lagged = g[col].shift(steps)
+                    g[f"{col}_lag_{lag}m"] = lagged
+                    g[f"{col}_delta_{lag}m"] = g[col] - lagged
+                for window in ROLLING_WINDOWS_MINUTES:
+                    steps = max(2, int(round(window / RESAMPLE_MINUTES)))
+                    roll = g[col].rolling(steps, min_periods=max(2, min(steps, 3)))
+                    mean = roll.mean()
+                    g[f"{col}_roll_{window}m_mean"] = mean
+                    g[f"{col}_roll_{window}m_std"] = roll.std().fillna(0.0)
+                    g[f"{col}_roll_{window}m_min"] = roll.min()
+                    g[f"{col}_roll_{window}m_max"] = roll.max()
+                    g[f"{col}_roll_{window}m_trend"] = g[col] - mean
+                g[f"{col}_t_plus_{HORIZON_MINUTES}m"] = g[col].shift(-horizon_steps)
+            g = g.reset_index().rename(columns={"index": "ts"})
+            frames.append(g)
+        if not frames:
+            return pd.DataFrame(columns=["ts", "sensor_id", "location"] + FEATURES + TARGET_COLUMNS)
+        out = pd.concat(frames, ignore_index=True)
+        out = add_time_features(out)
+        out[FEATURES] = out[FEATURES].replace([np.inf, -np.inf], np.nan)
+        out = out.dropna(subset=FEATURES + TARGET_COLUMNS).sort_values("ts").reset_index(drop=True)
+        return out
+
+
+    def metrics_for_target(name, y_true, y_pred, baseline):
+        mae = mean_absolute_error(y_true, y_pred)
+        baseline_mae = mean_absolute_error(y_true, baseline)
+        rmse = float(np.sqrt(mean_squared_error(y_true, y_pred)))
+        baseline_rmse = float(np.sqrt(mean_squared_error(y_true, baseline)))
+        skill = 1.0 - (mae / baseline_mae) if baseline_mae > 0 else 0.0
+        return {
+            f"{name}_mae": float(mae),
+            f"{name}_rmse": rmse,
+            f"{name}_r2": float(r2_score(y_true, y_pred)),
+            f"{name}_baseline_persistence_mae": float(baseline_mae),
+            f"{name}_baseline_persistence_rmse": baseline_rmse,
+            f"{name}_skill_vs_persistence": float(skill),
+        }
+
+
+    def log_artifacts(df, split_idx, preds, metrics):
+        sample = df.iloc[split_idx:].copy().head(300)
+        for i, col in enumerate(BASE_FEATURES):
+            sample[f"predicted_{col}_plus_{HORIZON_MINUTES}m"] = preds[: len(sample), i]
+        profile = {
+            "rows": int(len(df)),
+            "sensors": int(df["sensor_id"].nunique()) if len(df) else 0,
+            "lookback_days": LOOKBACK_DAYS,
+            "max_raw_rows": MAX_ROWS,
+            "horizon_minutes": HORIZON_MINUTES,
+            "resample_minutes": RESAMPLE_MINUTES,
+            "feature_set_version": FEATURE_SET_VERSION,
+            "feature_count": len(FEATURES),
+            "features": FEATURES,
+            "target_columns": TARGET_COLUMNS,
+            "time_range": {"min_ts": str(df["ts"].min()), "max_ts": str(df["ts"].max())} if len(df) else {},
+        }
+        model_card = [
+            "# AIOT sensor forecast model",
+            "",
+            f"Predicts temperature, humidity, pressure and battery {HORIZON_MINUTES} minutes ahead.",
+            "",
+            "## Validation",
+            "- Chronological 80/20 split.",
+            "- Baseline is persistence: future value equals current value.",
+            "- Positive skill means model beats persistence.",
+            "",
+            "## Metrics",
+        ]
+        for key, value in sorted(metrics.items()):
+            model_card.append(f"- {key}: {float(value):.6f}")
+        mlflow.log_dict(metrics, "reports/metrics.json")
+        mlflow.log_dict(profile, "reports/dataset-summary.json")
+        mlflow.log_text("\n".join(model_card) + "\n", "reports/model-card.md")
+        mlflow.log_table(sample, "reports/prediction-sample.json")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            sample.to_csv(tmp_path / "prediction-sample.csv", index=False)
+            (tmp_path / "features.json").write_text(json.dumps(FEATURES, indent=2))
+            mlflow.log_artifacts(str(tmp_path), artifact_path="exports")
+
+
+    def main():
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        mlflow.set_experiment(EXPERIMENT_NAME)
+        with mlflow.start_run() as run:
+            mlflow.set_tags({
+                "aiot.component": "sensor-forecast-trainer",
+                "aiot.model_name": MODEL_NAME,
+                "aiot.target_definition": TARGET_DEFINITION,
+                "aiot.feature_set_version": FEATURE_SET_VERSION,
+                "aiot.split_strategy": "chronological_80_20",
+            })
+            raw = load_minute_data()
+            df = prepare_supervised(raw)
+            mlflow.log_metric("minute_rows", float(len(raw)))
+            mlflow.log_metric("training_rows", float(len(df)))
+            mlflow.log_metric("sensors", float(df["sensor_id"].nunique()) if len(df) else 0.0)
+            if len(df) < 500:
+                print(f"Not enough supervised rows for forecast training: {len(df)}")
+                return
+            split_idx = max(1, int(len(df) * 0.8))
+            split_idx = min(split_idx, len(df) - 1)
+            X = df[FEATURES].replace([np.inf, -np.inf], np.nan).fillna(0.0)
+            y = df[TARGET_COLUMNS]
+            X_train, X_test = X.iloc[:split_idx], X.iloc[split_idx:]
+            y_train, y_test = y.iloc[:split_idx], y.iloc[split_idx:]
+            model = MultiOutputRegressor(
+                HistGradientBoostingRegressor(
+                    max_iter=350,
+                    learning_rate=0.06,
+                    max_leaf_nodes=31,
+                    min_samples_leaf=20,
+                    l2_regularization=0.02,
+                    random_state=42,
+                )
+            )
+            model.fit(X_train, y_train)
+            preds = np.asarray(model.predict(X_test), dtype=float)
+            metrics = {
+                "rows": float(len(df)),
+                "feature_count": float(len(FEATURES)),
+                "horizon_minutes": float(HORIZON_MINUTES),
+            }
+            skills = []
+            maes = []
+            for i, col in enumerate(BASE_FEATURES):
+                target = TARGET_COLUMNS[i]
+                baseline = X_test[col].to_numpy(dtype=float)
+                part = metrics_for_target(col, y_test[target].to_numpy(dtype=float), preds[:, i], baseline)
+                metrics.update(part)
+                skills.append(part[f"{col}_skill_vs_persistence"])
+                maes.append(part[f"{col}_mae"])
+            metrics["overall_skill_vs_persistence"] = float(np.mean(skills))
+            metrics["overall_mae"] = float(np.mean(maes))
+            mlflow.log_params({
+                "rows": len(df),
+                "lookback_days": LOOKBACK_DAYS,
+                "max_raw_rows": MAX_ROWS,
+                "model_type": "MultiOutputRegressor(HistGradientBoostingRegressor)",
+                "feature_count": len(FEATURES),
+                "feature_set_version": FEATURE_SET_VERSION,
+                "features": ",".join(FEATURES),
+                "target_definition": TARGET_DEFINITION,
+                "target_columns": ",".join(TARGET_COLUMNS),
+                "forecast_horizon_minutes": HORIZON_MINUTES,
+                "resample_minutes": RESAMPLE_MINUTES,
+                "split_strategy": "chronological_80_20",
+                "baseline": "persistence_current_value",
+            })
+            mlflow.log_metrics({k: float(v) for k, v in metrics.items()})
+            log_artifacts(df, split_idx, preds, metrics)
+            signature = infer_signature(X_train.head(20), model.predict(X_train.head(20)))
+            mlflow.sklearn.log_model(
+                model,
+                "model",
+                registered_model_name=MODEL_NAME,
+                signature=signature,
+                input_example=X_train.head(5),
+            )
+            print({"run_id": run.info.run_id, "rows": len(df), "sensors": int(df["sensor_id"].nunique()), "metrics": metrics})
+
+
+    if __name__ == "__main__":
+        main()

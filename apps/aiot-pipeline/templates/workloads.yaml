@@ -32,6 +32,8 @@ spec:
       app.kubernetes.io/component: sensor-simulator
   template:
     metadata:
+      annotations:
+        checksum/scripts: {{ include (print $.Template.BasePath "/configmap-scripts.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/component: sensor-simulator
         {{- include "aiot.labels" . | nindent 8 }}

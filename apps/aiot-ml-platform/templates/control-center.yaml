@@ -45,6 +45,8 @@ spec:
               value: http://aiot-maintenance-api.aiot.svc.cluster.local:8080
             - name: INFERENCE_MODEL_NAME
               value: {{ .Values.inference.modelName | quote }}
+            - name: FORECAST_MODEL_NAME
+              value: {{ .Values.forecast.modelName | quote }}
           ports:
             - name: http
               containerPort: 8080

@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: aiot-sensor-forecast-train
+  namespace: {{ .Values.training.namespace }}
+  labels:
+    {{- include "aiotml.labels" . | nindent 4 }}
+    app.kubernetes.io/component: sensor-forecast-trainer
+spec:
+  schedule: {{ .Values.forecast.schedule | quote }}
+  suspend: {{ .Values.forecast.suspend }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 5400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/component: sensor-forecast-trainer
+            app.kubernetes.io/part-of: aiot-ml-platform
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: trainer
+              image: {{ .Values.training.image | quote }}
+              imagePullPolicy: IfNotPresent
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  python -m pip install --no-cache-dir pandas scikit-learn psycopg2-binary "mlflow=={{ .Values.mlflow.version }}" >/tmp/forecast-pip.log 2>&1
+                  exec python /app/train_forecast.py
+              envFrom:
+                - secretRef:
+                    name: aiot-pg-credentials
+              env:
+                - name: MLFLOW_TRACKING_URI
+                  value: http://mlflow.mlflow.svc.cluster.local:5000
+                - name: MODEL_NAME
+                  value: {{ .Values.forecast.modelName | quote }}
+                - name: EXPERIMENT_NAME
+                  value: {{ .Values.forecast.experimentName | quote }}
+                - name: LOOKBACK_DAYS
+                  value: {{ .Values.forecast.lookbackDays | quote }}
+                - name: MAX_ROWS
+                  value: {{ .Values.forecast.maxRows | quote }}
+                - name: FORECAST_HORIZON_MINUTES
+                  value: {{ .Values.forecast.horizonMinutes | quote }}
+                - name: RESAMPLE_MINUTES
+                  value: {{ .Values.forecast.resampleMinutes | quote }}
+              resources:
+                {{- toYaml .Values.forecast.resources | nindent 16 }}
+              volumeMounts:
+                - name: code
+                  mountPath: /app
+          volumes:
+            - name: code
+              configMap:
+                name: aiot-sensor-forecast-trainer-code

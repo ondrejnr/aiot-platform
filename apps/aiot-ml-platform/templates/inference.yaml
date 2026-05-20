@@ -41,6 +41,15 @@ spec:
               value: {{ .Values.training.targetHorizonMinutes | quote }}
             - name: MIN_EVENT_DURATION_MINUTES
               value: {{ .Values.training.minEventDurationMinutes | quote }}
+
+            - name: FORECAST_MODEL_NAME
+              value: {{ .Values.forecast.modelName | quote }}
+            - name: FORECAST_HORIZON_MINUTES
+              value: {{ .Values.forecast.horizonMinutes | quote }}
+            - name: FORECAST_RESAMPLE_MINUTES
+              value: {{ .Values.forecast.resampleMinutes | quote }}
+            - name: FORECAST_MIN_SKILL
+              value: {{ .Values.forecast.minSkill | quote }}
           ports:
             - name: http
               containerPort: 8080
