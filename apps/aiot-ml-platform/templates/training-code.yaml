@@ -369,6 +369,7 @@ data:
                 "precision": precision_score(y_test, pred, zero_division=0),
                 "recall": recall_score(y_test, pred, zero_division=0),
                 "baseline_always_zero_accuracy": float((y_test == 0).mean()),
+                "baseline_always_one_accuracy": float((y_test == 1).mean()),
                 "baseline_current_rule_accuracy": accuracy_score(y_test, current_rule_baseline),
                 "feature_count": float(len(FEATURES)),
             }
@@ -392,6 +393,7 @@ data:
                     "min_event_duration_minutes": MIN_EVENT_DURATION_MINUTES,
                     "split_strategy": "chronological_80_20",
                     "rolling_windows": ",".join(WINDOWS.keys()),
+                    "pyfunc_predict_fn": "predict_proba",
                 }
             )
             mlflow.log_metrics(metrics)

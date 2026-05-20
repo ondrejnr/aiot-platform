@@ -90,6 +90,7 @@ data:
                 versions = [v for v in client.search_model_versions(f"name='{MODEL_NAME}'") if getattr(v, "status", "READY") == "READY"]
                 if not versions:
                     return None
+                preferred_proba = []
                 preferred = []
                 legacy = []
                 for v in versions:
@@ -102,13 +103,15 @@ data:
                         target = params.get("target_definition")
                         score = float(metrics.get("pr_auc", metrics.get("roc_auc", metrics.get("accuracy", 0.0))))
                         item = (score, int(v.version), v, params)
-                        if target == TARGET_DEFINITION:
+                        if target == TARGET_DEFINITION and params.get("pyfunc_predict_fn") == "predict_proba":
+                            preferred_proba.append(item)
+                        elif target == TARGET_DEFINITION:
                             preferred.append(item)
                         elif target == LEGACY_TARGET_DEFINITION:
                             legacy.append(item)
                     except Exception:
                         continue
-                selected_group = preferred or legacy
+                selected_group = preferred_proba or preferred or legacy
                 if selected_group:
                     score, _, selected, params = sorted(selected_group, key=lambda x: (x[0], x[1]), reverse=True)[0]
                     _model_score = score
