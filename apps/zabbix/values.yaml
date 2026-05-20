@@ -11,6 +11,8 @@ zabbix:
     enabled: false
   zabbixServer:
     extraEnv:
+      - name: ZBX_CACHESIZE
+        value: "256M"
       - name: ZBX_VALUECACHESIZE
         value: "256M"
       - name: ZBX_HISTORYCACHESIZE
