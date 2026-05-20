@@ -416,7 +416,7 @@ def build_impact(story, latest_workflow, latest_result):
             impact["resultTime"] = ev.get("time")
     start = parse_ts(impact.get("killTime"))
     end = parse_ts(impact.get("replacementTime")) or parse_ts(impact.get("resultTime"))
-    if start and end and end >= start:
+    if start and end and end > start:
         impact["recoverySeconds"] = round(end - start)
     return impact
 
