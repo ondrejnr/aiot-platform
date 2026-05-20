@@ -31,10 +31,10 @@ data:
         recall_score,
         roc_auc_score,
     )
-    from sklearn.model_selection import train_test_split
 
     LOOKBACK_DAYS = int(os.getenv("LOOKBACK_DAYS", "7"))
     MAX_ROWS = int(os.getenv("MAX_ROWS", "200000"))
+    MAX_TARGET_GAP_SECONDS = int(os.getenv("MAX_TARGET_GAP_SECONDS", "300"))
     MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow.mlflow.svc.cluster.local:5000")
     MODEL_NAME = os.getenv("MODEL_NAME", "aiot-maintenance-predictor")
     EXPERIMENT_NAME = os.getenv("EXPERIMENT_NAME", "aiot-maintenance-proxied")
@@ -60,26 +60,50 @@ data:
         with psycopg2.connect(dsn()) as conn:
             return pd.read_sql(sql, conn)
 
-    def add_target(df):
-        df = df.copy()
-        for col in FEATURES:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-        df = df.dropna(subset=FEATURES)
-        df["target"] = (
+    def threshold_rule(df):
+        return (
             (df["temperature"] > 29.0)
             | (df["humidity"] > 75.0)
             | (df["pressure"] < 998.0)
             | (df["pressure"] > 1025.0)
             | (df["battery"] < 3.50)
         ).astype(int)
-        return df
+
+    def add_target(df):
+        """Build a no-leakage target.
+
+        Previous training used target = threshold_rule(current features), while the model
+        also received those same current features. That made 1.0 metrics expected but not
+        useful: the classifier only learned the hard-coded threshold rule.
+
+        This target predicts the next observed threshold state for the same sensor. The
+        current threshold state is kept only as a baseline metric, not as a feature.
+        """
+        df = df.copy()
+        df["ts"] = pd.to_datetime(df["ts"], utc=True, errors="coerce")
+        for col in FEATURES:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df = df.dropna(subset=["ts", "sensor_id"] + FEATURES)
+        df = df.sort_values(["sensor_id", "ts"]).reset_index(drop=True)
+        df["current_rule_target"] = threshold_rule(df)
+        grouped = df.groupby("sensor_id", sort=False)
+        df["target"] = grouped["current_rule_target"].shift(-1)
+        df["target_ts"] = grouped["ts"].shift(-1)
+        df["target_gap_seconds"] = (df["target_ts"] - df["ts"]).dt.total_seconds()
+        df = df.dropna(subset=["target", "target_gap_seconds"])
+        df = df[df["target_gap_seconds"] <= MAX_TARGET_GAP_SECONDS]
+        df["target"] = df["target"].astype(int)
+        return df.sort_values("ts").reset_index(drop=True)
 
     def data_profile(df):
         profile = {
             "rows": int(len(df)),
             "lookback_days": LOOKBACK_DAYS,
             "max_rows": MAX_ROWS,
+            "target_definition": "next_sample_threshold_state_per_sensor",
+            "max_target_gap_seconds": MAX_TARGET_GAP_SECONDS,
             "positive_rate": float(df["target"].mean()) if len(df) else 0.0,
+            "current_rule_positive_rate": float(df["current_rule_target"].mean()) if len(df) else 0.0,
             "target_counts": {str(k): int(v) for k, v in df["target"].value_counts().sort_index().items()},
             "features": FEATURES,
             "feature_summary": {},
@@ -88,6 +112,13 @@ data:
             profile["time_range"] = {
                 "min_ts": str(df["ts"].min()),
                 "max_ts": str(df["ts"].max()),
+            }
+        if "target_gap_seconds" in df.columns and len(df):
+            gaps = pd.to_numeric(df["target_gap_seconds"], errors="coerce")
+            profile["target_gap_seconds"] = {
+                "min": float(gaps.min()),
+                "mean": float(gaps.mean()),
+                "max": float(gaps.max()),
             }
         for col in FEATURES:
             s = pd.to_numeric(df[col], errors="coerce")
@@ -111,7 +142,7 @@ data:
 
     def log_dataset_lineage(df):
         try:
-            sample = df[FEATURES + ["target"]].sample(min(len(df), 1000), random_state=42)
+            sample = df[FEATURES + ["current_rule_target", "target"]].sample(min(len(df), 1000), random_state=42)
             dataset = mlflow.data.from_pandas(
                 sample,
                 source="postgresql://aiot/sensor_data",
@@ -121,30 +152,34 @@ data:
         except Exception as exc:
             print(f"dataset lineage skipped: {exc}")
 
-    def log_artifacts(df, X_test, y_test, pred, proba, model, metrics, profile):
+    def log_artifacts(df, X_test, y_test, pred, proba, model, metrics, profile, split_idx):
         feature_importance = pd.DataFrame(
             {"feature": FEATURES, "importance": [float(v) for v in model.feature_importances_]}
         ).sort_values("importance", ascending=False)
-        pred_sample = X_test.copy()
-        pred_sample["target"] = list(y_test)
-        pred_sample["prediction"] = list(pred)
-        pred_sample["failure_probability"] = list(proba)
-        pred_sample = pred_sample.head(250)
+        pred_sample = df.iloc[split_idx:].copy().head(250)
+        pred_sample["prediction"] = list(pred[: len(pred_sample)])
+        pred_sample["failure_probability"] = list(proba[: len(pred_sample)])
         cm = confusion_matrix(y_test, pred, labels=[0, 1])
         report_text = classification_report(y_test, pred, labels=[0, 1], zero_division=0)
         model_card = f"""# AIOT maintenance predictor
 
     ## Purpose
-    Predicts elevated maintenance risk for AIOT sensor records from telemetry features.
+    Predicts the next observed threshold-risk state for each AIOT sensor from current telemetry features.
 
     ## Training data
     - Source table: `sensor_data`
     - Lookback window: {LOOKBACK_DAYS} days
     - Training rows after cleanup: {len(df)}
+    - Target: next sample threshold state per `sensor_id`, max gap {MAX_TARGET_GAP_SECONDS}s
     - Positive rate: {profile['positive_rate']:.4f}
+    - Current-rule positive rate: {profile['current_rule_positive_rate']:.4f}
 
     ## Features
     {', '.join(FEATURES)}
+
+    ## Validation
+    - Split strategy: chronological 80/20 split, not random row split
+    - Leakage check: current threshold state is not used as a feature
 
     ## Metrics
     """
@@ -178,6 +213,8 @@ data:
                     "aiot.component": "maintenance-trainer",
                     "aiot.model_name": MODEL_NAME,
                     "aiot.experiment": EXPERIMENT_NAME,
+                    "aiot.target_definition": "next_sample_threshold_state_per_sensor",
+                    "aiot.split_strategy": "chronological_80_20",
                 }
             )
             log_system_snapshot(0)
@@ -192,17 +229,18 @@ data:
                 print(f"Not enough rows for training: {len(df)}")
                 mlflow.log_metric("rows", len(df))
                 return
+            if df["target"].nunique() < 2:
+                print("Not enough target diversity for training")
+                mlflow.log_metric("rows", len(df))
+                mlflow.log_metric("positive_rate", float(df["target"].mean()))
+                return
 
             X = df[FEATURES].fillna(0)
             y = df["target"]
-            stratify = y if y.nunique() > 1 else None
-            X_train, X_test, y_train, y_test = train_test_split(
-                X,
-                y,
-                test_size=0.2,
-                random_state=42,
-                stratify=stratify,
-            )
+            split_idx = max(1, int(len(df) * 0.8))
+            split_idx = min(split_idx, len(df) - 1)
+            X_train, X_test = X.iloc[:split_idx], X.iloc[split_idx:]
+            y_train, y_test = y.iloc[:split_idx], y.iloc[split_idx:]
             model = RandomForestClassifier(
                 n_estimators=160,
                 max_depth=8,
@@ -219,11 +257,14 @@ data:
 
             pred = model.predict(X_test)
             proba = model.predict_proba(X_test)[:, 1] if len(model.classes_) > 1 else pred
+            current_rule_baseline = df["current_rule_target"].iloc[split_idx:].astype(int)
             metrics = {
                 "accuracy": accuracy_score(y_test, pred),
                 "f1": f1_score(y_test, pred, zero_division=0),
                 "precision": precision_score(y_test, pred, zero_division=0),
                 "recall": recall_score(y_test, pred, zero_division=0),
+                "baseline_always_zero_accuracy": float((y_test == 0).mean()),
+                "baseline_current_rule_accuracy": accuracy_score(y_test, current_rule_baseline),
             }
             if y_test.nunique() > 1:
                 metrics["roc_auc"] = roc_auc_score(y_test, proba)
@@ -237,12 +278,15 @@ data:
                     "features": ",".join(FEATURES),
                     "model_type": "RandomForestClassifier",
                     "experiment_name": EXPERIMENT_NAME,
+                    "target_definition": "next_sample_threshold_state_per_sensor",
+                    "max_target_gap_seconds": MAX_TARGET_GAP_SECONDS,
+                    "split_strategy": "chronological_80_20",
                 }
             )
             mlflow.log_metrics(metrics)
             log_system_snapshot(1)
             log_dataset_lineage(df)
-            log_artifacts(df, X_test, y_test, pred, proba, model, metrics, profile)
+            log_artifacts(df, X_test, y_test, pred, proba, model, metrics, profile, split_idx)
 
             signature = infer_signature(X_train.head(20), model.predict_proba(X_train.head(20)))
             mlflow.sklearn.log_model(
