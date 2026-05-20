@@ -26,7 +26,7 @@ data:
     from sklearn.multioutput import MultiOutputRegressor
 
     LOOKBACK_DAYS = int(os.getenv("LOOKBACK_DAYS", "30"))
-    MAX_ROWS = int(os.getenv("MAX_ROWS", "2500000"))
+    MAX_ROWS = int(float(os.getenv("MAX_ROWS", "2500000")))
     HORIZON_MINUTES = int(os.getenv("FORECAST_HORIZON_MINUTES", "30"))
     RESAMPLE_MINUTES = int(os.getenv("RESAMPLE_MINUTES", "1"))
     MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow.mlflow.svc.cluster.local:5000")
