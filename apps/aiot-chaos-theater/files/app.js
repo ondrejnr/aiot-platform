@@ -100,35 +100,70 @@ function eventLane(ev, state) {
 function renderFlowGraph(state, activeIndex = -1) {
   const el = document.getElementById('flowGraph');
   if (!el) return;
-  const events = importantEvents(state).filter(e => timeMs(e.time) !== null);
+  const all = importantEvents(state);
+  const events = all.map((ev, index) => ({...ev, index, ms: timeMs(ev.time)})).filter(e => e.ms !== null);
   if (!events.length) {
-    el.innerHTML = '<div class="empty">Po spustení experimentu sa tu zobrazí časový graf udalostí.</div>';
+    el.innerHTML = '<div class="empty">Po spustení experimentu sa tu zobrazí prehľadný graf priebehu.</div>';
     return;
   }
-  const stamps = events.map(e => timeMs(e.time)).filter(t => t !== null);
-  let start = Math.min(...stamps);
-  let end = Math.max(...stamps);
-  if (end <= start) end = start + 60000;
-  const target = state.impact?.target || state.latestWorkflow?.target;
-  const selected = getSelectedComponent(state)?.id;
-  const laneDefs = [{id: 'experiment', title: 'Experiment', icon: '🧪'}].concat(state.components || []);
-  const activeLaneIds = new Set(['experiment', target, selected].filter(Boolean));
-  events.forEach(e => activeLaneIds.add(eventLane(e, state)));
-  const lanes = laneDefs.filter(l => activeLaneIds.has(l.id));
-  const dotsByLane = new Map(lanes.map(l => [l.id, []]));
-  events.forEach((ev, idx) => {
-    const lane = eventLane(ev, state);
-    if (!dotsByLane.has(lane)) return;
-    const pct = Math.max(0, Math.min(100, ((timeMs(ev.time) - start) / (end - start)) * 100));
-    const cls = ev.level === 'danger' ? 'danger' : ev.level === 'warn' ? 'warn' : ev.level === 'success' ? 'success' : 'info';
-    dotsByLane.get(lane).push(`<span class="flow-dot ${cls} ${idx === activeIndex ? 'active' : ''}" style="left:${pct}%" title="${esc(fmtTime(ev.time) + ' · ' + (ev.title || ev.reason) + ' · ' + cleanMessage(ev))}">${ev.icon || '•'}</span>`);
-  });
-  const rows = lanes.map(l => `<div class="flow-row">
-    <div class="flow-label"><span>${l.icon || '•'}</span><b>${esc(l.title || l.id)}</b></div>
-    <div class="flow-track"><span class="flow-line"></span>${(dotsByLane.get(l.id) || []).join('')}</div>
-  </div>`).join('');
-  const running = state.latestWorkflow && !['Succeeded', 'Failed', 'Error'].includes(state.latestWorkflow.phase);
-  el.innerHTML = `<div class="flow-axis"><span>${fmtTime(new Date(start).toISOString())}</span><span>${running ? 'live' : fmtTime(new Date(end).toISOString())}</span></div>${rows}<div class="flow-legend"><span><i class="legend-dot danger"></i> zásah</span><span><i class="legend-dot warn"></i> obnova</span><span><i class="legend-dot success"></i> hotovo</span></div>`;
+
+  const wf = state.latestWorkflow || {};
+  const impact = state.impact || {};
+  const firstMs = Math.min(...events.map(e => e.ms));
+  const lastMs = Math.max(...events.map(e => e.ms));
+  const startMs = timeMs(wf.startedAt) || firstMs;
+  const endMs = Math.max(lastMs, startMs + 1000);
+  const span = Math.max(1, endMs - startMs);
+  const pct = (ms) => Math.max(2, Math.min(98, ((ms - startMs) / span) * 100));
+  const findLast = (predicate) => [...events].reverse().find(predicate);
+  const findFirst = (predicate) => events.find(predicate);
+
+  const started = wf.startedAt ? {time: wf.startedAt, ms: timeMs(wf.startedAt), title: 'Experiment štart', icon: '🧪', detail: wf.baseName || 'Litmus workflow', level: 'info'} : events[0];
+  const inject = findFirst(e => e.reason === 'ChaosInject');
+  const deleted = findFirst(e => e.reason === 'Killing');
+  const created = findFirst(e => e.reason === 'SuccessfulCreate' && (e.message || '').includes('Created pod:'));
+  const result = findLast(e => ['Pass', 'Fail', 'WorkflowSucceeded', 'Summary'].includes(e.reason)) || events[events.length - 1];
+
+  const replacementName = created?.message?.includes('Created pod:') ? shortPod(created.message.split('Created pod:')[1].trim().split(/\s+/)[0]) : shortPod(impact.replacementPod);
+  const milestones = [
+    {key:'start', label:'Štart', icon:'🧪', time: started?.time || wf.startedAt, ms: started?.ms || timeMs(wf.startedAt), detail: wf.baseName || 'experiment', level:'info'},
+    inject ? {key:'inject', label:'Fault', icon:'💥', time: inject.time, ms: inject.ms, detail:'Litmus aplikuje chaos', level:'danger', index: inject.index} : null,
+    deleted ? {key:'delete', label:'Pod delete', icon:'🧨', time: deleted.time, ms: deleted.ms, detail: shortPod(deleted.object), level:'danger', index: deleted.index} : null,
+    created ? {key:'replace', label:'Náhrada', icon:'🛠️', time: created.time, ms: created.ms, detail: replacementName, level:'warn', index: created.index} : null,
+    result ? {key:'result', label: impact.verdict || result.title || 'Výsledok', icon: impact.verdict === 'Pass' || result.reason === 'Pass' || result.reason === 'WorkflowSucceeded' ? '✅' : (impact.verdict === 'Fail' || result.reason === 'Fail' ? '🔴' : '🏁'), time: result.time, ms: result.ms, detail: impact.score ? `score ${impact.score}` : cleanMessage(result), level: (impact.verdict === 'Fail' || result.reason === 'Fail') ? 'danger' : 'success', index: result.index} : null
+  ].filter(m => m && m.ms !== null);
+
+  const activeMilestoneKey = milestones.find(m => m.index === activeIndex)?.key;
+  const journey = milestones.map((m, i) => {
+    const left = milestones.length === 1 ? 50 : 4 + (i * 92 / (milestones.length - 1));
+    return `<div class="journey-step ${m.level || 'info'} ${m.key === activeMilestoneKey ? 'active' : ''}" style="left:${left}%">
+      <div class="journey-bubble">${m.icon}</div>
+      <div class="journey-card">
+        <b>${esc(m.label)}</b>
+        <span>${fmtTime(m.time)}</span>
+        <small>${esc(m.detail || '')}</small>
+      </div>
+    </div>`;
+  }).join('');
+
+  const laneEvents = events.filter(e => ['ChaosInject','Killing','SuccessfulCreate','Pass','Fail','WorkflowSucceeded','Summary'].includes(e.reason));
+  const laneDefs = [
+    {id:'experiment', title:'Experiment', icon:'🧪', filter:e => ['Pass','Fail','WorkflowSucceeded','Summary'].includes(e.reason)},
+    {id:'target', title: state.components?.find(c => c.id === (impact.target || wf.target))?.title || 'Target', icon:'🎯', filter:e => ['ChaosInject','Killing'].includes(e.reason)},
+    {id:'kubernetes', title:'Kubernetes', icon:'☸️', filter:e => e.reason === 'SuccessfulCreate'}
+  ];
+  const lanes = laneDefs.map(l => {
+    const dots = laneEvents.filter(l.filter).map(e => `<span class="swim-dot ${e.level || 'info'} ${e.index === activeIndex ? 'active' : ''}" style="left:${pct(e.ms)}%" title="${esc(fmtTime(e.time) + ' · ' + (e.title || e.reason) + ' · ' + cleanMessage(e))}">${e.icon || '•'}</span>`).join('');
+    return `<div class="swim-row"><div class="swim-label"><span>${l.icon}</span><b>${esc(l.title)}</b></div><div class="swim-track"><span></span>${dots}</div></div>`;
+  }).join('');
+
+  const duration = Math.round((endMs - startMs) / 1000);
+  el.innerHTML = `<div class="journey">
+      <div class="journey-scale"><span>${fmtTime(new Date(startMs).toISOString())}</span><span>${duration}s</span><span>${fmtTime(new Date(endMs).toISOString())}</span></div>
+      <div class="journey-track"><span class="journey-line"></span>${journey}</div>
+    </div>
+    <div class="swimlanes">${lanes}</div>
+    <div class="flow-legend"><span><i class="legend-dot danger"></i> zásah</span><span><i class="legend-dot warn"></i> obnova</span><span><i class="legend-dot success"></i> výsledok</span></div>`;
 }
 
 function renderTimeline(state, activeIndex = -1) {
