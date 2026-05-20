@@ -48,7 +48,7 @@ def now_iso():
 
 
 def parse_ts(value):
-    if not value:
+    if not value or not isinstance(value, str):
         return None
     try:
         if value.endswith("Z"):
@@ -125,7 +125,7 @@ def workload_path(component):
 
 
 def component_from_name(name):
-    if not name:
+    if not isinstance(name, str) or not name:
         return None
     for prefix, cid in WORKLOAD_PREFIXES:
         if name.startswith(prefix):
@@ -143,7 +143,14 @@ def component_from_name(name):
 
 
 def infer_target_from_text(text):
-    text = text or ""
+    if isinstance(text, dict):
+        values = []
+        for key in ("applabel", "appLabel", "appns", "appkind", "name"):
+            if text.get(key):
+                values.append(str(text.get(key)))
+        text = " ".join(values)
+    elif not isinstance(text, str):
+        text = str(text or "")
     for exp in EXPERIMENTS:
         if exp["id"] in text or exp["target"] in text:
             return exp["target"]
