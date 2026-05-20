@@ -19,6 +19,8 @@ spec:
         app.kubernetes.io/component: control-center
         app.kubernetes.io/part-of: aiot-ml-platform
     spec:
+      serviceAccountName: aiot-control-center
+      automountServiceAccountToken: true
       containers:
         - name: app
           image: {{ .Values.controlCenter.image | quote }}
