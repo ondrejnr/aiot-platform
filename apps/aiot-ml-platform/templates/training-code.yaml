@@ -9,6 +9,7 @@ metadata:
 data:
   train.py: |
     import json
+    import math
     import os
     import sys
     import tempfile
@@ -17,6 +18,7 @@ data:
     import mlflow
     import mlflow.data
     import mlflow.sklearn
+    import numpy as np
     import pandas as pd
     import psycopg2
     import psutil
@@ -38,7 +40,28 @@ data:
     MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow.mlflow.svc.cluster.local:5000")
     MODEL_NAME = os.getenv("MODEL_NAME", "aiot-maintenance-predictor")
     EXPERIMENT_NAME = os.getenv("EXPERIMENT_NAME", "aiot-maintenance-proxied")
-    FEATURES = ["temperature", "humidity", "pressure", "battery"]
+    BASE_FEATURES = ["temperature", "humidity", "pressure", "battery"]
+    WINDOWS = {"5m": "5min", "15m": "15min", "60m": "60min"}
+    ROLLING_STATS = ["mean", "min", "max", "std"]
+    TIME_FEATURES = ["hour_sin", "hour_cos", "dow_sin", "dow_cos"]
+    FEATURE_SET_VERSION = "rolling_trend_time_v1"
+
+
+    def feature_columns():
+        cols = list(BASE_FEATURES)
+        for col in BASE_FEATURES:
+            cols.append(f"{col}_delta_1")
+        for label in WINDOWS:
+            for col in BASE_FEATURES:
+                for stat in ROLLING_STATS:
+                    cols.append(f"{col}_{label}_{stat}")
+                cols.append(f"{col}_{label}_trend")
+        cols.extend(TIME_FEATURES)
+        return cols
+
+
+    FEATURES = feature_columns()
+
 
     def dsn():
         return "host={host} port={port} dbname={db} user={user} password={pwd}".format(
@@ -48,6 +71,7 @@ data:
             user=os.getenv("PGUSER"),
             pwd=os.getenv("PGPASSWORD"),
         )
+
 
     def load_data():
         sql = f"""
@@ -60,6 +84,7 @@ data:
         with psycopg2.connect(dsn()) as conn:
             return pd.read_sql(sql, conn)
 
+
     def threshold_rule(df):
         return (
             (df["temperature"] > 29.0)
@@ -69,23 +94,65 @@ data:
             | (df["battery"] < 3.50)
         ).astype(int)
 
-    def add_target(df):
-        """Build a no-leakage target.
 
-        Previous training used target = threshold_rule(current features), while the model
-        also received those same current features. That made 1.0 metrics expected but not
-        useful: the classifier only learned the hard-coded threshold rule.
-
-        This target predicts the next observed threshold state for the same sensor. The
-        current threshold state is kept only as a baseline metric, not as a feature.
-        """
+    def prepare_base_frame(df):
         df = df.copy()
         df["ts"] = pd.to_datetime(df["ts"], utc=True, errors="coerce")
-        for col in FEATURES:
+        for col in BASE_FEATURES:
             df[col] = pd.to_numeric(df[col], errors="coerce")
-        df = df.dropna(subset=["ts", "sensor_id"] + FEATURES)
-        df = df.sort_values(["sensor_id", "ts"]).reset_index(drop=True)
+        df = df.dropna(subset=["ts", "sensor_id"] + BASE_FEATURES)
+        return df.sort_values(["sensor_id", "ts"]).reset_index(drop=True)
+
+
+    def add_time_features(df):
+        ts = pd.to_datetime(df["ts"], utc=True)
+        seconds = ts.dt.hour * 3600 + ts.dt.minute * 60 + ts.dt.second + ts.dt.microsecond / 1_000_000
+        hour_angle = 2 * math.pi * seconds / 86400.0
+        dow_angle = 2 * math.pi * ts.dt.dayofweek / 7.0
+        df["hour_sin"] = np.sin(hour_angle)
+        df["hour_cos"] = np.cos(hour_angle)
+        df["dow_sin"] = np.sin(dow_angle)
+        df["dow_cos"] = np.cos(dow_angle)
+        return df
+
+
+    def add_engineered_features(df):
+        """Add past-only rolling, trend, delta and calendar features.
+
+        All rolling windows are computed per sensor on rows sorted by time, so every feature
+        uses only the current and historical samples. No target or future row is used.
+        """
+        frames = []
+        for _, g in df.groupby("sensor_id", sort=False):
+            g = g.sort_values("ts").copy()
+            indexed = g.set_index("ts")
+            for col in BASE_FEATURES:
+                g[f"{col}_delta_1"] = g[col].diff().fillna(0.0)
+                for label, window in WINDOWS.items():
+                    roll = indexed[col].rolling(window, min_periods=1)
+                    mean = roll.mean()
+                    g[f"{col}_{label}_mean"] = mean.to_numpy()
+                    g[f"{col}_{label}_min"] = roll.min().to_numpy()
+                    g[f"{col}_{label}_max"] = roll.max().to_numpy()
+                    g[f"{col}_{label}_std"] = roll.std().fillna(0.0).to_numpy()
+                    g[f"{col}_{label}_trend"] = g[col].to_numpy() - mean.to_numpy()
+            frames.append(g)
+        out = pd.concat(frames, ignore_index=True) if frames else df.copy()
+        out = add_time_features(out)
+        out[FEATURES] = out[FEATURES].replace([np.inf, -np.inf], np.nan).fillna(0.0)
+        return out.sort_values(["sensor_id", "ts"]).reset_index(drop=True)
+
+
+    def add_target(df):
+        """Build a no-leakage target and stronger feature set.
+
+        Target: next observed threshold state for the same sensor.
+        Features: current values, deltas, rolling stats/trends over 5/15/60 minutes,
+        and calendar cyclic features. All engineered features are past-only.
+        """
+        df = prepare_base_frame(df)
         df["current_rule_target"] = threshold_rule(df)
+        df = add_engineered_features(df)
         grouped = df.groupby("sensor_id", sort=False)
         df["target"] = grouped["current_rule_target"].shift(-1)
         df["target_ts"] = grouped["ts"].shift(-1)
@@ -95,12 +162,17 @@ data:
         df["target"] = df["target"].astype(int)
         return df.sort_values("ts").reset_index(drop=True)
 
+
     def data_profile(df):
         profile = {
             "rows": int(len(df)),
             "lookback_days": LOOKBACK_DAYS,
             "max_rows": MAX_ROWS,
             "target_definition": "next_sample_threshold_state_per_sensor",
+            "feature_set_version": FEATURE_SET_VERSION,
+            "base_features": BASE_FEATURES,
+            "feature_count": len(FEATURES),
+            "rolling_windows": list(WINDOWS.keys()),
             "max_target_gap_seconds": MAX_TARGET_GAP_SECONDS,
             "positive_rate": float(df["target"].mean()) if len(df) else 0.0,
             "current_rule_positive_rate": float(df["current_rule_target"].mean()) if len(df) else 0.0,
@@ -109,17 +181,10 @@ data:
             "feature_summary": {},
         }
         if "ts" in df.columns and len(df):
-            profile["time_range"] = {
-                "min_ts": str(df["ts"].min()),
-                "max_ts": str(df["ts"].max()),
-            }
+            profile["time_range"] = {"min_ts": str(df["ts"].min()), "max_ts": str(df["ts"].max())}
         if "target_gap_seconds" in df.columns and len(df):
             gaps = pd.to_numeric(df["target_gap_seconds"], errors="coerce")
-            profile["target_gap_seconds"] = {
-                "min": float(gaps.min()),
-                "mean": float(gaps.mean()),
-                "max": float(gaps.max()),
-            }
+            profile["target_gap_seconds"] = {"min": float(gaps.min()), "mean": float(gaps.mean()), "max": float(gaps.max())}
         for col in FEATURES:
             s = pd.to_numeric(df[col], errors="coerce")
             profile["feature_summary"][col] = {
@@ -129,6 +194,7 @@ data:
                 "std": float(s.std()) if len(s) > 1 else 0.0,
             }
         return profile
+
 
     def log_system_snapshot(step):
         try:
@@ -140,17 +206,16 @@ data:
         except Exception as exc:
             print(f"system metrics skipped: {exc}")
 
+
     def log_dataset_lineage(df):
         try:
-            sample = df[FEATURES + ["current_rule_target", "target"]].sample(min(len(df), 1000), random_state=42)
-            dataset = mlflow.data.from_pandas(
-                sample,
-                source="postgresql://aiot/sensor_data",
-                name="sensor_data_training_sample",
-            )
+            sample_cols = FEATURES + ["current_rule_target", "target"]
+            sample = df[sample_cols].sample(min(len(df), 1000), random_state=42)
+            dataset = mlflow.data.from_pandas(sample, source="postgresql://aiot/sensor_data", name="sensor_data_training_sample")
             mlflow.log_input(dataset, context="training")
         except Exception as exc:
             print(f"dataset lineage skipped: {exc}")
+
 
     def log_artifacts(df, X_test, y_test, pred, proba, model, metrics, profile, split_idx):
         feature_importance = pd.DataFrame(
@@ -164,7 +229,7 @@ data:
         model_card = f"""# AIOT maintenance predictor
 
     ## Purpose
-    Predicts the next observed threshold-risk state for each AIOT sensor from current telemetry features.
+    Predicts the next observed threshold-risk state for each AIOT sensor from current and historical telemetry features.
 
     ## Training data
     - Source table: `sensor_data`
@@ -175,11 +240,15 @@ data:
     - Current-rule positive rate: {profile['current_rule_positive_rate']:.4f}
 
     ## Features
-    {', '.join(FEATURES)}
+    - Feature set: {FEATURE_SET_VERSION}
+    - Feature count: {len(FEATURES)}
+    - Base features: {', '.join(BASE_FEATURES)}
+    - Rolling windows: {', '.join(WINDOWS.keys())}
+    - Includes deltas, rolling mean/min/max/std, trend vs rolling mean, hour-of-day and day-of-week cyclic features.
 
     ## Validation
     - Split strategy: chronological 80/20 split, not random row split
-    - Leakage check: current threshold state is not used as a feature
+    - Leakage check: current threshold state is not used as a feature; rolling features are past-only.
 
     ## Metrics
     """
@@ -201,6 +270,7 @@ data:
             pred_sample.to_csv(tmp_path / "prediction-sample.csv", index=False)
             mlflow.log_artifacts(str(tmp_path), artifact_path="exports")
 
+
     def main():
         mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
         mlflow.set_experiment(EXPERIMENT_NAME)
@@ -214,6 +284,7 @@ data:
                     "aiot.model_name": MODEL_NAME,
                     "aiot.experiment": EXPERIMENT_NAME,
                     "aiot.target_definition": "next_sample_threshold_state_per_sensor",
+                    "aiot.feature_set_version": FEATURE_SET_VERSION,
                     "aiot.split_strategy": "chronological_80_20",
                 }
             )
@@ -223,7 +294,7 @@ data:
                 raw_df = load_data()
                 df = add_target(raw_df)
                 span.set_inputs({"lookback_days": LOOKBACK_DAYS, "max_rows": MAX_ROWS})
-                span.set_outputs({"raw_rows": len(raw_df), "training_rows": len(df)})
+                span.set_outputs({"raw_rows": len(raw_df), "training_rows": len(df), "feature_count": len(FEATURES)})
 
             if len(df) < 100:
                 print(f"Not enough rows for training: {len(df)}")
@@ -235,23 +306,24 @@ data:
                 mlflow.log_metric("positive_rate", float(df["target"].mean()))
                 return
 
-            X = df[FEATURES].fillna(0)
+            X = df[FEATURES].replace([np.inf, -np.inf], np.nan).fillna(0.0)
             y = df["target"]
             split_idx = max(1, int(len(df) * 0.8))
             split_idx = min(split_idx, len(df) - 1)
             X_train, X_test = X.iloc[:split_idx], X.iloc[split_idx:]
             y_train, y_test = y.iloc[:split_idx], y.iloc[split_idx:]
             model = RandomForestClassifier(
-                n_estimators=160,
-                max_depth=8,
-                min_samples_split=4,
+                n_estimators=220,
+                max_depth=12,
+                min_samples_split=8,
+                min_samples_leaf=3,
                 class_weight="balanced",
                 n_jobs=-1,
                 random_state=42,
             )
 
             with mlflow.start_span("fit-random-forest") as span:
-                span.set_inputs({"train_rows": len(X_train), "features": FEATURES})
+                span.set_inputs({"train_rows": len(X_train), "feature_count": len(FEATURES), "feature_set_version": FEATURE_SET_VERSION})
                 model.fit(X_train, y_train)
                 span.set_outputs({"n_estimators": model.n_estimators, "classes": [int(c) for c in model.classes_]})
 
@@ -265,6 +337,7 @@ data:
                 "recall": recall_score(y_test, pred, zero_division=0),
                 "baseline_always_zero_accuracy": float((y_test == 0).mean()),
                 "baseline_current_rule_accuracy": accuracy_score(y_test, current_rule_baseline),
+                "feature_count": float(len(FEATURES)),
             }
             if y_test.nunique() > 1:
                 metrics["roc_auc"] = roc_auc_score(y_test, proba)
@@ -275,12 +348,15 @@ data:
                 {
                     "rows": len(df),
                     "lookback_days": LOOKBACK_DAYS,
+                    "feature_count": len(FEATURES),
+                    "feature_set_version": FEATURE_SET_VERSION,
                     "features": ",".join(FEATURES),
                     "model_type": "RandomForestClassifier",
                     "experiment_name": EXPERIMENT_NAME,
                     "target_definition": "next_sample_threshold_state_per_sensor",
                     "max_target_gap_seconds": MAX_TARGET_GAP_SECONDS,
                     "split_strategy": "chronological_80_20",
+                    "rolling_windows": ",".join(WINDOWS.keys()),
                 }
             )
             mlflow.log_metrics(metrics)
@@ -302,7 +378,8 @@ data:
                 span.set_outputs({"metrics": metrics, "artifact_root": mlflow.get_artifact_uri()})
 
             log_system_snapshot(2)
-            print({"run_id": run.info.run_id, "rows": len(df), "positive_rate": profile["positive_rate"], "metrics": metrics})
+            print({"run_id": run.info.run_id, "rows": len(df), "positive_rate": profile["positive_rate"], "feature_count": len(FEATURES), "metrics": metrics})
+
 
     if __name__ == "__main__":
         main()

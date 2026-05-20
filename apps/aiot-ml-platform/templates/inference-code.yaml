@@ -8,71 +8,197 @@ metadata:
     app.kubernetes.io/component: maintenance-api
 data:
   service.py: |
-    import os, threading
+    import math
+    import os
+    import threading
+
     import mlflow
-    from mlflow.tracking import MlflowClient
+    import numpy as np
     import pandas as pd
     import psycopg
-    from psycopg.rows import dict_row
     from fastapi import FastAPI
+    from mlflow.tracking import MlflowClient
+    from psycopg.rows import dict_row
 
     app = FastAPI(title="AIOT Maintenance Inference API")
-    MODEL_NAME=os.getenv("MODEL_NAME","aiot-maintenance-predictor")
-    MLFLOW_TRACKING_URI=os.getenv("MLFLOW_TRACKING_URI","http://mlflow.mlflow.svc.cluster.local:5000")
-    _model=None; _version=None; _lock=threading.Lock()
+    MODEL_NAME = os.getenv("MODEL_NAME", "aiot-maintenance-predictor")
+    MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow.mlflow.svc.cluster.local:5000")
+    BASE_FEATURES = ["temperature", "humidity", "pressure", "battery"]
+    WINDOWS = {"5m": "5min", "15m": "15min", "60m": "60min"}
+    ROLLING_STATS = ["mean", "min", "max", "std"]
+    TIME_FEATURES = ["hour_sin", "hour_cos", "dow_sin", "dow_cos"]
+    FEATURE_SET_VERSION = "rolling_trend_time_v1"
+    _model = None
+    _version = None
+    _lock = threading.Lock()
+
+
+    def feature_columns():
+        cols = list(BASE_FEATURES)
+        for col in BASE_FEATURES:
+            cols.append(f"{col}_delta_1")
+        for label in WINDOWS:
+            for col in BASE_FEATURES:
+                for stat in ROLLING_STATS:
+                    cols.append(f"{col}_{label}_{stat}")
+                cols.append(f"{col}_{label}_trend")
+        cols.extend(TIME_FEATURES)
+        return cols
+
+
+    FEATURES = feature_columns()
+
 
     def pg_conn():
-        return psycopg.connect(host=os.getenv("PGHOST"), port=int(os.getenv("PGPORT","5432")), dbname=os.getenv("PGDATABASE"), user=os.getenv("PGUSER"), password=os.getenv("PGPASSWORD"), row_factory=dict_row, connect_timeout=5)
+        return psycopg.connect(
+            host=os.getenv("PGHOST"),
+            port=int(os.getenv("PGPORT", "5432")),
+            dbname=os.getenv("PGDATABASE"),
+            user=os.getenv("PGUSER"),
+            password=os.getenv("PGPASSWORD"),
+            row_factory=dict_row,
+            connect_timeout=5,
+        )
+
 
     def rule(row):
-        temp=float(row.get("temperature") or 0); hum=float(row.get("humidity") or 0); pressure=float(row.get("pressure") or 0); battery=float(row.get("battery") or 0)
-        risk=max(0,min(40,(temp-26)*8))+max(0,min(20,(hum-70)*4))+(20 if pressure<998 or pressure>1025 else 0)+max(0,min(20,(3.6-battery)*60))
-        risk=int(max(0,min(100,risk))); label="critical" if risk>=80 else "warning" if risk>=50 else "ok"
-        return risk,label
+        temp = float(row.get("temperature") or 0)
+        hum = float(row.get("humidity") or 0)
+        pressure = float(row.get("pressure") or 0)
+        battery = float(row.get("battery") or 0)
+        risk = max(0, min(40, (temp - 26) * 8)) + max(0, min(20, (hum - 70) * 4)) + (20 if pressure < 998 or pressure > 1025 else 0) + max(0, min(20, (3.6 - battery) * 60))
+        risk = int(max(0, min(100, risk)))
+        label = "critical" if risk >= 80 else "warning" if risk >= 50 else "ok"
+        return risk, label
+
 
     def load_model():
-        global _model,_version
+        global _model, _version
         with _lock:
-            if _model is not None: return _model
+            if _model is not None:
+                return _model
             try:
                 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-                versions=MlflowClient().search_model_versions(f"name='{MODEL_NAME}'")
-                if not versions: return None
-                latest=sorted(versions,key=lambda v:int(v.version))[-1]
-                _version=latest.version
-                _model=mlflow.pyfunc.load_model(f"models:/{MODEL_NAME}/{latest.version}")
+                versions = MlflowClient().search_model_versions(f"name='{MODEL_NAME}'")
+                if not versions:
+                    return None
+                latest = sorted(versions, key=lambda v: int(v.version))[-1]
+                _version = latest.version
+                _model = mlflow.pyfunc.load_model(f"models:/{MODEL_NAME}/{latest.version}")
                 return _model
             except Exception:
                 return None
 
-    def latest_rows(limit=50):
+
+    def prepare_base_frame(df):
+        df = df.copy()
+        df["ts"] = pd.to_datetime(df["ts"], utc=True, errors="coerce")
+        for col in BASE_FEATURES:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        df = df.dropna(subset=["ts", "sensor_id"] + BASE_FEATURES)
+        return df.sort_values(["sensor_id", "ts"]).reset_index(drop=True)
+
+
+    def add_time_features(df):
+        ts = pd.to_datetime(df["ts"], utc=True)
+        seconds = ts.dt.hour * 3600 + ts.dt.minute * 60 + ts.dt.second + ts.dt.microsecond / 1_000_000
+        hour_angle = 2 * math.pi * seconds / 86400.0
+        dow_angle = 2 * math.pi * ts.dt.dayofweek / 7.0
+        df["hour_sin"] = np.sin(hour_angle)
+        df["hour_cos"] = np.cos(hour_angle)
+        df["dow_sin"] = np.sin(dow_angle)
+        df["dow_cos"] = np.cos(dow_angle)
+        return df
+
+
+    def add_engineered_features(df):
+        df = prepare_base_frame(df)
+        frames = []
+        for _, g in df.groupby("sensor_id", sort=False):
+            g = g.sort_values("ts").copy()
+            indexed = g.set_index("ts")
+            for col in BASE_FEATURES:
+                g[f"{col}_delta_1"] = g[col].diff().fillna(0.0)
+                for label, window in WINDOWS.items():
+                    roll = indexed[col].rolling(window, min_periods=1)
+                    mean = roll.mean()
+                    g[f"{col}_{label}_mean"] = mean.to_numpy()
+                    g[f"{col}_{label}_min"] = roll.min().to_numpy()
+                    g[f"{col}_{label}_max"] = roll.max().to_numpy()
+                    g[f"{col}_{label}_std"] = roll.std().fillna(0.0).to_numpy()
+                    g[f"{col}_{label}_trend"] = g[col].to_numpy() - mean.to_numpy()
+            frames.append(g)
+        out = pd.concat(frames, ignore_index=True) if frames else df.copy()
+        out = add_time_features(out)
+        out[FEATURES] = out[FEATURES].replace([np.inf, -np.inf], np.nan).fillna(0.0)
+        return out.sort_values(["sensor_id", "ts"]).reset_index(drop=True)
+
+
+    def recent_rows(hours=2):
         with pg_conn() as conn, conn.cursor() as cur:
-            cur.execute("""select distinct on (sensor_id) sensor_id, location, ts, temperature, humidity, pressure, battery from sensor_data order by sensor_id, ts desc limit %s""", (limit,))
+            cur.execute(
+                """
+                select ts, sensor_id, location, temperature, humidity, pressure, battery
+                from sensor_data
+                where ts > now() - (%s::text || ' hours')::interval
+                order by sensor_id, ts asc
+                """,
+                (hours,),
+            )
             return [dict(r) for r in cur.fetchall()]
 
+
+    def latest_feature_rows(limit=50):
+        rows = recent_rows(2)
+        if not rows:
+            return [], pd.DataFrame()
+        df = add_engineered_features(pd.DataFrame(rows))
+        latest = df.sort_values(["sensor_id", "ts"]).groupby("sensor_id", as_index=False).tail(1)
+        latest = latest.sort_values("ts", ascending=False).head(limit).reset_index(drop=True)
+        return latest.to_dict("records"), latest
+
+
     @app.get("/healthz")
-    def healthz(): return {"ok": True, "model_loaded": _model is not None, "model_version": _version}
+    def healthz():
+        return {"ok": True, "model_loaded": _model is not None, "model_version": _version, "feature_set_version": FEATURE_SET_VERSION, "feature_count": len(FEATURES)}
+
 
     @app.post("/reload")
     def reload_model():
-        global _model,_version
-        with _lock: _model=None; _version=None
-        return {"loaded": load_model() is not None, "model_version": _version}
+        global _model, _version
+        with _lock:
+            _model = None
+            _version = None
+        return {"loaded": load_model() is not None, "model_version": _version, "feature_set_version": FEATURE_SET_VERSION, "feature_count": len(FEATURES)}
+
 
     @app.get("/predict/latest")
     def predict_latest():
-        rows=latest_rows(50); model=load_model(); items=[]
+        rows, feature_df = latest_feature_rows(50)
+        model = load_model()
+        items = []
         if model is not None and rows:
             try:
-                X=pd.DataFrame(rows)[["temperature","humidity","pressure","battery"]].fillna(0)
-                preds=model.predict(X)
-                for row,pred in zip(rows,preds):
-                    fallback,_=rule(row); risk=int(float(pred)*100) if float(pred)<=1 else int(float(pred)); risk=max(0,min(100,risk or fallback))
-                    label="critical" if risk>=80 else "warning" if risk>=50 else "ok"
-                    items.append({"sensor_id":row.get("sensor_id"),"risk":risk,"label":label,"source":"mlflow"})
-                return {"status":"ok","model_version":_version,"items":items}
+                X = feature_df[FEATURES].fillna(0.0)
+                try:
+                    preds = model.predict(X)
+                    used_feature_set = FEATURE_SET_VERSION
+                except Exception:
+                    # Backward compatibility while old 4-feature model is still latest during rollout.
+                    X = feature_df[BASE_FEATURES].fillna(0.0)
+                    preds = model.predict(X)
+                    used_feature_set = "base_features_legacy"
+                for row, pred in zip(rows, preds):
+                    fallback, _ = rule(row)
+                    value = float(pred)
+                    risk = int(value * 100) if value <= 1 else int(value)
+                    risk = max(0, min(100, risk or fallback))
+                    label = "critical" if risk >= 80 else "warning" if risk >= 50 else "ok"
+                    items.append({"sensor_id": row.get("sensor_id"), "risk": risk, "label": label, "source": "mlflow", "feature_set": used_feature_set})
+                return {"status": "ok", "model_version": _version, "feature_set_version": used_feature_set, "feature_count": int(X.shape[1]), "items": items}
             except Exception as exc:
-                return {"status":"degraded","error":str(exc),"items":[]}
+                return {"status": "degraded", "error": str(exc), "items": []}
         for row in rows:
-            risk,label=rule(row); items.append({"sensor_id":row.get("sensor_id"),"risk":risk,"label":label,"source":"rules"})
-        return {"status":"rules","model_version":None,"items":items}
+            risk, label = rule(row)
+            items.append({"sensor_id": row.get("sensor_id"), "risk": risk, "label": label, "source": "rules"})
+        return {"status": "rules", "model_version": None, "feature_set_version": None, "items": items}
