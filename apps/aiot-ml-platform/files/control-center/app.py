@@ -1,4 +1,4 @@
-import json, os, time
+import json, os, time, unicodedata
 import psycopg
 from psycopg.rows import dict_row
 import requests
@@ -264,14 +264,21 @@ def answer_cluster():
     return "\n".join(lines)
 
 
+def normalize_text(q):
+    text = unicodedata.normalize("NFKD", q or "")
+    return "".join(ch for ch in text if not unicodedata.combining(ch)).lower()
+
+
 def is_cluster_question(q):
-    words=["cluster", "kluster", "kubernetes", "pod", "pody", "node", "uzol", "helm", "flux", "helmrelease", "kustomization", "jenkins", "awx", "signoz", "loki", "grafana", "redis", "redpanda", "cnpg", "postgres", "crash", "fail", "chyba", "chyby", "log", "event", "load"]
-    return any(w in (q or "").lower() for w in words)
+    text = normalize_text(q)
+    words=["cluster", "clustr", "kluster", "klustr", "k8s", "kubernetes", "kubernet", "pod", "pody", "node", "nod", "uzol", "uzly", "helm", "flux", "helmrelease", "kustomization", "jenkins", "awx", "signoz", "loki", "grafana", "redis", "redpanda", "cnpg", "postgres", "crash", "fail", "chyba", "chyby", "log", "event", "load"]
+    return any(w in text for w in words)
 
 
 def is_write_request(q):
-    words=["restart", "reštart", "reboot", "delete", "zmaz", "vymaž", "scale", "škáluj", "patch", "apply", "nasad", "deploy", "upgrade", "update", "reconcile", "vytvor", "create", "edit", "uprav", "zmeň", "zmen", "kill", "drain", "cordon", "uncordon", "exec"]
-    return any(w in (q or "").lower() for w in words)
+    text = normalize_text(q)
+    words=["restart", "restartni", "reboot", "delete", "zmaz", "vymaz", "scale", "skaluj", "patch", "apply", "nasad", "deploy", "upgrade", "update", "reconcile", "vytvor", "create", "edit", "uprav", "zmen", "kill", "drain", "cordon", "uncordon", "exec"]
+    return any(w in text for w in words)
 
 
 def readonly_refusal():
