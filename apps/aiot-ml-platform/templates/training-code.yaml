@@ -406,6 +406,7 @@ data:
                 registered_model_name=MODEL_NAME,
                 signature=signature,
                 input_example=X_train.head(5),
+                pyfunc_predict_fn="predict_proba",
             )
 
             with mlflow.start_span("training-summary") as span:

@@ -234,9 +234,13 @@ data:
                     used_feature_set = "fallback_" + ("base_features" if X.shape[1] == len(BASE_FEATURES) else FEATURE_SET_VERSION)
                 for row, pred in zip(rows, preds):
                     fallback, _ = rule(row)
-                    value = float(pred)
+                    arr = np.asarray(pred).reshape(-1)
+                    if arr.size >= 2:
+                        value = float(arr[1])
+                    else:
+                        value = float(arr[0])
                     risk = int(value * 100) if value <= 1 else int(value)
-                    risk = max(0, min(100, risk or fallback))
+                    risk = max(0, min(100, risk if risk != 0 else fallback))
                     label = "critical" if risk >= 80 else "warning" if risk >= 50 else "ok"
                     items.append({"sensor_id": row.get("sensor_id"), "risk": risk, "label": label, "source": "mlflow", "feature_set": used_feature_set})
                 return {"status": "ok", "model_version": _version, "model_score": _model_score, "model_feature_set": _model_feature_set, "model_target_definition": _model_target_definition, "preferred_target_definition": TARGET_DEFINITION, "feature_set_version": used_feature_set, "feature_count": int(X.shape[1]), "items": items}
