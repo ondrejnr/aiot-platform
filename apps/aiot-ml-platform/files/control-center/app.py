@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="AIOT Control Center")
+app = FastAPI(title="AIOT Copilot")
 
 class ChatRequest(BaseModel):
     question: str = ""
