@@ -164,6 +164,86 @@ def answer_forecast(ctx):
     return f"Forecast hodnôt ({horizon}) používa {model}; zdroj={source}.{note} Najvyššie budúce riziko: " + "; ".join(bits) + "."
 
 
+SENSOR_METRICS = {
+    "temperature": {"label": "teplota", "unit": " °C", "words": ["teplot", "temperature", "temp"]},
+    "humidity": {"label": "vlhkosť", "unit": " %", "words": ["vlhkost", "humidity", "hum"]},
+    "pressure": {"label": "tlak", "unit": " hPa", "words": ["tlak", "pressure", "press"]},
+    "battery": {"label": "batéria", "unit": " V", "words": ["bateria", "battery", "bat"]},
+}
+
+
+def parse_sensor_id(question):
+    text = normalize_text(question)
+    match = re.search(r"\b(?:sensor|senzor)[\s:_-]*([o0-9]{1,4})\b", text)
+    if not match:
+        return None
+    raw = match.group(1).replace("o", "0")
+    digits = re.sub(r"\D", "", raw)
+    if not digits:
+        return None
+    return f"sensor-{int(digits):03d}"
+
+
+def metric_from_question(question):
+    text = normalize_text(question)
+    for column, meta in SENSOR_METRICS.items():
+        if any(word in text for word in meta["words"]):
+            return column, meta
+    return None, None
+
+
+def parse_hours(question, default=24):
+    text = normalize_text(question)
+    patterns = [
+        r"posledn\w*\s+(\d{1,3})\s*(?:h|hod|hodin|hodiny|hours?)",
+        r"\b(\d{1,3})\s*(?:h|hod|hodin|hodiny|hours?)\b",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if match:
+            return max(1, min(int(match.group(1)), 24 * 30))
+    return default
+
+
+def is_sensor_aggregate_question(q):
+    text = normalize_text(q)
+    has_aggregate = any(word in text for word in ["priemer", "priemern", "avg", "average", "minimal", "maximal", "minimum", "maximum"])
+    has_history = any(word in text for word in ["posledn", "hodin", "24h", "dnes", "vcera", "histori"])
+    sensor_id = parse_sensor_id(q)
+    metric, _ = metric_from_question(q)
+    return bool(sensor_id and metric and (has_aggregate or has_history))
+
+
+def answer_sensor_aggregate(question):
+    sensor_id = parse_sensor_id(question)
+    metric, meta = metric_from_question(question)
+    hours = parse_hours(question)
+    if not sensor_id or not metric:
+        return "Upresni senzor a veličinu, napríklad: priemerná teplota sensor-015 za 24 h."
+    with pg_conn() as conn, conn.cursor() as cur:
+        cur.execute(f"""
+            select count(*)::int samples,
+                   avg({metric})::float avg_value,
+                   min({metric})::float min_value,
+                   max({metric})::float max_value,
+                   max(ts) latest
+            from sensor_data
+            where sensor_id = %s and ts > now() - (%s * interval '1 hour')
+        """, (sensor_id, hours))
+        row = dict(cur.fetchone() or {})
+    samples = row.get("samples") or 0
+    if not samples:
+        return f"Pre {sensor_id} nemám za posledných {hours} h žiadne vzorky."
+    latest_ts = row.get("latest")
+    latest_txt = latest_ts.isoformat() if hasattr(latest_ts, "isoformat") else latest_ts
+    unit = meta["unit"]
+    label = meta["label"]
+    return (
+        f"Priemerná {label} pre {sensor_id} za posledných {hours} h je {fmt(row.get('avg_value'), unit)}. "
+        f"Počítané z {samples} vzoriek; min={fmt(row.get('min_value'), unit)}, max={fmt(row.get('max_value'), unit)}, "
+        f"posledná vzorka={latest_txt}."
+    )
+
 def k8s_get(path, timeout=7):
     """Read-only Kubernetes API helper. This app intentionally never PATCH/POST/DELETEs cluster state."""
     try:
@@ -459,7 +539,9 @@ def is_cluster_question(q):
 
 def is_forecast_question(q):
     text = normalize_text(q)
-    words=["forecast", "predik", "predpoved", "buduc", "dopredu", "o 30", "30m", "hodnot", "teplot", "vlhkost", "tlak", "bateria", "battery"]
+    # Forecast musí byť explicitný. Samotné slová ako teplota/vlhkosť/hodnota
+    # patria aj do historických otázok typu "priemerná teplota za 24 h".
+    words=["forecast", "predik", "predpoved", "buduc", "buduce", "buduci", "dopredu", "o 30", "za 30", "30m", "plus 30"]
     return any(w in text for w in words)
 
 
@@ -484,6 +566,8 @@ def fast_answer(question, ctx):
         return answer_logs(q)
     if is_cluster_question(q):
         return answer_cluster()
+    if is_sensor_aggregate_question(q):
+        return answer_sensor_aggregate(q)
     if is_forecast_question(q):
         return answer_forecast({"forecasts": forecasts()})
     if any(word in q for word in ["rizik", "naj", "kritick", "critical", "warning", "prečo", "preco", "senzor"]):
@@ -544,6 +628,8 @@ def api_chat(req: ChatRequest):
         return {"answer": answer_logs(question), "source": "kubernetes-logs-read-only", "seconds": round(time.time() - started, 3)}
     if is_cluster_question(q_lower):
         return {"answer": answer_cluster(), "source": "kubernetes-read-only", "seconds": round(time.time() - started, 3)}
+    if is_sensor_aggregate_question(question):
+        return {"answer": answer_sensor_aggregate(question), "source": "sensor-history-postgres", "seconds": round(time.time() - started, 3)}
     if is_forecast_question(q_lower):
         return {"answer": answer_forecast({"forecasts": forecasts()}), "source": "sensor-forecast", "seconds": round(time.time() - started, 3)}
     if any(word in q_lower for word in prediction_words):
