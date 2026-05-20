@@ -28,6 +28,7 @@ data:
         accuracy_score,
         classification_report,
         confusion_matrix,
+        average_precision_score,
         f1_score,
         precision_score,
         recall_score,
@@ -36,7 +37,11 @@ data:
 
     LOOKBACK_DAYS = int(os.getenv("LOOKBACK_DAYS", "7"))
     MAX_ROWS = int(os.getenv("MAX_ROWS", "200000"))
-    MAX_TARGET_GAP_SECONDS = int(os.getenv("MAX_TARGET_GAP_SECONDS", "300"))
+    TARGET_HORIZON_MINUTES = int(os.getenv("TARGET_HORIZON_MINUTES", "30"))
+    MIN_EVENT_DURATION_MINUTES = int(os.getenv("MIN_EVENT_DURATION_MINUTES", "5"))
+    TARGET_HORIZON_SECONDS = TARGET_HORIZON_MINUTES * 60
+    MIN_EVENT_DURATION_SECONDS = MIN_EVENT_DURATION_MINUTES * 60
+    TARGET_DEFINITION = f"risk_in_next_{TARGET_HORIZON_MINUTES}m_min_duration_{MIN_EVENT_DURATION_MINUTES}m"
     MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow.mlflow.svc.cluster.local:5000")
     MODEL_NAME = os.getenv("MODEL_NAME", "aiot-maintenance-predictor")
     EXPERIMENT_NAME = os.getenv("EXPERIMENT_NAME", "aiot-maintenance-proxied")
@@ -143,23 +148,48 @@ data:
         return out.sort_values(["sensor_id", "ts"]).reset_index(drop=True)
 
 
-    def add_target(df):
-        """Build a no-leakage target and stronger feature set.
+    def add_horizon_target(df):
+        frames = []
+        horizon_ns = int(TARGET_HORIZON_SECONDS * 1_000_000_000)
+        for _, g in df.groupby("sensor_id", sort=False):
+            g = g.sort_values("ts").copy()
+            if len(g) < 2:
+                continue
+            times = g["ts"].astype("int64").to_numpy()
+            current = g["current_rule_target"].astype(int).to_numpy()
+            diffs = np.diff(times) / 1_000_000_000.0
+            valid_diffs = diffs[(diffs > 0) & (diffs <= 300)]
+            median_gap = float(np.median(valid_diffs)) if len(valid_diffs) else 1.0
+            end_idx = np.searchsorted(times, times + horizon_ns, side="right")
+            start_idx = np.arange(len(g)) + 1
+            cumsum = np.concatenate([[0], np.cumsum(current)])
+            future_positive_count = cumsum[end_idx] - cumsum[start_idx]
+            future_positive_seconds = future_positive_count * median_gap
+            horizon_complete = (times[-1] - times) >= horizon_ns
+            g["future_positive_seconds"] = future_positive_seconds
+            g["target_horizon_complete"] = horizon_complete
+            g["target"] = (future_positive_seconds >= MIN_EVENT_DURATION_SECONDS).astype(int)
+            frames.append(g)
+        if not frames:
+            return df.iloc[0:0].copy()
+        out = pd.concat(frames, ignore_index=True)
+        out = out[out["target_horizon_complete"]].copy()
+        out["target"] = out["target"].astype(int)
+        return out
 
-        Target: next observed threshold state for the same sensor.
+
+    def add_target(df):
+        """Build a no-leakage horizon target and stronger feature set.
+
+        Target: whether the same sensor will spend at least MIN_EVENT_DURATION_MINUTES
+        in threshold-risk state during the next TARGET_HORIZON_MINUTES.
         Features: current values, deltas, rolling stats/trends over 5/15/60 minutes,
         and calendar cyclic features. All engineered features are past-only.
         """
         df = prepare_base_frame(df)
         df["current_rule_target"] = threshold_rule(df)
         df = add_engineered_features(df)
-        grouped = df.groupby("sensor_id", sort=False)
-        df["target"] = grouped["current_rule_target"].shift(-1)
-        df["target_ts"] = grouped["ts"].shift(-1)
-        df["target_gap_seconds"] = (df["target_ts"] - df["ts"]).dt.total_seconds()
-        df = df.dropna(subset=["target", "target_gap_seconds"])
-        df = df[df["target_gap_seconds"] <= MAX_TARGET_GAP_SECONDS]
-        df["target"] = df["target"].astype(int)
+        df = add_horizon_target(df)
         return df.sort_values("ts").reset_index(drop=True)
 
 
@@ -168,12 +198,13 @@ data:
             "rows": int(len(df)),
             "lookback_days": LOOKBACK_DAYS,
             "max_rows": MAX_ROWS,
-            "target_definition": "next_sample_threshold_state_per_sensor",
+            "target_definition": TARGET_DEFINITION,
+            "target_horizon_minutes": TARGET_HORIZON_MINUTES,
+            "min_event_duration_minutes": MIN_EVENT_DURATION_MINUTES,
             "feature_set_version": FEATURE_SET_VERSION,
             "base_features": BASE_FEATURES,
             "feature_count": len(FEATURES),
             "rolling_windows": list(WINDOWS.keys()),
-            "max_target_gap_seconds": MAX_TARGET_GAP_SECONDS,
             "positive_rate": float(df["target"].mean()) if len(df) else 0.0,
             "current_rule_positive_rate": float(df["current_rule_target"].mean()) if len(df) else 0.0,
             "target_counts": {str(k): int(v) for k, v in df["target"].value_counts().sort_index().items()},
@@ -182,9 +213,9 @@ data:
         }
         if "ts" in df.columns and len(df):
             profile["time_range"] = {"min_ts": str(df["ts"].min()), "max_ts": str(df["ts"].max())}
-        if "target_gap_seconds" in df.columns and len(df):
-            gaps = pd.to_numeric(df["target_gap_seconds"], errors="coerce")
-            profile["target_gap_seconds"] = {"min": float(gaps.min()), "mean": float(gaps.mean()), "max": float(gaps.max())}
+        if "future_positive_seconds" in df.columns and len(df):
+            fps = pd.to_numeric(df["future_positive_seconds"], errors="coerce")
+            profile["future_positive_seconds"] = {"min": float(fps.min()), "mean": float(fps.mean()), "max": float(fps.max())}
         for col in FEATURES:
             s = pd.to_numeric(df[col], errors="coerce")
             profile["feature_summary"][col] = {
@@ -235,7 +266,7 @@ data:
     - Source table: `sensor_data`
     - Lookback window: {LOOKBACK_DAYS} days
     - Training rows after cleanup: {len(df)}
-    - Target: next sample threshold state per `sensor_id`, max gap {MAX_TARGET_GAP_SECONDS}s
+    - Target: threshold-risk state within next {TARGET_HORIZON_MINUTES} minutes for at least {MIN_EVENT_DURATION_MINUTES} minutes
     - Positive rate: {profile['positive_rate']:.4f}
     - Current-rule positive rate: {profile['current_rule_positive_rate']:.4f}
 
@@ -283,7 +314,9 @@ data:
                     "aiot.component": "maintenance-trainer",
                     "aiot.model_name": MODEL_NAME,
                     "aiot.experiment": EXPERIMENT_NAME,
-                    "aiot.target_definition": "next_sample_threshold_state_per_sensor",
+                    "aiot.target_definition": TARGET_DEFINITION,
+                    "aiot.target_horizon_minutes": str(TARGET_HORIZON_MINUTES),
+                    "aiot.min_event_duration_minutes": str(MIN_EVENT_DURATION_MINUTES),
                     "aiot.feature_set_version": FEATURE_SET_VERSION,
                     "aiot.split_strategy": "chronological_80_20",
                 }
@@ -293,7 +326,7 @@ data:
             with mlflow.start_span("load-training-data") as span:
                 raw_df = load_data()
                 df = add_target(raw_df)
-                span.set_inputs({"lookback_days": LOOKBACK_DAYS, "max_rows": MAX_ROWS})
+                span.set_inputs({"lookback_days": LOOKBACK_DAYS, "max_rows": MAX_ROWS, "target_horizon_minutes": TARGET_HORIZON_MINUTES, "min_event_duration_minutes": MIN_EVENT_DURATION_MINUTES})
                 span.set_outputs({"raw_rows": len(raw_df), "training_rows": len(df), "feature_count": len(FEATURES)})
 
             if len(df) < 100:
@@ -340,6 +373,7 @@ data:
                 "feature_count": float(len(FEATURES)),
             }
             if y_test.nunique() > 1:
+                metrics["pr_auc"] = average_precision_score(y_test, proba)
                 metrics["roc_auc"] = roc_auc_score(y_test, proba)
             metrics = {k: float(v) for k, v in metrics.items()}
             profile = data_profile(df)
@@ -353,8 +387,9 @@ data:
                     "features": ",".join(FEATURES),
                     "model_type": "RandomForestClassifier",
                     "experiment_name": EXPERIMENT_NAME,
-                    "target_definition": "next_sample_threshold_state_per_sensor",
-                    "max_target_gap_seconds": MAX_TARGET_GAP_SECONDS,
+                    "target_definition": TARGET_DEFINITION,
+                    "target_horizon_minutes": TARGET_HORIZON_MINUTES,
+                    "min_event_duration_minutes": MIN_EVENT_DURATION_MINUTES,
                     "split_strategy": "chronological_80_20",
                     "rolling_windows": ",".join(WINDOWS.keys()),
                 }

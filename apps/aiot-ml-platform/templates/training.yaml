@@ -47,6 +47,10 @@ spec:
                   value: {{ .Values.training.lookbackDays | quote }}
                 - name: MAX_ROWS
                   value: {{ .Values.training.maxRows | quote }}
+                - name: TARGET_HORIZON_MINUTES
+                  value: {{ .Values.training.targetHorizonMinutes | quote }}
+                - name: MIN_EVENT_DURATION_MINUTES
+                  value: {{ .Values.training.minEventDurationMinutes | quote }}
               resources:
                 {{- toYaml .Values.training.resources | nindent 16 }}
               volumeMounts:
