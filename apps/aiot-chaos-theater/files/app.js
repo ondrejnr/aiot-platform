@@ -17,6 +17,10 @@ const fmtTime = (iso) => {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? iso : d.toLocaleTimeString('sk-SK', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 };
+const timeMs = (iso) => {
+  const t = new Date(iso || '').getTime();
+  return Number.isFinite(t) ? t : null;
+};
 const shortPod = (name) => name ? name.replace(/^aiot-/, '') : '—';
 
 function renderHero(state) {
@@ -84,6 +88,47 @@ function cleanMessage(ev) {
   if (ev.reason === 'Fail') return 'experiment zlyhal';
   if (ev.reason === 'ChaosInject') return 'Litmus práve aplikuje fault';
   return ev.message || '';
+}
+
+function eventLane(ev, state) {
+  if (ev.component) return ev.component;
+  if (['Killing', 'SuccessfulCreate'].includes(ev.reason)) return state.impact?.target || state.latestWorkflow?.target || 'experiment';
+  if (ev.reason === 'ChaosInject') return state.impact?.target || state.latestWorkflow?.target || 'experiment';
+  return 'experiment';
+}
+
+function renderFlowGraph(state, activeIndex = -1) {
+  const el = document.getElementById('flowGraph');
+  if (!el) return;
+  const events = importantEvents(state).filter(e => timeMs(e.time) !== null);
+  if (!events.length) {
+    el.innerHTML = '<div class="empty">Po spustení experimentu sa tu zobrazí časový graf udalostí.</div>';
+    return;
+  }
+  const stamps = events.map(e => timeMs(e.time)).filter(t => t !== null);
+  let start = Math.min(...stamps);
+  let end = Math.max(...stamps);
+  if (end <= start) end = start + 60000;
+  const target = state.impact?.target || state.latestWorkflow?.target;
+  const selected = getSelectedComponent(state)?.id;
+  const laneDefs = [{id: 'experiment', title: 'Experiment', icon: '🧪'}].concat(state.components || []);
+  const activeLaneIds = new Set(['experiment', target, selected].filter(Boolean));
+  events.forEach(e => activeLaneIds.add(eventLane(e, state)));
+  const lanes = laneDefs.filter(l => activeLaneIds.has(l.id));
+  const dotsByLane = new Map(lanes.map(l => [l.id, []]));
+  events.forEach((ev, idx) => {
+    const lane = eventLane(ev, state);
+    if (!dotsByLane.has(lane)) return;
+    const pct = Math.max(0, Math.min(100, ((timeMs(ev.time) - start) / (end - start)) * 100));
+    const cls = ev.level === 'danger' ? 'danger' : ev.level === 'warn' ? 'warn' : ev.level === 'success' ? 'success' : 'info';
+    dotsByLane.get(lane).push(`<span class="flow-dot ${cls} ${idx === activeIndex ? 'active' : ''}" style="left:${pct}%" title="${esc(fmtTime(ev.time) + ' · ' + (ev.title || ev.reason) + ' · ' + cleanMessage(ev))}">${ev.icon || '•'}</span>`);
+  });
+  const rows = lanes.map(l => `<div class="flow-row">
+    <div class="flow-label"><span>${l.icon || '•'}</span><b>${esc(l.title || l.id)}</b></div>
+    <div class="flow-track"><span class="flow-line"></span>${(dotsByLane.get(l.id) || []).join('')}</div>
+  </div>`).join('');
+  const running = state.latestWorkflow && !['Succeeded', 'Failed', 'Error'].includes(state.latestWorkflow.phase);
+  el.innerHTML = `<div class="flow-axis"><span>${fmtTime(new Date(start).toISOString())}</span><span>${running ? 'live' : fmtTime(new Date(end).toISOString())}</span></div>${rows}<div class="flow-legend"><span><i class="legend-dot danger"></i> zásah</span><span><i class="legend-dot warn"></i> obnova</span><span><i class="legend-dot success"></i> hotovo</span></div>`;
 }
 
 function renderTimeline(state, activeIndex = -1) {
@@ -160,6 +205,7 @@ function render(state) {
   renderFocus(state);
   renderPipeline(state);
   renderComponentDetail(state);
+  renderFlowGraph(state);
   renderTimeline(state);
   renderExperiments(state);
 }
@@ -186,6 +232,7 @@ function startReplay() {
   replayTimer = setInterval(() => {
     const ev = events[replayIndex];
     renderPipeline(currentState, ev?.component);
+    renderFlowGraph(currentState, replayIndex);
     renderTimeline(currentState, replayIndex);
     replayIndex += 1;
     if (replayIndex >= events.length) {
