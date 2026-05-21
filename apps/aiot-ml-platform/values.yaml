@@ -7,6 +7,7 @@ localAI:
   image: ollama/ollama:0.6.8
   model: gemma3:1b
   embeddingModel: nomic-embed-text
+  host: ollama.46.4.123.8.nip.io
   numThread: 8
   pvcSize: 20Gi
   resources:
