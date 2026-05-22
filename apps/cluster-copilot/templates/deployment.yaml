@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster-copilot
+  namespace: {{ .Values.namespace | quote }}
+  labels:
+    app.kubernetes.io/name: cluster-copilot
+    app.kubernetes.io/part-of: aiot-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cluster-copilot
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cluster-copilot
+        app.kubernetes.io/part-of: aiot-platform
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName | quote }}
+      containers:
+        - name: server
+          image: {{ .Values.image | quote }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -lc
+          args:
+            - |
+              set -eu
+              python - <<'PY'
+              import os
+              import pathlib
+              import stat
+              import urllib.request
+
+              target = pathlib.Path('/usr/local/bin/kubectl')
+              if not target.exists():
+                  url = 'https://dl.k8s.io/release/{{ .Values.kubectlVersion }}/bin/linux/amd64/kubectl'
+                  urllib.request.urlretrieve(url, target)
+                  target.chmod(target.stat().st_mode | stat.S_IEXEC)
+              PY
+
+              python -m pip install --no-cache-dir "mcp[cli]" pyyaml
+              exec python /app/server.py
+          ports:
+            - name: http
+              containerPort: {{ .Values.port }}
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            failureThreshold: 12
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu | quote }}
+              memory: {{ .Values.resources.requests.memory | quote }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu | quote }}
+              memory: {{ .Values.resources.limits.memory | quote }}
+          volumeMounts:
+            - name: server-code
+              mountPath: /app/server.py
+              subPath: server.py
+      volumes:
+        - name: server-code
+          configMap:
+            name: cluster-copilot-server

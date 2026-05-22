@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cluster-copilot
+  namespace: {{ .Values.namespace | quote }}
+  labels:
+    app.kubernetes.io/name: cluster-copilot
+    app.kubernetes.io/part-of: aiot-platform
+spec:
+  selector:
+    app.kubernetes.io/name: cluster-copilot
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

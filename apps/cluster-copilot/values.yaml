@@ -1,0 +1,13 @@
+namespace: cluster-copilot
+serviceAccountName: cluster-copilot
+image: python:3.12-slim
+port: 8000
+kubectlVersion: v1.31.5
+host: cluster-copilot.46.4.123.8.nip.io
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-copilot-server
+  namespace: {{ .Values.namespace | quote }}
+  labels:
+    app.kubernetes.io/name: cluster-copilot
+    app.kubernetes.io/part-of: aiot-platform
+data:
+  server.py: |-
+    {{- .Files.Get "files/server.py" | nindent 4 }}

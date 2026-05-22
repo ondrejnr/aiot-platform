@@ -1,0 +1,22 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cluster-copilot
+  namespace: cluster-copilot
+spec:
+  suspend: false
+  interval: 30m
+  releaseName: cluster-copilot
+  chart:
+    spec:
+      chart: ./apps/cluster-copilot
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  install:
+    createNamespace: true
+  upgrade:
+    cleanupOnFail: true
