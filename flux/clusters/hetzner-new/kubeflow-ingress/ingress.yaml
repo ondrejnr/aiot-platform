@@ -102,17 +102,15 @@ spec:
             port:
               number: 80
 ---
-# Katib UI -- /katib
+# Katib UI -- /katib (no rewrite - base href is /katib/)
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubeflow-katib
   namespace: kubeflow
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header x-forwarded-prefix /katib;
       proxy_set_header kubeflow-userid "user@example.com";
 spec:
   ingressClassName: nginx
@@ -120,8 +118,8 @@ spec:
   - host: kubeflow.46.4.123.8.nip.io
     http:
       paths:
-      - path: /katib(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /katib
+        pathType: Prefix
         backend:
           service:
             name: katib-ui
