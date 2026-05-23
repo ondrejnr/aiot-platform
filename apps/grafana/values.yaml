@@ -46,17 +46,17 @@ grafana:
     datasources.yaml:
       apiVersion: 1
       datasources:
-      - name: Prometheus
-        type: prometheus
-        access: proxy
-        url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc:8429
-        isDefault: true
-        editable: true
       - name: Loki
         uid: Loki
         type: loki
         access: proxy
         url: http://loki-gateway.observability-logs.svc.cluster.local
+        isDefault: true
+        editable: true
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc:8429
         isDefault: false
         editable: true
       - name: AIoT-Postgres

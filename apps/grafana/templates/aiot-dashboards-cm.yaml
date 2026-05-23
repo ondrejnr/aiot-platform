@@ -6,7 +6,5 @@ metadata:
   labels:
     grafana_dashboard: "1"
 data:
-{{- range $path, $_ := .Files.Glob "dashboards/*.json" }}
-  {{ base $path }}: |-
-{{ $.Files.Get $path | indent 4 }}
-{{- end }}
+  aiot-sensors.json: |-
+{{ .Files.Get "dashboards/aiot-sensors.json" | indent 4 }}
