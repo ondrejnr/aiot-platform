@@ -1,0 +1,147 @@
+# Central Dashboard — /
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubeflow-centraldashboard
+  namespace: kubeflow
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kubeflow.46.4.123.8.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: centraldashboard
+            port:
+              number: 80
+---
+# Jupyter Web App — /jupyter
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubeflow-jupyter
+  namespace: kubeflow
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header x-forwarded-prefix /jupyter;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kubeflow.46.4.123.8.nip.io
+    http:
+      paths:
+      - path: /jupyter(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: jupyter-web-app-service
+            port:
+              number: 80
+---
+# Volumes Web App — /volumes
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubeflow-volumes
+  namespace: kubeflow
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header x-forwarded-prefix /volumes;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kubeflow.46.4.123.8.nip.io
+    http:
+      paths:
+      - path: /volumes(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: volumes-web-app-service
+            port:
+              number: 80
+---
+# TensorBoards Web App — /tensorboards
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubeflow-tensorboards
+  namespace: kubeflow
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header x-forwarded-prefix /tensorboards;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kubeflow.46.4.123.8.nip.io
+    http:
+      paths:
+      - path: /tensorboards(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: tensorboards-web-app-service
+            port:
+              number: 80
+---
+# Katib UI — /katib
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubeflow-katib
+  namespace: kubeflow
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header x-forwarded-prefix /katib;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kubeflow.46.4.123.8.nip.io
+    http:
+      paths:
+      - path: /katib(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: katib-ui
+            port:
+              number: 80
+---
+# Profiles KFAM API — /kfam
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubeflow-kfam
+  namespace: kubeflow
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header x-forwarded-prefix /kfam;
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kubeflow.46.4.123.8.nip.io
+    http:
+      paths:
+      - path: /kfam(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: profiles-kfam
+            port:
+              number: 8081
