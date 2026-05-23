@@ -1,4 +1,4 @@
-# Central Dashboard — /
+# Central Dashboard -- /
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -8,6 +8,8 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header kubeflow-userid "user@example.com";
 spec:
   ingressClassName: nginx
   rules:
@@ -22,17 +24,18 @@ spec:
             port:
               number: 80
 ---
-# Jupyter Web App — /jupyter
+# Jupyter Web App -- /jupyter
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubeflow-jupyter
   namespace: kubeflow
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header x-forwarded-prefix /jupyter;
+      proxy_set_header kubeflow-userid "user@example.com";
 spec:
   ingressClassName: nginx
   rules:
@@ -47,17 +50,18 @@ spec:
             port:
               number: 80
 ---
-# Volumes Web App — /volumes
+# Volumes Web App -- /volumes
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubeflow-volumes
   namespace: kubeflow
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header x-forwarded-prefix /volumes;
+      proxy_set_header kubeflow-userid "user@example.com";
 spec:
   ingressClassName: nginx
   rules:
@@ -72,17 +76,18 @@ spec:
             port:
               number: 80
 ---
-# TensorBoards Web App — /tensorboards
+# TensorBoards Web App -- /tensorboards
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubeflow-tensorboards
   namespace: kubeflow
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header x-forwarded-prefix /tensorboards;
+      proxy_set_header kubeflow-userid "user@example.com";
 spec:
   ingressClassName: nginx
   rules:
@@ -97,17 +102,18 @@ spec:
             port:
               number: 80
 ---
-# Katib UI — /katib
+# Katib UI -- /katib
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubeflow-katib
   namespace: kubeflow
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header x-forwarded-prefix /katib;
+      proxy_set_header kubeflow-userid "user@example.com";
 spec:
   ingressClassName: nginx
   rules:
@@ -122,16 +128,17 @@ spec:
             port:
               number: 80
 ---
-# Profiles KFAM API — /kfam
+# Profiles KFAM API -- /kfam
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: kubeflow-kfam
   namespace: kubeflow
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/configuration-snippet: |
       proxy_set_header x-forwarded-prefix /kfam;
+      proxy_set_header kubeflow-userid "user@example.com";
 spec:
   ingressClassName: nginx
   rules:
