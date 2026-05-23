@@ -31,7 +31,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 30m
-  path: ./manifests/kustomize/env/cert-manager/platform-agnostic
+  path: ./manifests/kustomize/env/platform-agnostic
   prune: true
   wait: true
   patches:
