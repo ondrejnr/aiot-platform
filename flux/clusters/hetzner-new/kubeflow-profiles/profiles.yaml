@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -9,58 +10,7 @@ metadata:
   labels:
     kustomize.component: profiles
   name: profiles-controller-service-account
-  namespace: profiles-system
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  labels:
-    kustomize.component: profiles
-  name: profiles-leader-election-role
-  namespace: profiles-system
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - get
-      - list
-      - watch
-      - create
-      - update
-      - patch
-      - delete
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps/status
-    verbs:
-      - get
-      - update
-      - patch
-  - apiGroups:
-      - ""
-    resources:
-      - events
-    verbs:
-      - create
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  labels:
-    kustomize.component: profiles
-  name: profiles-leader-election-rolebinding
-  namespace: profiles-system
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: profiles-leader-election-role
-subjects:
-  - kind: ServiceAccount
-    name: profiles-controller-service-account
-    namespace: profiles-system
+  namespace: kubeflow
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -75,15 +25,15 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: profiles-controller-service-account
-    namespace: profiles-system
+    namespace: kubeflow
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   labels:
     kustomize.component: profiles
-  name: profiles-config-5h9m86f79f
-  namespace: profiles-system
+  name: profiles-config
+  namespace: kubeflow
 data:
   ADMIN: ""
   ISTIO_INGRESS_GATEWAY_PRINCIPAL: cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account
@@ -93,25 +43,29 @@ data:
   USERID_PREFIX: ""
   WORKLOAD_IDENTITY: ""
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: namespace-labels-data
+  namespace: kubeflow
+data:
+  namespace-labels.yaml: |
+    pipelines.kubeflow.org/enabled: "true"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     kustomize.component: profiles
   name: profiles-deployment
-  namespace: profiles-system
+  namespace: kubeflow
 spec:
   replicas: 1
-  revisionHistoryLimit: 10
-  progressDeadlineSeconds: 600
   selector:
     matchLabels:
       kustomize.component: profiles
   strategy:
     type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
   template:
     metadata:
       labels:
@@ -133,7 +87,7 @@ spec:
             - $(WORKLOAD_IDENTITY)
           envFrom:
             - configMapRef:
-                name: profiles-config-5h9m86f79f
+                name: profiles-config
           ports:
             - containerPort: 9876
               protocol: TCP
@@ -159,7 +113,57 @@ spec:
             - name: namespace-labels
               mountPath: /etc/profile-controller/namespace-labels.yaml
               subPath: namespace-labels.yaml
+        - name: kfam
+          image: ghcr.io/kubeflow/kubeflow/kfam:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - /access-management
+            - -cluster-admin
+            - $(ADMIN)
+            - -userid-header
+            - $(USERID_HEADER)
+            - -userid-prefix
+            - $(USERID_PREFIX)
+          envFrom:
+            - configMapRef:
+                name: profiles-config
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8081
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
       volumes:
         - name: namespace-labels
           configMap:
             name: namespace-labels-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    kustomize.component: profiles
+  name: profiles-kfam
+  namespace: kubeflow
+spec:
+  ports:
+    - port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    kustomize.component: profiles
