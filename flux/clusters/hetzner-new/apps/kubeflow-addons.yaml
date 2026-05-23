@@ -44,14 +44,14 @@ metadata:
 spec:
   interval: 30m
   timeout: 10m
-  path: ./applications/profiles/upstream/base
+  path: ./flux/clusters/hetzner-new/kubeflow-profiles
   prune: true
   wait: true
   dependsOn:
     - name: kubeflow-roles
   sourceRef:
     kind: GitRepository
-    name: kubeflow-manifests
+    name: flux-system
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

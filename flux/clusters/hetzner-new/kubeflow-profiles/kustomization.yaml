@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - https://github.com/kubeflow/manifests//applications/profiles/upstream/default?ref=v1.11.0
+patchesStrategicMerge:
+  - patch-serviceaccount.yaml
+
