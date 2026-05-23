@@ -1,0 +1,245 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: kubeflow-manifests
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://github.com/kubeflow/manifests.git
+  ref:
+    tag: v1.11.0
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: kubeflow-katib
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://github.com/kubeflow/katib.git
+  ref:
+    tag: v0.17.0
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-roles
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./common/kubeflow-roles/base
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-profiles
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./applications/profiles/upstream/base
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-admission-webhook
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./applications/admission-webhook/upstream/overlays/cert-manager
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-notebook-controller
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./applications/jupyter/notebook-controller/upstream/default
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-jupyter-web-app
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./applications/jupyter/jupyter-web-app/upstream/base
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-centraldashboard
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./applications/centraldashboard/upstream/base
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+    - name: kubeflow-profiles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-volumes-web-app
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./applications/volumes-web-app/upstream/base
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+    - name: kubeflow-profiles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-pvcviewer-controller
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./applications/pvcviewer-controller/upstream/base
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-tensorboard-controller
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./applications/tensorboard/tensorboard-controller/upstream/base
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-tensorboards-web-app
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./applications/tensorboard/tensorboards-web-app/upstream/base
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+    - name: kubeflow-profiles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-training-operator
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 15m
+  path: ./applications/training-operator/upstream/overlays/kubeflow
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-user-namespace
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./common/user-namespace/base
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-profiles
+    - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-manifests
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-katib
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 20m
+  path: ./manifests/v1beta1/installs/katib-standalone
+  prune: true
+  wait: true
+  dependsOn:
+    - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: kubeflow-katib
