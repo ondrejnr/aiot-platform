@@ -134,7 +134,7 @@ alloy:
 
         loki.process "node_logs" {
           stage.regex {
-            expression = "^\[(?P<time>[^\]]+)\]\s+(?P<content>.*)$"
+            expression = "^\\[(?P<time>[^\\]]+)\\]\\s+(?P<content>.*)$"
           }
 
           stage.static_labels {
