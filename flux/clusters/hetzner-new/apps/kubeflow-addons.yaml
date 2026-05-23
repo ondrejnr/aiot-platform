@@ -48,7 +48,23 @@ spec:
   prune: true
   wait: true
   dependsOn:
+    - name: kubeflow-authz-crd
     - name: kubeflow-roles
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeflow-authz-crd
+  namespace: flux-system
+spec:
+  interval: 30m
+  timeout: 10m
+  path: ./flux/clusters/hetzner-new/kubeflow-authz-crd
+  prune: true
+  wait: true
   sourceRef:
     kind: GitRepository
     name: flux-system
@@ -202,15 +218,15 @@ metadata:
 spec:
   interval: 30m
   timeout: 10m
-  path: ./common/user-namespace/base
+  path: ./flux/clusters/hetzner-new/kubeflow-user-namespace
   prune: true
   wait: true
   dependsOn:
     - name: kubeflow-profiles
-    - name: kubeflow-roles
+    - name: kubeflow-authz-crd
   sourceRef:
     kind: GitRepository
-    name: kubeflow-manifests
+    name: flux-system
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
