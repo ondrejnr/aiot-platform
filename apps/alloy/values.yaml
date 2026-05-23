@@ -119,6 +119,41 @@ alloy:
           forward_to = [loki.write.loki.receiver]
         }
 
+        loki.source.file "node_logs" {
+          targets = [
+            {
+              __path__ = "/var/log/k3d-entrypoints_*.log",
+            },
+          ]
+          forward_to = [loki.process.node_logs.receiver]
+          file_match {
+            enabled     = true
+            sync_period = "10s"
+          }
+        }
+
+        loki.process "node_logs" {
+          stage.regex {
+            expression = "^\[(?P<time>[^\]]+)\]\s+(?P<content>.*)$"
+          }
+
+          stage.static_labels {
+            values = {
+              cluster   = "hetzner-new",
+              source    = "alloy",
+              log_type  = "node",
+              job       = "node/system",
+              component = "k3d-entrypoint",
+            }
+          }
+
+          stage.output {
+            source = "content"
+          }
+
+          forward_to = [loki.write.loki.receiver]
+        }
+
   controller:
     type: daemonset
     tolerations:
