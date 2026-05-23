@@ -52,6 +52,12 @@ grafana:
         url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc:8429
         isDefault: true
         editable: true
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki-gateway.observability-logs.svc.cluster.local
+        isDefault: false
+        editable: true
       - name: AIoT-Postgres
         uid: AIoT-Postgres
         type: postgres

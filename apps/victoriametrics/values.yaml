@@ -9,7 +9,6 @@ victoria-metrics-k8s-stack:
   vmalert:
     spec:
       notifiers:
-        - url: "http://am.monitoring.svc:9093"
   kubeControllerManager:
     enabled: false
   kubeScheduler:
