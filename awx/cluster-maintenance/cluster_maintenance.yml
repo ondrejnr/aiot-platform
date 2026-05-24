@@ -28,7 +28,7 @@
 
         github_latest() {
           repo="$1"
-          tag=$(curl --connect-timeout 5 --max-time 15 -fsSL "https://api.github.com/repos/${repo}/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+          tag=$(curl --connect-timeout 3 --max-time 5 -fsSL "https://api.github.com/repos/${repo}/releases/latest" 2>/dev/null | sed -n 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
           if [ -n "$tag" ]; then echo "$tag"; else echo "unknown"; fi
         }
 
@@ -141,6 +141,7 @@
         echo
 
         echo "=== LATEST RELEASE CHECKS (ONLINE) ==="
+        echo "release_checks=best_effort (unknown means GitHub check failed or timed out)"
         echo "latest_k3d=$(github_latest k3d-io/k3d)"
         echo "latest_k3s=$(github_latest k3s-io/k3s)"
         echo "latest_flux=$(github_latest fluxcd/flux2)"
