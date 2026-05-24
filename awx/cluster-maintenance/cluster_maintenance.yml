@@ -187,10 +187,10 @@
           === AIOT HETZNER PATCH DECISION ===
           Tento AWX job je iba AUDIT. Nic nepatchuje a nemenil host.
 
-          OS_DNF_PATCHING_NEEDED={% if audit_os_updates_count == 'unknown' %}UNKNOWN{% elif (audit_os_updates_count | int) > 0 %}YES{% else %}NO{% endif %}
+          OS_DNF_PATCHING_NEEDED={{ 'UNKNOWN' if (audit_os_updates_count | string) == 'unknown' else ('YES' if (audit_os_updates_count | int) > 0 else 'NO') }}
           dnf_updates_available={{ audit_os_updates_count }}
           security_updates_available={{ audit_security_updates_count }}
-          reboot_required={{ audit_reboot_required }}
+          reboot_required={{ 'yes' if audit_reboot_required in [true, 'true', 'yes', 'YES', 'True'] else ('no' if audit_reboot_required in [false, 'false', 'no', 'NO', 'False'] else audit_reboot_required) }}
           background_patch_unit={{ audit_patch_unit_state }}
           last_background_patch_status={{ audit_patch_status }}
           last_background_patch_remaining_updates={{ audit_updates_after }}
@@ -207,7 +207,7 @@
           {% else %}
           - DNF patching teraz netreba. OS baliky su aktualne.
           {% endif %}
-          {% if audit_reboot_required == 'yes' %}
+          {% if audit_reboot_required in [true, 'true', 'yes', 'YES', 'True'] %}
           - Treba reboot: po patchi spusti AWX job "3 - Reboot ak treba" s confirm_reboot=YES.
           {% else %}
           - Reboot teraz netreba.
