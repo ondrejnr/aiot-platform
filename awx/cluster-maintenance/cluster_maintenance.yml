@@ -168,7 +168,53 @@
       changed_when: false
       when: maintenance_action == "audit_all"
 
-    - name: Print audit result
+    - name: Extract audit decision values
+      ansible.builtin.set_fact:
+        audit_os_updates_count: "{{ (audit_all_result.stdout | regex_search('(?m)^all_os_updates_count=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_security_updates_count: "{{ (audit_all_result.stdout | regex_search('(?m)^security_updates_count=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_reboot_required: "{{ (audit_all_result.stdout | regex_search('(?m)^reboot_required=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_bad_pods: "{{ (audit_all_result.stdout | regex_search('(?m)^bad_pods=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_bad_helmreleases: "{{ (audit_all_result.stdout | regex_search('(?m)^bad_helmreleases=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_cluster_health: "{{ (audit_all_result.stdout | regex_search('(?m)^cluster_health=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_patch_unit_state: "{{ (audit_all_result.stdout | regex_search('(?m)^patch_unit_state=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_patch_status: "{{ (audit_all_result.stdout | regex_search('(?m)^status=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_updates_after: "{{ (audit_all_result.stdout | regex_search('(?m)^updates_after=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+      when: audit_all_result is defined and audit_all_result.stdout is defined
+
+    - name: Print audit decision - patching needed or not
+      ansible.builtin.debug:
+        msg: |
+          === AIOT HETZNER PATCH DECISION ===
+          Tento AWX job je iba AUDIT. Nic nepatchuje a nemenil host.
+
+          OS_DNF_PATCHING_NEEDED={% if audit_os_updates_count == 'unknown' %}UNKNOWN{% elif (audit_os_updates_count | int) > 0 %}YES{% else %}NO{% endif %}
+          dnf_updates_available={{ audit_os_updates_count }}
+          security_updates_available={{ audit_security_updates_count }}
+          reboot_required={{ audit_reboot_required }}
+          background_patch_unit={{ audit_patch_unit_state }}
+          last_background_patch_status={{ audit_patch_status }}
+          last_background_patch_remaining_updates={{ audit_updates_after }}
+          cluster_health={{ audit_cluster_health }} (bad_pods={{ audit_bad_pods }}, bad_helmreleases={{ audit_bad_helmreleases }})
+
+          WHAT_TO_DO:
+          {% if audit_os_updates_count == 'unknown' %}
+          - DNF audit nedal jednoznacny pocet updateov. Pozri FULL AUDIT DETAIL nizsie.
+          {% elif (audit_os_updates_count | int) > 0 %}
+          - Treba patchovat DNF baliky: spusti AWX job "2 - Opatchovat cely Hetzner" s confirm_patch=YES.
+          {% if (audit_bad_pods | int) != 0 or (audit_bad_helmreleases | int) != 0 %}
+          - POZOR: cluster ma warningy. Patch job 2 zamerne odmietne start, kym bad_pods/bad_helmreleases nie su 0.
+          {% endif %}
+          {% else %}
+          - DNF patching teraz netreba. OS baliky su aktualne.
+          {% endif %}
+          {% if audit_reboot_required == 'yes' %}
+          - Treba reboot: po patchi spusti AWX job "3 - Reboot ak treba" s confirm_reboot=YES.
+          {% else %}
+          - Reboot teraz netreba.
+          {% endif %}
+      when: audit_all_result is defined and audit_all_result.stdout is defined
+
+    - name: Print full audit detail
       ansible.builtin.debug:
         msg: "{{ audit_all_result.stdout_lines }}"
       when: audit_all_result is defined and audit_all_result.stdout is defined
