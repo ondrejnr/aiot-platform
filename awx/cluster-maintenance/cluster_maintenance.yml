@@ -68,13 +68,25 @@
           if [ "$DNF_RC" = "0" ]; then
             echo "all_os_updates_count=0"
             echo "No DNF package updates available."
+            echo "patch_this_count=0"
+            echo "patch_this_start"
+            echo "  - none"
+            echo "patch_this_end"
           elif [ "$DNF_RC" = "100" ]; then
             ALL_UPDATES_COUNT=$(awk 'NF>=3 && $1 !~ /^(Obsoleting|Last)$/ {c++} END{print c+0}' /tmp/aiot-dnf-check-update.txt)
             echo "all_os_updates_count=$ALL_UPDATES_COUNT"
+            echo "patch_this_count=$ALL_UPDATES_COUNT"
+            echo "patch_this_start"
+            awk 'NF>=3 && $1 !~ /^(Obsoleting|Last)$/ {print "  - " $1 " " $2 " " $3}' /tmp/aiot-dnf-check-update.txt
+            echo "patch_this_end"
             echo "--- first 80 DNF updates ---"
             head -80 /tmp/aiot-dnf-check-update.txt
           else
             echo "all_os_updates_count=unknown"
+            echo "patch_this_count=unknown"
+            echo "patch_this_start"
+            echo "  - unknown"
+            echo "patch_this_end"
             echo "dnf_check_update_rc=$DNF_RC"
             cat /tmp/aiot-dnf-check-update.err || true
           fi
@@ -172,6 +184,8 @@
     - name: Extract audit decision values
       ansible.builtin.set_fact:
         audit_os_updates_count: "{{ (audit_all_result.stdout | regex_search('(?m)^all_os_updates_count=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_patch_this_count: "{{ (audit_all_result.stdout | regex_search('(?m)^patch_this_count=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
+        audit_patch_this_block: "{{ (audit_all_result.stdout | regex_search('(?ms)^patch_this_start$\n(.*?)^patch_this_end$', '\\1') | default('  - unknown', true)) }}"
         audit_security_updates_count: "{{ (audit_all_result.stdout | regex_search('(?m)^security_updates_count=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
         audit_reboot_required: "{{ (audit_all_result.stdout | regex_search('(?m)^reboot_required=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
         audit_bad_pods: "{{ (audit_all_result.stdout | regex_search('(?m)^bad_pods=([^\n]+)', '\\1') | default(['unknown'], true) | first) }}"
@@ -196,6 +210,15 @@
           last_background_patch_status={{ audit_patch_status }}
           last_background_patch_remaining_updates={{ audit_updates_after }}
           cluster_health={{ audit_cluster_health }} (bad_pods={{ audit_bad_pods }}, bad_helmreleases={{ audit_bad_helmreleases }})
+
+          PATCH_THIS:
+          {% if audit_patch_this_count == 'unknown' %}
+          {{ audit_patch_this_block | trim }}
+          {% elif (audit_patch_this_count | int) > 0 %}
+          {{ audit_patch_this_block | trim }}
+          {% else %}
+          - none
+          {% endif %}
 
           WHAT_TO_DO:
           {% if audit_os_updates_count == 'unknown' %}
