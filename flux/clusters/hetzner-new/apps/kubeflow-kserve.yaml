@@ -24,6 +24,109 @@ spec:
     kind: GitRepository
     name: kubeflow-pipelines
 ---
+# Separate GitRepository for argo-workflows to avoid remote URL fetches in kubeflow kustomize build
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: argo-workflows
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://github.com/argoproj/argo-workflows.git
+  ref:
+    tag: v3.7.3
+---
+# Deploy workflow-controller from upstream argo source (avoids remote URL in kubeflow kustomize)
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: argo-workflows-controller
+  namespace: flux-system
+spec:
+  interval: 30m
+  path: ./manifests/base/workflow-controller
+  prune: true
+  wait: true
+  targetNamespace: kubeflow
+  sourceRef:
+    kind: GitRepository
+    name: argo-workflows
+  patches:
+    - target:
+        kind: Deployment
+        name: workflow-controller
+      patch: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: workflow-controller
+        spec:
+          template:
+            spec:
+              securityContext:
+                seccompProfile:
+                  type: RuntimeDefault
+              containers:
+                - name: workflow-controller
+                  image: quay.io/argoproj/workflow-controller:v3.7.3
+                  args:
+                    - --configmap
+                    - workflow-controller-configmap
+                    - --executor-image
+                    - quay.io/argoproj/argoexec:v3.7.3
+                    - --namespaced
+                  securityContext:
+                    readOnlyRootFilesystem: true
+                    runAsNonRoot: true
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                      drop:
+                        - ALL
+                  resources:
+                    requests:
+                      cpu: 100m
+                      memory: 500Mi
+    - target:
+        kind: ConfigMap
+        name: workflow-controller-configmap
+      patch: |
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: workflow-controller-configmap
+        data:
+          artifactRepository: |
+            archiveLogs: true
+            s3:
+              endpoint: "minio-service.kubeflow:9000"
+              bucket: "mlpipeline"
+              keyFormat: "private-artifacts/{{workflow.namespace}}/{{workflow.name}}/{{workflow.creationTimestamp.Y}}/{{workflow.creationTimestamp.m}}/{{workflow.creationTimestamp.d}}/{{pod.name}}"
+              insecure: true
+              accessKeySecret:
+                name: mlpipeline-minio-artifact
+                key: accesskey
+              secretKeySecret:
+                name: mlpipeline-minio-artifact
+                key: secretkey
+          executor: |
+            imagePullPolicy: IfNotPresent
+---
+# Deploy workflow-controller RBAC from upstream argo source
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: argo-workflows-rbac
+  namespace: flux-system
+spec:
+  interval: 30m
+  path: ./manifests/namespace-install/workflow-controller-rbac
+  prune: true
+  wait: true
+  targetNamespace: kubeflow
+  sourceRef:
+    kind: GitRepository
+    name: argo-workflows
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -31,7 +134,8 @@ metadata:
   namespace: flux-system
 spec:
   interval: 30m
-  path: ./manifests/kustomize/env/platform-agnostic
+  # env/plain: same as platform-agnostic but WITHOUT argo (argo deployed separately via argo-workflows-controller)
+  path: ./manifests/kustomize/env/plain
   prune: true
   wait: true
   patches:
@@ -49,6 +153,8 @@ spec:
           defaultPipelineRoot: minio://mlpipeline/v2/artifacts
   dependsOn:
     - name: kubeflow-pipelines-crds
+    - name: argo-workflows-controller
+    - name: argo-workflows-rbac
   sourceRef:
     kind: GitRepository
     name: kubeflow-pipelines
