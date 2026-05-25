@@ -108,8 +108,7 @@ spec:
               secretKeySecret:
                 name: mlpipeline-minio-artifact
                 key: secretkey
-          executor: |
-            imagePullPolicy: IfNotPresent
+          executor: "imagePullPolicy: IfNotPresent\n"
 ---
 # Deploy workflow-controller RBAC from upstream argo source
 apiVersion: kustomize.toolkit.fluxcd.io/v1
