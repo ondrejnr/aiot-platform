@@ -5,13 +5,13 @@ metadata:
   namespace: victoriametrics
 spec:
   extraArgs:
-    search.maxConcurrentRequests: \ 6\
-    search.maxQueueDuration: \1m\
-    search.maxQueryDuration: \5m\
+    search.maxConcurrentRequests:  6
+    search.maxQueueDuration: 1m
+    search.maxQueryDuration: 5m
   resources:
     requests:
-      cpu: \1\
+      cpu: 1
       memory: 2Gi
     limits:
-      cpu: \2\
+      cpu: 2
       memory: 4Gi
