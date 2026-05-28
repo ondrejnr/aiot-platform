@@ -1,0 +1,17 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMSingle
+metadata:
+  name: victoriametrics-victoria-metrics-k8s-stack
+  namespace: victoriametrics
+spec:
+  extraArgs:
+    search.maxConcurrentRequests:  6
+    search.maxQueueDuration: 1m
+    search.maxQueryDuration: 5m
+  resources:
+    requests:
+      cpu: 1
+      memory: 2Gi
+    limits:
+      cpu: 2
+      memory: 4Gi
