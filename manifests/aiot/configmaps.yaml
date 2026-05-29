@@ -1876,7 +1876,17 @@ items:
       {}\r\n        machine_id = payload.get(\"machine_id\") or payload.get(\"sensor_id\",
       \"unknown\")\r\n        machine_type = infer_machine_type(machine_id, payload,
       message.topic)\r\n        location = infer_location(payload, message.topic)\r\n
-      \       ts_value = float(payload.get(\"ts\") or time.time())\r\n        item_payload
+        ts_raw = payload.get("ts")
+        if isinstance(ts_raw, (int, float)):
+            ts_value = float(ts_raw)
+        elif isinstance(ts_raw, str):
+            try:
+                ts_value = float(ts_raw)
+            except ValueError:
+                from datetime import datetime
+                ts_value = datetime.fromisoformat(ts_raw.replace("Z", "+00:00")).timestamp()
+        else:
+            ts_value = time.time()
       = {\r\n            \"machine_id\": machine_id,\r\n            \"machine_type\":
       machine_type,\r\n            \"location\": location,\r\n            \"topic\":
       message.topic,\r\n            \"ts\": ts_value,\r\n            \"status\": payload.get(\"status\"),\r\n

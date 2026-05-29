@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ruvllm-proxy-secret
+  namespace: local-ai
+type: Opaque
+stringData:
+  proxy-key: "secret"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ruvllm-proxy
+  namespace: local-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ruvllm-proxy
+  template:
+    metadata:
+      labels:
+        app: ruvllm-proxy
+    spec:
+      containers:
+      - name: proxy
+        image: ruvbot-ollama-proxy:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: OLLAMA_URL
+          value: "http://ollama.local-ai.svc.cluster.local:11434"
+        - name: PROXY_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ruvllm-proxy-secret
+              key: proxy-key
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ruvllm-proxy
+  namespace: local-ai
+spec:
+  selector:
+    app: ruvllm-proxy
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP
+
+---
+# ruvBot namespace + deployment (image should be built and available to the cluster)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ruvbot
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ruvbot-secrets
+  namespace: ruvbot
+type: Opaque
+stringData:
+  OPENAI_API_KEY: "secret"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ruvbot
+  namespace: ruvbot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ruvbot
+  template:
+    metadata:
+      labels:
+        app: ruvbot
+    spec:
+      containers:
+      - name: ruvbot
+        image: ruvnet/ruvbot:local
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: OPENAI_API_BASE
+          value: "http://ruvllm-proxy.local-ai.svc.cluster.local:8080/v1"
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ruvbot-secrets
+              key: OPENAI_API_KEY
+        - name: OLLAMA_BASE_URL
+          value: "http://ollama.local-ai.svc.cluster.local:11434"
+        - name: OLLAMA_MODEL
+          value: "llama3"
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ruvbot
+  namespace: ruvbot
+spec:
+  selector:
+    app: ruvbot
+  ports:
+  - port: 3000
+    targetPort: 3000
+  type: ClusterIP

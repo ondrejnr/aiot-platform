@@ -1,0 +1,58 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pg-cluster-superuser
+  namespace: databases
+type: kubernetes.io/basic-auth
+stringData:
+  username: postgres
+  password: "Sup3rPg_2026!"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pg-cluster-app
+  namespace: databases
+type: kubernetes.io/basic-auth
+stringData:
+  username: appuser
+  password: "AiotPg2026!"
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-cluster
+  namespace: databases
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.4
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: pg-cluster-superuser
+  storage:
+    size: 10Gi
+    storageClass: local-path
+  bootstrap:
+    initdb:
+      database: aiot
+      owner: appuser
+      secret:
+        name: pg-cluster-app
+      postInitSQL:
+        - "CREATE ROLE gitea LOGIN PASSWORD 'gitea'"
+        - "CREATE ROLE zabbix LOGIN PASSWORD 'e982317cfac9d8d8208183a8fd037e56'"
+        - "CREATE ROLE awx LOGIN PASSWORD 'oXYg5X6K872w1Q24BGiiiMaWApHsISTM'"
+        - "CREATE ROLE puppetdb LOGIN PASSWORD 'unbreakablePassword'"
+        - "CREATE ROLE terrakube LOGIN PASSWORD 'Ibm5ksY6VqOoN2kHdj1MXQCcMhSh'"
+        - "CREATE ROLE grafana_ro LOGIN PASSWORD 'Gr4f4n4R0_2026!'"
+        - "CREATE DATABASE gitea OWNER gitea"
+        - "CREATE DATABASE zabbix OWNER zabbix"
+        - "CREATE DATABASE awx OWNER awx"
+        - "CREATE DATABASE puppetdb OWNER puppetdb"
+        - "CREATE DATABASE terrakube OWNER terrakube"
+      postInitApplicationSQL:
+        - "GRANT CONNECT ON DATABASE aiot TO grafana_ro"
+        - "GRANT USAGE ON SCHEMA public TO grafana_ro"
+        - "GRANT SELECT ON ALL TABLES IN SCHEMA public TO grafana_ro"
+        - "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO grafana_ro"

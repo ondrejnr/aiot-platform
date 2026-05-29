@@ -179,7 +179,6 @@
         executable: /bin/bash
       register: audit_all_result
       changed_when: false
-      when: maintenance_action == "audit_all"
 
     - name: Extract audit decision values
       ansible.builtin.set_fact:
@@ -200,7 +199,11 @@
       ansible.builtin.debug:
         msg: |
           === AIOT HETZNER PATCH DECISION ===
+          {% if maintenance_action == "audit_all" %}
           Tento AWX job je iba AUDIT. Nic nepatchuje a nemenil host.
+          {% else %}
+          Job MODE={{ maintenance_action }}
+          {% endif %}
 
           OS_DNF_PATCHING_NEEDED={{ 'UNKNOWN' if (audit_os_updates_count | string) == 'unknown' else ('YES' if (audit_os_updates_count | int) > 0 else 'NO') }}
           dnf_updates_available={{ audit_os_updates_count }}
@@ -409,8 +412,10 @@
 
         MESSAGE="running dnf -y update"
         write_status "$FINISH_STATUS" ""
-        dnf -y update
-        DNF_UPDATE_RC=$?
+        log "starting dnf -y update"
+        dnf -y update 2>&1 | tee -a "$LOG_FILE"
+        DNF_UPDATE_RC=${PIPESTATUS[0]}
+        log "dnf -y update returned rc=$DNF_UPDATE_RC"
         if [ "$DNF_UPDATE_RC" != "0" ]; then
           MESSAGE="dnf -y update failed rc=$DNF_UPDATE_RC"
           FINISH_STATUS="FAILED"
@@ -497,10 +502,26 @@
           echo "VERDICT=PATCH_START_FAILED"
           exit "$SYSTEMD_RUN_RC"
         fi
+        echo
+        echo "=== WAITING FOR PATCH TO START (10s status check) ==="
+        for i in {1..10}; do
+          sleep 1
+          PATCH_UNIT_STATE=$(systemctl show -p ActiveState --value aiot-host-patch.service 2>/dev/null)
+          PATCH_UNIT_SUBSTATE=$(systemctl show -p SubState --value aiot-host-patch.service 2>/dev/null)
+          if [ -z "$PATCH_UNIT_STATE" ]; then PATCH_UNIT_STATE=unknown; fi
+          if [ -z "$PATCH_UNIT_SUBSTATE" ]; then PATCH_UNIT_SUBSTATE=unknown; fi
+          echo "[$i/10] patch_unit_state=${PATCH_UNIT_STATE} patch_unit_substate=${PATCH_UNIT_SUBSTATE}"
+          if [ "$PATCH_UNIT_STATE" = "active" ]; then
+            echo "Patch has started successfully!"
+            break
+          fi
+        done
+        echo
         if ! systemctl show aiot-host-patch.service -p ActiveState -p SubState -p FragmentPath --no-pager; then :; fi
         echo
         echo "VERDICT=PATCH_STARTED_BACKGROUND"
-        echo "Next: wait for AWX to stay responsive, then run job 1 to check BACKGROUND PATCH JOB STATUS. If reboot_required=yes, run job 3."
+        echo "Next: wait for Hetzner host patch to complete, then run job 1 to check BACKGROUND PATCH JOB STATUS. If reboot_required=yes, run job 3."
+        echo "You can check patch progress anytime by checking /var/log/aiot-host-patch.log"
       args:
         executable: /bin/bash
       register: patch_all_result

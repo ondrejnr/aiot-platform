@@ -1,4 +1,4 @@
-# Allow ingress-nginx to access centraldashboard
+# Allow ingress-nginx to access kubeflow web apps
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -17,4 +17,84 @@ spec:
           kubernetes.io/metadata.name: ingress-nginx
     ports:
     - port: 8082
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-nginx-to-jupyter-web-app
+  namespace: kubeflow
+spec:
+  podSelector:
+    matchLabels:
+      app: jupyter-web-app
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+    ports:
+    - port: 5000
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-nginx-to-volumes-web-app
+  namespace: kubeflow
+spec:
+  podSelector:
+    matchLabels:
+      app: volumes-web-app
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+    ports:
+    - port: 5000
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-nginx-to-tensorboards-web-app
+  namespace: kubeflow
+spec:
+  podSelector:
+    matchLabels:
+      app: tensorboards-web-app
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+    ports:
+    - port: 5000
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-nginx-to-katib-ui
+  namespace: kubeflow
+spec:
+  podSelector:
+    matchLabels:
+      katib.kubeflow.org/component: ui
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: ingress-nginx
+    ports:
+    - port: 8080
       protocol: TCP
