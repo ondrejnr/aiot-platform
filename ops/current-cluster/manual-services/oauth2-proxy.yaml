@@ -1,0 +1,167 @@
+# oauth2-proxy (manual service)
+#
+# Snapshot generated from the live hetzner-new cluster. NOT applied by Flux.
+# Secrets are intentionally omitted/masked. Do not apply blindly.
+#
+# Purpose: forward-auth gateway used by nginx-ingress `auth-url`/`auth-signin`
+# annotations to put Authentik SSO in front of apps that have no native OIDC
+# (currently: chef-automate, cloudbeaver, aiot-chaos-theater).
+#
+# Login flow:
+#   app.46.4.123.8.nip.io
+#     -> nginx ingress (auth-url -> oauth2-proxy /oauth2/auth)
+#     -> 401 -> auth-signin -> oauth2-proxy /oauth2/start
+#     -> Authentik (OIDC authorization_code)
+#     -> oauth2-proxy /oauth2/callback (sets _AUTH cookie)
+#     -> back to the app
+#
+# Two pitfalls that broke this (see TROUBLESHOOTING at the bottom):
+#   1. oauth2-proxy `provider` was unset -> it defaults to "google", so it
+#      redirected to accounts.google.com with client_id=oauth2-proxy and Google
+#      returned "401 invalid_client / The OAuth client was not found".
+#      Fix: set `provider = "oidc"` in the config.
+#   2. The Authentik OAuth2 provider "oauth2-proxy" had an EMPTY grant_types
+#      list, so Authentik rejected the authorization_code flow with
+#      "invalid_request / The request is otherwise malformed"
+#      (log: "Invalid grant_type for provider"). Authentik added a configurable
+#      grant_types field (goauthentik/authentik#20363); providers created before
+#      that can end up with [].  Fix: include "authorization_code".
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: oauth2-proxy
+---
+# ConfigMap data key: oauth2-proxy.cfg
+# Secrets (cookie_secret, client_secret) are masked here on purpose.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oauth2-proxy-config
+  namespace: oauth2-proxy
+data:
+  oauth2-proxy.cfg: |
+    http_address = "0.0.0.0:4180"
+    reverse_proxy = true
+    cookie_secure = false
+    cookie_name = "_AUTH"
+    cookie_secret = "***MASKED***"
+    cookie_expire = "168h"
+    oidc_issuer_url = "https://authentik.46.4.123.8.nip.io/application/o/oauth2-proxy/"
+    provider = "oidc"          # REQUIRED: without this oauth2-proxy defaults to Google
+    client_id = "oauth2-proxy"
+    client_secret = "***MASKED***"
+    redirect_url = "https://oauth2-proxy.46.4.123.8.nip.io/oauth2/callback"
+    email_domains = ["*"]
+    whitelist_domains = [".46.4.123.8.nip.io"]
+    set_xauthrequest = true
+    pass_user_headers = true
+    pass_access_token = true
+    pass_authorization_header = true
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+type: Opaque
+# data omitted on purpose (cookie secret / client secret live only in-cluster)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        app: oauth2-proxy
+    spec:
+      containers:
+        - name: oauth2-proxy
+          image: quay.io/oauth2-proxy/oauth2-proxy:v7.7.0
+          args:
+            - "--config=/etc/oauth2-proxy/oauth2-proxy.cfg"
+          ports:
+            - containerPort: 4180
+          volumeMounts:
+            - name: config
+              mountPath: /etc/oauth2-proxy
+      volumes:
+        - name: config
+          configMap:
+            name: oauth2-proxy-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+spec:
+  selector:
+    app: oauth2-proxy
+  ports:
+    - port: 4180
+      targetPort: 4180
+---
+# oauth2-proxy's own ingress (the auth endpoint the other ingresses point to)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: oauth2-proxy
+  namespace: oauth2-proxy
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: oauth2-proxy.46.4.123.8.nip.io
+      http:
+        paths:
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy
+                port:
+                  number: 4180
+---
+# How a PROTECTED app opts in (example: chef-automate). Add these annotations to
+# the protected app's own Ingress:
+#
+#   nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.46.4.123.8.nip.io/oauth2/auth
+#   nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.46.4.123.8.nip.io/oauth2/start?rd=$scheme://$host$request_uri
+#
+# Apps currently protected by oauth2-proxy:
+#   - chef/chef-automate            (chef.46.4.123.8.nip.io)
+#   - aiot/cloudbeaver              (cloudbeaver.46.4.123.8.nip.io)
+#   - chaos-theater/aiot-chaos-theater (chaos-theater.46.4.123.8.nip.io)
+#
+# ---------------------------------------------------------------------------
+# TROUBLESHOOTING
+# ---------------------------------------------------------------------------
+# Symptom: clicking a protected app shows Google "Access blocked: Authorization
+#   Error / The OAuth client was not found / Error 401: invalid_client" with
+#   client_id=oauth2-proxy on accounts.google.com.
+#   Cause: `provider` not set in oauth2-proxy.cfg -> defaults to "google".
+#   Verify: `kubectl logs deploy/oauth2-proxy -n oauth2-proxy | grep configured`
+#     bad : "OAuthProxy configured for Google Client ID: oauth2-proxy"
+#     good: "OAuthProxy configured for OpenID Connect Client ID: oauth2-proxy"
+#   Fix : add `provider = "oidc"`, recreate the configmap, restart the deploy.
+#
+# Symptom: after fixing provider, Authentik bounces back to /oauth2/callback
+#   with error=invalid_request&error_description=The%20request%20is%20otherwise
+#   %20malformed. Authentik log: "Invalid grant_type for provider".
+#   Cause: the Authentik OAuth2 provider has grant_types = [].
+#   Fix (Authentik shell):
+#     kubectl exec -n authentik deploy/authentik-worker -- ak shell -c "
+#     from authentik.providers.oauth2.models import OAuth2Provider
+#     p = OAuth2Provider.objects.get(client_id='oauth2-proxy')
+#     p.grant_types = ['authorization_code', 'refresh_token']; p.save()"
+#   Or in the UI: Providers -> oauth2-proxy -> Advanced protocol settings ->
+#   Allowed grant types -> enable Authorization Code (+ Refresh Token).

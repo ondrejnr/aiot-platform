@@ -9,7 +9,8 @@ These files are **snapshots**, not active Flux resources. They are kept here so 
 | File | Live namespace | Purpose | Notes |
 |---|---|---|---|
 | `manual-services/authentik.yaml` | `authentik` | Authentik SSO server, worker, Redis and ingress | Secret objects are intentionally omitted. Several GitOps-managed apps depend on `authentik-server.authentik.svc.cluster.local`. |
-| `manual-services/chef-automate-proxy.yaml` | `chef` | Kubernetes `Service`/`Endpoints`/`Ingress` proxy to the Docker `chef-automate` container | Endpoint IP is `172.18.0.8` on Docker network `k3d-aiot-hetzner`. |
+| `manual-services/chef-automate-proxy.yaml` | `chef` | Kubernetes `Service`/`Endpoints`/`Ingress` proxy to the Docker `chef-automate` container | Endpoint IP is `172.18.0.8` on Docker network `k3d-aiot-hetzner`. Protected by `oauth2-proxy` (Authentik SSO). |
+| `manual-services/oauth2-proxy.yaml` | `oauth2-proxy` | Forward-auth gateway putting Authentik SSO in front of apps without native OIDC (chef-automate, cloudbeaver, chaos-theater) | `provider = "oidc"` is required (else it defaults to Google). The Authentik provider must have `grant_types` including `authorization_code`, and its `client_secret` must match the one in `oauth2-proxy.cfg`. See in-file TROUBLESHOOTING. |
 | `manual-services/loadtest-emqtt-bench.yaml` | `loadtest` | Optional MQTT benchmark publisher | Kept scaled to `0`. Before any pipeline change, keep this stopped unless running a controlled load test. |
 
 ## Host-level / SSO configuration
