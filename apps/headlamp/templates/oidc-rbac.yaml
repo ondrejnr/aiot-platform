@@ -1,0 +1,34 @@
+{{- /*
+OIDC RBAC for Headlamp users.
+
+The Kubernetes API server is configured to trust Authentik as an OIDC issuer
+(see INSTALL.md, "API server OIDC" section). When the username claim is not the
+"email" claim, the API server prefixes the username with "<issuer-url>#", so the
+effective Kubernetes user for the Authentik "admin" account is:
+
+  https://authentik.46.4.123.8.nip.io/application/o/headlamp/#admin
+
+These bindings map those OIDC identities to cluster RBAC roles so that the token
+Headlamp forwards to the API server is actually authorized.
+*/}}
+{{- if .Values.oidcRbac.enabled }}
+{{- range .Values.oidcRbac.bindings }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .name }}
+  labels:
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+    app.kubernetes.io/part-of: headlamp
+    headlamp.dev/oidc-rbac: "true"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .clusterRole }}
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: {{ .subjectKind | default "User" }}
+    name: {{ .subject | quote }}
+{{- end }}
+{{- end }}

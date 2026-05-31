@@ -1,0 +1,10 @@
+# /etc/rancher/k3s/config.yaml on k3d-aiot-hetzner-server-0
+#
+# Makes the Kubernetes API server trust Authentik as an OIDC issuer so that the
+# ID token Headlamp forwards is accepted. See README.md in this directory for
+# how to apply this on an existing cluster or during a fresh k3d bootstrap.
+kube-apiserver-arg:
+  - "oidc-issuer-url=https://authentik.46.4.123.8.nip.io/application/o/headlamp/"
+  - "oidc-client-id=headlamp"
+  - "oidc-username-claim=preferred_username"
+  - "oidc-groups-claim=groups"

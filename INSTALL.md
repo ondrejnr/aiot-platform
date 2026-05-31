@@ -24,6 +24,28 @@ The current cluster was bootstrapped as k3d/k3s on one Hetzner host:
 
 A fresh rebuild should recreate the k3d cluster, bootstrap Flux to `flux/clusters/hetzner-new/flux-system`, point Flux at the internal Gitea repository, and then let Flux reconcile `apps/*`.
 
+## API server OIDC (required for Headlamp SSO)
+
+The Kubernetes API server must trust Authentik as an OIDC issuer, otherwise the
+ID token Headlamp forwards to the API is rejected with `401` and SSO fails. This
+is a host-level k3s setting, not a Flux resource, so it has to be re-applied on
+every cluster rebuild. Full details and the exact `--k3s-arg` / `config.yaml`
+form are in [`ops/current-cluster/k3d-oidc/`](ops/current-cluster/k3d-oidc/).
+
+Minimal apply on the running cluster:
+
+```bash
+docker cp ops/current-cluster/k3d-oidc/server-config.yaml \
+  k3d-aiot-hetzner-server-0:/etc/rancher/k3s/config.yaml
+docker restart k3d-aiot-hetzner-server-0
+```
+
+The matching RBAC (OIDC identity -> `cluster-admin`) and the Headlamp OIDC client
+args are Flux-managed in the `apps/headlamp` overlay chart. The `headlamp-oidc`
+Secret (OIDC client id/secret/issuer/scopes) is created out-of-band in the
+`headlamp` namespace and is referenced by the chart as an external secret; see
+[`ops/current-cluster/authentik-headlamp.md`](ops/current-cluster/authentik-headlamp.md).
+
 ## Day-2 workflow
 
 ```bash

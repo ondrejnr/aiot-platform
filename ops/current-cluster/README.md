@@ -12,6 +12,17 @@ These files are **snapshots**, not active Flux resources. They are kept here so 
 | `manual-services/chef-automate-proxy.yaml` | `chef` | Kubernetes `Service`/`Endpoints`/`Ingress` proxy to the Docker `chef-automate` container | Endpoint IP is `172.18.0.8` on Docker network `k3d-aiot-hetzner`. |
 | `manual-services/loadtest-emqtt-bench.yaml` | `loadtest` | Optional MQTT benchmark publisher | Kept scaled to `0`. Before any pipeline change, keep this stopped unless running a controlled load test. |
 
+## Host-level / SSO configuration
+
+These are not Kubernetes snapshots but cluster-bootstrap and SSO settings that
+must survive a rebuild and are not captured by any Flux `HelmRelease`:
+
+| Path | Purpose |
+|---|---|
+| `k3d-oidc/` | k3s API server OIDC flags (trust Authentik as issuer) and how to apply them on rebuild or fresh `k3d cluster create`. Required for Headlamp SSO. |
+| `authentik-headlamp.md` | Authentik OAuth2 provider settings for Headlamp (redirect URIs, signing key, the `_redirect_uris` list-vs-string pitfall) and the `headlamp-oidc` Secret. |
+
+
 ## Active GitOps source of truth
 
 The active Flux-managed source remains:

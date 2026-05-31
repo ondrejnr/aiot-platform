@@ -1,3 +1,16 @@
+# OIDC RBAC: maps Authentik OIDC identities (as seen by the Kubernetes API
+# server) to cluster RBAC. The API server must trust Authentik as an OIDC
+# issuer for these tokens to be accepted (see INSTALL.md, "API server OIDC").
+# Because the username claim is "preferred_username" (not email), the API
+# server prefixes the username with "<issuer-url>#", hence the subject below.
+oidcRbac:
+  enabled: true
+  bindings:
+    - name: headlamp-oidc-admin
+      clusterRole: cluster-admin
+      subjectKind: User
+      subject: "https://authentik.46.4.123.8.nip.io/application/o/headlamp/#admin"
+
 headlamp:
   config:
     inCluster: true
