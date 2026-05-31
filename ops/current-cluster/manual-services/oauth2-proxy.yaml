@@ -53,6 +53,7 @@ data:
     client_secret = "***MASKED***"
     redirect_url = "https://oauth2-proxy.46.4.123.8.nip.io/oauth2/callback"
     insecure_oidc_allow_unverified_email = true   # Authentik users (e.g. admin@localhost) have email_verified=false
+    cookie_domains = [".46.4.123.8.nip.io"]       # REQUIRED: share the _AUTH cookie across all *.nip.io apps
     email_domains = ["*"]
     whitelist_domains = [".46.4.123.8.nip.io"]
     set_xauthrequest = true
@@ -173,6 +174,17 @@ spec:
 #   Authentik's built-in admin (admin@localhost) is not email-verified.
 #   Fix : add `insecure_oidc_allow_unverified_email = true` to oauth2-proxy.cfg
 #   (or mark the user's email as verified in Authentik).
+#
+# Symptom: login succeeds (log shows [AuthSuccess] Authenticated via OAuth2)
+#   but the browser bounces in a redirect loop: /oauth2/callback -> app ->
+#   /oauth2/auth 401 -> /oauth2/start -> login -> repeat, and the app never
+#   loads.
+#   Cause: the _AUTH cookie is scoped to oauth2-proxy.46.4.123.8.nip.io only, so
+#   the browser never sends it to chef.46.4.123.8.nip.io. The startup log shows
+#   "Cookie settings: ... domains:" with an EMPTY domains field.
+#   Fix : set `cookie_domains = [".46.4.123.8.nip.io"]` so the cookie is shared
+#   across every *.46.4.123.8.nip.io app behind this proxy. The log should then
+#   show "domains:.46.4.123.8.nip.io".
 #
 # Symptom: callback fails with "invalid_client / Client authentication failed".
 #   Cause: the client_secret in oauth2-proxy.cfg does not match the Authentik
