@@ -52,6 +52,7 @@ data:
     client_id = "oauth2-proxy"
     client_secret = "***MASKED***"
     redirect_url = "https://oauth2-proxy.46.4.123.8.nip.io/oauth2/callback"
+    insecure_oidc_allow_unverified_email = true   # Authentik users (e.g. admin@localhost) have email_verified=false
     email_domains = ["*"]
     whitelist_domains = [".46.4.123.8.nip.io"]
     set_xauthrequest = true
@@ -165,3 +166,19 @@ spec:
 #     p.grant_types = ['authorization_code', 'refresh_token']; p.save()"
 #   Or in the UI: Providers -> oauth2-proxy -> Advanced protocol settings ->
 #   Allowed grant types -> enable Authorization Code (+ Refresh Token).
+#
+# Symptom: token exchange succeeds but the callback returns HTTP 500 and the
+#   oauth2-proxy log says: "email in id_token (admin@localhost) isn't verified".
+#   Cause: oauth2-proxy rejects id_tokens whose email_verified claim is not true;
+#   Authentik's built-in admin (admin@localhost) is not email-verified.
+#   Fix : add `insecure_oidc_allow_unverified_email = true` to oauth2-proxy.cfg
+#   (or mark the user's email as verified in Authentik).
+#
+# Symptom: callback fails with "invalid_client / Client authentication failed".
+#   Cause: the client_secret in oauth2-proxy.cfg does not match the Authentik
+#   provider's client_secret.
+#   Fix : sync them (Authentik shell):
+#     kubectl exec -n authentik deploy/authentik-worker -- ak shell -c "
+#     from authentik.providers.oauth2.models import OAuth2Provider
+#     print(OAuth2Provider.objects.get(client_id='oauth2-proxy').client_secret)"
+#   then make oauth2-proxy.cfg client_secret match (or update Authentik to match).
