@@ -4,6 +4,7 @@ metadata:
   name: victoriametrics-victoria-metrics-k8s-stack
   namespace: victoriametrics
 spec:
+  retentionPeriod: "1"
   extraArgs:
     search.maxConcurrentRequests: "6"
     search.maxQueueDuration: "1m"

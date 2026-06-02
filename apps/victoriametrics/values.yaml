@@ -5,7 +5,10 @@ victoria-metrics-k8s-stack:
     enabled: false
   vmsingle:
     spec:
-      retentionPeriod: "2d"
+      retentionPeriod: "1"
+  prometheus-node-exporter:
+    hostRootFsMount:
+      mountPropagation: None
   vmalert:
     spec:
       extraArgs:
