@@ -73,3 +73,16 @@ spec:
                         until curl -sk -f -o /dev/null https://authentik.46.4.123.8.nip.io/application/o/weave-gitops/.well-known/openid-configuration; do
                           echo "[init] waiting for authentik OIDC provider..."; sleep 5;
                         done
+---
+# OIDC konfiguracia (chart default secret name = oidc-auth). Plaintext: interny nip.io homelab.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: oidc-auth
+  namespace: flux-ui
+type: Opaque
+stringData:
+  issuerURL: https://authentik.46.4.123.8.nip.io/application/o/weave-gitops/
+  clientID: weave-gitops
+  clientSecret: wsec
+  redirectURL: https://flux.46.4.123.8.nip.io/oauth2/callback
