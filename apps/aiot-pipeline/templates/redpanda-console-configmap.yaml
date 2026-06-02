@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redpanda-console-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: redpanda-console
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: aiot-pipeline
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+  annotations:
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+data:
+  config.yaml: |
+    kafka:
+      brokers:
+        - aiot-redpanda.aiot.svc.cluster.local:9092
+
+    server:
+      listenPort: 8080
