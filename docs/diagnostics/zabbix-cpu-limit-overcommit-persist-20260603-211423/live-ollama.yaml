@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "7"
+    meta.helm.sh/release-name: aiot-ml-platform
+    meta.helm.sh/release-namespace: aiot-ml
+  creationTimestamp: "2026-05-29T12:55:22Z"
+  generation: 7
+  labels:
+    app.kubernetes.io/component: ollama
+    app.kubernetes.io/instance: aiot-ml-platform
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: aiot-ml-platform
+    helm.toolkit.fluxcd.io/name: aiot-ml-platform
+    helm.toolkit.fluxcd.io/namespace: aiot-ml
+  name: ollama
+  namespace: local-ai
+  resourceVersion: "2081656"
+  uid: 69883c9a-b6a3-46d2-a0c5-510e17fa7dc6
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ollama
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: ollama
+        app.kubernetes.io/part-of: aiot-ml-platform
+    spec:
+      containers:
+      - env:
+        - name: OLLAMA_HOST
+          value: 0.0.0.0:11434
+        - name: OLLAMA_KEEP_ALIVE
+          value: 30m
+        image: ollama/ollama:0.6.8
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /api/tags
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 90
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: ollama
+        ports:
+        - containerPort: 11434
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 20
+          httpGet:
+            path: /api/tags
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: "1"
+            memory: 12Gi
+          requests:
+            cpu: 250m
+            memory: 2Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /root/.ollama
+          name: models
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: ollama-models
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-29T14:06:10Z"
+    lastUpdateTime: "2026-06-03T19:06:30Z"
+    message: ReplicaSet "ollama-ff5d7458f" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2026-06-03T19:10:02Z"
+    lastUpdateTime: "2026-06-03T19:10:02Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 7
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
