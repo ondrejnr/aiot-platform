@@ -1,0 +1,11 @@
+host	path	expected	code	location	content_type	result
+qdrant.46.4.123.8.nip.io    /collections    JSON_OK						FAIL
+qdrant.46.4.123.8.nip.io    /dashboard    HTTP_200						FAIL
+grafana.46.4.123.8.nip.io    /    REDIRECT_OK						FAIL
+headlamp.46.4.123.8.nip.io    /    HTTP_200						FAIL
+litmus.46.4.123.8.nip.io    /    HTTP_200						FAIL
+gitea.46.4.123.8.nip.io    /    HTTP_200						FAIL
+mlflow.46.4.123.8.nip.io    /    HTTP_200						FAIL
+jenkins.46.4.123.8.nip.io    /    HTTP_200_OR_403						FAIL
+awx.46.4.123.8.nip.io    /    HTTP_200_OR_REDIRECT						FAIL
+victoriametrics.46.4.123.8.nip.io    /    HTTP_200_OR_404						FAIL

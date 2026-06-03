@@ -1,0 +1,1616 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: aiot-ml-platform
+      meta.helm.sh/release-namespace: aiot-ml
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "180"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "180"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T12:55:22Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      helm.toolkit.fluxcd.io/name: aiot-ml-platform
+      helm.toolkit.fluxcd.io/namespace: aiot-ml
+    name: aiot-control-center
+    namespace: aiot
+    resourceVersion: "1533136"
+    uid: 1807078d-e4fe-4467-a585-4ec07beb11cf
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: aiot-control.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: aiot-control-center
+              port:
+                number: 8080
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - aiot-control.46.4.123.8.nip.io
+      secretName: aiot-control-center-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: aiot-pipeline
+      meta.helm.sh/release-namespace: aiot
+      nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+      nginx.ingress.kubernetes.io/auth-signin: https://$http_host/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri
+      nginx.ingress.kubernetes.io/auth-snippet: |
+        proxy_set_header X-Forwarded-Host $http_host;
+      nginx.ingress.kubernetes.io/auth-url: http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header Accept-Encoding "";
+        sub_filter_types text/html application/javascript;
+        sub_filter_once off;
+        sub_filter 'state:{user:_()||{}' 'state:{user:(window.__EMQX_PREAUTH__||_()||{})';
+        sub_filter 'r&&!l.token&&c(o),t()' '(window.__EMQX_PREAUTH__&&!l.token&&s["a"].commit("UPDATE_USER_INFO",window.__EMQX_PREAUTH__)),t()';
+        sub_filter '</head>' '<script>(function(){try{var x=new XMLHttpRequest();x.open("POST","/api/v5/login",false);x.setRequestHeader("Content-Type","application/json");x.send(JSON.stringify({username:"admin",password:"AiotEmqx2026!"}));if(x.status>=200&&x.status<300){window.__EMQX_PREAUTH__=JSON.parse(x.responseText);console.log("[AL] preauth OK");}else{console.error("[AL] preauth failed",x.status);}}catch(e){console.error("[AL] err",e);}})();</script></head>';
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T12:55:22Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: emqx
+      app.kubernetes.io/instance: aiot-pipeline
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: aiot-pipeline
+      helm.sh/chart: aiot-pipeline-1.0.5
+      helm.toolkit.fluxcd.io/name: aiot-pipeline
+      helm.toolkit.fluxcd.io/namespace: aiot
+    name: aiot-emqx-dashboard
+    namespace: aiot
+    resourceVersion: "1888816"
+    uid: 26b7719e-879f-475f-87f7-fef4c153a777
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: emqx.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: aiot-emqx
+              port:
+                name: dashboard
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - emqx.46.4.123.8.nip.io
+      secretName: aiot-emqx-dashboard-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"nginx.ingress.kubernetes.io/ssl-redirect":"true"},"labels":{"app.kubernetes.io/component":"emqx-authentik-outpost","app.kubernetes.io/part-of":"aiot-platform"},"name":"aiot-emqx-dashboard-authentik-outpost","namespace":"aiot"},"spec":{"ingressClassName":"nginx","rules":[{"host":"emqx.46.4.123.8.nip.io","http":{"paths":[{"backend":{"service":{"name":"authentik-outpost-proxy","port":{"name":"http"}}},"path":"/outpost.goauthentik.io","pathType":"Prefix"}]}}],"tls":[{"hosts":["emqx.46.4.123.8.nip.io"],"secretName":"emqx-tls"}]}}
+      meta.helm.sh/release-name: aiot-pipeline
+      meta.helm.sh/release-namespace: aiot
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-06-03T08:12:16Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: emqx-authentik-outpost
+      app.kubernetes.io/instance: aiot-pipeline
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: aiot-pipeline
+      app.kubernetes.io/part-of: aiot-platform
+      helm.sh/chart: aiot-pipeline-1.0.5
+      helm.toolkit.fluxcd.io/name: aiot-pipeline
+      helm.toolkit.fluxcd.io/namespace: aiot
+    name: aiot-emqx-dashboard-authentik-outpost
+    namespace: aiot
+    resourceVersion: "1888750"
+    uid: d69ddb4d-596c-4a51-a3e9-2e00e1c9e836
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: emqx.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: authentik-outpost-proxy
+              port:
+                name: http
+          path: /outpost.goauthentik.io
+          pathType: Prefix
+    tls:
+    - hosts:
+      - emqx.46.4.123.8.nip.io
+      secretName: emqx-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: aiot-pipeline
+      meta.helm.sh/release-namespace: aiot
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T12:55:22Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: emqx
+      app.kubernetes.io/instance: aiot-pipeline
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: aiot-pipeline
+      helm.sh/chart: aiot-pipeline-1.0.5
+      helm.toolkit.fluxcd.io/name: aiot-pipeline
+      helm.toolkit.fluxcd.io/namespace: aiot
+    name: aiot-emqx-login-bypass
+    namespace: aiot
+    resourceVersion: "1888770"
+    uid: c176400f-04ff-4359-8814-0aacf11c285d
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: emqx.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: aiot-emqx
+              port:
+                name: dashboard
+          path: /api/v5/login
+          pathType: Exact
+    tls:
+    - hosts:
+      - emqx.46.4.123.8.nip.io
+      secretName: aiot-emqx-dashboard-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: aiot-pipeline
+      meta.helm.sh/release-namespace: aiot
+      nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+      nginx.ingress.kubernetes.io/auth-signin: https://$http_host/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri
+      nginx.ingress.kubernetes.io/auth-snippet: |
+        proxy_set_header X-Forwarded-Host $http_host;
+      nginx.ingress.kubernetes.io/auth-url: http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T12:55:22Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: redpanda-console
+      app.kubernetes.io/instance: aiot-pipeline
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: aiot-pipeline
+      helm.sh/chart: aiot-pipeline-1.0.5
+      helm.toolkit.fluxcd.io/name: aiot-pipeline
+      helm.toolkit.fluxcd.io/namespace: aiot
+    name: aiot-redpanda-console
+    namespace: aiot
+    resourceVersion: "1888832"
+    uid: ccbe6d4e-d91b-4e3f-b54e-5ebcd94b33bd
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: redpanda.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: aiot-redpanda-console
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - redpanda.46.4.123.8.nip.io
+      secretName: aiot-redpanda-console-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: aiot-pipeline
+      meta.helm.sh/release-namespace: aiot
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-06-03T07:10:40Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: redpanda-console-authentik-outpost
+      app.kubernetes.io/instance: aiot-pipeline
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: aiot-pipeline
+      helm.sh/chart: aiot-pipeline-1.0.5
+      helm.toolkit.fluxcd.io/name: aiot-pipeline
+      helm.toolkit.fluxcd.io/namespace: aiot
+    name: aiot-redpanda-console-authentik-outpost
+    namespace: aiot
+    resourceVersion: "1888854"
+    uid: 5220d1c9-785b-4a4a-a2d4-1c03e91f1783
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: redpanda.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: authentik-outpost-proxy
+              port:
+                name: http
+          path: /outpost.goauthentik.io
+          pathType: Prefix
+    tls:
+    - hosts:
+      - redpanda.46.4.123.8.nip.io
+      secretName: aiot-redpanda-console-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: cloudbeaver
+      meta.helm.sh/release-namespace: aiot
+      nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+      nginx.ingress.kubernetes.io/auth-signin: https://authentik.46.4.123.8.nip.io/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri
+      nginx.ingress.kubernetes.io/auth-snippet: |
+        proxy_set_header X-Forwarded-Host $http_host;
+      nginx.ingress.kubernetes.io/auth-url: http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T12:56:14Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: cloudbeaver
+      helm.toolkit.fluxcd.io/name: cloudbeaver
+      helm.toolkit.fluxcd.io/namespace: aiot
+    name: cloudbeaver
+    namespace: aiot
+    resourceVersion: "1533120"
+    uid: 74802e86-a56e-461f-a7d5-4addbedd24e1
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: cloudbeaver.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: cloudbeaver
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - cloudbeaver.46.4.123.8.nip.io
+      secretName: cloudbeaver-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: dex
+      meta.helm.sh/release-namespace: auth
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T14:33:32Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: dex
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: dex
+      app.kubernetes.io/version: 2.41.1
+      helm.sh/chart: dex-0.20.0
+      helm.toolkit.fluxcd.io/name: dex
+      helm.toolkit.fluxcd.io/namespace: auth
+    name: dex
+    namespace: auth
+    resourceVersion: "1533150"
+    uid: 688ef864-753c-49b0-adfd-bf0e9995df77
+  spec:
+    rules:
+    - host: dex.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: dex
+              port:
+                number: 5556
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - dex.46.4.123.8.nip.io
+      secretName: dex-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: authentik
+      meta.helm.sh/release-namespace: authentik
+      nginx.ingress.kubernetes.io/compute-full-forwarded-for: "true"
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
+      nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+      nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+      nginx.ingress.kubernetes.io/x-forwarded-prefix: /v1
+    creationTimestamp: "2026-05-30T04:31:49Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: server
+      app.kubernetes.io/instance: authentik
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: authentik
+      app.kubernetes.io/part-of: authentik
+      app.kubernetes.io/version: 2026.5.2
+      helm.sh/chart: authentik-2026.5.2
+    name: authentik-server
+    namespace: authentik
+    resourceVersion: "1592682"
+    uid: ca66e9b6-de80-48f1-bd83-bb98d65329fc
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: authentik.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: authentik-server
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - authentik.46.4.123.8.nip.io
+      secretName: authentik-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubectl.kubernetes.io/last-applied-configuration: '{"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"cert-manager.io/cluster-issuer":"letsencrypt-prod","nginx.ingress.kubernetes.io/proxy-body-size":"200m","nginx.ingress.kubernetes.io/ssl-redirect":"true"},"labels":{"app.kubernetes.io/component":"awx","app.kubernetes.io/managed-by":"awx-operator","app.kubernetes.io/operator-version":"2.19.1","app.kubernetes.io/part-of":"awx"},"name":"awx-ingress","namespace":"awx"},"spec":{"ingressClassName":"nginx","rules":[{"host":"awx.46.4.123.8.nip.io","http":{"paths":[{"backend":{"service":{"name":"awx-service","port":{"number":80}}},"path":"/","pathType":"Prefix"}]}}],"tls":[{"hosts":["awx.46.4.123.8.nip.io"],"secretName":"awx-tls"}]}}'
+      nginx.ingress.kubernetes.io/proxy-body-size: 200m
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T14:55:38Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: awx
+      app.kubernetes.io/managed-by: awx-operator
+      app.kubernetes.io/operator-version: 2.19.1
+      app.kubernetes.io/part-of: awx
+    name: awx-ingress
+    namespace: awx
+    ownerReferences:
+    - apiVersion: awx.ansible.com/v1beta1
+      kind: AWX
+      name: awx
+      uid: 8d5bf391-87e7-4965-9a1b-5097babfc1bd
+    resourceVersion: "1533198"
+    uid: c0bd2f7e-a8d8-447a-893d-16c7578d93d7
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: awx.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: awx-service
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - awx.46.4.123.8.nip.io
+      secretName: awx-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: aiot-chaos-theater
+      meta.helm.sh/release-namespace: chaos-theater
+      nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+      nginx.ingress.kubernetes.io/auth-signin: https://authentik.46.4.123.8.nip.io/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri
+      nginx.ingress.kubernetes.io/auth-snippet: |
+        proxy_set_header X-Forwarded-Host $http_host;
+      nginx.ingress.kubernetes.io/auth-url: http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/nginx
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T13:13:46Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: aiot-chaos-theater
+      app.kubernetes.io/part-of: aiot-platform
+      helm.toolkit.fluxcd.io/name: aiot-chaos-theater
+      helm.toolkit.fluxcd.io/namespace: chaos-theater
+    name: aiot-chaos-theater
+    namespace: chaos-theater
+    resourceVersion: "1533146"
+    uid: fbc9b001-fc06-4b81-8908-586c5fd8c71a
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: chaos-theater.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: aiot-chaos-theater
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - chaos-theater.46.4.123.8.nip.io
+      secretName: chaos-theater-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"cert-manager.io/cluster-issuer":"letsencrypt-prod","nginx.ingress.kubernetes.io/backend-protocol":"HTTPS","nginx.ingress.kubernetes.io/proxy-ssl-server-name":"chef.46.4.123.8.nip.io","nginx.ingress.kubernetes.io/proxy-ssl-verify":"off"},"name":"chef-automate","namespace":"chef"},"spec":{"ingressClassName":"nginx","rules":[{"host":"chef.46.4.123.8.nip.io","http":{"paths":[{"backend":{"service":{"name":"chef-automate","port":{"number":443}}},"path":"/","pathType":"Prefix"}]}}],"tls":[{"hosts":["chef.46.4.123.8.nip.io"],"secretName":"chef-tls"}]}}
+      nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.46.4.123.8.nip.io/oauth2/start?rd=$scheme://$host$request_uri
+      nginx.ingress.kubernetes.io/auth-url: http://oauth2-proxy.oauth2-proxy.svc.cluster.local:4180/oauth2/auth
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      nginx.ingress.kubernetes.io/configuration-snippet: proxy_set_header Host "";
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
+      nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+      nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+      nginx.ingress.kubernetes.io/proxy-ssl-name: chef.46.4.123.8.nip.io
+      nginx.ingress.kubernetes.io/proxy-ssl-server-name: chef.46.4.123.8.nip.io
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+    creationTimestamp: "2026-05-30T07:46:41Z"
+    generation: 7
+    name: chef-automate
+    namespace: chef
+    resourceVersion: "1533214"
+    uid: c3614aea-e770-48a7-97a7-e1acb10f1d4e
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: chef.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: chef-automate
+              port:
+                number: 443
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - chef.46.4.123.8.nip.io
+      secretName: chef-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: cluster-copilot
+      meta.helm.sh/release-namespace: cluster-copilot
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T14:45:31Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: cluster-copilot
+      app.kubernetes.io/part-of: aiot-platform
+      helm.toolkit.fluxcd.io/name: cluster-copilot
+      helm.toolkit.fluxcd.io/namespace: cluster-copilot
+    name: cluster-copilot
+    namespace: cluster-copilot
+    resourceVersion: "1533177"
+    uid: 09649588-c5f8-4aed-9fe8-944dcd3797c2
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: cluster-copilot.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: cluster-copilot
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - cluster-copilot.46.4.123.8.nip.io
+      secretName: cluster-copilot-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: pgadmin
+      meta.helm.sh/release-namespace: databases
+      nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+      nginx.ingress.kubernetes.io/auth-snippet: |
+        proxy_set_header X-Forwarded-Host $http_host;
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T14:51:12Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: pgadmin4
+      app.kubernetes.io/version: "9.1"
+      helm.sh/chart: pgadmin4-1.36.0
+      helm.toolkit.fluxcd.io/name: pgadmin
+      helm.toolkit.fluxcd.io/namespace: databases
+    name: pgadmin-pgadmin4
+    namespace: databases
+    resourceVersion: "1533188"
+    uid: 6d501f84-fc69-4671-81ec-2582098b7ef5
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: pgadmin.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: pgadmin-pgadmin4
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - pgadmin.46.4.123.8.nip.io
+      secretName: pgadmin-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: weave-gitops
+      meta.helm.sh/release-namespace: flux-ui
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T13:12:49Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: weave-gitops
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: weave-gitops
+      app.kubernetes.io/version: v0.38.0
+      helm.sh/chart: weave-gitops-4.0.36
+      helm.toolkit.fluxcd.io/name: weave-gitops
+      helm.toolkit.fluxcd.io/namespace: flux-ui
+    name: weave-gitops
+    namespace: flux-ui
+    resourceVersion: "1533144"
+    uid: cd0bd783-c063-43e1-a7a2-9347037e2297
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: flux.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: weave-gitops
+              port:
+                number: 9001
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - flux.46.4.123.8.nip.io
+      secretName: weave-gitops-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: gitea
+      meta.helm.sh/release-namespace: gitea
+      nginx.ingress.kubernetes.io/proxy-body-size: 500m
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T14:40:03Z"
+    generation: 1
+    labels:
+      app: gitea
+      app.kubernetes.io/instance: gitea
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: gitea
+      app.kubernetes.io/version: 1.22.3
+      helm.sh/chart: gitea-10.6.0
+      helm.toolkit.fluxcd.io/name: gitea
+      helm.toolkit.fluxcd.io/namespace: gitea
+      version: 1.22.3
+    name: gitea
+    namespace: gitea
+    resourceVersion: "1533157"
+    uid: bd75730f-66e8-4cfe-bcf2-b6639038d86e
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: gitea.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: gitea-http
+              port:
+                number: 3000
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - gitea.46.4.123.8.nip.io
+      secretName: gitea-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: grafana
+      meta.helm.sh/release-namespace: grafana
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T14:34:47Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: grafana
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/version: 11.4.0
+      helm.sh/chart: grafana-8.8.5
+      helm.toolkit.fluxcd.io/name: grafana
+      helm.toolkit.fluxcd.io/namespace: grafana
+    name: grafana
+    namespace: grafana
+    resourceVersion: "1533153"
+    uid: 39f7dfb9-ce63-49e7-a289-e50ec3abec10
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: grafana.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: grafana
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - grafana.46.4.123.8.nip.io
+      secretName: grafana-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: headlamp
+      meta.helm.sh/release-namespace: headlamp
+      nginx.ingress.kubernetes.io/server-snippet: large_client_header_buffers 8 32k;
+        client_header_buffer_size 32k;
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-30T09:30:47Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: headlamp
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: headlamp
+      app.kubernetes.io/version: 0.41.0
+      helm.sh/chart: headlamp-0.41.0
+      helm.toolkit.fluxcd.io/name: headlamp
+      helm.toolkit.fluxcd.io/namespace: headlamp
+    name: headlamp
+    namespace: headlamp
+    resourceVersion: "1533217"
+    uid: 5b934e33-ee98-45c8-a71a-aa84b57c2fd4
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: headlamp.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: headlamp
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - headlamp.46.4.123.8.nip.io
+      secretName: headlamp-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: jenkins
+      meta.helm.sh/release-namespace: jenkins
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T12:56:39Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: jenkins-controller
+      app.kubernetes.io/instance: jenkins
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: jenkins
+      helm.sh/chart: jenkins-5.9.18
+      helm.toolkit.fluxcd.io/name: jenkins
+      helm.toolkit.fluxcd.io/namespace: jenkins
+    name: jenkins
+    namespace: jenkins
+    resourceVersion: "1533103"
+    uid: 2f013c10-c07f-4536-9458-d28f12d5ae54
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: jenkins.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: jenkins
+              port:
+                number: 8080
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - jenkins.46.4.123.8.nip.io
+      secretName: jenkins-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header kubeflow-userid "user@example.com";
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    creationTimestamp: "2026-05-29T12:55:20Z"
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-centraldashboard
+    namespace: kubeflow
+    resourceVersion: "2104186"
+    uid: dcddaa82-c438-456f-902a-19fbbb2770cd
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: kubeflow.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: centraldashboard
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header x-forwarded-prefix /jupyter;
+        proxy_set_header kubeflow-userid "user@example.com";
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    creationTimestamp: "2026-05-29T12:55:20Z"
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-jupyter
+    namespace: kubeflow
+    resourceVersion: "2104189"
+    uid: 51348f4d-4ffc-46a1-9a53-a467b3d78796
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: kubeflow.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: jupyter-web-app-service
+              port:
+                number: 80
+          path: /jupyter(/|$)(.*)
+          pathType: ImplementationSpecific
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header kubeflow-userid "user@example.com";
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    creationTimestamp: "2026-05-29T12:55:20Z"
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-katib
+    namespace: kubeflow
+    resourceVersion: "2104190"
+    uid: 179b7c2a-7415-4e22-b538-6ce7e85901a1
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: kubeflow.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: katib-ui
+              port:
+                number: 80
+          path: /katib
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header x-forwarded-prefix /kfam;
+        proxy_set_header kubeflow-userid "user@example.com";
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    creationTimestamp: "2026-05-29T12:55:20Z"
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-kfam
+    namespace: kubeflow
+    resourceVersion: "2104192"
+    uid: 29f91bc2-64ba-4cfa-afa3-b4c25d5b722b
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: kubeflow.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: profiles-kfam
+              port:
+                number: 8081
+          path: /kfam(/|$)(.*)
+          pathType: ImplementationSpecific
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: aiot-ml-platform
+      meta.helm.sh/release-namespace: aiot-ml
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header x-forwarded-prefix /pipeline;
+        proxy_set_header kubeflow-userid "user@example.com";
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T12:55:22Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      helm.toolkit.fluxcd.io/name: aiot-ml-platform
+      helm.toolkit.fluxcd.io/namespace: aiot-ml
+    name: kubeflow-pipelines
+    namespace: kubeflow
+    resourceVersion: "1533124"
+    uid: a58302d3-604c-43f1-a965-9b70c0620419
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: kubeflow.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: ml-pipeline-ui
+              port:
+                number: 80
+          path: /pipeline(/|$)(.*)
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - kubeflow.46.4.123.8.nip.io
+      secretName: kubeflow-pipelines-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header x-forwarded-prefix /tensorboards;
+        proxy_set_header kubeflow-userid "user@example.com";
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    creationTimestamp: "2026-05-29T12:55:20Z"
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-tensorboards
+    namespace: kubeflow
+    resourceVersion: "2104194"
+    uid: 6b5eca60-fd01-47a7-b893-242969d95f93
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: kubeflow.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: tensorboards-web-app-service
+              port:
+                number: 80
+          path: /tensorboards(/|$)(.*)
+          pathType: ImplementationSpecific
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header x-forwarded-prefix /volumes;
+        proxy_set_header kubeflow-userid "user@example.com";
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/rewrite-target: /
+    creationTimestamp: "2026-05-29T12:55:20Z"
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-volumes
+    namespace: kubeflow
+    resourceVersion: "2104197"
+    uid: 0f1c4359-6808-4ce7-aa9c-21ad473f35de
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: kubeflow.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: volumes-web-app-service
+              port:
+                number: 80
+          path: /volumes(/|$)(.*)
+          pathType: ImplementationSpecific
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      ingress.kubernetes.io/proxy-body-size: "0"
+      ingress.kubernetes.io/ssl-redirect: "true"
+      meta.helm.sh/release-name: chaos
+      meta.helm.sh/release-namespace: litmus
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header Accept-Encoding "";
+        sub_filter_once on;
+        sub_filter_types text/html;
+        sub_filter '</head>' '<script>try{(function(){function sso(){if(location.pathname==="/login"&&!new URLSearchParams(location.search).has("jwtToken")){location.replace("/auth/dex/login")}}sso();setInterval(sso,500);})();}catch(e){}</script></head>';
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T14:52:44Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: litmus-frontend
+      app.kubernetes.io/instance: chaos
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: litmus
+      app.kubernetes.io/part-of: litmus
+      app.kubernetes.io/version: 3.28.0
+      helm.sh/chart: litmus-3.28.0
+      helm.toolkit.fluxcd.io/name: chaos
+      helm.toolkit.fluxcd.io/namespace: litmus
+      litmuschaos.io/version: 3.28.0
+    name: litmus-ingress
+    namespace: litmus
+    resourceVersion: "1533194"
+    uid: b3ee2271-6de9-4085-b8ce-c685cbb8252b
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: litmus.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: chaos-litmus-frontend-service
+              port:
+                number: 9091
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - litmus.46.4.123.8.nip.io
+      secretName: litmus-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: aiot-ml-platform
+      meta.helm.sh/release-namespace: aiot-ml
+      nginx.ingress.kubernetes.io/proxy-body-size: 50m
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    creationTimestamp: "2026-05-29T12:55:22Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: ollama
+      app.kubernetes.io/instance: aiot-ml-platform
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: aiot-ml-platform
+      helm.toolkit.fluxcd.io/name: aiot-ml-platform
+      helm.toolkit.fluxcd.io/namespace: aiot-ml
+    name: ollama
+    namespace: local-ai
+    resourceVersion: "1533107"
+    uid: 41c86074-2183-4e15-bc2b-1624039d16ed
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: ollama.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: ollama
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - ollama.46.4.123.8.nip.io
+      secretName: ollama-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: aiot-ml-platform
+      meta.helm.sh/release-namespace: aiot-ml
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T12:55:22Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      helm.toolkit.fluxcd.io/name: aiot-ml-platform
+      helm.toolkit.fluxcd.io/namespace: aiot-ml
+    name: mlflow
+    namespace: mlflow
+    resourceVersion: "1533200"
+    uid: f03c4107-23a6-4978-9440-5cc0e6a74974
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: mlflow.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: mlflow
+              port:
+                number: 5000
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - mlflow.46.4.123.8.nip.io
+      secretName: mlflow-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{},"name":"oauth2-proxy","namespace":"oauth2-proxy"},"spec":{"ingressClassName":"nginx","rules":[{"host":"oauth2-proxy.46.4.123.8.nip.io","http":{"paths":[{"backend":{"service":{"name":"oauth2-proxy","port":{"number":4180}}},"path":"/","pathType":"Prefix"}]}}]}}
+      nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
+      nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+    creationTimestamp: "2026-05-29T17:55:11Z"
+    generation: 2
+    name: oauth2-proxy
+    namespace: oauth2-proxy
+    resourceVersion: "1533207"
+    uid: 1a1ac39e-2af7-4f6d-aa90-6e8d1964b27d
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: oauth2-proxy.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: oauth2-proxy
+              port:
+                number: 4180
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - oauth2-proxy.46.4.123.8.nip.io
+      secretName: oauth2-proxy-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: pe-console
+      meta.helm.sh/release-namespace: pe-console
+      nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+      nginx.ingress.kubernetes.io/auth-snippet: |
+        proxy_set_header X-Forwarded-Host $http_host;
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        proxy_set_header Accept-Encoding "";
+        proxy_hide_header Content-Security-Policy;
+        proxy_hide_header X-Content-Security-Policy;
+        add_header Content-Security-Policy "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;" always;
+        sub_filter_once on;
+        sub_filter_types text/html;
+        sub_filter '</body>' '<script>window.addEventListener("load",function(){setTimeout(function(){var u=document.getElementById("username");var p=document.getElementById("password");if(!u||!p)return;u.value="admin";p.value="AioT2026pe-Admin";if(window.jQuery){jQuery("#loginForm").trigger("submit");}else{document.getElementById("loginForm").submit();}},300);});</script></body>';
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T13:07:59Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      helm.toolkit.fluxcd.io/name: pe-console
+      helm.toolkit.fluxcd.io/namespace: pe-console
+    name: pe-console
+    namespace: pe-console
+    resourceVersion: "1533113"
+    uid: d80339d6-2403-4f7a-b2d1-e7df40efd8dc
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: pe.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: pe-console
+              port:
+                number: 4443
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - pe.46.4.123.8.nip.io
+      secretName: pe-console-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"nginx.ingress.kubernetes.io/backend-protocol":"HTTP","nginx.ingress.kubernetes.io/enable-global-auth":"false","nginx.ingress.kubernetes.io/proxy-body-size":"0","nginx.ingress.kubernetes.io/proxy-read-timeout":"3600","nginx.ingress.kubernetes.io/proxy-send-timeout":"3600"},"name":"qdrant","namespace":"qdrant"},"spec":{"ingressClassName":"nginx","rules":[{"host":"qdrant.46.4.123.8.nip.io","http":{"paths":[{"backend":{"service":{"name":"qdrant","port":{"number":6333}}},"path":"/","pathType":"Prefix"}]}}],"tls":[{"hosts":["qdrant.46.4.123.8.nip.io"],"secretName":"qdrant-tls"}]}}
+      meta.helm.sh/release-name: qdrant
+      meta.helm.sh/release-namespace: qdrant
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/enable-global-auth: "false"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T14:44:36Z"
+    generation: 1
+    labels:
+      app: qdrant
+      app.kubernetes.io/instance: qdrant
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: qdrant
+      app.kubernetes.io/version: v1.13.0
+      helm.sh/chart: qdrant-1.13.0
+      helm.toolkit.fluxcd.io/name: qdrant
+      helm.toolkit.fluxcd.io/namespace: qdrant
+    name: qdrant
+    namespace: qdrant
+    resourceVersion: "2096598"
+    uid: f455f762-b058-40cb-bfb2-408d86c04765
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: qdrant.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: qdrant
+              port:
+                number: 6333
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - qdrant.46.4.123.8.nip.io
+      secretName: qdrant-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"nginx.ingress.kubernetes.io/backend-protocol":"HTTP","nginx.ingress.kubernetes.io/enable-global-auth":"false"},"name":"qdrant-authentik-outpost","namespace":"qdrant"},"spec":{"ingressClassName":"nginx","rules":[{"host":"qdrant.46.4.123.8.nip.io","http":{"paths":[{"backend":{"service":{"name":"authentik-outpost-proxy","port":{"number":80}}},"path":"/outpost.goauthentik.io","pathType":"Prefix"}]}}],"tls":[{"hosts":["qdrant.46.4.123.8.nip.io"],"secretName":"qdrant-tls"}]}}
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/enable-global-auth: "false"
+    creationTimestamp: "2026-06-03T08:57:54Z"
+    generation: 2
+    name: qdrant-authentik-outpost
+    namespace: qdrant
+    resourceVersion: "2096601"
+    uid: 9b2fb117-51e2-43ca-9c08-3ca0b2b04d80
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: qdrant.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: authentik-outpost-proxy
+              port:
+                number: 80
+          path: /outpost.goauthentik.io
+          pathType: Prefix
+    tls:
+    - hosts:
+      - qdrant.46.4.123.8.nip.io
+      secretName: qdrant-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: terrakube
+      meta.helm.sh/release-namespace: terrakube
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      nginx.ingress.kubernetes.io/proxy-set-headers: terrakube/custom-headers
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/use-regex: "true"
+    creationTimestamp: "2026-05-29T14:45:20Z"
+    generation: 1
+    labels:
+      app: terrakube-api
+      app.kubernetes.io/managed-by: Helm
+      helm.toolkit.fluxcd.io/name: terrakube
+      helm.toolkit.fluxcd.io/namespace: terrakube
+    name: terrakube-api
+    namespace: terrakube
+    resourceVersion: "1533179"
+    uid: 4bcbb4c6-a73f-45c6-a3bb-3c86aada0623
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: terrakube-api.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: terrakube-api-service
+              port:
+                number: 8080
+          path: /.well-known/openid-configuration
+          pathType: Exact
+        - backend:
+            service:
+              name: terrakube-api-service
+              port:
+                number: 8080
+          path: /.well-known/jwks
+          pathType: Exact
+        - backend:
+            service:
+              name: terrakube-api-service
+              port:
+                number: 8080
+          path: /
+          pathType: Prefix
+        - backend:
+            service:
+              name: terrakube-dex
+              port:
+                number: 5556
+          path: /dex
+          pathType: Prefix
+    tls:
+    - hosts:
+      - terrakube-api.46.4.123.8.nip.io
+      secretName: terrakube-api-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: terrakube
+      meta.helm.sh/release-namespace: terrakube
+      nginx.ingress.kubernetes.io/proxy-set-headers: terrakube/custom-headers
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/use-regex: "true"
+    creationTimestamp: "2026-05-29T14:45:20Z"
+    generation: 1
+    labels:
+      app: terrakube-registry
+      app.kubernetes.io/managed-by: Helm
+      helm.toolkit.fluxcd.io/name: terrakube
+      helm.toolkit.fluxcd.io/namespace: terrakube
+    name: terrakube-registry
+    namespace: terrakube
+    resourceVersion: "1533174"
+    uid: 428d4e1f-59fc-4ce5-a698-634f9aef9d1d
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: terrakube-reg.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: terrakube-registry-service
+              port:
+                number: 8075
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - terrakube-reg.46.4.123.8.nip.io
+      secretName: terrakube-reg-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: terrakube
+      meta.helm.sh/release-namespace: terrakube
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/use-regex: "true"
+    creationTimestamp: "2026-05-29T14:45:20Z"
+    generation: 1
+    labels:
+      app: terrakube-ui
+      app.kubernetes.io/managed-by: Helm
+      helm.toolkit.fluxcd.io/name: terrakube
+      helm.toolkit.fluxcd.io/namespace: terrakube
+    name: terrakube-ui
+    namespace: terrakube
+    resourceVersion: "1533164"
+    uid: 35d5a287-679f-4023-bf29-63f4c8362cfb
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: terrakube.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: terrakube-ui-service
+              port:
+                number: 8080
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - terrakube.46.4.123.8.nip.io
+      secretName: terrakube-ui-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      meta.helm.sh/release-name: zabbix
+      meta.helm.sh/release-namespace: zabbix
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    creationTimestamp: "2026-05-29T14:51:02Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: web
+      app.kubernetes.io/instance: zabbix
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: zabbix
+      app.kubernetes.io/version: 7.0.16
+      helm.sh/chart: zabbix-7.0.12
+      helm.toolkit.fluxcd.io/name: zabbix
+      helm.toolkit.fluxcd.io/namespace: zabbix
+    name: zabbix
+    namespace: zabbix
+    resourceVersion: "1533182"
+    uid: 919e5c39-7b31-432a-a21a-4d112c9e106b
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: zabbix.46.4.123.8.nip.io
+      http:
+        paths:
+        - backend:
+            service:
+              name: zabbix-zabbix-web
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - zabbix.46.4.123.8.nip.io
+      secretName: zabbix-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.18.0.7
+kind: List
+metadata:
+  resourceVersion: ""
