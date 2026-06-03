@@ -32,5 +32,5 @@ spec:
           namespace: observability-logs
         patch: "apiVersion: apps/v1\nkind: DaemonSet\nmetadata:\n  name: alloy\n \
           \ namespace: observability-logs\nspec:\n  template:\n    spec:\n      containers:\n\
-          \        - name: alloy\n          resources:\n            requests:\n  \
-          \            cpu: 50m\n            limits:\n              cpu: 250m\n"
+          \      - name: alloy\n        resources:\n          requests:\n        \
+          \    cpu: 50m\n          limits:\n            cpu: 250m\n"

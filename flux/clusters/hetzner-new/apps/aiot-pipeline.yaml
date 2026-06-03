@@ -35,8 +35,8 @@ spec:
           namespace: aiot
         patch: "apiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: aiot-emqx\n\
           \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
-          \       - name: emqx\n          resources:\n            requests:\n    \
-          \          cpu: 250m\n            limits:\n              cpu: 1000m\n"
+          \     - name: emqx\n        resources:\n          requests:\n          \
+          \  cpu: 250m\n          limits:\n            cpu: 700m\n"
       - target:
           version: v1
           kind: StatefulSet
@@ -44,8 +44,8 @@ spec:
           namespace: aiot
         patch: "apiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: aiot-redpanda\n\
           \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
-          \       - name: redpanda\n          resources:\n            requests:\n\
-          \              cpu: 250m\n            limits:\n              cpu: 1000m\n"
+          \     - name: redpanda\n        resources:\n          requests:\n      \
+          \      cpu: 250m\n          limits:\n            cpu: 700m\n"
       - target:
           version: v1
           kind: StatefulSet
