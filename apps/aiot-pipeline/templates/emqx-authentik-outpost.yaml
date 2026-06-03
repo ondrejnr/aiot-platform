@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aiot-emqx-dashboard-authentik-outpost
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/component: emqx-authentik-outpost
+    {{- include "aiot.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - emqx.{{ .Values.global.domain }}
+      secretName: emqx-tls
+  rules:
+    - host: emqx.{{ .Values.global.domain }}
+      http:
+        paths:
+          - path: /outpost.goauthentik.io
+            pathType: Prefix
+            backend:
+              service:
+                name: authentik-outpost-proxy
+                port:
+                  name: http
