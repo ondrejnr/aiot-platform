@@ -1,0 +1,260 @@
+flux/clusters/hetzner-new/apps/litmus.yaml:5:  name: litmus
+flux/clusters/hetzner-new/apps/litmus.yaml:10:  name: litmuschaos
+flux/clusters/hetzner-new/apps/litmus.yaml:14:  url: https://litmuschaos.github.io/litmus-helm/
+flux/clusters/hetzner-new/apps/litmus.yaml:20:  namespace: litmus
+flux/clusters/hetzner-new/apps/litmus.yaml:27:      chart: litmus
+flux/clusters/hetzner-new/apps/litmus.yaml:31:        name: litmuschaos
+flux/clusters/hetzner-new/apps/litmus.yaml:41:    existingSecret: litmus-admin-auth
+flux/clusters/hetzner-new/apps/litmus.yaml:44:      name: litmus-ingress
+flux/clusters/hetzner-new/apps/litmus.yaml:56:        name: litmus.46.4.123.8.nip.io
+flux/clusters/hetzner-new/apps/litmus.yaml:61:        - secretName: litmus-tls
+flux/clusters/hetzner-new/apps/litmus.yaml:63:            - litmus.46.4.123.8.nip.io
+flux/clusters/hetzner-new/apps/litmus.yaml:68:            CHAOS_CENTER_UI_ENDPOINT: https://litmus.46.4.123.8.nip.io
+flux/clusters/hetzner-new/apps/litmus.yaml:72:            DEX_OAUTH_CALLBACK_URL: https://litmus.46.4.123.8.nip.io/auth/dex/callback
+flux/clusters/hetzner-new/apps/litmus.yaml:73:            DEX_OAUTH_CLIENT_ID: litmus
+flux/clusters/hetzner-new/apps/litmus.yaml:74:            OIDC_ISSUER: https://authentik.46.4.123.8.nip.io/application/o/litmus/
+flux/clusters/hetzner-new/apps/litmus.yaml:79:        existingSecret: litmus-mongodb-auth
+flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:53:          name: ollama
+flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:54:          namespace: local-ai
+flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:58:        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: ollama\n\
+flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:59:          \  namespace: local-ai\nspec:\n  template:\n    spec:\n      containers:\n\
+flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:60:          \      - name: ollama\n        resources:\n          requests:\n       \
+apps/aiot-ml-platform/templates/control-center.yaml:39:              value: http://ollama.local-ai.svc.cluster.local:11434
+apps/aiot-ml-platform/templates/ollama.yaml:4:  name: ollama-models
+apps/aiot-ml-platform/templates/ollama.yaml:8:    app.kubernetes.io/component: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:19:  name: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:23:    app.kubernetes.io/component: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:30:      app.kubernetes.io/component: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:34:        app.kubernetes.io/component: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:38:        - name: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:53:              mountPath: /root/.ollama
+apps/aiot-ml-platform/templates/ollama.yaml:71:            claimName: ollama-models
+apps/aiot-ml-platform/templates/ollama.yaml:76:  name: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:80:    app.kubernetes.io/component: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:83:    app.kubernetes.io/component: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:92:  name: ollama-model-pull
+apps/aiot-ml-platform/templates/ollama.yaml:96:    app.kubernetes.io/component: ollama-model-pull
+apps/aiot-ml-platform/templates/ollama.yaml:106:        app.kubernetes.io/component: ollama-model-pull
+apps/aiot-ml-platform/templates/ollama.yaml:117:              ollama serve &
+apps/aiot-ml-platform/templates/ollama.yaml:120:              until ollama list >/dev/null 2>&1; do
+apps/aiot-ml-platform/templates/ollama.yaml:123:                  echo "ollama did not become ready"
+apps/aiot-ml-platform/templates/ollama.yaml:128:              ollama pull {{ .Values.localAI.model | quote }}
+apps/aiot-ml-platform/templates/ollama.yaml:129:              ollama pull {{ .Values.localAI.embeddingModel | quote }}
+apps/aiot-ml-platform/templates/ollama.yaml:140:              mountPath: /root/.ollama
+apps/aiot-ml-platform/templates/ollama.yaml:144:            claimName: ollama-models
+apps/aiot-ml-platform/templates/ollama.yaml:149:  name: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:153:    app.kubernetes.io/component: ollama
+apps/aiot-ml-platform/templates/ollama.yaml:166:      secretName: ollama-tls
+apps/aiot-ml-platform/templates/ollama.yaml:175:                name: ollama
+apps/aiot-ml-platform/files/control-center/app.py:14:OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama.local-ai.svc.cluster.local:11434")
+apps/aiot-ml-platform/files/control-center/app.py:411:LOG_NAMESPACES={"aiot", "aiot-ml", "local-ai", "mlflow", "signoz", "observability-logs", "victoriametrics", "grafana", "jenkins", "awx", "databases", "qdrant", "flux-system"}
+apps/aiot-ml-platform/values.yaml:6:  namespace: local-ai
+apps/aiot-ml-platform/values.yaml:7:  image: ollama/ollama:0.6.8
+apps/aiot-ml-platform/values.yaml:10:  host: ollama.46.4.123.8.nip.io
+apps/aiot-chaos-theater/templates/rbac.yaml:24:  - apiGroups: ["litmuschaos.io"]
+apps/aiot-chaos-theater/files/app.py:199:    data = kube_get(f"/apis/litmuschaos.io/v1alpha1/namespaces/{TARGET_NAMESPACE}/chaosresults", {"items": []})
+apps/aiot-chaos-theater/files/app.py:224:    data = kube_get(f"/apis/litmuschaos.io/v1alpha1/namespaces/{TARGET_NAMESPACE}/chaosengines", {"items": []})
+./README.md:165:| Local AI | `local-ai/ollama` | local Ollama runtime and model PVC |
+./README.md:263:| Ollama image | `ollama/ollama:0.6.8` |
+./docs/restore-points/zabbix-k8s-cpu-limits-below-90-20260603-154135.md:13:- ollama CPU limit: 1000m
+./docs/restore-points/zabbix-cpu-limit-overcommit-persist-20260603-211423.md:7:- local-ai Deployment/ollama container ollama: cpu limit 500m
+./docs/restore-points/zabbix-cpu-limit-overcommit-persist-20260603-211423.md:8:- litmus Deployment/chaos-litmus-auth-server container auth-server: cpu limit 500m
+./docs/restore-points/zabbix-cpu-limit-overcommit-persist-20260603-211423.md:9:- litmus Deployment/chaos-litmus-server container graphql-server: cpu limit 500m
+./docs/restore-points/zabbix-node-cpu-limit-overcommit-20260603-210747.md:18:local-ai Deployment/ollama container ollama: 1000m -> 500m
+./docs/restore-points/zabbix-node-cpu-limit-overcommit-20260603-210747.md:19:litmus Deployment/chaos-litmus-auth-server container auth-server: 550m -> 500m
+./docs/restore-points/zabbix-node-cpu-limit-overcommit-20260603-210747.md:20:litmus Deployment/chaos-litmus-server container graphql-server: 550m -> 500m
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:7:    meta.helm.sh/release-namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:11:    app.kubernetes.io/component: litmus-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:14:    app.kubernetes.io/name: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:15:    app.kubernetes.io/part-of: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:17:    helm.sh/chart: litmus-3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:19:    helm.toolkit.fluxcd.io/namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:20:    litmuschaos.io/version: 3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:21:  name: chaos-litmus-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:22:  namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:31:      app.kubernetes.io/component: litmus-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:41:        app.kubernetes.io/component: litmus-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:44:        app.kubernetes.io/name: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:45:        app.kubernetes.io/part-of: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:47:        helm.sh/chart: litmus-3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:48:        litmuschaos.io/version: 3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:57:              name: litmus-mongodb-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:61:          value: chaos-litmus-auth-server-service
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:76:          value: litmuschaos.docker.scarf.sh/litmuschaos/workflow-controller:v3.3.1
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:78:          value: litmuschaos.docker.scarf.sh/litmuschaos/argoexec:v3.3.1
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:80:          value: litmuschaos.docker.scarf.sh/litmuschaos/litmusportal-event-tracker:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:82:          value: litmuschaos.docker.scarf.sh/litmuschaos/chaos-exporter:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:84:          value: litmuschaos.docker.scarf.sh/litmuschaos/chaos-operator:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:86:          value: litmuschaos.docker.scarf.sh/litmuschaos/chaos-runner:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:88:          value: litmuschaos.docker.scarf.sh/litmuschaos/litmusportal-subscriber:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:90:          value: https://litmus.46.4.123.8.nip.io
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:109:            name: litmus-admin-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:111:            name: chaos-litmus-admin-config
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:112:        image: litmuschaos.docker.scarf.sh/litmuschaos/litmusportal-server:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:114:        name: graphql-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:157:              name: litmus-mongodb-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:164:              name: chaos-litmus-admin-config
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:165:        image: litmuschaos.docker.scarf.sh/litmuschaos/mongo:6
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:200:    message: ReplicaSet "chaos-litmus-server-f77989f54" has successfully progressed.
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:166:litmus                       chaos-litmus-auth-server-665994b566-6m5nz                         1/1     Running     0                8m25s   10.42.9.7      k3d-agent-2-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:167:litmus                       chaos-litmus-frontend-55c676bb4b-kkmr9                            1/1     Running     0                5d4h    10.42.7.4      k3d-agent-0-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:168:litmus                       chaos-litmus-server-f77989f54-g7kb8                               1/1     Running     0                8m25s   10.42.10.69    k3d-aiot-hetzner-agent-3   <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:169:litmus                       chaos-mongodb-0                                                   1/1     Running     1 (3d19h ago)    5d4h    10.42.0.247    cb50aad492c3               <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:170:litmus                       chaos-mongodb-1                                                   1/1     Running     0                5d1h    10.42.8.7      k3d-agent-1-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:171:litmus                       chaos-mongodb-2                                                   1/1     Running     0                5d1h    10.42.10.16    k3d-aiot-hetzner-agent-3   <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:172:litmus                       chaos-mongodb-arbiter-0                                           1/1     Running     0                5d1h    10.42.13.9     k3d-agent-3-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:173:local-ai                     ollama-7dd4c9d5cd-7c6fj                                           1/1     Running     0                4m53s   10.42.9.9      k3d-agent-2-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-deployments.txt:1:litmus                       chaos-litmus-auth-server                              1/1     1            1           5d4h
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-deployments.txt:2:litmus                       chaos-litmus-server                                   1/1     1            1           5d4h
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-deployments.txt:3:local-ai                     ollama                                                1/1     1            1           5d6h
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:11:    app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:17:  name: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:18:  namespace: local-ai
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:27:      app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:34:        app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:43:        image: ollama/ollama:0.6.8
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:55:        name: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:80:        - mountPath: /root/.ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:90:          claimName: ollama-models
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:96:    message: ReplicaSet "ollama-ff5d7458f" has successfully progressed.
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:7:    meta.helm.sh/release-namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:11:    app.kubernetes.io/component: litmus-auth-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:14:    app.kubernetes.io/name: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:15:    app.kubernetes.io/part-of: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:17:    helm.sh/chart: litmus-3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:19:    helm.toolkit.fluxcd.io/namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:20:    litmuschaos.io/version: 3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:21:  name: chaos-litmus-auth-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:22:  namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:31:      app.kubernetes.io/component: litmus-auth-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:41:        app.kubernetes.io/component: litmus-auth-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:44:        app.kubernetes.io/name: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:45:        app.kubernetes.io/part-of: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:47:        helm.sh/chart: litmus-3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:48:        litmuschaos.io/version: 3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:57:              name: litmus-mongodb-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:61:          value: chaos-litmus-server-service
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:78:          value: https://litmus.46.4.123.8.nip.io/auth/dex/callback
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:80:          value: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:84:          value: https://authentik.46.4.123.8.nip.io/application/o/litmus/
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:87:            name: litmus-admin-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:89:            name: chaos-litmus-admin-config
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:90:        image: litmuschaos.docker.scarf.sh/litmuschaos/litmusportal-auth-server:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:92:        name: auth-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:95:          name: auth-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:130:              name: litmus-mongodb-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:137:              name: chaos-litmus-admin-config
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:138:        image: litmuschaos.docker.scarf.sh/litmuschaos/mongo:6
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-auth-server.yaml:168:    message: ReplicaSet "chaos-litmus-auth-server-665994b566" has successfully progressed.
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:1:flux/clusters/hetzner-new/apps/litmus.yaml:5:  name: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:2:flux/clusters/hetzner-new/apps/litmus.yaml:10:  name: litmuschaos
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:3:flux/clusters/hetzner-new/apps/litmus.yaml:14:  url: https://litmuschaos.github.io/litmus-helm/
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:4:flux/clusters/hetzner-new/apps/litmus.yaml:20:  namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:5:flux/clusters/hetzner-new/apps/litmus.yaml:27:      chart: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:6:flux/clusters/hetzner-new/apps/litmus.yaml:31:        name: litmuschaos
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:7:flux/clusters/hetzner-new/apps/litmus.yaml:41:    existingSecret: litmus-admin-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:8:flux/clusters/hetzner-new/apps/litmus.yaml:44:      name: litmus-ingress
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:9:flux/clusters/hetzner-new/apps/litmus.yaml:56:        name: litmus.46.4.123.8.nip.io
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:10:flux/clusters/hetzner-new/apps/litmus.yaml:61:        - secretName: litmus-tls
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:11:flux/clusters/hetzner-new/apps/litmus.yaml:63:            - litmus.46.4.123.8.nip.io
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:12:flux/clusters/hetzner-new/apps/litmus.yaml:68:            CHAOS_CENTER_UI_ENDPOINT: https://litmus.46.4.123.8.nip.io
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:13:flux/clusters/hetzner-new/apps/litmus.yaml:72:            DEX_OAUTH_CALLBACK_URL: https://litmus.46.4.123.8.nip.io/auth/dex/callback
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:14:flux/clusters/hetzner-new/apps/litmus.yaml:73:            DEX_OAUTH_CLIENT_ID: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:15:flux/clusters/hetzner-new/apps/litmus.yaml:74:            OIDC_ISSUER: https://authentik.46.4.123.8.nip.io/application/o/litmus/
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:16:flux/clusters/hetzner-new/apps/litmus.yaml:79:        existingSecret: litmus-mongodb-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:17:flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:53:          name: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:18:flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:54:          namespace: local-ai
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:19:flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:55:        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: ollama\n\
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:20:flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:56:          \  namespace: local-ai\nspec:\n  template:\n    spec:\n      containers:\n\
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:21:flux/clusters/hetzner-new/apps/aiot-ml-platform.yaml:57:          \      - name: ollama\n        resources:\n          requests:\n       \
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:22:apps/aiot-ml-platform/templates/control-center.yaml:39:              value: http://ollama.local-ai.svc.cluster.local:11434
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:23:apps/aiot-ml-platform/templates/ollama.yaml:4:  name: ollama-models
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:24:apps/aiot-ml-platform/templates/ollama.yaml:8:    app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:25:apps/aiot-ml-platform/templates/ollama.yaml:19:  name: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:26:apps/aiot-ml-platform/templates/ollama.yaml:23:    app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:27:apps/aiot-ml-platform/templates/ollama.yaml:30:      app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:28:apps/aiot-ml-platform/templates/ollama.yaml:34:        app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:29:apps/aiot-ml-platform/templates/ollama.yaml:38:        - name: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:30:apps/aiot-ml-platform/templates/ollama.yaml:53:              mountPath: /root/.ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:31:apps/aiot-ml-platform/templates/ollama.yaml:71:            claimName: ollama-models
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:32:apps/aiot-ml-platform/templates/ollama.yaml:76:  name: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:33:apps/aiot-ml-platform/templates/ollama.yaml:80:    app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:34:apps/aiot-ml-platform/templates/ollama.yaml:83:    app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:35:apps/aiot-ml-platform/templates/ollama.yaml:92:  name: ollama-model-pull
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:36:apps/aiot-ml-platform/templates/ollama.yaml:96:    app.kubernetes.io/component: ollama-model-pull
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:37:apps/aiot-ml-platform/templates/ollama.yaml:106:        app.kubernetes.io/component: ollama-model-pull
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:38:apps/aiot-ml-platform/templates/ollama.yaml:117:              ollama serve &
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:39:apps/aiot-ml-platform/templates/ollama.yaml:120:              until ollama list >/dev/null 2>&1; do
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:40:apps/aiot-ml-platform/templates/ollama.yaml:123:                  echo "ollama did not become ready"
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:41:apps/aiot-ml-platform/templates/ollama.yaml:128:              ollama pull {{ .Values.localAI.model | quote }}
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:42:apps/aiot-ml-platform/templates/ollama.yaml:129:              ollama pull {{ .Values.localAI.embeddingModel | quote }}
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:43:apps/aiot-ml-platform/templates/ollama.yaml:140:              mountPath: /root/.ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:44:apps/aiot-ml-platform/templates/ollama.yaml:144:            claimName: ollama-models
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:45:apps/aiot-ml-platform/templates/ollama.yaml:149:  name: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:46:apps/aiot-ml-platform/templates/ollama.yaml:153:    app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:47:apps/aiot-ml-platform/templates/ollama.yaml:166:      secretName: ollama-tls
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:48:apps/aiot-ml-platform/templates/ollama.yaml:175:                name: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:49:apps/aiot-ml-platform/files/control-center/app.py:14:OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama.local-ai.svc.cluster.local:11434")
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:50:apps/aiot-ml-platform/files/control-center/app.py:411:LOG_NAMESPACES={"aiot", "aiot-ml", "local-ai", "mlflow", "signoz", "observability-logs", "victoriametrics", "grafana", "jenkins", "awx", "databases", "qdrant", "flux-system"}
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:51:apps/aiot-ml-platform/values.yaml:6:  namespace: local-ai
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:52:apps/aiot-ml-platform/values.yaml:7:  image: ollama/ollama:0.6.8
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:53:apps/aiot-ml-platform/values.yaml:10:  host: ollama.46.4.123.8.nip.io
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:54:apps/aiot-chaos-theater/templates/rbac.yaml:24:  - apiGroups: ["litmuschaos.io"]
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:55:apps/aiot-chaos-theater/files/app.py:199:    data = kube_get(f"/apis/litmuschaos.io/v1alpha1/namespaces/{TARGET_NAMESPACE}/chaosresults", {"items": []})
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:56:apps/aiot-chaos-theater/files/app.py:224:    data = kube_get(f"/apis/litmuschaos.io/v1alpha1/namespaces/{TARGET_NAMESPACE}/chaosengines", {"items": []})
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:57:./README.md:165:| Local AI | `local-ai/ollama` | local Ollama runtime and model PVC |
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:58:./README.md:263:| Ollama image | `ollama/ollama:0.6.8` |
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:59:./docs/restore-points/zabbix-k8s-cpu-limits-below-90-20260603-154135.md:13:- ollama CPU limit: 1000m
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:60:./docs/restore-points/zabbix-node-cpu-limit-overcommit-20260603-210747.md:18:local-ai Deployment/ollama container ollama: 1000m -> 500m
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:61:./docs/restore-points/zabbix-node-cpu-limit-overcommit-20260603-210747.md:19:litmus Deployment/chaos-litmus-auth-server container auth-server: 550m -> 500m
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:62:./docs/restore-points/zabbix-node-cpu-limit-overcommit-20260603-210747.md:20:litmus Deployment/chaos-litmus-server container graphql-server: 550m -> 500m
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:63:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:7:    meta.helm.sh/release-namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:64:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:11:    app.kubernetes.io/component: litmus-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:65:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:14:    app.kubernetes.io/name: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:66:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:15:    app.kubernetes.io/part-of: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:67:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:17:    helm.sh/chart: litmus-3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:68:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:19:    helm.toolkit.fluxcd.io/namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:69:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:20:    litmuschaos.io/version: 3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:70:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:21:  name: chaos-litmus-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:71:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:22:  namespace: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:72:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:31:      app.kubernetes.io/component: litmus-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:73:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:41:        app.kubernetes.io/component: litmus-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:74:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:44:        app.kubernetes.io/name: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:75:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:45:        app.kubernetes.io/part-of: litmus
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:76:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:47:        helm.sh/chart: litmus-3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:77:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:48:        litmuschaos.io/version: 3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:78:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:57:              name: litmus-mongodb-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:79:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:61:          value: chaos-litmus-auth-server-service
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:80:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:76:          value: litmuschaos.docker.scarf.sh/litmuschaos/workflow-controller:v3.3.1
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:81:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:78:          value: litmuschaos.docker.scarf.sh/litmuschaos/argoexec:v3.3.1
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:82:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:80:          value: litmuschaos.docker.scarf.sh/litmuschaos/litmusportal-event-tracker:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:83:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:82:          value: litmuschaos.docker.scarf.sh/litmuschaos/chaos-exporter:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:84:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:84:          value: litmuschaos.docker.scarf.sh/litmuschaos/chaos-operator:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:85:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:86:          value: litmuschaos.docker.scarf.sh/litmuschaos/chaos-runner:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:86:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:88:          value: litmuschaos.docker.scarf.sh/litmuschaos/litmusportal-subscriber:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:87:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:90:          value: https://litmus.46.4.123.8.nip.io
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:88:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:109:            name: litmus-admin-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:89:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:111:            name: chaos-litmus-admin-config
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:90:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:112:        image: litmuschaos.docker.scarf.sh/litmuschaos/litmusportal-server:3.28.0
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:91:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:114:        name: graphql-server
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:92:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:157:              name: litmus-mongodb-auth
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:93:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:164:              name: chaos-litmus-admin-config
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:94:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:165:        image: litmuschaos.docker.scarf.sh/litmuschaos/mongo:6
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:95:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-chaos-litmus-server.yaml:200:    message: ReplicaSet "chaos-litmus-server-f77989f54" has successfully progressed.
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:96:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:166:litmus                       chaos-litmus-auth-server-665994b566-6m5nz                         1/1     Running     0                8m25s   10.42.9.7      k3d-agent-2-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:97:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:167:litmus                       chaos-litmus-frontend-55c676bb4b-kkmr9                            1/1     Running     0                5d4h    10.42.7.4      k3d-agent-0-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:98:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:168:litmus                       chaos-litmus-server-f77989f54-g7kb8                               1/1     Running     0                8m25s   10.42.10.69    k3d-aiot-hetzner-agent-3   <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:99:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:169:litmus                       chaos-mongodb-0                                                   1/1     Running     1 (3d19h ago)    5d4h    10.42.0.247    cb50aad492c3               <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:100:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:170:litmus                       chaos-mongodb-1                                                   1/1     Running     0                5d1h    10.42.8.7      k3d-agent-1-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:101:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:171:litmus                       chaos-mongodb-2                                                   1/1     Running     0                5d1h    10.42.10.16    k3d-aiot-hetzner-agent-3   <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:102:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:172:litmus                       chaos-mongodb-arbiter-0                                           1/1     Running     0                5d1h    10.42.13.9     k3d-agent-3-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:103:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/pods-wide.txt:173:local-ai                     ollama-7dd4c9d5cd-7c6fj                                           1/1     Running     0                4m53s   10.42.9.9      k3d-agent-2-0              <none>           <none>
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:104:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-deployments.txt:1:litmus                       chaos-litmus-auth-server                              1/1     1            1           5d4h
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:105:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-deployments.txt:2:litmus                       chaos-litmus-server                                   1/1     1            1           5d4h
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:106:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-deployments.txt:3:local-ai                     ollama                                                1/1     1            1           5d6h
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:107:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:11:    app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:108:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:17:  name: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:109:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:18:  namespace: local-ai
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:110:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:27:      app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:111:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:34:        app.kubernetes.io/component: ollama
+./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/repo-source-search.txt:112:./docs/diagnostics/zabbix-cpu-limit-overcommit-persist-20260603-211423/live-ollama.yaml:43:        image: ollama/ollama:0.6.8
