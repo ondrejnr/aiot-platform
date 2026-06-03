@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -9,8 +8,8 @@ spec:
   interval: 30m
   releaseName: alloy
   dependsOn:
-    - name: loki
-      namespace: observability-logs
+  - name: loki
+    namespace: observability-logs
   chart:
     spec:
       chart: ./apps/alloy
@@ -23,3 +22,15 @@ spec:
     createNamespace: true
   upgrade:
     cleanupOnFail: true
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          version: v1
+          kind: DaemonSet
+          name: alloy
+          namespace: observability-logs
+        patch: "apiVersion: apps/v1\nkind: DaemonSet\nmetadata:\n  name: alloy\n \
+          \ namespace: observability-logs\nspec:\n  template:\n    spec:\n      containers:\n\
+          \        - name: alloy\n          resources:\n            requests:\n  \
+          \            cpu: 50m\n            limits:\n              cpu: 250m\n"

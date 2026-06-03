@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -20,3 +19,15 @@ spec:
     createNamespace: true
   upgrade:
     cleanupOnFail: true
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          version: v1
+          kind: Deployment
+          name: vmsingle-victoriametrics-victoria-metrics-k8s-stack
+          namespace: victoriametrics
+        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: vmsingle-victoriametrics-victoria-metrics-k8s-stack\n\
+          \  namespace: victoriametrics\nspec:\n  template:\n    spec:\n      containers:\n\
+          \        - name: vmsingle\n          resources:\n            requests:\n\
+          \              cpu: 500m\n            limits:\n              cpu: 1000m\n"

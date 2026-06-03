@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -21,35 +20,35 @@ spec:
   upgrade:
     cleanupOnFail: true
   postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              kind: ConfigMap
-              name: jenkins
-            patch: |-
-              - op: replace
-                path: /data/apply_config.sh
-                value: |
-                  set -e
-                  echo "disable Setup Wizard"
-                  # Prevent Setup Wizard when JCasC is enabled
-                  echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.UpgradeWizard.state
-                  echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.InstallUtil.lastExecVersion
-                  echo "remove all plugins from shared volume"
-                  # remove all plugins from shared volume
-                  rm -rf /var/jenkins_home/plugins/*
-                  echo "download plugins"
-                  # Install missing plugins
-                  cp /var/jenkins_config/plugins.txt /var/jenkins_home;
-                  rm -rf /usr/share/jenkins/ref/plugins/*.lock
-                  version () { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
-                  if [ -f "/usr/share/jenkins/jenkins.war" ] && [ -n "$(command -v jenkins-plugin-cli)" 2>/dev/null ] && [ $(version $(jenkins-plugin-cli --version)) -ge $(version "2.1.1") ]; then
-                    jenkins-plugin-cli --verbose --war "/usr/share/jenkins/jenkins.war" --plugin-file "/var/jenkins_home/plugins.txt" --latest true;
-                  else
-                    /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`;
-                  fi
-                  echo "copy plugins to shared volume"
-                  # Copy plugins to shared volume
-                  rm -rf /var/jenkins_plugins/*
-                  cp -f /usr/share/jenkins/ref/plugins/* /var/jenkins_plugins/;
-                  echo "finished initialization"
+  - kustomize:
+      patches:
+      - target:
+          kind: ConfigMap
+          name: jenkins
+        patch: "- op: replace\n  path: /data/apply_config.sh\n  value: |\n    set\
+          \ -e\n    echo \"disable Setup Wizard\"\n    # Prevent Setup Wizard when\
+          \ JCasC is enabled\n    echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.UpgradeWizard.state\n\
+          \    echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.InstallUtil.lastExecVersion\n\
+          \    echo \"remove all plugins from shared volume\"\n    # remove all plugins\
+          \ from shared volume\n    rm -rf /var/jenkins_home/plugins/*\n    echo \"\
+          download plugins\"\n    # Install missing plugins\n    cp /var/jenkins_config/plugins.txt\
+          \ /var/jenkins_home;\n    rm -rf /usr/share/jenkins/ref/plugins/*.lock\n\
+          \    version () { echo \"$@\" | awk -F. '{ printf(\"%d%03d%03d%03d\\n\"\
+          , $1,$2,$3,$4); }'; }\n    if [ -f \"/usr/share/jenkins/jenkins.war\" ]\
+          \ && [ -n \"$(command -v jenkins-plugin-cli)\" 2>/dev/null ] && [ $(version\
+          \ $(jenkins-plugin-cli --version)) -ge $(version \"2.1.1\") ]; then\n  \
+          \    jenkins-plugin-cli --verbose --war \"/usr/share/jenkins/jenkins.war\"\
+          \ --plugin-file \"/var/jenkins_home/plugins.txt\" --latest true;\n    else\n\
+          \      /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`;\n\
+          \    fi\n    echo \"copy plugins to shared volume\"\n    # Copy plugins\
+          \ to shared volume\n    rm -rf /var/jenkins_plugins/*\n    cp -f /usr/share/jenkins/ref/plugins/*\
+          \ /var/jenkins_plugins/;\n    echo \"finished initialization\""
+      - target:
+          version: v1
+          kind: StatefulSet
+          name: jenkins
+          namespace: jenkins
+        patch: "apiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: jenkins\n\
+          \  namespace: jenkins\nspec:\n  template:\n    spec:\n      containers:\n\
+          \        - name: jenkins\n          resources:\n            requests:\n\
+          \              cpu: 100m\n            limits:\n              cpu: 500m\n"

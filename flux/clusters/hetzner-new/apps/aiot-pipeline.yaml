@@ -1,4 +1,3 @@
----
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -26,3 +25,69 @@ spec:
     createNamespace: true
   upgrade:
     cleanupOnFail: true
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          version: v1
+          kind: StatefulSet
+          name: aiot-emqx
+          namespace: aiot
+        patch: "apiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: aiot-emqx\n\
+          \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
+          \       - name: emqx\n          resources:\n            requests:\n    \
+          \          cpu: 250m\n            limits:\n              cpu: 1000m\n"
+      - target:
+          version: v1
+          kind: StatefulSet
+          name: aiot-redpanda
+          namespace: aiot
+        patch: "apiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: aiot-redpanda\n\
+          \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
+          \       - name: redpanda\n          resources:\n            requests:\n\
+          \              cpu: 250m\n            limits:\n              cpu: 1000m\n"
+      - target:
+          version: v1
+          kind: StatefulSet
+          name: aiot-sensor-simulator
+          namespace: aiot
+        patch: "apiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: aiot-sensor-simulator\n\
+          \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
+          \       - name: app\n          resources:\n            requests:\n     \
+          \         cpu: 20m\n            limits:\n              cpu: 100m\n"
+      - target:
+          version: v1
+          kind: Deployment
+          name: aiot-pg-sink
+          namespace: aiot
+        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: aiot-pg-sink\n\
+          \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
+          \       - name: app\n          resources:\n            requests:\n     \
+          \         cpu: 50m\n            limits:\n              cpu: 200m\n"
+      - target:
+          version: v1
+          kind: Deployment
+          name: aiot-mqtt-to-redis
+          namespace: aiot
+        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: aiot-mqtt-to-redis\n\
+          \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
+          \       - name: app\n          resources:\n            requests:\n     \
+          \         cpu: 50m\n            limits:\n              cpu: 200m\n"
+      - target:
+          version: v1
+          kind: Deployment
+          name: aiot-redis-to-redpanda
+          namespace: aiot
+        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: aiot-redis-to-redpanda\n\
+          \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
+          \       - name: app\n          resources:\n            requests:\n     \
+          \         cpu: 50m\n            limits:\n              cpu: 200m\n"
+      - target:
+          version: v1
+          kind: Deployment
+          name: aiot-redis
+          namespace: aiot
+        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: aiot-redis\n\
+          \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
+          \       - name: redis\n          resources:\n            requests:\n   \
+          \           cpu: 100m\n            limits:\n              cpu: 500m\n"

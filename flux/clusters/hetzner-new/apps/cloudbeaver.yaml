@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -20,3 +19,15 @@ spec:
     createNamespace: true
   upgrade:
     cleanupOnFail: true
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          version: v1
+          kind: Deployment
+          name: cloudbeaver
+          namespace: aiot
+        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: cloudbeaver\n\
+          \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
+          \       - name: cloudbeaver\n          resources:\n            requests:\n\
+          \              cpu: 50m\n            limits:\n              cpu: 300m\n"
