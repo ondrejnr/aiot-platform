@@ -11,22 +11,22 @@ flux get helmreleases -A > "$OUT_DIR/flux-helmreleases.txt" 2>&1 || true
 kubectl get ingress -A -o yaml > "$OUT_DIR/ingress-all.yaml" 2>/dev/null || true
 kubectl get ingress -A -o wide > "$OUT_DIR/ingress-wide.txt" 2>&1 || true
 
-cat > "$OUT_DIR/known-hosts.psv" <<'HOSTS'
-qdrant.46.4.123.8.nip.io|/collections|JSON_OK
-qdrant.46.4.123.8.nip.io|/dashboard|HTTP_200
-grafana.46.4.123.8.nip.io|/|REDIRECT_OK
-headlamp.46.4.123.8.nip.io|/|HTTP_200
-litmus.46.4.123.8.nip.io|/|HTTP_200
-gitea.46.4.123.8.nip.io|/|HTTP_200
-mlflow.46.4.123.8.nip.io|/|HTTP_200
-jenkins.46.4.123.8.nip.io|/|HTTP_200_OR_403
-awx.46.4.123.8.nip.io|/|HTTP_200_OR_REDIRECT
-victoriametrics.46.4.123.8.nip.io|/|HTTP_200_OR_404
+cat > "$OUT_DIR/known-hosts.tsv" <<'HOSTS'
+qdrant.46.4.123.8.nip.io    /collections    JSON_OK
+qdrant.46.4.123.8.nip.io    /dashboard    HTTP_200
+grafana.46.4.123.8.nip.io    /    REDIRECT_OK
+headlamp.46.4.123.8.nip.io    /    HTTP_200
+litmus.46.4.123.8.nip.io    /    HTTP_200
+gitea.46.4.123.8.nip.io    /    HTTP_200
+mlflow.46.4.123.8.nip.io    /    HTTP_200
+jenkins.46.4.123.8.nip.io    /    HTTP_200_OR_403
+awx.46.4.123.8.nip.io    /    HTTP_200_OR_REDIRECT
+victoriametrics.46.4.123.8.nip.io    /    HTTP_200_OR_404
 HOSTS
 
 echo -e "host\tpath\texpected\tcode\tredirect_url\tcontent_type\tcurl_error\tresult" > "$OUT_DIR/web-results.tsv"
 
-while IFS='|' read -r host path expected; do
+while IFS=$'\t' read -r host path expected; do
   [ -z "$host" ] && continue
 
   safe_host="${host//[^a-zA-Z0-9]/_}"
@@ -36,13 +36,13 @@ while IFS='|' read -r host path expected; do
 
   curl -k -sS -L --max-redirs 3 --connect-timeout 8 -m 20 \
     -o "$body" \
-    -w '%{http_code}|%{redirect_url}|%{content_type}|%{errormsg}' \
+    -w '%{http_code}\t%{redirect_url}\t%{content_type}\t%{errormsg}' \
     "https://${host}${path}" > "$meta" 2>/dev/null || true
 
-  code="$(awk -F'|' '{print $1}' "$meta")"
-  redirect_url="$(awk -F'|' '{print $2}' "$meta")"
-  content_type="$(awk -F'|' '{print $3}' "$meta")"
-  curl_error="$(awk -F'|' '{print $4}' "$meta")"
+  code="$(awk -F'\t' '{print $1}' "$meta")"
+  redirect_url="$(awk -F'\t' '{print $2}' "$meta")"
+  content_type="$(awk -F'\t' '{print $3}' "$meta")"
+  curl_error="$(awk -F'\t' '{print $4}' "$meta")"
 
   result="FAIL"
 
@@ -54,6 +54,7 @@ while IFS='|' read -r host path expected; do
       [ "$code" = "200" ] && result="OK"
       ;;
     REDIRECT_OK)
+      # -L follows redirects, so Grafana can end on login page with 200.
       { [ "$code" = "200" ] || [ "$code" = "302" ] || [ "$code" = "308" ]; } && result="OK"
       ;;
     HTTP_200_OR_403)
@@ -72,7 +73,7 @@ while IFS='|' read -r host path expected; do
   fi
 
   echo -e "${host}\t${path}\t${expected}\t${code}\t${redirect_url}\t${content_type}\t${curl_error}\t${result}" >> "$OUT_DIR/web-results.tsv"
-done < "$OUT_DIR/known-hosts.psv"
+done < "$OUT_DIR/known-hosts.tsv"
 
 python3 - "$OUT_DIR" <<'PY'
 from pathlib import Path
@@ -128,6 +129,8 @@ PY
 
 WEB_FAILS="$(awk -F'\t' 'NR>1 && $8 !~ /^OK$/ {print}' "$OUT_DIR/web-results.tsv" | wc -l)"
 INGRESS_COLLISIONS="$(awk 'NR>1 {print}' "$OUT_DIR/ingress-collisions.tsv" | wc -l)"
+
+# Correct Flux READY check: count rows where READY column is not True, ignore SUSPENDED=False.
 FLUX_NOT_READY="$(awk 'NR>1 && $5 != "True" {print}' "$OUT_DIR/flux-kustomizations.txt" | wc -l)"
 
 echo
