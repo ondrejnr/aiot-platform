@@ -24,38 +24,29 @@ awx.46.4.123.8.nip.io    /    HTTP_200_OR_REDIRECT
 victoriametrics.46.4.123.8.nip.io    /    HTTP_200_OR_404
 HOSTS
 
-echo -e "host\tpath\texpected\tcode\tredirect_url\tcontent_type\tcurl_error\tresult" > "$OUT_DIR/web-results.tsv"
+echo -e "host\tpath\texpected\tcode\tlocation\tcontent_type\tresult" > "$OUT_DIR/web-results.tsv"
 
 while IFS=$'\t' read -r host path expected; do
   [ -z "$host" ] && continue
+  tmp="$OUT_DIR/resp-${host//[^a-zA-Z0-9]/_}-${path//[^a-zA-Z0-9]/_}.txt"
 
-  safe_host="${host//[^a-zA-Z0-9]/_}"
-  safe_path="${path//[^a-zA-Z0-9]/_}"
-  body="$OUT_DIR/body-${safe_host}-${safe_path}.txt"
-  meta="$OUT_DIR/meta-${safe_host}-${safe_path}.txt"
+  curl -k -sS -i -m 15 "https://${host}${path}" > "$tmp" 2>/dev/null || true
 
-  curl -k -sS -L --max-redirs 3 --connect-timeout 8 -m 20 \
-    -o "$body" \
-    -w '%{http_code}\t%{redirect_url}\t%{content_type}\t%{errormsg}' \
-    "https://${host}${path}" > "$meta" 2>/dev/null || true
-
-  code="$(awk -F'\t' '{print $1}' "$meta")"
-  redirect_url="$(awk -F'\t' '{print $2}' "$meta")"
-  content_type="$(awk -F'\t' '{print $3}' "$meta")"
-  curl_error="$(awk -F'\t' '{print $4}' "$meta")"
+  code="$(awk 'BEGIN{c=""} /^HTTP\//{c=$2} END{print c}' "$tmp")"
+  loc="$(awk 'BEGIN{IGNORECASE=1} /^location:/{sub(/\r/,""); print substr($0, index($0,$2)); exit}' "$tmp")"
+  ctype="$(awk 'BEGIN{IGNORECASE=1} /^content-type:/{sub(/\r/,""); print substr($0, index($0,$2)); exit}' "$tmp")"
 
   result="FAIL"
 
   case "$expected" in
     JSON_OK)
-      grep -q '"status":"ok"' "$body" && grep -q '"collections"' "$body" && result="OK"
+      grep -q '"status":"ok"' "$tmp" && grep -q '"collections"' "$tmp" && result="OK"
       ;;
     HTTP_200)
       [ "$code" = "200" ] && result="OK"
       ;;
     REDIRECT_OK)
-      # -L follows redirects, so Grafana can end on login page with 200.
-      { [ "$code" = "200" ] || [ "$code" = "302" ] || [ "$code" = "308" ]; } && result="OK"
+      { [ "$code" = "302" ] || [ "$code" = "308" ] || [ "$code" = "200" ]; } && result="OK"
       ;;
     HTTP_200_OR_403)
       { [ "$code" = "200" ] || [ "$code" = "403" ]; } && result="OK"
@@ -68,11 +59,11 @@ while IFS=$'\t' read -r host path expected; do
       ;;
   esac
 
-  if grep -qi 'outpost.goauthentik.io/start' "$body" && [ "$expected" = "JSON_OK" ]; then
+  if grep -qi 'outpost.goauthentik.io/start' "$tmp" && [ "$expected" = "JSON_OK" ]; then
     result="FAIL_AUTH_REDIRECT_ON_JSON_API"
   fi
 
-  echo -e "${host}\t${path}\t${expected}\t${code}\t${redirect_url}\t${content_type}\t${curl_error}\t${result}" >> "$OUT_DIR/web-results.tsv"
+  echo -e "${host}\t${path}\t${expected}\t${code}\t${loc}\t${ctype}\t${result}" >> "$OUT_DIR/web-results.tsv"
 done < "$OUT_DIR/known-hosts.tsv"
 
 python3 - "$OUT_DIR" <<'PY'
@@ -107,7 +98,6 @@ for i in items:
     ns = meta.get("namespace", "")
     name = meta.get("name", "")
     ann = meta.get("annotations", {}) or {}
-
     if any(k in ann for k in auth_keys):
         auth.append(f"{ns}/{name}")
 
@@ -127,11 +117,9 @@ with (out / "ingress-collisions.tsv").open("w") as f:
 (out / "ingress-auth-list.txt").write_text("\n".join(auth) + "\n")
 PY
 
-WEB_FAILS="$(awk -F'\t' 'NR>1 && $8 !~ /^OK$/ {print}' "$OUT_DIR/web-results.tsv" | wc -l)"
-INGRESS_COLLISIONS="$(awk 'NR>1 {print}' "$OUT_DIR/ingress-collisions.tsv" | wc -l)"
-
-# Correct Flux READY check: count rows where READY column is not True, ignore SUSPENDED=False.
-FLUX_NOT_READY="$(awk 'NR>1 && $5 != "True" {print}' "$OUT_DIR/flux-kustomizations.txt" | wc -l)"
+FAILS="$(awk -F'\t' 'NR>1 && $7 !~ /^OK$/ {print}' "$OUT_DIR/web-results.tsv" | wc -l)"
+COLLISIONS="$(awk 'NR>1 {print}' "$OUT_DIR/ingress-collisions.tsv" | wc -l)"
+FLUX_FALSE="$(grep -E '\sFalse\s' "$OUT_DIR/flux-kustomizations.txt" | wc -l)"
 
 echo
 echo "===== WEB RESULTS ====="
@@ -139,12 +127,12 @@ cat "$OUT_DIR/web-results.tsv"
 
 echo
 echo "===== SUMMARY ====="
-echo "WEB_FAILS=$WEB_FAILS"
-echo "INGRESS_COLLISIONS=$INGRESS_COLLISIONS"
-echo "FLUX_NOT_READY=$FLUX_NOT_READY"
+echo "WEB_FAILS=$FAILS"
+echo "INGRESS_COLLISIONS=$COLLISIONS"
+echo "FLUX_FALSE=$FLUX_FALSE"
 echo "OUT_DIR=$OUT_DIR"
 
-if [ "$WEB_FAILS" -eq 0 ] && [ "$INGRESS_COLLISIONS" -eq 0 ] && [ "$FLUX_NOT_READY" -eq 0 ]; then
+if [ "$FAILS" -eq 0 ] && [ "$COLLISIONS" -eq 0 ] && [ "$FLUX_FALSE" -eq 0 ]; then
   echo "SMOKE_STATUS=OK"
   exit 0
 else

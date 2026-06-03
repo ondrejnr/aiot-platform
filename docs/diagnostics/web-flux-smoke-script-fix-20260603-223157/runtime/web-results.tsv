@@ -1,0 +1,11 @@
+host	path	expected	code	redirect_url	content_type	curl_error	result
+qdrant.46.4.123.8.nip.io    /collections    JSON_OK			000			URL using bad/illegal format or missing URL	FAIL
+qdrant.46.4.123.8.nip.io    /dashboard    HTTP_200			000			URL using bad/illegal format or missing URL	FAIL
+grafana.46.4.123.8.nip.io    /    REDIRECT_OK			000			URL using bad/illegal format or missing URL	FAIL
+headlamp.46.4.123.8.nip.io    /    HTTP_200			000			URL using bad/illegal format or missing URL	FAIL
+litmus.46.4.123.8.nip.io    /    HTTP_200			000			URL using bad/illegal format or missing URL	FAIL
+gitea.46.4.123.8.nip.io    /    HTTP_200			000			URL using bad/illegal format or missing URL	FAIL
+mlflow.46.4.123.8.nip.io    /    HTTP_200			000			URL using bad/illegal format or missing URL	FAIL
+jenkins.46.4.123.8.nip.io    /    HTTP_200_OR_403			000			URL using bad/illegal format or missing URL	FAIL
+awx.46.4.123.8.nip.io    /    HTTP_200_OR_REDIRECT			000			URL using bad/illegal format or missing URL	FAIL
+victoriametrics.46.4.123.8.nip.io    /    HTTP_200_OR_404			000			URL using bad/illegal format or missing URL	FAIL
