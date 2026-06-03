@@ -1,0 +1,175 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "2"
+    meta.helm.sh/release-name: chaos
+    meta.helm.sh/release-namespace: litmus
+  creationTimestamp: "2026-05-29T14:52:44Z"
+  generation: 2
+  labels:
+    app.kubernetes.io/component: litmus-auth-server
+    app.kubernetes.io/instance: chaos
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: litmus
+    app.kubernetes.io/part-of: litmus
+    app.kubernetes.io/version: 3.28.0
+    helm.sh/chart: litmus-3.28.0
+    helm.toolkit.fluxcd.io/name: chaos
+    helm.toolkit.fluxcd.io/namespace: litmus
+    litmuschaos.io/version: 3.28.0
+  name: chaos-litmus-auth-server
+  namespace: litmus
+  resourceVersion: "2080277"
+  uid: 25c93829-cc18-46da-9e47-36323b69044a
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: litmus-auth-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: litmus-auth-server
+        app.kubernetes.io/instance: chaos
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: litmus
+        app.kubernetes.io/part-of: litmus
+        app.kubernetes.io/version: 3.28.0
+        helm.sh/chart: litmus-3.28.0
+        litmuschaos.io/version: 3.28.0
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: mongodb-root-password
+              name: litmus-mongodb-auth
+        - name: DB_USER
+          value: root
+        - name: LITMUS_GQL_GRPC_ENDPOINT
+          value: chaos-litmus-server-service
+        - name: LITMUS_GQL_GRPC_PORT
+          value: "8000"
+        - name: ENABLE_INTERNAL_TLS
+          value: "false"
+        - name: REST_PORT
+          value: "3000"
+        - name: GRPC_PORT
+          value: "3030"
+        - name: ALLOWED_ORIGINS
+          value: .*
+        - name: HTTP_PROXY
+        - name: HTTPS_PROXY
+        - name: NO_PROXY
+        - name: DEX_ENABLED
+          value: "true"
+        - name: DEX_OAUTH_CALLBACK_URL
+          value: https://litmus.46.4.123.8.nip.io/auth/dex/callback
+        - name: DEX_OAUTH_CLIENT_ID
+          value: litmus
+        - name: OAUTH_JWT_EXP_MINS
+          value: "5"
+        - name: OIDC_ISSUER
+          value: https://authentik.46.4.123.8.nip.io/application/o/litmus/
+        envFrom:
+        - secretRef:
+            name: litmus-admin-auth
+        - configMapRef:
+            name: chaos-litmus-admin-config
+        image: litmuschaos.docker.scarf.sh/litmuschaos/litmusportal-auth-server:3.28.0
+        imagePullPolicy: Always
+        name: auth-server
+        ports:
+        - containerPort: 3000
+          name: auth-server
+          protocol: TCP
+        - containerPort: 3030
+          name: auth-rpc-server
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 1Gi
+            memory: 712Mi
+          requests:
+            cpu: 225m
+            ephemeral-storage: 500Mi
+            memory: 250Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 2000
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - args:
+        - until  [[ $(mongosh -u ${DB_USER} -p ${DB_PASSWORD} ${DB_SERVER} --eval
+          'rs.status()' | grep 'ok' | wc -l) -eq 1 ]]; do sleep 5; echo 'Waiting for
+          the MongoDB to be ready...'; done; echo 'Connection with MongoDB established'
+        command:
+        - /bin/bash
+        - -c
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: mongodb-root-password
+              name: litmus-mongodb-auth
+        - name: DB_USER
+          value: root
+        - name: DB_SERVER
+          valueFrom:
+            configMapKeyRef:
+              key: DB_SERVER
+              name: chaos-litmus-admin-config
+        image: litmuschaos.docker.scarf.sh/litmuschaos/mongo:6
+        imagePullPolicy: Always
+        name: wait-for-mongodb
+        resources:
+          limits:
+            cpu: 250m
+            ephemeral-storage: 1Gi
+            memory: 512Mi
+          requests:
+            cpu: 25m
+            ephemeral-storage: 500Mi
+            memory: 150Mi
+        securityContext: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2026-05-29T17:42:42Z"
+    lastUpdateTime: "2026-05-29T17:42:42Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2026-05-29T17:41:43Z"
+    lastUpdateTime: "2026-06-03T19:06:27Z"
+    message: ReplicaSet "chaos-litmus-auth-server-665994b566" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
