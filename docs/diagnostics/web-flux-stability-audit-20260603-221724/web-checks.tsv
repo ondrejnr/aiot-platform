@@ -1,0 +1,12 @@
+host	path	http_code	location	content_type	ok_hint
+qdrant.46.4.123.8.nip.io	/collections	200		application/json	JSON_OK
+qdrant.46.4.123.8.nip.io	/dashboard	200		text/html; charset=utf-8	HTTP_200
+grafana.46.4.123.8.nip.io	/	302	/login	text/html; charset=utf-8	UNKNOWN_REDIRECT
+victoriametrics.46.4.123.8.nip.io	/	404		text/html	UNKNOWN
+headlamp.46.4.123.8.nip.io	/	200		text/html; charset=utf-8	HTTP_200
+litmus.46.4.123.8.nip.io	/	200		text/html	HTTP_200
+awx.46.4.123.8.nip.io	/	302	/migrations_notran/	text/html; charset=utf-8	UNKNOWN_REDIRECT
+jenkins.46.4.123.8.nip.io	/	403		text/html;charset=utf-8	UNKNOWN
+gitea.46.4.123.8.nip.io	/	200		text/html; charset=utf-8	HTTP_200
+mlflow.46.4.123.8.nip.io	/	200		text/html; charset=utf-8	HTTP_200
+qdrant.46.4.123.8.nip.io	/collections	200		application/json	JSON_OK

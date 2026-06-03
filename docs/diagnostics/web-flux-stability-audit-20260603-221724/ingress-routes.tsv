@@ -1,0 +1,41 @@
+host	path	namespace	ingress	service	port	auth_hint
+aiot-control.46.4.123.8.nip.io	/	aiot	aiot-control-center	aiot-control-center	8080	
+authentik.46.4.123.8.nip.io	/	authentik	authentik-server	authentik-server	80	
+awx.46.4.123.8.nip.io	/	awx	awx-ingress	awx-service	80	
+chaos-theater.46.4.123.8.nip.io	/	chaos-theater	aiot-chaos-theater	aiot-chaos-theater	http	AUTH
+chef.46.4.123.8.nip.io	/	chef	chef-automate	chef-automate	443	AUTH
+cloudbeaver.46.4.123.8.nip.io	/	aiot	cloudbeaver	cloudbeaver	http	AUTH
+cluster-copilot.46.4.123.8.nip.io	/	cluster-copilot	cluster-copilot	cluster-copilot	http	
+dex.46.4.123.8.nip.io	/	auth	dex	dex	5556	
+emqx.46.4.123.8.nip.io	/	aiot	aiot-emqx-dashboard	aiot-emqx	dashboard	AUTH
+emqx.46.4.123.8.nip.io	/api/v5/login	aiot	aiot-emqx-login-bypass	aiot-emqx	dashboard	
+emqx.46.4.123.8.nip.io	/outpost.goauthentik.io	aiot	aiot-emqx-dashboard-authentik-outpost	authentik-outpost-proxy	http	
+flux.46.4.123.8.nip.io	/	flux-ui	weave-gitops	weave-gitops	9001	
+gitea.46.4.123.8.nip.io	/	gitea	gitea	gitea-http	3000	
+grafana.46.4.123.8.nip.io	/	grafana	grafana	grafana	80	
+headlamp.46.4.123.8.nip.io	/	headlamp	headlamp	headlamp	80	AUTH
+jenkins.46.4.123.8.nip.io		jenkins	jenkins	jenkins	8080	
+kubeflow.46.4.123.8.nip.io	/	kubeflow	kubeflow-centraldashboard	centraldashboard	80	AUTH
+kubeflow.46.4.123.8.nip.io	/jupyter(/|$)(.*)	kubeflow	kubeflow-jupyter	jupyter-web-app-service	80	AUTH
+kubeflow.46.4.123.8.nip.io	/katib	kubeflow	kubeflow-katib	katib-ui	80	AUTH
+kubeflow.46.4.123.8.nip.io	/kfam(/|$)(.*)	kubeflow	kubeflow-kfam	profiles-kfam	8081	AUTH
+kubeflow.46.4.123.8.nip.io	/pipeline(/|$)(.*)	kubeflow	kubeflow-pipelines	ml-pipeline-ui	80	AUTH
+kubeflow.46.4.123.8.nip.io	/tensorboards(/|$)(.*)	kubeflow	kubeflow-tensorboards	tensorboards-web-app-service	80	AUTH
+kubeflow.46.4.123.8.nip.io	/volumes(/|$)(.*)	kubeflow	kubeflow-volumes	volumes-web-app-service	80	AUTH
+litmus.46.4.123.8.nip.io	/	litmus	litmus-ingress	chaos-litmus-frontend-service	9091	AUTH
+mlflow.46.4.123.8.nip.io	/	mlflow	mlflow	mlflow	5000	
+oauth2-proxy.46.4.123.8.nip.io	/	oauth2-proxy	oauth2-proxy	oauth2-proxy	4180	
+ollama.46.4.123.8.nip.io	/	local-ai	ollama	ollama	http	
+pe.46.4.123.8.nip.io	/	pe-console	pe-console	pe-console	4443	AUTH
+pgadmin.46.4.123.8.nip.io	/	databases	pgadmin-pgadmin4	pgadmin-pgadmin4	80	AUTH
+qdrant.46.4.123.8.nip.io	/	qdrant	qdrant	qdrant	6333	AUTH
+qdrant.46.4.123.8.nip.io	/outpost.goauthentik.io	qdrant	qdrant-authentik-outpost	authentik-outpost-proxy	80	AUTH
+redpanda.46.4.123.8.nip.io	/	aiot	aiot-redpanda-console	aiot-redpanda-console	http	AUTH
+redpanda.46.4.123.8.nip.io	/outpost.goauthentik.io	aiot	aiot-redpanda-console-authentik-outpost	authentik-outpost-proxy	http	
+terrakube-api.46.4.123.8.nip.io	/	terrakube	terrakube-api	terrakube-api-service	8080	
+terrakube-api.46.4.123.8.nip.io	/.well-known/jwks	terrakube	terrakube-api	terrakube-api-service	8080	
+terrakube-api.46.4.123.8.nip.io	/.well-known/openid-configuration	terrakube	terrakube-api	terrakube-api-service	8080	
+terrakube-api.46.4.123.8.nip.io	/dex	terrakube	terrakube-api	terrakube-dex	5556	
+terrakube-reg.46.4.123.8.nip.io	/	terrakube	terrakube-registry	terrakube-registry-service	8075	
+terrakube.46.4.123.8.nip.io	/	terrakube	terrakube-ui	terrakube-ui-service	8080	
+zabbix.46.4.123.8.nip.io	/	zabbix	zabbix	zabbix-zabbix-web	80	

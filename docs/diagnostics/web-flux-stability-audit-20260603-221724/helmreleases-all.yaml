@@ -1,0 +1,3152 @@
+apiVersion: v1
+items:
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:17Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 8
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: aiot-ml-platform
+    namespace: aiot-ml
+    resourceVersion: "2099588"
+    uid: c88fd5a5-2779-4ed7-934d-5f1188c4cd59
+  spec:
+    chart:
+      spec:
+        chart: ./apps/aiot-ml-platform
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: aiot-control-center
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: app
+                      resources:
+                        requests:
+                          cpu: 50m
+                        limits:
+                          cpu: 300m
+          target:
+            kind: Deployment
+            name: aiot-control-center
+            namespace: aiot
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: aiot-maintenance-api
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: app
+                      resources:
+                        requests:
+                          cpu: 50m
+                        limits:
+                          cpu: 300m
+          target:
+            kind: Deployment
+            name: aiot-maintenance-api
+            namespace: aiot
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: ollama
+              namespace: local-ai
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: ollama
+                      resources:
+                        limits:
+                          cpu: 500m
+          target:
+            group: apps
+            kind: Deployment
+            name: ollama
+            namespace: local-ai
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: mlflow
+              namespace: mlflow
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: mlflow
+                      resources:
+                        requests:
+                          cpu: 100m
+                        limits:
+                          cpu: 500m
+          target:
+            kind: Deployment
+            name: mlflow
+            namespace: mlflow
+            version: v1
+    releaseName: aiot-ml-platform
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:06:53Z"
+      message: Helm upgrade succeeded for release aiot-ml/aiot-ml-platform.v33 with
+        chart aiot-ml-platform@1.0.0+fc9e6eb63f15
+      observedGeneration: 8
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:06:53Z"
+      message: Helm upgrade succeeded for release aiot-ml/aiot-ml-platform.v33 with
+        chart aiot-ml-platform@1.0.0+fc9e6eb63f15
+      observedGeneration: 8
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/aiot-ml-aiot-ml-platform
+    history:
+    - appVersion: 0.1.0
+      chartName: aiot-ml-platform
+      chartVersion: 1.0.0+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:98e1db697b3070504773fba6b3aa4e37a38eb5a821a8dd3c2f8c8e39a72e6337
+      firstDeployed: "2026-05-29T12:55:20Z"
+      lastDeployed: "2026-06-03T20:06:33Z"
+      name: aiot-ml-platform
+      namespace: aiot-ml
+      status: deployed
+      version: 33
+    - appVersion: 0.1.0
+      chartName: aiot-ml-platform
+      chartVersion: 1.0.0+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:f6fdc38f7189bbf635acd680fa929945dc527eb8fed59b96ab6c49d6adeca996
+      firstDeployed: "2026-05-29T12:55:20Z"
+      lastDeployed: "2026-06-03T19:59:59Z"
+      name: aiot-ml-platform
+      namespace: aiot-ml
+      status: superseded
+      version: 32
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 8
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0+fc9e6eb63f15
+    observedGeneration: 8
+    observedPostRenderersDigest: sha256:06f31234b3ab21c9124e8c5ebffc43435c6bbf22a021296bf1415a4896f264d2
+    storageNamespace: aiot-ml
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-06-03T10:25:34.684900367+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.044222158+02:00"
+    creationTimestamp: "2026-05-29T12:55:17Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 7
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: aiot-pipeline
+    namespace: aiot
+    resourceVersion: "2099012"
+    uid: b9f88c15-bb7b-4ec0-b367-89b4991fed8b
+  spec:
+    chart:
+      spec:
+        chart: ./apps/aiot-pipeline
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |
+            apiVersion: apps/v1
+            kind: StatefulSet
+            metadata:
+              name: aiot-emqx
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                  - name: emqx
+                    resources:
+                      requests:
+                        cpu: 250m
+                      limits:
+                        cpu: 700m
+          target:
+            kind: StatefulSet
+            name: aiot-emqx
+            namespace: aiot
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: StatefulSet
+            metadata:
+              name: aiot-redpanda
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                  - name: redpanda
+                    resources:
+                      requests:
+                        cpu: 250m
+                      limits:
+                        cpu: 700m
+          target:
+            kind: StatefulSet
+            name: aiot-redpanda
+            namespace: aiot
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: StatefulSet
+            metadata:
+              name: aiot-sensor-simulator
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: app
+                      resources:
+                        requests:
+                          cpu: 20m
+                        limits:
+                          cpu: 100m
+          target:
+            kind: StatefulSet
+            name: aiot-sensor-simulator
+            namespace: aiot
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: aiot-pg-sink
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: app
+                      resources:
+                        requests:
+                          cpu: 50m
+                        limits:
+                          cpu: 200m
+          target:
+            kind: Deployment
+            name: aiot-pg-sink
+            namespace: aiot
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: aiot-mqtt-to-redis
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: app
+                      resources:
+                        requests:
+                          cpu: 50m
+                        limits:
+                          cpu: 200m
+          target:
+            kind: Deployment
+            name: aiot-mqtt-to-redis
+            namespace: aiot
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: aiot-redis-to-redpanda
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: app
+                      resources:
+                        requests:
+                          cpu: 50m
+                        limits:
+                          cpu: 200m
+          target:
+            kind: Deployment
+            name: aiot-redis-to-redpanda
+            namespace: aiot
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: aiot-redis
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: redis
+                      resources:
+                        requests:
+                          cpu: 100m
+                        limits:
+                          cpu: 500m
+          target:
+            kind: Deployment
+            name: aiot-redis
+            namespace: aiot
+            version: v1
+    releaseName: aiot-pipeline
+    suspend: false
+    timeout: 45m
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:45:50Z"
+      message: Helm upgrade succeeded for release aiot/aiot-pipeline.v9 with chart
+        aiot-pipeline@1.0.5
+      observedGeneration: 7
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T13:45:50Z"
+      message: Helm upgrade succeeded for release aiot/aiot-pipeline.v9 with chart
+        aiot-pipeline@1.0.5
+      observedGeneration: 7
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/aiot-aiot-pipeline
+    history:
+    - appVersion: 1.0.0
+      chartName: aiot-pipeline
+      chartVersion: 1.0.5
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:5ea0815033ba9ad7fb5d984686e7c255441f8cbb7d20d7adf01f06ea46936984
+      firstDeployed: "2026-05-29T12:55:21Z"
+      lastDeployed: "2026-06-03T13:44:46Z"
+      name: aiot-pipeline
+      namespace: aiot
+      status: deployed
+      version: 9
+    - appVersion: 1.0.0
+      chartName: aiot-pipeline
+      chartVersion: 1.0.5
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:e64d2c61ee89445b8dc022c1b491332a65d1fc850bfbbb3ee39ab3700f15ebd9
+      firstDeployed: "2026-05-29T12:55:21Z"
+      lastDeployed: "2026-06-03T08:25:46Z"
+      name: aiot-pipeline
+      namespace: aiot
+      status: superseded
+      version: 8
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 7
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.5
+    lastHandledReconcileAt: "2026-06-03T10:25:34.684900367+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.044222158+02:00"
+    observedGeneration: 7
+    observedPostRenderersDigest: sha256:73aeb16cfee4cc0caa6456a04bb44ca946702c4c42874f421af87499dfe882d1
+    storageNamespace: aiot
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 6
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: cloudbeaver
+    namespace: aiot
+    resourceVersion: "2099625"
+    uid: fea7197e-0b3a-4a84-b83a-7d00fae0a768
+  spec:
+    chart:
+      spec:
+        chart: ./apps/cloudbeaver
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: cloudbeaver
+              namespace: aiot
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: cloudbeaver
+                      resources:
+                        requests:
+                          cpu: 50m
+                        limits:
+                          cpu: 300m
+          target:
+            kind: Deployment
+            name: cloudbeaver
+            namespace: aiot
+            version: v1
+    releaseName: cloudbeaver
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:06:57Z"
+      message: Helm upgrade succeeded for release aiot/cloudbeaver.v31 with chart
+        cloudbeaver-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 6
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:06:57Z"
+      message: Helm upgrade succeeded for release aiot/cloudbeaver.v31 with chart
+        cloudbeaver-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 6
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/aiot-cloudbeaver
+    history:
+    - appVersion: 24.3.1
+      chartName: cloudbeaver-overlay
+      chartVersion: 1.0.0+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:54c8676525c684cf17e50af670a1b36bf32bad9386819be999a4d10dafac31fa
+      firstDeployed: "2026-05-29T12:56:14Z"
+      lastDeployed: "2026-06-03T20:06:55Z"
+      name: cloudbeaver
+      namespace: aiot
+      status: deployed
+      version: 31
+    - appVersion: 24.3.1
+      chartName: cloudbeaver-overlay
+      chartVersion: 1.0.0+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:b8ae39b5202411f2f72917bcbbe9c837874c8297c7e3f3d99310e371e9f67200
+      firstDeployed: "2026-05-29T12:56:14Z"
+      lastDeployed: "2026-06-03T20:00:06Z"
+      name: cloudbeaver
+      namespace: aiot
+      status: superseded
+      version: 30
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 6
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0+fc9e6eb63f15
+    observedGeneration: 6
+    observedPostRenderersDigest: sha256:da8d76e66a1e69874a5be48dc98f94762150263fbc92e4291ec66187ed03d4f7
+    storageNamespace: aiot
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: dex
+    namespace: auth
+    resourceVersion: "2095527"
+    uid: 0413518e-6222-4f67-90c5-f793a79a1151
+  spec:
+    chart:
+      spec:
+        chart: ./apps/dex
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: dex
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:33:13Z"
+      message: Helm install succeeded for release auth/dex.v1 with chart dex-overlay@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T14:33:44Z"
+      message: Helm install succeeded for release auth/dex.v1 with chart dex-overlay@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/auth-dex
+    history:
+    - appVersion: 2.41.1
+      chartName: dex-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:1fc937f16fa89f556bdb8f29bdf930a0d64059e8f3577c203cfa22dc68106d85
+      firstDeployed: "2026-05-29T14:33:31Z"
+      lastDeployed: "2026-05-29T14:33:31Z"
+      name: dex
+      namespace: auth
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: auth
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: awx
+    namespace: awx
+    resourceVersion: "2097832"
+    uid: f5c1cff2-40a8-4a12-8418-6db43284ec43
+  spec:
+    chart:
+      spec:
+        chart: ./apps/awx
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: awx
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:33:00Z"
+      message: Helm install succeeded for release awx/awx.v1 with chart awx@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T14:55:07Z"
+      message: Helm install succeeded for release awx/awx.v1 with chart awx@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/awx-awx
+    history:
+    - appVersion: 24.6.1
+      chartName: awx
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:e1513538bffa941207724e9b28527dfe90d0a29ef41a3a23166da246253b9fed
+      firstDeployed: "2026-05-29T14:55:07Z"
+      lastDeployed: "2026-05-29T14:55:07Z"
+      name: awx
+      namespace: awx
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: awx
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: awx-operator
+    namespace: awx
+    resourceVersion: "2095581"
+    uid: 5f34ebc4-922c-4fb6-b3f2-84314a8234e9
+  spec:
+    chart:
+      spec:
+        chart: ./apps/awx-operator
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: awx-operator
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:46Z"
+      message: Helm install succeeded for release awx/awx-operator.v1 with chart awx-operator-overlay@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T14:34:05Z"
+      message: Helm install succeeded for release awx/awx-operator.v1 with chart awx-operator-overlay@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/awx-awx-operator
+    history:
+    - appVersion: 2.19.1
+      chartName: awx-operator-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:bbd6c5ed29af56f04c347c18be4f2f61223be4d3bfecd5599e1c97367481d2b6
+      firstDeployed: "2026-05-29T14:33:33Z"
+      lastDeployed: "2026-05-29T14:33:33Z"
+      name: awx-operator
+      namespace: awx
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: awx
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: blackbox-exporter
+    namespace: blackbox-exporter
+    resourceVersion: "2099864"
+    uid: 9fc68f8f-b582-45d8-adea-8659eb84467e
+  spec:
+    chart:
+      spec:
+        chart: ./apps/blackbox-exporter
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: blackbox-exporter
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:07:24Z"
+      message: Helm upgrade succeeded for release blackbox-exporter/blackbox-exporter.v30
+        with chart blackbox-exporter-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 3
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:07:24Z"
+      message: Helm upgrade succeeded for release blackbox-exporter/blackbox-exporter.v30
+        with chart blackbox-exporter-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 3
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/blackbox-exporter-blackbox-exporter
+    history:
+    - appVersion: 0.25.0
+      chartName: blackbox-exporter-overlay
+      chartVersion: 1.0.0+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:dc819115b0b884cd03668e692ffcc65ee15e454bd885420fda6d52cf16819067
+      firstDeployed: "2026-05-29T14:01:36Z"
+      lastDeployed: "2026-06-03T20:07:04Z"
+      name: blackbox-exporter
+      namespace: blackbox-exporter
+      status: deployed
+      version: 30
+    - appVersion: 0.25.0
+      chartName: blackbox-exporter-overlay
+      chartVersion: 1.0.0+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:9e566e08b346c7db57c981788f20904fe1efbdc757f7cea3343c958e4c6f54eb
+      firstDeployed: "2026-05-29T14:01:36Z"
+      lastDeployed: "2026-06-03T20:00:24Z"
+      name: blackbox-exporter
+      namespace: blackbox-exporter
+      status: superseded
+      version: 29
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0+fc9e6eb63f15
+    observedGeneration: 3
+    storageNamespace: blackbox-exporter
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: cert-manager
+    namespace: cert-manager
+    resourceVersion: "2096731"
+    uid: f8024537-d059-494f-b0a9-ad9e834032c8
+  spec:
+    chart:
+      spec:
+        chart: ./apps/cert-manager
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: cert-manager
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:04Z"
+      message: Helm install succeeded for release cert-manager/cert-manager.v1 with
+        chart cert-manager-overlay@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T14:34:31Z"
+      message: Helm install succeeded for release cert-manager/cert-manager.v1 with
+        chart cert-manager-overlay@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/cert-manager-cert-manager
+    history:
+    - appVersion: v1.16.2
+      chartName: cert-manager-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:f024b59774f4fa1d36a71075580189dfa9d8c51b55e65d21c0c1e87459871947
+      firstDeployed: "2026-05-29T14:33:59Z"
+      lastDeployed: "2026-05-29T14:33:59Z"
+      name: cert-manager
+      namespace: cert-manager
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: cert-manager
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:17Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 5
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: aiot-chaos-theater
+    namespace: chaos-theater
+    resourceVersion: "2099548"
+    uid: 9f817621-4145-454d-9f5d-d8c508ec7853
+  spec:
+    chart:
+      spec:
+        chart: ./apps/aiot-chaos-theater
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+      remediation:
+        retries: 3
+    interval: 30m
+    releaseName: aiot-chaos-theater
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+      remediation:
+        retries: 3
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:06:51Z"
+      message: Helm upgrade succeeded for release chaos-theater/aiot-chaos-theater.v31
+        with chart aiot-chaos-theater@0.1.0+fc9e6eb63f15
+      observedGeneration: 5
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:06:51Z"
+      message: Helm upgrade succeeded for release chaos-theater/aiot-chaos-theater.v31
+        with chart aiot-chaos-theater@0.1.0+fc9e6eb63f15
+      observedGeneration: 5
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/chaos-theater-aiot-chaos-theater
+    history:
+    - appVersion: 0.1.0
+      chartName: aiot-chaos-theater
+      chartVersion: 0.1.0+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:9f7fc96d3eb5efeefd684cd1f15b6a3ecaef65ca2d40e6bfc2663f74553aa9ec
+      firstDeployed: "2026-05-29T13:13:45Z"
+      lastDeployed: "2026-06-03T20:06:23Z"
+      name: aiot-chaos-theater
+      namespace: chaos-theater
+      status: deployed
+      version: 31
+    - appVersion: 0.1.0
+      chartName: aiot-chaos-theater
+      chartVersion: 0.1.0+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:a3fe6ae06aabb34ef5a5994379aeb13c514494b3f5591e22c34659a2ff6e0557
+      firstDeployed: "2026-05-29T13:13:45Z"
+      lastDeployed: "2026-06-03T20:00:50Z"
+      name: aiot-chaos-theater
+      namespace: chaos-theater
+      status: superseded
+      version: 30
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 5
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 0.1.0+fc9e6eb63f15
+    observedGeneration: 5
+    storageNamespace: chaos-theater
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:21:31.921777509+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:31.921777509+02:00"
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: cluster-copilot
+    namespace: cluster-copilot
+    resourceVersion: "2098437"
+    uid: 365fae73-7863-4885-9c08-bb14c8d2da87
+  spec:
+    chart:
+      spec:
+        chart: ./apps/cluster-copilot
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: cluster-copilot
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:46Z"
+      message: Helm upgrade succeeded for release cluster-copilot/cluster-copilot.v2
+        with chart cluster-copilot-overlay@1.0.0
+      observedGeneration: 3
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T17:21:36Z"
+      message: Helm upgrade succeeded for release cluster-copilot/cluster-copilot.v2
+        with chart cluster-copilot-overlay@1.0.0
+      observedGeneration: 1
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/cluster-copilot-cluster-copilot
+    history:
+    - appVersion: 1.0.0
+      chartName: cluster-copilot-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:4da9b3ae9f12d50d0ac3cf69a8b9d3d93c4bac2b3895a807b7556e3f5292a3c2
+      firstDeployed: "2026-05-29T14:45:31Z"
+      lastDeployed: "2026-05-29T17:21:32Z"
+      name: cluster-copilot
+      namespace: cluster-copilot
+      status: deployed
+      version: 2
+    - appVersion: 1.0.0
+      chartName: cluster-copilot-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:8923cb775eda54ff03e69b60306a5144ce9e63af709bbf8117aa4d89522bb557
+      firstDeployed: "2026-05-29T14:45:31Z"
+      lastDeployed: "2026-05-29T14:45:31Z"
+      name: cluster-copilot
+      namespace: cluster-copilot
+      status: superseded
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0
+    lastHandledReconcileAt: "2026-05-29T19:21:31.921777509+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:31.921777509+02:00"
+    observedGeneration: 3
+    storageNamespace: cluster-copilot
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: cnpg
+    namespace: cnpg-system
+    resourceVersion: "2096808"
+    uid: 1d1e89b7-96a2-48f3-9c68-f8b72f03e678
+  spec:
+    chart:
+      spec:
+        chart: ./apps/cnpg
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: cnpg
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:23Z"
+      message: Helm install succeeded for release cnpg-system/cnpg.v1 with chart cnpg-overlay@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T14:34:44Z"
+      message: Helm install succeeded for release cnpg-system/cnpg.v1 with chart cnpg-overlay@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/cnpg-system-cnpg
+    history:
+    - appVersion: 0.23.0
+      chartName: cnpg-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:9c38a8a79ce518ab38e9c6930b7adee76154b1eb718c5e8eb687382acf9e929a
+      firstDeployed: "2026-05-29T14:34:21Z"
+      lastDeployed: "2026-05-29T14:34:21Z"
+      name: cnpg
+      namespace: cnpg-system
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: cnpg-system
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: pgadmin
+    namespace: databases
+    resourceVersion: "2096933"
+    uid: 081fce7c-a056-4fe5-83ff-9f5a551d08ff
+  spec:
+    chart:
+      spec:
+        chart: ./apps/pgadmin
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: pgadmin
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:25Z"
+      message: Helm install succeeded for release databases/pgadmin.v1 with chart
+        pgadmin-overlay@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T14:52:28Z"
+      message: Helm install succeeded for release databases/pgadmin.v1 with chart
+        pgadmin-overlay@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/databases-pgadmin
+    history:
+    - appVersion: "8.13"
+      chartName: pgadmin-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:6a04b61d06b48a359a428648c8f64b225d58e32be002291021fd797712fb82b3
+      firstDeployed: "2026-05-29T14:51:11Z"
+      lastDeployed: "2026-05-29T14:51:11Z"
+      name: pgadmin
+      namespace: databases
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: databases
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: descheduler
+    namespace: descheduler
+    resourceVersion: "2095994"
+    uid: 17950fb1-39f4-42cc-90f9-45837552be9f
+  spec:
+    chart:
+      spec:
+        chart: ./apps/descheduler
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: descheduler
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:33:01Z"
+      message: Helm install succeeded for release descheduler/descheduler.v1 with
+        chart descheduler-overlay@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T14:45:35Z"
+      message: Helm install succeeded for release descheduler/descheduler.v1 with
+        chart descheduler-overlay@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/descheduler-descheduler
+    history:
+    - appVersion: 0.31.0
+      chartName: descheduler-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:b917d842e6c8a82719d3121b026d9b9379249339bf216c068e4cadfa0f5b69e9
+      firstDeployed: "2026-05-29T14:45:35Z"
+      lastDeployed: "2026-05-29T14:45:35Z"
+      name: descheduler
+      namespace: descheduler
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: descheduler
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:21:31.959283175+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:31.959283175+02:00"
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: event-exporter
+    namespace: event-exporter
+    resourceVersion: "2098370"
+    uid: 6c47cb47-362d-422b-9fc7-5ec2039fd378
+  spec:
+    chart:
+      spec:
+        chart: ./apps/event-exporter
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: event-exporter
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:33:02Z"
+      message: Helm upgrade succeeded for release event-exporter/event-exporter.v2
+        with chart event-exporter-overlay@1.0.0
+      observedGeneration: 3
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T17:21:35Z"
+      message: Helm upgrade succeeded for release event-exporter/event-exporter.v2
+        with chart event-exporter-overlay@1.0.0
+      observedGeneration: 1
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/event-exporter-event-exporter
+    history:
+    - appVersion: 3.2.13
+      chartName: event-exporter-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:8524ca5b66089fad148ad8c313a11b791dbb0e503b122e16f42efad2ad34f66c
+      firstDeployed: "2026-05-29T14:33:32Z"
+      lastDeployed: "2026-05-29T17:21:32Z"
+      name: event-exporter
+      namespace: event-exporter
+      status: deployed
+      version: 2
+    - appVersion: 3.2.13
+      chartName: event-exporter-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:eecfe649b65f0e733cf1ec26e5971a13dd9f1fbedd91eda73a3c7bda49317a15
+      firstDeployed: "2026-05-29T14:33:32Z"
+      lastDeployed: "2026-05-29T14:33:32Z"
+      name: event-exporter
+      namespace: event-exporter
+      status: superseded
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0
+    lastHandledReconcileAt: "2026-05-29T19:21:31.959283175+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:31.959283175+02:00"
+    observedGeneration: 3
+    storageNamespace: event-exporter
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/resetAt: "2026-06-02T17:45:26.604939259+02:00"
+    creationTimestamp: "2026-05-29T12:55:19Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 11
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: weave-gitops
+    namespace: flux-ui
+    resourceVersion: "2098634"
+    uid: 983740a6-557a-422d-9d1b-7983f2fe548e
+  spec:
+    chart:
+      spec:
+        chart: weave-gitops
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: HelmRepository
+          name: weave-gitops
+          namespace: flux-system
+        version: 4.0.36
+    install:
+      createNamespace: true
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |
+            - op: add
+              path: /spec/template/spec/initContainers
+              value:
+                - name: wait-authentik
+                  image: curlimages/curl:8.5.0
+                  command:
+                    - sh
+                    - -c
+                    - |
+                      until curl -sk -f -o /dev/null http://authentik-server.authentik.svc.cluster.local/-/health/ready/; do
+                        echo "[init] waiting for authentik..."; sleep 5;
+                      done
+                      until curl -sk -f -o /dev/null https://authentik.46.4.123.8.nip.io/application/o/weave-gitops/.well-known/openid-configuration; do
+                        echo "[init] waiting for authentik OIDC provider..."; sleep 5;
+                      done
+          target:
+            kind: Deployment
+            name: weave-gitops
+    releaseName: weave-gitops
+    values:
+      additionalArgs:
+      - --auth-methods=oidc
+      adminUser:
+        create: false
+      ingress:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        className: nginx
+        enabled: true
+        hosts:
+        - host: flux.46.4.123.8.nip.io
+          paths:
+          - path: /
+            pathType: Prefix
+        tls:
+        - hosts:
+          - flux.46.4.123.8.nip.io
+          secretName: weave-gitops-tls
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:31:32Z"
+      message: Helm upgrade succeeded for release flux-ui/weave-gitops.v10 with chart
+        weave-gitops@4.0.36
+      observedGeneration: 11
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-02T15:53:49Z"
+      message: Helm upgrade succeeded for release flux-ui/weave-gitops.v10 with chart
+        weave-gitops@4.0.36
+      observedGeneration: 11
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    failures: 1
+    helmChart: flux-system/flux-ui-weave-gitops
+    history:
+    - appVersion: v0.38.0
+      chartName: weave-gitops
+      chartVersion: 4.0.36
+      configDigest: sha256:b0f1370544e05372c819f5c56aa62dff4afb79d89968399a6e87944a55819f27
+      digest: sha256:5d352e1b7c2e044fe68fa2069e28be4c8922a27501d439e9bca19fdb7ce3a3ac
+      firstDeployed: "2026-05-29T13:12:49Z"
+      lastDeployed: "2026-06-02T15:53:48Z"
+      name: weave-gitops
+      namespace: flux-ui
+      status: deployed
+      version: 10
+    - appVersion: v0.38.0
+      chartName: weave-gitops
+      chartVersion: 4.0.36
+      configDigest: sha256:b0f1370544e05372c819f5c56aa62dff4afb79d89968399a6e87944a55819f27
+      digest: sha256:a2d4b74cc3bd0847a2ee16e17e98dc54607f5bd664b661bff5405a531cf00547
+      firstDeployed: "2026-05-29T13:12:49Z"
+      lastDeployed: "2026-06-02T15:45:26Z"
+      name: weave-gitops
+      namespace: flux-ui
+      status: superseded
+      version: 9
+    lastAttemptedConfigDigest: sha256:b0f1370544e05372c819f5c56aa62dff4afb79d89968399a6e87944a55819f27
+    lastAttemptedGeneration: 11
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 4.0.36
+    lastHandledForceAt: "2026-06-02T15:53:48Z"
+    lastHandledReconcileAt: "2026-06-02T15:53:48Z"
+    lastHandledResetAt: "2026-06-02T17:45:26.604939259+02:00"
+    observedGeneration: 11
+    observedPostRenderersDigest: sha256:517e125563348017fb4d5a67a451189b41358ef799bc724e17432085b0c5a81e
+    storageNamespace: flux-ui
+    upgradeFailures: 1
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:31:44.191280953+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.123027782+02:00"
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: gitea
+    namespace: gitea
+    resourceVersion: "2097671"
+    uid: 40f7274a-e718-4eff-84cf-136d3779cd9f
+  spec:
+    chart:
+      spec:
+        chart: ./apps/gitea
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: gitea
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:26Z"
+      message: Helm upgrade succeeded for release gitea/gitea.v2 with chart gitea-overlay@1.0.0
+      observedGeneration: 3
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T17:33:15Z"
+      message: Helm upgrade succeeded for release gitea/gitea.v2 with chart gitea-overlay@1.0.0
+      observedGeneration: 1
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/gitea-gitea
+    history:
+    - appVersion: 10.6.0
+      chartName: gitea-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:d456e2637a72050b856cd92da79d181c8bad718dec17364974769db10cf488ae
+      firstDeployed: "2026-05-29T14:40:02Z"
+      lastDeployed: "2026-05-29T17:30:55Z"
+      name: gitea
+      namespace: gitea
+      status: deployed
+      version: 2
+    - appVersion: 10.6.0
+      chartName: gitea-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:8ed9ab85493923e1a36a94996904a762cac3d5d353d9bd329201219b9a8dfeb4
+      firstDeployed: "2026-05-29T14:40:02Z"
+      lastDeployed: "2026-05-29T14:40:02Z"
+      name: gitea
+      namespace: gitea
+      status: superseded
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0
+    lastHandledReconcileAt: "2026-05-29T19:31:44.191280953+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.123027782+02:00"
+    observedGeneration: 3
+    storageNamespace: gitea
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:33:18.995442292+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.051768084+02:00"
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 6
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: grafana
+    namespace: grafana
+    resourceVersion: "2096460"
+    uid: 8ff2771a-0bf5-4cb9-8451-9c1b63ddc242
+  spec:
+    chart:
+      spec:
+        chart: ./apps/grafana
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: grafana
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:33:05Z"
+      message: Helm upgrade succeeded for release grafana/grafana.v3 with chart grafana-overlay@1.0.3
+      observedGeneration: 6
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T17:36:04Z"
+      message: Helm upgrade succeeded for release grafana/grafana.v3 with chart grafana-overlay@1.0.3
+      observedGeneration: 3
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/grafana-grafana
+    history:
+    - appVersion: 11.4.0
+      chartName: grafana-overlay
+      chartVersion: 1.0.3
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:41db1dd1a3f475a11fa4f7ff9f36564e7e78c250210a5d9c69cde6f5b02c1560
+      firstDeployed: "2026-05-29T14:34:47Z"
+      lastDeployed: "2026-05-29T17:36:01Z"
+      name: grafana
+      namespace: grafana
+      status: deployed
+      version: 3
+    - appVersion: 11.4.0
+      chartName: grafana-overlay
+      chartVersion: 1.0.3
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:6ae6480afd0abd8b7966324762e0dc4e4909084ea7843c771310b807ea2a84c9
+      firstDeployed: "2026-05-29T14:34:47Z"
+      lastDeployed: "2026-05-29T17:23:54Z"
+      name: grafana
+      namespace: grafana
+      status: superseded
+      version: 2
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 6
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.3
+    lastHandledReconcileAt: "2026-05-29T19:33:18.995442292+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.051768084+02:00"
+    observedGeneration: 6
+    storageNamespace: grafana
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/forceAt: "2026-05-31T02:26:31.737837847+02:00"
+    creationTimestamp: "2026-05-30T09:30:45Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 2
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: headlamp
+    namespace: headlamp
+    resourceVersion: "2096575"
+    uid: 9107698c-bde1-472d-8d14-ba22bf27194d
+  spec:
+    chart:
+      spec:
+        chart: ./apps/headlamp
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: headlamp
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:37Z"
+      message: Helm upgrade succeeded for release headlamp/headlamp.v5 with chart
+        headlamp-overlay@1.1.0
+      observedGeneration: 2
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-31T00:29:16Z"
+      message: Helm upgrade succeeded for release headlamp/headlamp.v5 with chart
+        headlamp-overlay@1.1.0
+      observedGeneration: 2
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/headlamp-headlamp
+    history:
+    - appVersion: 0.41.0
+      chartName: headlamp-overlay
+      chartVersion: 1.1.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:da5b6a27bbc5a4366a1b952a8dbb85b7006e19acfb59484b6d82d1320af806dc
+      firstDeployed: "2026-05-30T09:30:46Z"
+      lastDeployed: "2026-05-31T00:29:15Z"
+      name: headlamp
+      namespace: headlamp
+      status: deployed
+      version: 5
+    - appVersion: 0.41.0
+      chartName: headlamp-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:ddcafdf556490090c533dc6504024cf91a3edd2b5fdfcaed30714ac1f104e419
+      firstDeployed: "2026-05-30T09:30:46Z"
+      lastDeployed: "2026-05-31T00:26:31Z"
+      name: headlamp
+      namespace: headlamp
+      status: superseded
+      version: 4
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 2
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.1.0
+    lastHandledForceAt: "2026-05-31T02:26:31.737837847+02:00"
+    lastHandledReconcileAt: "1780187365"
+    observedGeneration: 2
+    storageNamespace: headlamp
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T20:01:27.276076492+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.073705424+02:00"
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: ingress-nginx
+    namespace: ingress-nginx
+    resourceVersion: "2098877"
+    uid: db96e783-c68d-4205-8bdd-15ba929dba9a
+  spec:
+    chart:
+      spec:
+        chart: ./apps/ingress-nginx
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: ingress-nginx
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:33:04Z"
+      message: Helm upgrade succeeded for release ingress-nginx/ingress-nginx.v2 with
+        chart ingress-nginx-overlay@1.0.0
+      observedGeneration: 3
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T17:26:38Z"
+      message: Helm upgrade succeeded for release ingress-nginx/ingress-nginx.v2 with
+        chart ingress-nginx-overlay@1.0.0
+      observedGeneration: 1
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/ingress-nginx-ingress-nginx
+    history:
+    - appVersion: 4.11.3
+      chartName: ingress-nginx-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:7cd7ec07a98982512fc5ea336b441567a757cffc7c7a1f2258849425e65c8c3f
+      firstDeployed: "2026-05-29T14:40:15Z"
+      lastDeployed: "2026-05-29T17:26:38Z"
+      name: ingress-nginx
+      namespace: ingress-nginx
+      status: deployed
+      version: 2
+    - appVersion: 4.11.3
+      chartName: ingress-nginx-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:f819101d17d12510ab027b8ee0cabdab3080f5226acbf913c70ce335712aa9f7
+      firstDeployed: "2026-05-29T14:40:15Z"
+      lastDeployed: "2026-05-29T14:40:15Z"
+      name: ingress-nginx
+      namespace: ingress-nginx
+      status: superseded
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0
+    lastHandledReconcileAt: "2026-05-29T20:01:27.276076492+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.073705424+02:00"
+    observedGeneration: 3
+    storageNamespace: ingress-nginx
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:21:32.027643503+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.027643503+02:00"
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 6
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: jenkins
+    namespace: jenkins
+    resourceVersion: "2099391"
+    uid: e70b2d37-e8f7-41aa-95e1-fb75204beefc
+  spec:
+    chart:
+      spec:
+        chart: ./apps/jenkins
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |-
+            - op: replace
+              path: /data/apply_config.sh
+              value: |
+                set -e
+                echo "disable Setup Wizard"
+                # Prevent Setup Wizard when JCasC is enabled
+                echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.UpgradeWizard.state
+                echo $JENKINS_VERSION > /var/jenkins_home/jenkins.install.InstallUtil.lastExecVersion
+                echo "remove all plugins from shared volume"
+                # remove all plugins from shared volume
+                rm -rf /var/jenkins_home/plugins/*
+                echo "download plugins"
+                # Install missing plugins
+                cp /var/jenkins_config/plugins.txt /var/jenkins_home;
+                rm -rf /usr/share/jenkins/ref/plugins/*.lock
+                version () { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+                if [ -f "/usr/share/jenkins/jenkins.war" ] && [ -n "$(command -v jenkins-plugin-cli)" 2>/dev/null ] && [ $(version $(jenkins-plugin-cli --version)) -ge $(version "2.1.1") ]; then
+                  jenkins-plugin-cli --verbose --war "/usr/share/jenkins/jenkins.war" --plugin-file "/var/jenkins_home/plugins.txt" --latest true;
+                else
+                  /usr/local/bin/install-plugins.sh `echo $(cat /var/jenkins_home/plugins.txt)`;
+                fi
+                echo "copy plugins to shared volume"
+                # Copy plugins to shared volume
+                rm -rf /var/jenkins_plugins/*
+                cp -f /usr/share/jenkins/ref/plugins/* /var/jenkins_plugins/;
+                echo "finished initialization"
+          target:
+            kind: ConfigMap
+            name: jenkins
+        - patch: |
+            apiVersion: apps/v1
+            kind: StatefulSet
+            metadata:
+              name: jenkins
+              namespace: jenkins
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: jenkins
+                      resources:
+                        requests:
+                          cpu: 100m
+                        limits:
+                          cpu: 500m
+          target:
+            kind: StatefulSet
+            name: jenkins
+            namespace: jenkins
+            version: v1
+    releaseName: jenkins
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:06:39Z"
+      message: Helm upgrade succeeded for release jenkins/jenkins.v33 with chart jenkins-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 6
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:06:39Z"
+      message: Helm upgrade succeeded for release jenkins/jenkins.v33 with chart jenkins-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 6
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/jenkins-jenkins
+    history:
+    - appVersion: 5.9.18
+      chartName: jenkins-overlay
+      chartVersion: 1.0.0+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:5d8eb93a8de5f54e72f8e844d8c070c9ff07e673bb7e998855cc8fdbf08db8b4
+      firstDeployed: "2026-05-29T12:56:39Z"
+      lastDeployed: "2026-06-03T20:06:29Z"
+      name: jenkins
+      namespace: jenkins
+      status: deployed
+      version: 33
+    - appVersion: 5.9.18
+      chartName: jenkins-overlay
+      chartVersion: 1.0.0+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:7894b85cb9e3e2af7c44ae5e5e4589abf4589137208f6145ca236517bfb9646e
+      firstDeployed: "2026-05-29T12:56:39Z"
+      lastDeployed: "2026-06-03T20:00:56Z"
+      name: jenkins
+      namespace: jenkins
+      status: superseded
+      version: 32
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 6
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0+fc9e6eb63f15
+    lastHandledReconcileAt: "2026-05-29T19:21:32.027643503+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.027643503+02:00"
+    observedGeneration: 6
+    observedPostRenderersDigest: sha256:b160602a11b41a9ba7abb53148a4ec6568eb13348bb141a32a86073508bdbfa1
+    storageNamespace: jenkins
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: k8up
+    namespace: k8up-system
+    resourceVersion: "2097705"
+    uid: 191e4625-16c3-4273-96f2-6cac069e7eff
+  spec:
+    chart:
+      spec:
+        chart: ./apps/k8up
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: k8up
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:33:14Z"
+      message: Helm install succeeded for release k8up-system/k8up.v1 with chart k8up-overlay@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T14:44:21Z"
+      message: Helm install succeeded for release k8up-system/k8up.v1 with chart k8up-overlay@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/k8up-system-k8up
+    history:
+    - appVersion: 4.9.0
+      chartName: k8up-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:626e651325b0d36d2233e7a0270756f5b30453e75bea98500664b459078ea0a4
+      firstDeployed: "2026-05-29T14:44:06Z"
+      lastDeployed: "2026-05-29T14:44:06Z"
+      name: k8up
+      namespace: k8up-system
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: k8up-system
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:19Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: sealed-secrets
+    namespace: kube-system
+    resourceVersion: "2097925"
+    uid: 995bd8f1-cb50-4bb3-9e19-0f42f910008c
+  spec:
+    chart:
+      spec:
+        chart: ./apps/sealed-secrets
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: sealed-secrets
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:33:06Z"
+      message: Helm install succeeded for release kube-system/sealed-secrets.v1 with
+        chart sealed-secrets-overlay@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T13:12:34Z"
+      message: Helm install succeeded for release kube-system/sealed-secrets.v1 with
+        chart sealed-secrets-overlay@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/kube-system-sealed-secrets
+    history:
+    - appVersion: 2.16.2
+      chartName: sealed-secrets-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:0bcfef15cd857f3a6c0964e15c9615748e6a170ca9ac75b03cd283a04e0a0732
+      firstDeployed: "2026-05-29T13:12:27Z"
+      lastDeployed: "2026-05-29T13:12:27Z"
+      name: sealed-secrets
+      namespace: kube-system
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: kube-system
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/forceAt: "2026-05-29T16:09:53.18965004+02:00"
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:21:31.998229955+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:31.998229955+02:00"
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 5
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: chaos
+    namespace: litmus
+    resourceVersion: "2096548"
+    uid: 2cda4c82-b990-4ced-8649-0be8211607de
+  spec:
+    chart:
+      spec:
+        chart: litmus
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: HelmRepository
+          name: litmuschaos
+          namespace: flux-system
+        version: 3.28.0
+    install:
+      createNamespace: true
+      remediation:
+        retries: 3
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: chaos-litmus-auth-server
+              namespace: litmus
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: auth-server
+                      resources:
+                        limits:
+                          cpu: 500m
+          target:
+            group: apps
+            kind: Deployment
+            name: chaos-litmus-auth-server
+            namespace: litmus
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: chaos-litmus-server
+              namespace: litmus
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: graphql-server
+                      resources:
+                        limits:
+                          cpu: 500m
+          target:
+            group: apps
+            kind: Deployment
+            name: chaos-litmus-server
+            namespace: litmus
+            version: v1
+    releaseName: chaos
+    timeout: 20m
+    upgrade:
+      remediation:
+        retries: 3
+    values:
+      existingSecret: litmus-admin-auth
+      ingress:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            proxy_set_header Accept-Encoding "";
+            sub_filter_once on;
+            sub_filter_types text/html;
+            sub_filter '</head>' '<script>try{(function(){function sso(){if(location.pathname==="/login"&&!new URLSearchParams(location.search).has("jwtToken")){location.replace("/auth/dex/login")}}sso();setInterval(sso,500);})();}catch(e){}</script></head>';
+          nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        enabled: true
+        host:
+          frontend:
+            path: /
+            pathType: Prefix
+          name: litmus.46.4.123.8.nip.io
+        ingressClassName: nginx
+        name: litmus-ingress
+        tls:
+        - hosts:
+          - litmus.46.4.123.8.nip.io
+          secretName: litmus-tls
+      mongodb:
+        architecture: replicaset
+        auth:
+          existingSecret: litmus-mongodb-auth
+        enabled: true
+        persistence:
+          enabled: true
+          size: 20Gi
+          storageClass: local-path
+        replicaCount: 3
+        volumePermissions:
+          enabled: true
+      portal:
+        server:
+          authServer:
+            env:
+              DEX_ENABLED: "true"
+              DEX_OAUTH_CALLBACK_URL: https://litmus.46.4.123.8.nip.io/auth/dex/callback
+              DEX_OAUTH_CLIENT_ID: litmus
+              OAUTH_JWT_EXP_MINS: "5"
+              OIDC_ISSUER: https://authentik.46.4.123.8.nip.io/application/o/litmus/
+          graphqlServer:
+            genericEnv:
+              CHAOS_CENTER_UI_ENDPOINT: https://litmus.46.4.123.8.nip.io
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T19:30:26Z"
+      message: Helm upgrade succeeded for release litmus/chaos.v4 with chart litmus@3.28.0
+      observedGeneration: 5
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T19:30:26Z"
+      message: Helm upgrade succeeded for release litmus/chaos.v4 with chart litmus@3.28.0
+      observedGeneration: 5
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/litmus-chaos
+    history:
+    - appVersion: 3.28.0
+      chartName: litmus
+      chartVersion: 3.28.0
+      configDigest: sha256:08a2150f067c23ff03c503b7591e8f5095d590b4159e39762a73bb8c9799275f
+      digest: sha256:91ef47696434f1751595ce642b7999c9f3e7976e058e7d9016679667465635d5
+      firstDeployed: "2026-05-29T14:52:43Z"
+      lastDeployed: "2026-06-03T19:30:08Z"
+      name: chaos
+      namespace: litmus
+      status: deployed
+      version: 4
+    - appVersion: 3.28.0
+      chartName: litmus
+      chartVersion: 3.28.0
+      configDigest: sha256:08a2150f067c23ff03c503b7591e8f5095d590b4159e39762a73bb8c9799275f
+      digest: sha256:0a05e5c0a9cca003d87ee7db8bfb32a9e36c985e1ca9c5307a191d7898bb23fb
+      firstDeployed: "2026-05-29T14:52:43Z"
+      lastDeployed: "2026-05-29T19:01:11Z"
+      name: chaos
+      namespace: litmus
+      status: superseded
+      version: 3
+    lastAttemptedConfigDigest: sha256:08a2150f067c23ff03c503b7591e8f5095d590b4159e39762a73bb8c9799275f
+    lastAttemptedGeneration: 5
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 3.28.0
+    lastHandledForceAt: "2026-05-29T16:09:53.18965004+02:00"
+    lastHandledReconcileAt: "2026-05-29T19:21:31.998229955+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:31.998229955+02:00"
+    observedGeneration: 5
+    observedPostRenderersDigest: sha256:3858c67d19d462774f740113aaf3e1b90100a2e042a3ecf9580a3812782a184d
+    storageNamespace: litmus
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:31:44.186325548+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.096823983+02:00"
+    creationTimestamp: "2026-05-29T12:55:19Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 5
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: nfs-provisioner
+    namespace: nfs-provisioner
+    resourceVersion: "2097673"
+    uid: 622851b0-84c5-451f-b497-ef63782d700c
+  spec:
+    chart:
+      spec:
+        chart: ./apps/nfs-provisioner
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: nfs-provisioner
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:46Z"
+      message: Helm upgrade succeeded for release nfs-provisioner/nfs-provisioner.v3
+        with chart nfs-provisioner-overlay@1.0.0
+      observedGeneration: 5
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T17:30:54Z"
+      message: Helm upgrade succeeded for release nfs-provisioner/nfs-provisioner.v3
+        with chart nfs-provisioner-overlay@1.0.0
+      observedGeneration: 3
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/nfs-provisioner-nfs-provisioner
+    history:
+    - appVersion: 4.0.18
+      chartName: nfs-provisioner-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:594d24460a2723f6141e0540f16c0e40194ab4071e9cbb56b4c2af550526af1c
+      firstDeployed: "2026-05-29T13:07:10Z"
+      lastDeployed: "2026-05-29T17:30:53Z"
+      name: nfs-provisioner
+      namespace: nfs-provisioner
+      status: deployed
+      version: 3
+    - appVersion: 4.0.18
+      chartName: nfs-provisioner-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:7cb600428c6c5e08015fb62b02e54905156bc3e47a8ad76bc6e0d8647272d398
+      firstDeployed: "2026-05-29T13:07:10Z"
+      lastDeployed: "2026-05-29T14:34:59Z"
+      name: nfs-provisioner
+      namespace: nfs-provisioner
+      status: superseded
+      version: 2
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 5
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0
+    lastHandledReconcileAt: "2026-05-29T19:31:44.186325548+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.096823983+02:00"
+    observedGeneration: 5
+    storageNamespace: nfs-provisioner
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:19Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: node-problem-detector
+    namespace: node-problem-detector
+    resourceVersion: "2099035"
+    uid: 679e544b-13e0-4352-b52c-fa54f7e93cdb
+  spec:
+    chart:
+      spec:
+        chart: ./apps/node-problem-detector
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: node-problem-detector
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:05Z"
+      message: Helm install succeeded for release node-problem-detector/node-problem-detector.v1
+        with chart node-problem-detector-overlay@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T14:02:25Z"
+      message: Helm install succeeded for release node-problem-detector/node-problem-detector.v1
+        with chart node-problem-detector-overlay@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/node-problem-detector-node-problem-detector
+    history:
+    - appVersion: 0.8.20
+      chartName: node-problem-detector-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:2d92dad18b65d3944dc1f91f703f1b04e4af0cc4d16971dfc946fa909c2733ae
+      firstDeployed: "2026-05-29T14:01:32Z"
+      lastDeployed: "2026-05-29T14:01:32Z"
+      name: node-problem-detector
+      namespace: node-problem-detector
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: node-problem-detector
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:21:32.008188265+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.008188265+02:00"
+    creationTimestamp: "2026-05-29T12:55:17Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 7
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: alloy
+    namespace: observability-logs
+    resourceVersion: "2099700"
+    uid: 030a72ae-610d-47d3-b693-6e6a0d1419a7
+  spec:
+    chart:
+      spec:
+        chart: ./apps/alloy
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    dependsOn:
+    - name: loki
+      namespace: observability-logs
+    install:
+      createNamespace: true
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |
+            apiVersion: apps/v1
+            kind: DaemonSet
+            metadata:
+              name: alloy
+              namespace: observability-logs
+            spec:
+              template:
+                spec:
+                  containers:
+                  - name: alloy
+                    resources:
+                      requests:
+                        cpu: 50m
+                      limits:
+                        cpu: 250m
+          target:
+            kind: DaemonSet
+            name: alloy
+            namespace: observability-logs
+            version: v1
+    releaseName: alloy
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:07:02Z"
+      message: Helm upgrade succeeded for release observability-logs/alloy.v31 with
+        chart alloy-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 7
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:07:02Z"
+      message: Helm upgrade succeeded for release observability-logs/alloy.v31 with
+        chart alloy-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 7
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/observability-logs-alloy
+    history:
+    - appVersion: 1.16.1
+      chartName: alloy-overlay
+      chartVersion: 1.0.0+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:c7f8f5fe0bf0d5ef51350b762215687bb9c1dd4837822422ad9c0229fa0fe6a5
+      firstDeployed: "2026-05-29T17:21:42Z"
+      lastDeployed: "2026-06-03T20:06:58Z"
+      name: alloy
+      namespace: observability-logs
+      status: deployed
+      version: 31
+    - appVersion: 1.16.1
+      chartName: alloy-overlay
+      chartVersion: 1.0.0+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:f6536b7630c080d7848ac33a522225dd38819a6a5433cf619418612edc9bef00
+      firstDeployed: "2026-05-29T17:21:42Z"
+      lastDeployed: "2026-06-03T20:00:20Z"
+      name: alloy
+      namespace: observability-logs
+      status: superseded
+      version: 30
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 7
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0+fc9e6eb63f15
+    lastHandledReconcileAt: "2026-05-29T19:21:32.008188265+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.008188265+02:00"
+    observedGeneration: 7
+    observedPostRenderersDigest: sha256:8e424696bba20a2bb562f33e9c162a931559c154a5fd522302d13223bf5858ef
+    storageNamespace: observability-logs
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:21:32.020438105+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.020438105+02:00"
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 6
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: loki
+    namespace: observability-logs
+    resourceVersion: "2099858"
+    uid: 57581179-ef58-48d1-96c7-10f291101963
+  spec:
+    chart:
+      spec:
+        chart: ./apps/loki
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |
+            apiVersion: apps/v1
+            kind: StatefulSet
+            metadata:
+              name: loki
+              namespace: observability-logs
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: loki
+                      resources:
+                        requests:
+                          cpu: 100m
+                        limits:
+                          cpu: 500m
+          target:
+            kind: StatefulSet
+            name: loki
+            namespace: observability-logs
+            version: v1
+    releaseName: loki
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:07:23Z"
+      message: Helm upgrade succeeded for release observability-logs/loki.v32 with
+        chart loki-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 6
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:07:23Z"
+      message: Helm upgrade succeeded for release observability-logs/loki.v32 with
+        chart loki-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 6
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/observability-logs-loki
+    history:
+    - appVersion: 3.6.7
+      chartName: loki-overlay
+      chartVersion: 1.0.0+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:6bcba0a2257e59fbcc51a8107e2acdaf0ca40ec4a1b4623e9600972af8a04163
+      firstDeployed: "2026-05-29T13:02:10Z"
+      lastDeployed: "2026-06-03T20:07:07Z"
+      name: loki
+      namespace: observability-logs
+      status: deployed
+      version: 32
+    - appVersion: 3.6.7
+      chartName: loki-overlay
+      chartVersion: 1.0.0+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:7b5201a77d16575b4625232833766d154dcc96d663bd260b56a53d38f4a932b9
+      firstDeployed: "2026-05-29T13:02:10Z"
+      lastDeployed: "2026-06-03T20:00:33Z"
+      name: loki
+      namespace: observability-logs
+      status: superseded
+      version: 31
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 6
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0+fc9e6eb63f15
+    lastHandledReconcileAt: "2026-05-29T19:21:32.020438105+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.020438105+02:00"
+    observedGeneration: 6
+    observedPostRenderersDigest: sha256:0a42c30d675ec3303ea86f1eb8050aceebccac9a81bd351600646b492b73e6c5
+    storageNamespace: observability-logs
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:19Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 3
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: pe-console
+    namespace: pe-console
+    resourceVersion: "2096849"
+    uid: a472823d-17a7-469f-b3f4-fca6755e3632
+  spec:
+    chart:
+      spec:
+        chart: ./apps/pe-console
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: pe-console
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:09Z"
+      message: Helm install succeeded for release pe-console/pe-console.v1 with chart
+        pe-console@1.0.0
+      observedGeneration: 3
+      reason: InstallSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T13:07:59Z"
+      message: Helm install succeeded for release pe-console/pe-console.v1 with chart
+        pe-console@1.0.0
+      observedGeneration: 1
+      reason: InstallSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/pe-console-pe-console
+    history:
+    - appVersion: 1.0.0
+      chartName: pe-console
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:339323928d827b34e39ba24c9e11193f2906287d5e5050bd38722e0d0a5fbaf1
+      firstDeployed: "2026-05-29T13:07:59Z"
+      lastDeployed: "2026-05-29T13:07:59Z"
+      name: pe-console
+      namespace: pe-console
+      status: deployed
+      version: 1
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 3
+    lastAttemptedReleaseAction: install
+    lastAttemptedRevision: 1.0.0
+    observedGeneration: 3
+    storageNamespace: pe-console
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:21:31.980968899+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:31.980968899+02:00"
+    creationTimestamp: "2026-05-29T12:55:19Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 8
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: puppet
+    namespace: puppet
+    resourceVersion: "2098600"
+    uid: fbf28d04-fedd-4176-a11e-4dc281306407
+  spec:
+    chart:
+      spec:
+        chart: ./apps/puppet
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      crds: CreateReplace
+      createNamespace: true
+    interval: 30m
+    releaseName: puppet
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+      crds: CreateReplace
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:33:15Z"
+      message: Helm upgrade succeeded for release puppet/puppet.v4 with chart puppet-overlay@1.0.0
+      observedGeneration: 8
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-05-29T17:36:04Z"
+      message: Helm upgrade succeeded for release puppet/puppet.v4 with chart puppet-overlay@1.0.0
+      observedGeneration: 5
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/puppet-puppet
+    history:
+    - appVersion: 9.5.2
+      chartName: puppet-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:df677cf8614d66bab490c23adfa4c5e26c4b84f384961bee8e01ecec7d259f6a
+      firstDeployed: "2026-05-29T13:08:14Z"
+      lastDeployed: "2026-05-29T17:36:01Z"
+      name: puppet
+      namespace: puppet
+      status: deployed
+      version: 4
+    - appVersion: 9.5.2
+      chartName: puppet-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:7e923d0758990418162398a0271e41ae59f817c5bdaefe357310b951411188fc
+      firstDeployed: "2026-05-29T13:08:14Z"
+      lastDeployed: "2026-05-29T17:21:32Z"
+      name: puppet
+      namespace: puppet
+      status: superseded
+      version: 3
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 8
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0
+    lastHandledReconcileAt: "2026-05-29T19:21:31.980968899+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:31.980968899+02:00"
+    observedGeneration: 8
+    storageNamespace: puppet
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:31:44.300587482+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:31.971110682+02:00"
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 4
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: qdrant
+    namespace: qdrant
+    resourceVersion: "2099136"
+    uid: 7f2f54f3-0d5f-47c8-bf48-f8159b9d5cad
+  spec:
+    chart:
+      spec:
+        chart: ./apps/qdrant
+        reconcileStrategy: ChartVersion
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: qdrant
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+    values:
+      ingress:
+        annotations:
+          nginx.ingress.kubernetes.io/configuration-snippet: |-
+            if ($request_uri = "/") {
+              return 302 https://$host/dashboard;
+            }
+          nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        enabled: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T13:32:31Z"
+      message: Helm upgrade succeeded for release qdrant/qdrant.v3 with chart qdrant-overlay@1.0.0
+      observedGeneration: 4
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T12:37:39Z"
+      message: Helm upgrade succeeded for release qdrant/qdrant.v3 with chart qdrant-overlay@1.0.0
+      observedGeneration: 4
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/qdrant-qdrant
+    history:
+    - appVersion: 1.13.0
+      chartName: qdrant-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:113333db2c25118c78456a40d61bc3b42c9a7267cbeabb988e40c8eea0379a2c
+      digest: sha256:db39a67ff29a257bcb4e646d21e0cfe9a9625b77fc35354efb60e096ec1d8a05
+      firstDeployed: "2026-05-29T14:44:36Z"
+      lastDeployed: "2026-06-03T12:37:37Z"
+      name: qdrant
+      namespace: qdrant
+      status: deployed
+      version: 3
+    - appVersion: 1.13.0
+      chartName: qdrant-overlay
+      chartVersion: 1.0.0
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:b9ec345c9bb49aadd7e16272c4faa1a9bcbc3764b96f032604ef807d71016b2b
+      firstDeployed: "2026-05-29T14:44:36Z"
+      lastDeployed: "2026-05-29T17:26:36Z"
+      name: qdrant
+      namespace: qdrant
+      status: superseded
+      version: 2
+    lastAttemptedConfigDigest: sha256:113333db2c25118c78456a40d61bc3b42c9a7267cbeabb988e40c8eea0379a2c
+    lastAttemptedGeneration: 4
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0
+    lastHandledReconcileAt: "2026-05-29T19:31:44.300587482+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:31.971110682+02:00"
+    observedGeneration: 4
+    storageNamespace: qdrant
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 4
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: terrakube
+    namespace: terrakube
+    resourceVersion: "2099749"
+    uid: 4b3bcdd5-db21-47b0-acf7-52acf7828f49
+  spec:
+    chart:
+      spec:
+        chart: ./apps/terrakube
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+      disableWait: true
+      remediation:
+        retries: 3
+      timeout: 5m
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |
+            - op: add
+              path: /spec/template/spec/initContainers
+              value:
+                - name: wait-authentik
+                  image: curlimages/curl:8.5.0
+                  command:
+                    - sh
+                    - -c
+                    - |
+                      until curl -sk -f -o /dev/null http://authentik-server.authentik.svc.cluster.local/-/health/ready/; do
+                        echo "[init] waiting for authentik..."; sleep 5;
+                      done
+                      until curl -sk -f -o /dev/null https://authentik.46.4.123.8.nip.io/application/o/terrakube/.well-known/openid-configuration; do
+                        echo "[init] waiting for authentik OIDC provider..."; sleep 5;
+                      done
+          target:
+            kind: Deployment
+            name: terrakube-dex
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: terrakube-api
+              namespace: terrakube
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: terrakube-api
+                      resources:
+                        requests:
+                          cpu: 100m
+                        limits:
+                          cpu: 500m
+          target:
+            kind: Deployment
+            name: terrakube-api
+            namespace: terrakube
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: terrakube-executor
+              namespace: terrakube
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: terrakube-executor
+                      resources:
+                        requests:
+                          cpu: 100m
+                        limits:
+                          cpu: 500m
+          target:
+            kind: Deployment
+            name: terrakube-executor
+            namespace: terrakube
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: terrakube-minio
+              namespace: terrakube
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: minio
+                      resources:
+                        requests:
+                          cpu: 50m
+                        limits:
+                          cpu: 200m
+          target:
+            kind: Deployment
+            name: terrakube-minio
+            namespace: terrakube
+            version: v1
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: terrakube-registry
+              namespace: terrakube
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: terrakube-registry
+                      resources:
+                        requests:
+                          cpu: 50m
+                        limits:
+                          cpu: 200m
+          target:
+            kind: Deployment
+            name: terrakube-registry
+            namespace: terrakube
+            version: v1
+    releaseName: terrakube
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+      disableWait: true
+      remediation:
+        retries: 3
+      timeout: 5m
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:07:09Z"
+      message: Helm upgrade succeeded for release terrakube/terrakube.v30 with chart
+        terrakube-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 4
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:07:09Z"
+      message: Helm upgrade succeeded for release terrakube/terrakube.v30 with chart
+        terrakube-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 4
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/terrakube-terrakube
+    history:
+    - appVersion: 2.31.0
+      chartName: terrakube-overlay
+      chartVersion: 1.0.0+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:902c4385f74a33e85f0ccdcddc7f4aa1237a9506d0ef19e3c058fc7f8149a169
+      firstDeployed: "2026-05-29T14:45:18Z"
+      lastDeployed: "2026-06-03T20:06:42Z"
+      name: terrakube
+      namespace: terrakube
+      status: deployed
+      version: 30
+    - appVersion: 2.31.0
+      chartName: terrakube-overlay
+      chartVersion: 1.0.0+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:c2e1523cdc4487b2f0febed04d06e73da68c49c5142aff780de52e32a42342c7
+      firstDeployed: "2026-05-29T14:45:18Z"
+      lastDeployed: "2026-06-03T20:01:09Z"
+      name: terrakube
+      namespace: terrakube
+      status: superseded
+      version: 29
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 4
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0+fc9e6eb63f15
+    lastHandledReconcileAt: "2026-06-02T16:33:24Z"
+    observedGeneration: 4
+    observedPostRenderersDigest: sha256:d4fd12c5ae044db72e3abbdd7e51fb85c9c7758d9b16e0abcda79188a39b00ab
+    storageNamespace: terrakube
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-05-29T19:31:44.308981814+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.034366881+02:00"
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 4
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: victoriametrics
+    namespace: victoriametrics
+    resourceVersion: "2099967"
+    uid: 519a03a6-2b40-45c2-a77d-3c6b6934d811
+  spec:
+    chart:
+      spec:
+        chart: ./apps/victoriametrics
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    postRenderers:
+    - kustomize:
+        patches:
+        - patch: |
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: vmsingle-victoriametrics-victoria-metrics-k8s-stack
+              namespace: victoriametrics
+            spec:
+              template:
+                spec:
+                  containers:
+                    - name: vmsingle
+                      resources:
+                        requests:
+                          cpu: 500m
+                        limits:
+                          cpu: 1000m
+          target:
+            kind: Deployment
+            name: vmsingle-victoriametrics-victoria-metrics-k8s-stack
+            namespace: victoriametrics
+            version: v1
+    releaseName: victoriametrics
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:07:44Z"
+      message: Helm upgrade succeeded for release victoriametrics/victoriametrics.v31
+        with chart victoriametrics-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 4
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:07:44Z"
+      message: Helm upgrade succeeded for release victoriametrics/victoriametrics.v31
+        with chart victoriametrics-overlay@1.0.0+fc9e6eb63f15
+      observedGeneration: 4
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/victoriametrics-victoriametrics
+    history:
+    - appVersion: 0.40.0
+      chartName: victoriametrics-overlay
+      chartVersion: 1.0.0+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:d09e00cf5628487bdf5fb45731cdf2cc37abc7769d9f490b23938ed8d61d784a
+      firstDeployed: "2026-05-29T14:45:51Z"
+      lastDeployed: "2026-06-03T20:07:04Z"
+      name: victoriametrics
+      namespace: victoriametrics
+      status: deployed
+      version: 31
+    - appVersion: 0.40.0
+      chartName: victoriametrics-overlay
+      chartVersion: 1.0.0+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:49e35a654dc2d585a20b061b85b9380b202a84c4581a049adac32a2ad58fa050
+      firstDeployed: "2026-05-29T14:45:51Z"
+      lastDeployed: "2026-06-03T20:00:15Z"
+      name: victoriametrics
+      namespace: victoriametrics
+      status: superseded
+      version: 30
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 4
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.0+fc9e6eb63f15
+    lastHandledReconcileAt: "2026-05-29T19:31:44.308981814+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.034366881+02:00"
+    observedGeneration: 4
+    observedPostRenderersDigest: sha256:39a1e2429b1d4d1570c83e615296591e6e1767f8c8a7efcb41f6d422ad99dd3e
+    storageNamespace: victoriametrics
+- apiVersion: helm.toolkit.fluxcd.io/v2
+  kind: HelmRelease
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-06-03T09:58:49.57168454+02:00"
+      reconcile.fluxcd.io/resetAt: "2026-05-29T19:21:32.087466955+02:00"
+    creationTimestamp: "2026-05-29T14:17:49Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 8
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: zabbix
+    namespace: zabbix
+    resourceVersion: "2099708"
+    uid: 02be1e3c-eaf1-41b7-bee5-7d2e1800e1cb
+  spec:
+    chart:
+      spec:
+        chart: ./apps/zabbix
+        reconcileStrategy: Revision
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+          namespace: flux-system
+        version: '*'
+    install:
+      createNamespace: true
+    interval: 30m
+    releaseName: zabbix
+    suspend: false
+    upgrade:
+      cleanupOnFail: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:07:03Z"
+      message: Helm upgrade succeeded for release zabbix/zabbix.v35 with chart zabbix-overlay@1.0.1+fc9e6eb63f15
+      observedGeneration: 8
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:07:03Z"
+      message: Helm upgrade succeeded for release zabbix/zabbix.v35 with chart zabbix-overlay@1.0.1+fc9e6eb63f15
+      observedGeneration: 8
+      reason: UpgradeSucceeded
+      status: "True"
+      type: Released
+    helmChart: flux-system/zabbix-zabbix
+    history:
+    - appVersion: 7.2.0
+      chartName: zabbix-overlay
+      chartVersion: 1.0.1+fc9e6eb63f15
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:277e5243229c27f2cd5aa15696d8374dbca54afe46cb2ba48347e10d7d636bc1
+      firstDeployed: "2026-05-29T14:51:01Z"
+      lastDeployed: "2026-06-03T20:06:21Z"
+      name: zabbix
+      namespace: zabbix
+      status: deployed
+      version: 35
+    - appVersion: 7.2.0
+      chartName: zabbix-overlay
+      chartVersion: 1.0.1+f0cc3d6708ce
+      configDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      digest: sha256:1c073118d6394274af7da90f3e0c3aa357ea9de9468439aba34609c3c49dd11c
+      firstDeployed: "2026-05-29T14:51:01Z"
+      lastDeployed: "2026-06-03T20:00:30Z"
+      name: zabbix
+      namespace: zabbix
+      status: superseded
+      version: 34
+    lastAttemptedConfigDigest: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    lastAttemptedGeneration: 8
+    lastAttemptedReleaseAction: upgrade
+    lastAttemptedRevision: 1.0.1+fc9e6eb63f15
+    lastHandledReconcileAt: "2026-06-03T09:58:49.57168454+02:00"
+    lastHandledResetAt: "2026-05-29T19:21:32.087466955+02:00"
+    observedGeneration: 8
+    storageNamespace: zabbix
+kind: List
+metadata:
+  resourceVersion: ""

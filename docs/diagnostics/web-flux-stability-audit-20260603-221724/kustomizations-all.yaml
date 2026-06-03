@@ -1,0 +1,1810 @@
+apiVersion: v1
+items:
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: argo-workflows-controller
+    namespace: flux-system
+    resourceVersion: "2097618"
+    uid: aace31a4-aa77-44a6-a46a-bf7f32337ff6
+  spec:
+    force: false
+    interval: 30m
+    patches:
+    - patch: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: workflow-controller
+        spec:
+          template:
+            spec:
+              securityContext:
+                seccompProfile:
+                  type: RuntimeDefault
+              containers:
+                - name: workflow-controller
+                  image: quay.io/argoproj/workflow-controller:v3.7.3
+                  args:
+                    - --configmap
+                    - workflow-controller-configmap
+                    - --executor-image
+                    - quay.io/argoproj/argoexec:v3.7.3
+                    - --namespaced
+                  securityContext:
+                    readOnlyRootFilesystem: true
+                    runAsNonRoot: true
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                      drop:
+                        - ALL
+                  resources:
+                    requests:
+                      cpu: 100m
+                      memory: 500Mi
+      target:
+        kind: Deployment
+        name: workflow-controller
+    - patch: |
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: workflow-controller-configmap
+        data:
+          artifactRepository: |
+            archiveLogs: true
+            s3:
+              endpoint: "minio-service.kubeflow:9000"
+              bucket: "mlpipeline"
+              keyFormat: "private-artifacts/{{workflow.namespace}}/{{workflow.name}}/{{workflow.creationTimestamp.Y}}/{{workflow.creationTimestamp.m}}/{{workflow.creationTimestamp.d}}/{{pod.name}}"
+              insecure: true
+              accessKeySecret:
+                name: mlpipeline-minio-artifact
+                key: accesskey
+              secretKeySecret:
+                name: mlpipeline-minio-artifact
+                key: secretkey
+          executor: "imagePullPolicy: IfNotPresent\n"
+      target:
+        kind: ConfigMap
+        name: workflow-controller-configmap
+    path: ./manifests/base/workflow-controller
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: argo-workflows
+    targetNamespace: kubeflow
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:01:25Z"
+      message: 'Applied revision: v3.7.3@sha1:bded09fe4abd37cb98d7fc81b4c14a6f5034e9ab'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:01:25Z"
+      message: Health check passed in 102.963021ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _workflow-controller_scheduling.k8s.io_PriorityClass
+        v: v1
+      - id: kubeflow_argo__ServiceAccount
+        v: v1
+      - id: kubeflow_workflow-controller-configmap__ConfigMap
+        v: v1
+      - id: kubeflow_workflow-controller_apps_Deployment
+        v: v1
+    lastAppliedRevision: v3.7.3@sha1:bded09fe4abd37cb98d7fc81b4c14a6f5034e9ab
+    lastAttemptedRevision: v3.7.3@sha1:bded09fe4abd37cb98d7fc81b4c14a6f5034e9ab
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: argo-workflows-rbac
+    namespace: flux-system
+    resourceVersion: "2096762"
+    uid: 89f3e367-4501-4d62-81c2-194f545293f6
+  spec:
+    force: false
+    interval: 30m
+    path: ./manifests/namespace-install/workflow-controller-rbac
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: argo-workflows
+    targetNamespace: kubeflow
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T19:59:51Z"
+      message: 'Applied revision: v3.7.3@sha1:bded09fe4abd37cb98d7fc81b4c14a6f5034e9ab'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T19:59:50Z"
+      message: Health check passed in 18.255538ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: kubeflow_argo-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_argo-binding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+    lastAppliedRevision: v3.7.3@sha1:bded09fe4abd37cb98d7fc81b4c14a6f5034e9ab
+    lastAttemptedRevision: v3.7.3@sha1:bded09fe4abd37cb98d7fc81b4c14a6f5034e9ab
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-06-03T22:06:18.916339501+02:00"
+    creationTimestamp: "2026-05-29T12:13:39Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 8
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: flux-system
+    namespace: flux-system
+    resourceVersion: "2101135"
+    uid: 3b8bf59a-0445-487c-a51a-1068cae4747e
+  spec:
+    force: false
+    interval: 10m0s
+    path: ./flux/clusters/hetzner-new
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: flux-system
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:11:56Z"
+      message: 'Applied revision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9'
+      observedGeneration: 8
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    inventory:
+      entries:
+      - id: _alerts.notification.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _authorizationpolicies.security.istio.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _buckets.source.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _gitrepositories.source.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _helmcharts.source.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _helmreleases.helm.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _helmrepositories.source.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _kustomizations.kustomize.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _ocirepositories.source.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _profiles.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _providers.notification.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _receivers.notification.toolkit.fluxcd.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _aiot__Namespace
+        v: v1
+      - id: _aiot-ml__Namespace
+        v: v1
+      - id: _blackbox-exporter__Namespace
+        v: v1
+      - id: _chaos-theater__Namespace
+        v: v1
+      - id: _flux-system__Namespace
+        v: v1
+      - id: _flux-ui__Namespace
+        v: v1
+      - id: _litmus__Namespace
+        v: v1
+      - id: _monitoring__Namespace
+        v: v1
+      - id: _nfs-provisioner__Namespace
+        v: v1
+      - id: _node-problem-detector__Namespace
+        v: v1
+      - id: _observability-logs__Namespace
+        v: v1
+      - id: _pe-console__Namespace
+        v: v1
+      - id: _profiles-system__Namespace
+        v: v1
+      - id: _puppet__Namespace
+        v: v1
+      - id: flux-system_critical-pods-flux-system__ResourceQuota
+        v: v1
+      - id: flux-system_helm-controller__ServiceAccount
+        v: v1
+      - id: flux-system_kustomize-controller__ServiceAccount
+        v: v1
+      - id: flux-system_notification-controller__ServiceAccount
+        v: v1
+      - id: flux-system_source-controller__ServiceAccount
+        v: v1
+      - id: kubeflow_profiles-controller-service-account__ServiceAccount
+        v: v1
+      - id: jenkins_jenkins-kubernetes-credentials_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: observability-logs_jenkins-observability-reader_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: _crd-controller-flux-system_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _flux-edit-flux-system_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _flux-view-flux-system_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _jenkins-flux-reconciler_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: jenkins_jenkins-kubernetes-credentials_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: observability-logs_jenkins-observability-reader_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: _cluster-reconciler-flux-system_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _crd-controller-flux-system_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _jenkins-flux-reconciler_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _profiles-cluster-rolebinding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _weave-gitops-flux-reader_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _weave-oidc-admins_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: grafana_grafana-fixed-datasources__ConfigMap
+        v: v1
+      - id: kubeflow_namespace-labels-data__ConfigMap
+        v: v1
+      - id: kubeflow_profiles-config__ConfigMap
+        v: v1
+      - id: observability-logs_alloy__ConfigMap
+        v: v1
+      - id: victoriametrics_victoriametrics-victoria-metrics-k8s-stack-grafana-ds__ConfigMap
+        v: v1
+      - id: flux-ui_oidc-auth__Secret
+        v: v1
+      - id: flux-system_notification-controller__Service
+        v: v1
+      - id: flux-system_source-controller__Service
+        v: v1
+      - id: flux-system_webhook-receiver__Service
+        v: v1
+      - id: kubeflow_profiles-kfam__Service
+        v: v1
+      - id: flux-system_helm-controller_apps_Deployment
+        v: v1
+      - id: flux-system_kustomize-controller_apps_Deployment
+        v: v1
+      - id: flux-system_notification-controller_apps_Deployment
+        v: v1
+      - id: flux-system_source-controller_apps_Deployment
+        v: v1
+      - id: kubeflow_profiles-deployment_apps_Deployment
+        v: v1
+      - id: aiot_aiot-pipeline_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: aiot_cloudbeaver_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: aiot-ml_aiot-ml-platform_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: auth_dex_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: awx_awx_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: awx_awx-operator_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: blackbox-exporter_blackbox-exporter_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: cert-manager_cert-manager_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: chaos-theater_aiot-chaos-theater_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: cluster-copilot_cluster-copilot_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: cnpg-system_cnpg_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: databases_pgadmin_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: descheduler_descheduler_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: event-exporter_event-exporter_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: flux-ui_weave-gitops_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: gitea_gitea_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: grafana_grafana_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: headlamp_headlamp_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: ingress-nginx_ingress-nginx_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: jenkins_jenkins_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: k8up-system_k8up_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: kube-system_sealed-secrets_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: litmus_chaos_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: nfs-provisioner_nfs-provisioner_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: node-problem-detector_node-problem-detector_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: observability-logs_alloy_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: observability-logs_loki_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: pe-console_pe-console_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: puppet_puppet_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: qdrant_qdrant_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: terrakube_terrakube_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: victoriametrics_victoriametrics_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: zabbix_zabbix_helm.toolkit.fluxcd.io_HelmRelease
+        v: v2
+      - id: _kubeflow-user-example-com_kubeflow.org_Profile
+        v: v1
+      - id: _kubeflow-user-example-com_kubeflow.org_Profile
+        v: v1beta1
+      - id: flux-system_argo-workflows-controller_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_argo-workflows-rbac_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_flux-system_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kserve_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-admission-webhook_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-authz-crd_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-centraldashboard_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-ingress_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-jupyter-web-app_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-katib_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-notebook-controller_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-pipelines_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-pipelines-crds_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-profiles_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-roles_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-tensorboard-controller_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-tensorboards-web-app_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-training-operator_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_kubeflow-volumes-web-app_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: flux-system_qdrant-indexer_kustomize.toolkit.fluxcd.io_Kustomization
+        v: v1
+      - id: kubeflow_kubeflow-centraldashboard_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-jupyter_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-katib_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-kfam_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-tensorboards_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-volumes_networking.k8s.io_Ingress
+        v: v1
+      - id: flux-system_allow-egress_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: flux-system_allow-scraping_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: flux-system_allow-webhooks_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-centraldashboard_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-jupyter-web-app_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-katib-ui_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-tensorboards-web-app_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-volumes-web-app_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: victoriametrics_victoriametrics-victoria-metrics-k8s-stack_operator.victoriametrics.com_VMSingle
+        v: v1beta1
+      - id: flux-system_argo-workflows_source.toolkit.fluxcd.io_GitRepository
+        v: v1
+      - id: flux-system_flux-system_source.toolkit.fluxcd.io_GitRepository
+        v: v1
+      - id: flux-system_kserve_source.toolkit.fluxcd.io_GitRepository
+        v: v1
+      - id: flux-system_kubeflow-katib_source.toolkit.fluxcd.io_GitRepository
+        v: v1
+      - id: flux-system_kubeflow-manifests_source.toolkit.fluxcd.io_GitRepository
+        v: v1
+      - id: flux-system_kubeflow-pipelines_source.toolkit.fluxcd.io_GitRepository
+        v: v1
+      - id: flux-system_litmuschaos_source.toolkit.fluxcd.io_HelmRepository
+        v: v1
+      - id: flux-system_weave-gitops_source.toolkit.fluxcd.io_HelmRepository
+        v: v1
+    lastAppliedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    lastAttemptedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    lastHandledReconcileAt: "2026-06-03T22:06:18.916339501+02:00"
+    observedGeneration: 8
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kserve
+    namespace: flux-system
+    resourceVersion: "2098420"
+    uid: 84e17217-5db5-4ad6-9720-828f238f4b1d
+  spec:
+    force: false
+    interval: 30m
+    patches:
+    - patch: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: kserve-localmodel-controller-manager
+          namespace: kserve
+        spec:
+          replicas: 0
+      target:
+        kind: Deployment
+        name: kserve-localmodel-controller-manager
+    path: ./config/default
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kserve
+    wait: false
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:03:43Z"
+      message: 'Applied revision: v0.15.2@sha1:d623ea29e4a7312e509829f9104209cd6f820268'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    inventory:
+      entries:
+      - id: _clusterservingruntimes.serving.kserve.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _clusterstoragecontainers.serving.kserve.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _inferencegraphs.serving.kserve.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _inferenceservices.serving.kserve.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _localmodelcaches.serving.kserve.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _localmodelnodegroups.serving.kserve.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _localmodelnodes.serving.kserve.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _servingruntimes.serving.kserve.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _trainedmodels.serving.kserve.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _kserve__Namespace
+        v: v1
+      - id: kserve_kserve-controller-manager__ServiceAccount
+        v: v1
+      - id: kserve_kserve-localmodel-controller-manager__ServiceAccount
+        v: v1
+      - id: kserve_kserve-localmodelnode-agent__ServiceAccount
+        v: v1
+      - id: kserve_kserve-leader-election-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: _kserve-localmodel-manager-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kserve-localmodelnode-agent-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kserve-manager-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kserve-proxy-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: kserve_kserve-leader-election-rolebinding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: _kserve-localmodel-manager-rolebinding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _kserve-localmodelnode-agent-rolebinding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _kserve-manager-rolebinding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _kserve-proxy-rolebinding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kserve_inferenceservice-config__ConfigMap
+        v: v1
+      - id: kserve_kserve-webhook-server-secret__Secret
+        v: v1
+      - id: kserve_kserve-controller-manager-metrics-service__Service
+        v: v1
+      - id: kserve_kserve-controller-manager-service__Service
+        v: v1
+      - id: kserve_kserve-webhook-server-service__Service
+        v: v1
+      - id: kserve_kserve-controller-manager_apps_Deployment
+        v: v1
+      - id: kserve_kserve-localmodel-controller-manager_apps_Deployment
+        v: v1
+      - id: kserve_kserve-localmodelnode-agent_apps_DaemonSet
+        v: v1
+      - id: kserve_serving-cert_cert-manager.io_Certificate
+        v: v1
+      - id: kserve_selfsigned-issuer_cert-manager.io_Issuer
+        v: v1
+      - id: _inferenceservice.serving.kserve.io_admissionregistration.k8s.io_MutatingWebhookConfiguration
+        v: v1
+      - id: _clusterservingruntime.serving.kserve.io_admissionregistration.k8s.io_ValidatingWebhookConfiguration
+        v: v1
+      - id: _inferencegraph.serving.kserve.io_admissionregistration.k8s.io_ValidatingWebhookConfiguration
+        v: v1
+      - id: _inferenceservice.serving.kserve.io_admissionregistration.k8s.io_ValidatingWebhookConfiguration
+        v: v1
+      - id: _localmodelcache.serving.kserve.io_admissionregistration.k8s.io_ValidatingWebhookConfiguration
+        v: v1
+      - id: _servingruntime.serving.kserve.io_admissionregistration.k8s.io_ValidatingWebhookConfiguration
+        v: v1
+      - id: _trainedmodel.serving.kserve.io_admissionregistration.k8s.io_ValidatingWebhookConfiguration
+        v: v1
+    lastAppliedRevision: v0.15.2@sha1:d623ea29e4a7312e509829f9104209cd6f820268
+    lastAttemptedRevision: v0.15.2@sha1:d623ea29e4a7312e509829f9104209cd6f820268
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-admission-webhook
+    namespace: flux-system
+    resourceVersion: "2097917"
+    uid: 069f8d48-66d5-4a0a-a3b7-6ffe65dbb874
+  spec:
+    dependsOn:
+    - name: kubeflow-roles
+    force: false
+    interval: 30m
+    path: ./applications/admission-webhook/upstream/overlays/cert-manager
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-manifests
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:02:08Z"
+      message: 'Applied revision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:02:08Z"
+      message: Health check passed in 71.395354ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _poddefaults.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: kubeflow_admission-webhook-service-account__ServiceAccount
+        v: v1
+      - id: _admission-webhook-cluster-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _admission-webhook-kubeflow-poddefaults-admin_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _admission-webhook-kubeflow-poddefaults-edit_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _admission-webhook-kubeflow-poddefaults-view_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _admission-webhook-cluster-role-binding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kubeflow_admission-webhook-service__Service
+        v: v1
+      - id: kubeflow_admission-webhook-deployment_apps_Deployment
+        v: v1
+      - id: kubeflow_admission-webhook-cert_cert-manager.io_Certificate
+        v: v1
+      - id: kubeflow_admission-webhook-selfsigned-issuer_cert-manager.io_Issuer
+        v: v1
+      - id: _admission-webhook-mutating-webhook-configuration_admissionregistration.k8s.io_MutatingWebhookConfiguration
+        v: v1
+    lastAppliedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastAttemptedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-06-03T21:30:12.640139565+02:00"
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-authz-crd
+    namespace: flux-system
+    resourceVersion: "2099222"
+    uid: 9ec27f67-a656-4d53-8d2f-234b770dcd74
+  spec:
+    force: false
+    interval: 30m
+    path: ./flux/clusters/hetzner-new/kubeflow-authz-crd
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: flux-system
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:06:23Z"
+      message: 'Applied revision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:06:23Z"
+      message: Health check passed in 300.599649ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _authorizationpolicies.security.istio.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+    lastAppliedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    lastAttemptedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    lastHandledReconcileAt: "2026-06-03T21:30:12.640139565+02:00"
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-centraldashboard
+    namespace: flux-system
+    resourceVersion: "2098859"
+    uid: ada8c0ce-42fc-4578-84db-64530dc29ccf
+  spec:
+    dependsOn:
+    - name: kubeflow-roles
+    - name: kubeflow-profiles
+    force: false
+    interval: 30m
+    path: ./applications/centraldashboard/upstream/base
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-manifests
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:05:14Z"
+      message: 'Applied revision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:05:14Z"
+      message: Health check passed in 37.951267ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: kubeflow_centraldashboard__ServiceAccount
+        v: v1
+      - id: kubeflow_centraldashboard_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: _centraldashboard_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: kubeflow_centraldashboard_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: _centraldashboard_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kubeflow_centraldashboard-config__ConfigMap
+        v: v1
+      - id: kubeflow_centraldashboard-parameters__ConfigMap
+        v: v1
+      - id: kubeflow_centraldashboard__Service
+        v: v1
+      - id: kubeflow_centraldashboard_apps_Deployment
+        v: v1
+    lastAppliedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastAttemptedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-06-03T21:30:24.77129509+02:00"
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-ingress
+    namespace: flux-system
+    resourceVersion: "2099823"
+    uid: 9d6e12c5-8b2c-4534-9c07-7def7a10c2ff
+  spec:
+    dependsOn:
+    - name: kubeflow-centraldashboard
+    - name: kubeflow-profiles
+    force: false
+    interval: 30m
+    path: ./flux/clusters/hetzner-new/kubeflow-ingress
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: flux-system
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:07:18Z"
+      message: 'Applied revision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:07:18Z"
+      message: Health check passed in 76.642813ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: kubeflow_kubeflow-centraldashboard_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-jupyter_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-katib_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-kfam_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-tensorboards_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_kubeflow-volumes_networking.k8s.io_Ingress
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-centraldashboard_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-jupyter-web-app_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-katib-ui_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-tensorboards-web-app_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_allow-ingress-nginx-to-volumes-web-app_networking.k8s.io_NetworkPolicy
+        v: v1
+    lastAppliedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    lastAttemptedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    lastHandledReconcileAt: "2026-06-03T21:30:24.77129509+02:00"
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-jupyter-web-app
+    namespace: flux-system
+    resourceVersion: "2098685"
+    uid: c2eacb0d-634a-4683-8de6-a549ca2d8394
+  spec:
+    dependsOn:
+    - name: kubeflow-roles
+    force: false
+    interval: 30m
+    path: ./applications/jupyter/jupyter-web-app/upstream/base
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-manifests
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:04:38Z"
+      message: 'Applied revision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:04:37Z"
+      message: Health check passed in 43.433801ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: kubeflow_jupyter-web-app-service-account__ServiceAccount
+        v: v1
+      - id: kubeflow_jupyter-web-app-jupyter-notebook-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: _jupyter-web-app-cluster-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _jupyter-web-app-kubeflow-notebook-ui-admin_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _jupyter-web-app-kubeflow-notebook-ui-edit_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _jupyter-web-app-kubeflow-notebook-ui-view_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: kubeflow_jupyter-web-app-jupyter-notebook-role-binding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: _jupyter-web-app-cluster-role-binding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kubeflow_jupyter-web-app-config-9c2fbg2gdc__ConfigMap
+        v: v1
+      - id: kubeflow_jupyter-web-app-logos__ConfigMap
+        v: v1
+      - id: kubeflow_jupyter-web-app-parameters-48gf6bbhmk__ConfigMap
+        v: v1
+      - id: kubeflow_jupyter-web-app-service__Service
+        v: v1
+      - id: kubeflow_jupyter-web-app-deployment_apps_Deployment
+        v: v1
+    lastAppliedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastAttemptedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-katib
+    namespace: flux-system
+    resourceVersion: "2098791"
+    uid: 5b00d9cb-62c0-4779-b4a9-853eb7129b60
+  spec:
+    dependsOn:
+    - name: kubeflow-roles
+    force: false
+    interval: 30m
+    path: ./manifests/v1beta1/installs/katib-standalone
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-katib
+    timeout: 20m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:05:00Z"
+      message: 'Applied revision: v0.17.0@sha1:5723604d419c5ba5bf01240b7be5ebf55aaee0bc'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:05:00Z"
+      message: Health check passed in 209.91559ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _experiments.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _suggestions.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _trials.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _kubeflow__Namespace
+        v: v1
+      - id: kubeflow_katib-controller__ServiceAccount
+        v: v1
+      - id: kubeflow_katib-ui__ServiceAccount
+        v: v1
+      - id: _katib-controller_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _katib-ui_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _katib-controller_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _katib-ui_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kubeflow_katib-config__ConfigMap
+        v: v1
+      - id: kubeflow_trial-templates__ConfigMap
+        v: v1
+      - id: kubeflow_katib-mysql-secrets__Secret
+        v: v1
+      - id: kubeflow_katib-webhook-cert__Secret
+        v: v1
+      - id: kubeflow_katib-controller__Service
+        v: v1
+      - id: kubeflow_katib-db-manager__Service
+        v: v1
+      - id: kubeflow_katib-mysql__Service
+        v: v1
+      - id: kubeflow_katib-ui__Service
+        v: v1
+      - id: kubeflow_katib-controller_apps_Deployment
+        v: v1
+      - id: kubeflow_katib-db-manager_apps_Deployment
+        v: v1
+      - id: kubeflow_katib-mysql_apps_Deployment
+        v: v1
+      - id: kubeflow_katib-ui_apps_Deployment
+        v: v1
+      - id: kubeflow_katib-mysql__PersistentVolumeClaim
+        v: v1
+      - id: _katib.kubeflow.org_admissionregistration.k8s.io_MutatingWebhookConfiguration
+        v: v1
+      - id: _katib.kubeflow.org_admissionregistration.k8s.io_ValidatingWebhookConfiguration
+        v: v1
+    lastAppliedRevision: v0.17.0@sha1:5723604d419c5ba5bf01240b7be5ebf55aaee0bc
+    lastAttemptedRevision: v0.17.0@sha1:5723604d419c5ba5bf01240b7be5ebf55aaee0bc
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-notebook-controller
+    namespace: flux-system
+    resourceVersion: "2098520"
+    uid: 4ba77c1e-ea10-47a6-828e-e6a214109dc5
+  spec:
+    dependsOn:
+    - name: kubeflow-roles
+    force: false
+    interval: 30m
+    path: ./applications/jupyter/notebook-controller/upstream/overlays/standalone
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-manifests
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:04:01Z"
+      message: 'Applied revision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:04:01Z"
+      message: Health check passed in 95.208709ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _notebooks.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _notebook-controller-system__Namespace
+        v: v1
+      - id: notebook-controller-system_notebook-controller-service-account__ServiceAccount
+        v: v1
+      - id: notebook-controller-system_notebook-controller-leader-election-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: _notebook-controller-kubeflow-notebooks-admin_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _notebook-controller-kubeflow-notebooks-edit_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _notebook-controller-kubeflow-notebooks-view_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _notebook-controller-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: notebook-controller-system_notebook-controller-leader-election-rolebinding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: _notebook-controller-role-binding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: notebook-controller-system_notebook-controller-config-h659mh255b__ConfigMap
+        v: v1
+      - id: notebook-controller-system_notebook-controller-service__Service
+        v: v1
+      - id: notebook-controller-system_notebook-controller-deployment_apps_Deployment
+        v: v1
+    lastAppliedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastAttemptedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-pipelines
+    namespace: flux-system
+    resourceVersion: "2097650"
+    uid: 7ffb11d2-99df-4f5e-ba1a-f56ce055ffd4
+  spec:
+    dependsOn:
+    - name: kubeflow-pipelines-crds
+    - name: argo-workflows-controller
+    - name: argo-workflows-rbac
+    force: false
+    interval: 30m
+    patches:
+    - patch: |
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: kfp-launcher
+          namespace: kubeflow
+        data:
+          defaultPipelineRoot: minio://mlpipeline/v2/artifacts
+      target:
+        kind: ConfigMap
+        name: kfp-launcher
+        namespace: kubeflow
+    path: ./manifests/kustomize/env/plain
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-pipelines
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:01:30Z"
+      message: 'Applied revision: 2.15.0@sha1:8fe8d7bdd88f027bde080f619762a0b3294796db'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:01:30Z"
+      message: Health check passed in 460.125229ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: kubeflow_kubeflow-pipelines-cache__ServiceAccount
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-container-builder__ServiceAccount
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-metadata-writer__ServiceAccount
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-viewer__ServiceAccount
+        v: v1
+      - id: kubeflow_metadata-grpc-server__ServiceAccount
+        v: v1
+      - id: kubeflow_ml-pipeline__ServiceAccount
+        v: v1
+      - id: kubeflow_ml-pipeline-persistenceagent__ServiceAccount
+        v: v1
+      - id: kubeflow_ml-pipeline-scheduledworkflow__ServiceAccount
+        v: v1
+      - id: kubeflow_ml-pipeline-ui__ServiceAccount
+        v: v1
+      - id: kubeflow_ml-pipeline-viewer-crd-service-account__ServiceAccount
+        v: v1
+      - id: kubeflow_ml-pipeline-visualizationserver__ServiceAccount
+        v: v1
+      - id: kubeflow_mysql__ServiceAccount
+        v: v1
+      - id: kubeflow_pipeline-runner__ServiceAccount
+        v: v1
+      - id: kubeflow_seaweedfs__ServiceAccount
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-cache-deployer-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-cache-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-metadata-writer-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_ml-pipeline_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_ml-pipeline-persistenceagent-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_ml-pipeline-scheduledworkflow-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_ml-pipeline-ui_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_ml-pipeline-viewer-controller-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_pipeline-runner_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-cache-binding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-cache-deployer-rolebinding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-metadata-writer-binding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: kubeflow_ml-pipeline_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: kubeflow_ml-pipeline-persistenceagent-binding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: kubeflow_ml-pipeline-scheduledworkflow-binding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: kubeflow_ml-pipeline-ui_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: kubeflow_ml-pipeline-viewer-crd-binding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: kubeflow_pipeline-runner-binding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: kubeflow_kfp-launcher__ConfigMap
+        v: v1
+      - id: kubeflow_metadata-envoy-configmap__ConfigMap
+        v: v1
+      - id: kubeflow_metadata-grpc-configmap__ConfigMap
+        v: v1
+      - id: kubeflow_ml-pipeline-ui-configmap__ConfigMap
+        v: v1
+      - id: kubeflow_pipeline-install-config__ConfigMap
+        v: v1
+      - id: kubeflow_mlpipeline-minio-artifact__Secret
+        v: v1
+      - id: kubeflow_mysql-secret__Secret
+        v: v1
+      - id: kubeflow_cache-server__Service
+        v: v1
+      - id: kubeflow_metadata-envoy-service__Service
+        v: v1
+      - id: kubeflow_metadata-grpc-service__Service
+        v: v1
+      - id: kubeflow_minio-service__Service
+        v: v1
+      - id: kubeflow_ml-pipeline__Service
+        v: v1
+      - id: kubeflow_ml-pipeline-ui__Service
+        v: v1
+      - id: kubeflow_ml-pipeline-visualizationserver__Service
+        v: v1
+      - id: kubeflow_mysql__Service
+        v: v1
+      - id: kubeflow_seaweedfs__Service
+        v: v1
+      - id: kubeflow_cache-deployer-deployment_apps_Deployment
+        v: v1
+      - id: kubeflow_cache-server_apps_Deployment
+        v: v1
+      - id: kubeflow_metadata-envoy-deployment_apps_Deployment
+        v: v1
+      - id: kubeflow_metadata-grpc-deployment_apps_Deployment
+        v: v1
+      - id: kubeflow_metadata-writer_apps_Deployment
+        v: v1
+      - id: kubeflow_ml-pipeline_apps_Deployment
+        v: v1
+      - id: kubeflow_ml-pipeline-persistenceagent_apps_Deployment
+        v: v1
+      - id: kubeflow_ml-pipeline-scheduledworkflow_apps_Deployment
+        v: v1
+      - id: kubeflow_ml-pipeline-ui_apps_Deployment
+        v: v1
+      - id: kubeflow_ml-pipeline-viewer-crd_apps_Deployment
+        v: v1
+      - id: kubeflow_ml-pipeline-visualizationserver_apps_Deployment
+        v: v1
+      - id: kubeflow_mysql_apps_Deployment
+        v: v1
+      - id: kubeflow_seaweedfs_apps_Deployment
+        v: v1
+      - id: kubeflow_mysql-pv-claim__PersistentVolumeClaim
+        v: v1
+      - id: kubeflow_seaweedfs-pvc__PersistentVolumeClaim
+        v: v1
+      - id: kubeflow_default-allow-same-namespace_networking.k8s.io_NetworkPolicy
+        v: v1
+      - id: kubeflow_seaweedfs_networking.k8s.io_NetworkPolicy
+        v: v1
+    lastAppliedRevision: 2.15.0@sha1:8fe8d7bdd88f027bde080f619762a0b3294796db
+    lastAttemptedRevision: 2.15.0@sha1:8fe8d7bdd88f027bde080f619762a0b3294796db
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-pipelines-crds
+    namespace: flux-system
+    resourceVersion: "2097625"
+    uid: 5925ddb5-1319-49c3-8cee-2ecfc1bedd92
+  spec:
+    force: false
+    interval: 30m
+    path: ./manifests/kustomize/cluster-scoped-resources
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-pipelines
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:01:26Z"
+      message: 'Applied revision: 2.15.0@sha1:8fe8d7bdd88f027bde080f619762a0b3294796db'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:01:25Z"
+      message: Health check passed in 73.03853ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _applications.app.k8s.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _clusterworkflowtemplates.argoproj.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _cronworkflows.argoproj.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _scheduledworkflows.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _viewers.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _workflowartifactgctasks.argoproj.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _workfloweventbindings.argoproj.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _workflows.argoproj.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _workflowtaskresults.argoproj.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _workflowtasksets.argoproj.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _workflowtemplates.argoproj.io_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _kubeflow__Namespace
+        v: v1
+      - id: kubeflow_kubeflow-pipelines-cache-deployer-sa__ServiceAccount
+        v: v1
+      - id: _kubeflow-pipelines-cache-deployer-clusterrole_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kubeflow-pipelines-cache-deployer-clusterrolebinding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+    lastAppliedRevision: 2.15.0@sha1:8fe8d7bdd88f027bde080f619762a0b3294796db
+    lastAttemptedRevision: 2.15.0@sha1:8fe8d7bdd88f027bde080f619762a0b3294796db
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-06-03T21:34:32.246157473+02:00"
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-profiles
+    namespace: flux-system
+    resourceVersion: "2099505"
+    uid: 7391991c-16bf-4b14-82ee-d41221ce545f
+  spec:
+    dependsOn:
+    - name: kubeflow-authz-crd
+    - name: kubeflow-roles
+    force: false
+    interval: 30m
+    path: ./flux/clusters/hetzner-new/kubeflow-profiles
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: flux-system
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:06:49Z"
+      message: 'Applied revision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:06:49Z"
+      message: Health check passed in 89.72789ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _profiles.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _profiles-system__Namespace
+        v: v1
+      - id: kubeflow_profiles-controller-service-account__ServiceAccount
+        v: v1
+      - id: _profiles-cluster-rolebinding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kubeflow_namespace-labels-data__ConfigMap
+        v: v1
+      - id: kubeflow_profiles-config__ConfigMap
+        v: v1
+      - id: kubeflow_profiles-kfam__Service
+        v: v1
+      - id: kubeflow_profiles-deployment_apps_Deployment
+        v: v1
+      - id: _kubeflow-user-example-com_kubeflow.org_Profile
+        v: v1
+    lastAppliedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    lastAttemptedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    lastHandledReconcileAt: "2026-06-03T21:34:32.246157473+02:00"
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-roles
+    namespace: flux-system
+    resourceVersion: "2098010"
+    uid: 3eb36cd9-9395-4bdc-a883-d75d41403057
+  spec:
+    force: false
+    interval: 30m
+    path: ./common/kubeflow-roles/base
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-manifests
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:02:24Z"
+      message: 'Applied revision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:02:24Z"
+      message: Health check passed in 32.031576ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _kubeflow-admin_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kubeflow-edit_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kubeflow-kubernetes-admin_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kubeflow-kubernetes-edit_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kubeflow-kubernetes-view_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kubeflow-view_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+    lastAppliedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastAttemptedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-tensorboard-controller
+    namespace: flux-system
+    resourceVersion: "2097240"
+    uid: 0af463e7-93e0-4423-8cd3-3a8136f9c561
+  spec:
+    dependsOn:
+    - name: kubeflow-roles
+    force: false
+    interval: 30m
+    path: ./applications/tensorboard/tensorboard-controller/upstream/base
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-manifests
+    targetNamespace: kubeflow
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:00:40Z"
+      message: 'Applied revision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:00:40Z"
+      message: Health check passed in 56.843474ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _tensorboards.tensorboard.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _kubeflow__Namespace
+        v: v1
+      - id: kubeflow_tensorboard-controller-controller-manager__ServiceAccount
+        v: v1
+      - id: kubeflow_tensorboard-controller-leader-election-role_rbac.authorization.k8s.io_Role
+        v: v1
+      - id: _tensorboard-controller-manager-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _tensorboard-controller-metrics-reader_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _tensorboard-controller-proxy-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: kubeflow_tensorboard-controller-leader-election-rolebinding_rbac.authorization.k8s.io_RoleBinding
+        v: v1
+      - id: _tensorboard-controller-manager-rolebinding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: _tensorboard-controller-proxy-rolebinding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kubeflow_tensorboard-controller-config-7hd244gf2d__ConfigMap
+        v: v1
+      - id: kubeflow_tensorboard-controller-controller-manager-metrics-service__Service
+        v: v1
+      - id: kubeflow_tensorboard-controller-deployment_apps_Deployment
+        v: v1
+    lastAppliedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastAttemptedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-06-03T21:02:14.300629256+02:00"
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-tensorboards-web-app
+    namespace: flux-system
+    resourceVersion: "2096609"
+    uid: eddb2d4d-36fa-4e51-aa76-bf5b338a1dcf
+  spec:
+    dependsOn:
+    - name: kubeflow-roles
+    - name: kubeflow-profiles
+    force: false
+    interval: 30m
+    path: ./applications/tensorboard/tensorboards-web-app/upstream/base
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-manifests
+    targetNamespace: kubeflow
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T19:59:16Z"
+      message: 'Applied revision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T19:59:16Z"
+      message: Health check passed in 84.638666ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: kubeflow_tensorboards-web-app-service-account__ServiceAccount
+        v: v1
+      - id: _tensorboards-web-app-cluster-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _tensorboards-web-app-kubeflow-tensorboard-ui-admin_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _tensorboards-web-app-kubeflow-tensorboard-ui-edit_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _tensorboards-web-app-kubeflow-tensorboard-ui-view_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _tensorboards-web-app-cluster-role-binding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kubeflow_tensorboards-web-app-parameters-6ffg2tt572__ConfigMap
+        v: v1
+      - id: kubeflow_tensorboards-web-app-service__Service
+        v: v1
+      - id: kubeflow_tensorboards-web-app-deployment_apps_Deployment
+        v: v1
+    lastAppliedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastAttemptedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastHandledReconcileAt: "2026-06-03T21:02:14.300629256+02:00"
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-training-operator
+    namespace: flux-system
+    resourceVersion: "2096484"
+    uid: 8da080c3-b02e-4f8e-aa2e-e985b6d83f47
+  spec:
+    dependsOn:
+    - name: kubeflow-roles
+    force: false
+    interval: 30m
+    path: ./applications/training-operator/upstream/overlays/kubeflow
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-manifests
+    timeout: 15m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T19:58:52Z"
+      message: 'Applied revision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T19:58:52Z"
+      message: Health check passed in 240.902964ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: _jaxjobs.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _mpijobs.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _paddlejobs.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _pytorchjobs.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _tfjobs.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: _xgboostjobs.kubeflow.org_apiextensions.k8s.io_CustomResourceDefinition
+        v: v1
+      - id: kubeflow_training-operator__ServiceAccount
+        v: v1
+      - id: _kubeflow-training-admin_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kubeflow-training-edit_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _kubeflow-training-view_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _training-operator_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _training-operator_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kubeflow_training-operator-webhook-cert__Secret
+        v: v1
+      - id: kubeflow_training-operator__Service
+        v: v1
+      - id: kubeflow_training-operator_apps_Deployment
+        v: v1
+      - id: _validator.training-operator.kubeflow.org_admissionregistration.k8s.io_ValidatingWebhookConfiguration
+        v: v1
+    lastAppliedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastAttemptedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    annotations:
+      reconcile.fluxcd.io/requestedAt: "2026-06-03T21:34:34.314194507+02:00"
+    creationTimestamp: "2026-05-29T12:55:18Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: kubeflow-volumes-web-app
+    namespace: flux-system
+    resourceVersion: "2097750"
+    uid: 087c3d9e-d947-4ff6-8afe-ccae554b965e
+  spec:
+    dependsOn:
+    - name: kubeflow-roles
+    - name: kubeflow-profiles
+    force: false
+    interval: 30m
+    path: ./applications/volumes-web-app/upstream/base
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: kubeflow-manifests
+    timeout: 10m
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:01:48Z"
+      message: 'Applied revision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:01:47Z"
+      message: Health check passed in 35.680969ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: kubeflow_volumes-web-app-service-account__ServiceAccount
+        v: v1
+      - id: _volumes-web-app-cluster-role_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _volumes-web-app-kubeflow-volume-ui-admin_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _volumes-web-app-kubeflow-volume-ui-edit_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _volumes-web-app-kubeflow-volume-ui-view_rbac.authorization.k8s.io_ClusterRole
+        v: v1
+      - id: _volumes-web-app-cluster-role-binding_rbac.authorization.k8s.io_ClusterRoleBinding
+        v: v1
+      - id: kubeflow_volumes-web-app-parameters-mbftc78hbk__ConfigMap
+        v: v1
+      - id: kubeflow_volumes-web-app-viewer-spec-gm954c98h6__ConfigMap
+        v: v1
+      - id: kubeflow_volumes-web-app-service__Service
+        v: v1
+      - id: kubeflow_volumes-web-app-deployment_apps_Deployment
+        v: v1
+    lastAppliedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastAttemptedRevision: v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f
+    lastHandledReconcileAt: "2026-06-03T21:34:34.314194507+02:00"
+    observedGeneration: 1
+- apiVersion: kustomize.toolkit.fluxcd.io/v1
+  kind: Kustomization
+  metadata:
+    creationTimestamp: "2026-05-29T12:55:19Z"
+    finalizers:
+    - finalizers.fluxcd.io
+    generation: 1
+    labels:
+      kustomize.toolkit.fluxcd.io/name: flux-system
+      kustomize.toolkit.fluxcd.io/namespace: flux-system
+    name: qdrant-indexer
+    namespace: flux-system
+    resourceVersion: "2099200"
+    uid: 8f8856f7-569e-4cb5-8688-f7a85d7361f0
+  spec:
+    force: false
+    interval: 30m
+    path: ./gitops/qdrant-indexer
+    prune: true
+    sourceRef:
+      kind: GitRepository
+      name: flux-system
+      namespace: flux-system
+    wait: true
+  status:
+    conditions:
+    - lastTransitionTime: "2026-06-03T20:06:21Z"
+      message: 'Applied revision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9'
+      observedGeneration: 1
+      reason: ReconciliationSucceeded
+      status: "True"
+      type: Ready
+    - lastTransitionTime: "2026-06-03T20:06:20Z"
+      message: Health check passed in 57.679548ms
+      observedGeneration: 1
+      reason: Succeeded
+      status: "True"
+      type: Healthy
+    inventory:
+      entries:
+      - id: aiot_qdrant-indexer-code__ConfigMap
+        v: v1
+      - id: aiot_qdrant-indexer_apps_Deployment
+        v: v1
+    lastAppliedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    lastAttemptedRevision: main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9
+    observedGeneration: 1
+kind: List
+metadata:
+  resourceVersion: ""

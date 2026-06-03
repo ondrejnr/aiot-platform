@@ -1,0 +1,222 @@
+LAST SEEN   TYPE     REASON                       OBJECT                                                  MESSAGE
+60m         Normal   GitOperationSucceeded        gitrepository/flux-system                               no changes since last reconcilation: observed revision 'main@sha1:0de4268f6519ccfbc4c20540a10082f81f360626'
+56m         Normal   ReconciliationSucceeded      kustomization/qdrant-indexer                            Reconciliation finished in 4.488823748s, next run in 30m0s
+55m         Normal   Progressing                  kustomization/kubeflow-authz-crd                        Health check passed in 208.461219ms
+55m         Normal   ReconciliationSucceeded      kustomization/kubeflow-authz-crd                        Reconciliation finished in 5.220408746s, next run in 30m0s
+55m         Normal   ChartPackageSucceeded        helmchart/aiot-ml-aiot-ml-platform                      packaged 'aiot-ml-platform' chart with version '1.0.0+20b7075c2298'
+55m         Normal   ChartPackageSucceeded        helmchart/terrakube-terrakube                           packaged 'terrakube-overlay' chart with version '1.0.0+20b7075c2298'
+55m         Normal   ChartPackageSucceeded        helmchart/aiot-cloudbeaver                              packaged 'cloudbeaver-overlay' chart with version '1.0.0+20b7075c2298'
+55m         Normal   ChartPackageSucceeded        helmchart/victoriametrics-victoriametrics               packaged 'victoriametrics-overlay' chart with version '1.0.0+20b7075c2298'
+55m         Normal   Progressing                  kustomization/kubeflow-profiles                         Health check passed in 72.608935ms
+55m         Normal   Progressing                  kustomization/kubeflow-profiles                         CustomResourceDefinition/profiles.kubeflow.org configured...
+55m         Normal   ReconciliationSucceeded      kustomization/kubeflow-profiles                         Reconciliation finished in 2.930893373s, next run in 30m0s
+55m         Normal   ChartPackageSucceeded        helmchart/observability-logs-alloy                      packaged 'alloy-overlay' chart with version '1.0.0+20b7075c2298'
+55m         Normal   ChartPackageSucceeded        helmchart/blackbox-exporter-blackbox-exporter           packaged 'blackbox-exporter-overlay' chart with version '1.0.0+20b7075c2298'
+55m         Normal   ChartPackageSucceeded        helmchart/zabbix-zabbix                                 packaged 'zabbix-overlay' chart with version '1.0.1+20b7075c2298'
+55m         Normal   ChartPackageSucceeded        helmchart/observability-logs-loki                       packaged 'loki-overlay' chart with version '1.0.0+20b7075c2298'
+55m         Normal   ChartPackageSucceeded        helmchart/chaos-theater-aiot-chaos-theater              packaged 'aiot-chaos-theater' chart with version '0.1.0+20b7075c2298'
+55m         Normal   ChartPackageSucceeded        helmchart/jenkins-jenkins                               packaged 'jenkins-overlay' chart with version '1.0.0+20b7075c2298'
+55m         Normal   ReconciliationSucceeded      kustomization/kubeflow-ingress                          Reconciliation finished in 1.089732468s, next run in 30m0s
+55m         Normal   GarbageCollectionSucceeded   gitrepository/flux-system                               garbage collected 1 artifacts
+50m         Normal   ArtifactUpToDate             helmchart/terrakube-terrakube                           artifact up-to-date with remote revision: '1.0.0+20b7075c2298'
+50m         Normal   ArtifactUpToDate             helmchart/observability-logs-loki                       artifact up-to-date with remote revision: '1.0.0+20b7075c2298'
+49m         Normal   GitOperationSucceeded        gitrepository/flux-system                               no changes since last reconcilation: observed revision 'main@sha1:20b7075c22983686cde5bc5811763e4ccc39232c'
+49m         Normal   ArtifactUpToDate             helmchart/observability-logs-alloy                      artifact up-to-date with remote revision: '1.0.0+20b7075c2298'
+48m         Normal   ReconciliationSucceeded      kustomization/argo-workflows-rbac                       Reconciliation finished in 1.087780093s, next run in 30m0s
+47m         Normal   ReconciliationSucceeded      kustomization/kubeflow-training-operator                Reconciliation finished in 7.657414161s, next run in 30m0s
+47m         Normal   ArtifactUpToDate             helmchart/zabbix-zabbix                                 artifact up-to-date with remote revision: '1.0.1+20b7075c2298'
+47m         Normal   Progressing                  kustomization/kubeflow-authz-crd                        Health check passed in 15.33527ms
+47m         Normal   ReconciliationSucceeded      kustomization/qdrant-indexer                            Reconciliation finished in 4.506032642s, next run in 30m0s
+47m         Normal   ReconciliationSucceeded      kustomization/kubeflow-authz-crd                        Reconciliation finished in 4.358356695s, next run in 30m0s
+47m         Normal   ReconciliationSucceeded      kustomization/flux-system                               Reconciliation finished in 6.864784051s, next run in 10m0s
+47m         Normal   Progressing                  kustomization/flux-system                               CustomResourceDefinition/authorizationpolicies.security.istio.io configured...
+47m         Normal   ChartPackageSucceeded        helmchart/aiot-cloudbeaver                              packaged 'cloudbeaver-overlay' chart with version '1.0.0+53a118bf6f45'
+47m         Normal   ReconciliationSucceeded      kustomization/flux-system                               Reconciliation finished in 3.849057877s, next run in 10m0s
+47m         Normal   DependencyNotReady           kustomization/kubeflow-volumes-web-app                  Dependencies do not meet ready condition, retrying in 30s
+47m         Normal   ChartPackageSucceeded        helmchart/victoriametrics-victoriametrics               packaged 'victoriametrics-overlay' chart with version '1.0.0+53a118bf6f45'
+47m         Normal   ReconciliationSucceeded      kustomization/kubeflow-authz-crd                        Reconciliation finished in 2.276609267s, next run in 30m0s
+47m         Normal   ChartPackageSucceeded        helmchart/observability-logs-alloy                      packaged 'alloy-overlay' chart with version '1.0.0+53a118bf6f45'
+47m         Normal   Progressing                  kustomization/kubeflow-profiles                         Health check passed in 232.248965ms
+47m         Normal   ReconciliationSucceeded      kustomization/kubeflow-profiles                         Reconciliation finished in 7.244456663s, next run in 30m0s
+47m         Normal   ReconciliationSucceeded      kustomization/kubeflow-pipelines-crds                   Reconciliation finished in 10.619757253s, next run in 30m0s
+46m         Normal   ChartPackageSucceeded        helmchart/blackbox-exporter-blackbox-exporter           packaged 'blackbox-exporter-overlay' chart with version '1.0.0+53a118bf6f45'
+46m         Normal   ReconciliationSucceeded      kustomization/kubeflow-tensorboards-web-app             Reconciliation finished in 2.151447533s, next run in 30m0s
+46m         Normal   Progressing                  kustomization/kubeflow-ingress                          Health check passed in 91.931775ms
+46m         Normal   ReconciliationSucceeded      kustomization/kubeflow-ingress                          Reconciliation finished in 2.66551461s, next run in 30m0s
+46m         Normal   ChartPackageSucceeded        helmchart/zabbix-zabbix                                 packaged 'zabbix-overlay' chart with version '1.0.1+53a118bf6f45'
+46m         Normal   ReconciliationSucceeded      kustomization/kubeflow-profiles                         Reconciliation finished in 1.360676544s, next run in 30m0s
+46m         Normal   ChartPackageSucceeded        helmchart/observability-logs-loki                       packaged 'loki-overlay' chart with version '1.0.0+53a118bf6f45'
+46m         Normal   ChartPackageSucceeded        helmchart/chaos-theater-aiot-chaos-theater              packaged 'aiot-chaos-theater' chart with version '0.1.0+53a118bf6f45'
+46m         Normal   ChartPackageSucceeded        helmchart/jenkins-jenkins                               packaged 'jenkins-overlay' chart with version '1.0.0+53a118bf6f45'
+46m         Normal   ReconciliationSucceeded      kustomization/kubeflow-volumes-web-app                  Reconciliation finished in 797.23761ms, next run in 30m0s
+46m         Normal   ChartPackageSucceeded        helmchart/terrakube-terrakube                           packaged 'terrakube-overlay' chart with version '1.0.0+53a118bf6f45'
+46m         Normal   ChartPackageSucceeded        helmchart/aiot-ml-aiot-ml-platform                      packaged 'aiot-ml-platform' chart with version '1.0.0+53a118bf6f45'
+46m         Normal   ReconciliationSucceeded      kustomization/kubeflow-ingress                          Reconciliation finished in 1.463611934s, next run in 30m0s
+46m         Normal   ArtifactUpToDate             helmchart/aiot-ml-aiot-ml-platform                      artifact up-to-date with remote revision: '1.0.0+53a118bf6f45'
+45m         Normal   ReconciliationSucceeded      kustomization/argo-workflows-controller                 Reconciliation finished in 1.486418509s, next run in 30m0s
+45m         Normal   ReconciliationSucceeded      kustomization/kubeflow-tensorboard-controller           Reconciliation finished in 1.249910998s, next run in 30m0s
+45m         Normal   ReconciliationSucceeded      kustomization/kubeflow-roles                            Reconciliation finished in 640.417798ms, next run in 30m0s
+45m         Normal   ReconciliationSucceeded      kustomization/qdrant-indexer                            Reconciliation finished in 906.532514ms, next run in 30m0s
+45m         Normal   ArtifactUpToDate             helmchart/victoriametrics-victoriametrics               artifact up-to-date with remote revision: '1.0.0+53a118bf6f45'
+45m         Normal   ReconciliationSucceeded      kustomization/kubeflow-pipelines                        Reconciliation finished in 2.970238846s, next run in 30m0s
+45m         Normal   Progressing                  kustomization/flux-system                               CustomResourceDefinition/authorizationpolicies.security.istio.io configured...
+45m         Normal   ReconciliationSucceeded      kustomization/flux-system                               Reconciliation finished in 3.909799028s, next run in 10m0s
+45m         Normal   ArtifactUpToDate             helmchart/blackbox-exporter-blackbox-exporter           artifact up-to-date with remote revision: '1.0.0+53a118bf6f45'
+44m         Normal   ReconciliationSucceeded      kustomization/kubeflow-authz-crd                        Reconciliation finished in 1.107916605s, next run in 30m0s
+44m         Normal   ReconciliationSucceeded      kustomization/kserve                                    Reconciliation finished in 8.159365048s, next run in 30m0s
+44m         Normal   ReconciliationSucceeded      kustomization/kubeflow-admission-webhook                Reconciliation finished in 1.017081472s, next run in 30m0s
+44m         Normal   ArtifactUpToDate             helmchart/chaos-theater-aiot-chaos-theater              artifact up-to-date with remote revision: '0.1.0+53a118bf6f45'
+44m         Normal   ArtifactUpToDate             helmchart/jenkins-jenkins                               artifact up-to-date with remote revision: '1.0.0+53a118bf6f45'
+43m         Normal   ReconciliationSucceeded      kustomization/kubeflow-centraldashboard                 Reconciliation finished in 625.379494ms, next run in 30m0s
+42m         Normal   ReconciliationSucceeded      kustomization/kubeflow-profiles                         Reconciliation finished in 1.263229258s, next run in 30m0s
+42m         Normal   ReconciliationSucceeded      kustomization/kubeflow-volumes-web-app                  Reconciliation finished in 612.518882ms, next run in 30m0s
+42m         Normal   ReconciliationSucceeded      kustomization/kubeflow-katib                            Reconciliation finished in 973.464137ms, next run in 30m0s
+42m         Normal   ReconciliationSucceeded      kustomization/kubeflow-jupyter-web-app                  Reconciliation finished in 858.974709ms, next run in 30m0s
+42m         Normal   ReconciliationSucceeded      kustomization/kubeflow-notebook-controller              Reconciliation finished in 3.232611753s, next run in 30m0s
+37m         Normal   ArtifactUpToDate             helmchart/aiot-cloudbeaver                              artifact up-to-date with remote revision: '1.0.0+53a118bf6f45'
+35m         Normal   Progressing                  kustomization/flux-system                               CustomResourceDefinition/authorizationpolicies.security.istio.io configured...
+35m         Normal   ReconciliationSucceeded      kustomization/flux-system                               Reconciliation finished in 3.849092264s, next run in 10m0s
+30m         Normal   GitOperationSucceeded        gitrepository/flux-system                               no changes since last reconcilation: observed revision 'main@sha1:53a118bf6f459d5210b473a84986c827f60f6152'
+28m         Normal   Progressing                  kustomization/kubeflow-authz-crd                        Health check passed in 271.920504ms
+28m         Normal   ReconciliationSucceeded      kustomization/kubeflow-authz-crd                        Reconciliation finished in 4.111177011s, next run in 30m0s
+27m         Normal   ReconciliationSucceeded      kustomization/qdrant-indexer                            Reconciliation finished in 5.069886603s, next run in 30m0s
+27m         Normal   ChartPackageSucceeded        helmchart/aiot-cloudbeaver                              packaged 'cloudbeaver-overlay' chart with version '1.0.0+cad61595bdc3'
+27m         Normal   ReconciliationSucceeded      kustomization/flux-system                               Reconciliation finished in 7.363178468s, next run in 10m0s
+27m         Normal   ChartPackageSucceeded        helmchart/victoriametrics-victoriametrics               packaged 'victoriametrics-overlay' chart with version '1.0.0+cad61595bdc3'
+27m         Normal   ChartPackageSucceeded        helmchart/observability-logs-alloy                      packaged 'alloy-overlay' chart with version '1.0.0+cad61595bdc3'
+27m         Normal   ChartPackageSucceeded        helmchart/blackbox-exporter-blackbox-exporter           packaged 'blackbox-exporter-overlay' chart with version '1.0.0+cad61595bdc3'
+27m         Normal   ChartPackageSucceeded        helmchart/zabbix-zabbix                                 packaged 'zabbix-overlay' chart with version '1.0.1+cad61595bdc3'
+27m         Normal   ChartPackageSucceeded        helmchart/observability-logs-loki                       packaged 'loki-overlay' chart with version '1.0.0+cad61595bdc3'
+27m         Normal   ChartPackageSucceeded        helmchart/chaos-theater-aiot-chaos-theater              packaged 'aiot-chaos-theater' chart with version '0.1.0+cad61595bdc3'
+27m         Normal   Progressing                  kustomization/kubeflow-profiles                         Health check passed in 43.147185ms
+27m         Normal   ReconciliationSucceeded      kustomization/kubeflow-profiles                         Reconciliation finished in 2.454045676s, next run in 30m0s
+27m         Normal   ChartPackageSucceeded        helmchart/jenkins-jenkins                               packaged 'jenkins-overlay' chart with version '1.0.0+cad61595bdc3'
+27m         Normal   ChartPackageSucceeded        helmchart/terrakube-terrakube                           packaged 'terrakube-overlay' chart with version '1.0.0+cad61595bdc3'
+27m         Normal   ChartPackageSucceeded        helmchart/aiot-ml-aiot-ml-platform                      packaged 'aiot-ml-platform' chart with version '1.0.0+cad61595bdc3'
+27m         Normal   ReconciliationSucceeded      kustomization/kubeflow-ingress                          Reconciliation finished in 1.409776753s, next run in 30m0s
+27m         Normal   Progressing                  kustomization/kubeflow-ingress                          Health check passed in 60.527232ms
+25m         Normal   ReconciliationSucceeded      kustomization/flux-system                               Reconciliation finished in 3.273139413s, next run in 10m0s
+22m         Normal   GitOperationSucceeded        gitrepository/kubeflow-katib                            no changes since last reconcilation: observed revision 'v0.17.0@sha1:5723604d419c5ba5bf01240b7be5ebf55aaee0bc'
+19m         Normal   GitOperationSucceeded        gitrepository/flux-system                               no changes since last reconcilation: observed revision 'main@sha1:cad61595bdc3191ce018c1e85725332a7bad8dd4'
+19m         Normal   ArtifactUpToDate             helmchart/terrakube-terrakube                           artifact up-to-date with remote revision: '1.0.0+cad61595bdc3'
+19m         Normal   ArtifactUpToDate             helmchart/observability-logs-loki                       artifact up-to-date with remote revision: '1.0.0+cad61595bdc3'
+19m         Normal   GitOperationSucceeded        gitrepository/kubeflow-pipelines                        no changes since last reconcilation: observed revision '2.15.0@sha1:8fe8d7bdd88f027bde080f619762a0b3294796db'
+18m         Normal   ArtifactUpToDate             helmchart/flux-ui-weave-gitops                          artifact up-to-date with remote revision: '4.0.36'
+18m         Normal   ReconciliationSucceeded      kustomization/kubeflow-training-operator                Reconciliation finished in 7.321220249s, next run in 30m0s
+18m         Normal   Progressing                  kustomization/kubeflow-training-operator                ClusterRole/kubeflow-training-admin configured
+18m         Normal   ArtifactUpToDate             helmchart/observability-logs-alloy                      artifact up-to-date with remote revision: '1.0.0+cad61595bdc3'
+18m         Normal   ReconciliationSucceeded      kustomization/kubeflow-tensorboards-web-app             Reconciliation finished in 840.800333ms, next run in 30m0s
+17m         Normal   ReconciliationSucceeded      kustomization/argo-workflows-rbac                       Reconciliation finished in 1.310887139s, next run in 30m0s
+17m         Normal   ChartPackageSucceeded        helmchart/aiot-ml-aiot-ml-platform                      packaged 'aiot-ml-platform' chart with version '1.0.0+f0cc3d6708ce'
+17m         Normal   ReconciliationSucceeded      kustomization/kubeflow-authz-crd                        Reconciliation finished in 5.792939733s, next run in 30m0s
+17m         Normal   Progressing                  kustomization/kubeflow-authz-crd                        Health check passed in 303.115634ms
+17m         Normal   ReconciliationSucceeded      kustomization/qdrant-indexer                            Reconciliation finished in 5.584100898s, next run in 30m0s
+17m         Normal   ReconciliationSucceeded      kustomization/flux-system                               Reconciliation finished in 6.805262123s, next run in 10m0s
+17m         Normal   ChartPackageSucceeded        helmchart/aiot-cloudbeaver                              packaged 'cloudbeaver-overlay' chart with version '1.0.0+f0cc3d6708ce'
+17m         Normal   ReconciliationSucceeded      kustomization/flux-system                               Reconciliation finished in 4.816547199s, next run in 10m0s
+17m         Normal   ChartPackageSucceeded        helmchart/victoriametrics-victoriametrics               packaged 'victoriametrics-overlay' chart with version '1.0.0+f0cc3d6708ce'
+17m         Normal   ChartPackageSucceeded        helmchart/observability-logs-alloy                      packaged 'alloy-overlay' chart with version '1.0.0+f0cc3d6708ce'
+17m         Normal   ChartPackageSucceeded        helmchart/blackbox-exporter-blackbox-exporter           packaged 'blackbox-exporter-overlay' chart with version '1.0.0+f0cc3d6708ce'
+16m         Normal   ChartPackageSucceeded        helmchart/zabbix-zabbix                                 packaged 'zabbix-overlay' chart with version '1.0.1+f0cc3d6708ce'
+16m         Normal   ChartPackageSucceeded        helmchart/observability-logs-loki                       packaged 'loki-overlay' chart with version '1.0.0+f0cc3d6708ce'
+16m         Normal   ReconciliationSucceeded      kustomization/kubeflow-profiles                         Reconciliation finished in 1.764606258s, next run in 30m0s
+16m         Normal   Progressing                  kustomization/kubeflow-profiles                         Health check passed in 122.441073ms
+16m         Normal   ChartPackageSucceeded        helmchart/chaos-theater-aiot-chaos-theater              packaged 'aiot-chaos-theater' chart with version '0.1.0+f0cc3d6708ce'
+16m         Normal   ChartPackageSucceeded        helmchart/jenkins-jenkins                               packaged 'jenkins-overlay' chart with version '1.0.0+f0cc3d6708ce'
+16m         Normal   GarbageCollectionSucceeded   helmchart/aiot-ml-aiot-ml-platform                      garbage collected 1 artifacts
+16m         Normal   ChartPackageSucceeded        helmchart/terrakube-terrakube                           packaged 'terrakube-overlay' chart with version '1.0.0+f0cc3d6708ce'
+16m         Normal   ArtifactUpToDate             helmchart/aiot-ml-aiot-ml-platform                      artifact up-to-date with remote revision: '1.0.0+f0cc3d6708ce'
+16m         Normal   Progressing                  kustomization/kubeflow-tensorboard-controller           Namespace/kubeflow configured
+16m         Normal   ReconciliationSucceeded      kustomization/kubeflow-tensorboard-controller           Reconciliation finished in 1.064624987s, next run in 30m0s
+16m         Normal   ReconciliationSucceeded      kustomization/kubeflow-ingress                          Reconciliation finished in 1.654686897s, next run in 30m0s
+16m         Normal   Progressing                  kustomization/kubeflow-ingress                          Health check passed in 99.699487ms
+16m         Normal   Progressing                  kustomization/kubeflow-ingress                          Ingress/kubeflow/kubeflow-centraldashboard configured...
+16m         Normal   GarbageCollectionSucceeded   helmchart/victoriametrics-victoriametrics               garbage collected 1 artifacts
+16m         Normal   ArtifactUpToDate             helmchart/victoriametrics-victoriametrics               artifact up-to-date with remote revision: '1.0.0+f0cc3d6708ce'
+16m         Normal   ReconciliationSucceeded      kustomization/argo-workflows-controller                 Reconciliation finished in 5.463039146s, next run in 30m0s
+16m         Normal   Progressing                  kustomization/kubeflow-pipelines-crds                   Namespace/kubeflow configured
+15m         Normal   ReconciliationSucceeded      kustomization/kubeflow-pipelines-crds                   Reconciliation finished in 8.963320867s, next run in 30m0s
+15m         Normal   ReconciliationSucceeded      kustomization/kubeflow-pipelines                        Reconciliation finished in 3.636105761s, next run in 30m0s
+15m         Normal   ReconciliationSucceeded      kustomization/qdrant-indexer                            Reconciliation finished in 977.569223ms, next run in 30m0s
+15m         Normal   ReconciliationSucceeded      kustomization/kubeflow-volumes-web-app                  Reconciliation finished in 582.795271ms, next run in 30m0s
+15m         Normal   ReconciliationSucceeded      kustomization/flux-system                               Reconciliation finished in 3.482542159s, next run in 10m0s
+15m         Normal   GitOperationSucceeded        gitrepository/kubeflow-manifests                        no changes since last reconcilation: observed revision 'v1.11.0@sha1:854bd3a21044f767204def71b2dcda83e376891f'
+15m         Normal   Progressing                  kustomization/kubeflow-authz-crd                        CustomResourceDefinition/authorizationpolicies.security.istio.io configured
+15m         Normal   Progressing                  kustomization/kubeflow-admission-webhook                ClusterRole/admission-webhook-kubeflow-poddefaults-admin configured...
+15m         Normal   ReconciliationSucceeded      kustomization/kubeflow-authz-crd                        Reconciliation finished in 2.071665297s, next run in 30m0s
+15m         Normal   ReconciliationSucceeded      kustomization/kubeflow-admission-webhook                Reconciliation finished in 1.814024711s, next run in 30m0s
+15m         Normal   GitOperationSucceeded        gitrepository/argo-workflows                            no changes since last reconcilation: observed revision 'v3.7.3@sha1:bded09fe4abd37cb98d7fc81b4c14a6f5034e9ab'
+15m         Normal   Progressing                  kustomization/kubeflow-roles                            ClusterRole/kubeflow-admin configured...
+15m         Normal   ReconciliationSucceeded      kustomization/kubeflow-roles                            Reconciliation finished in 652.209959ms, next run in 30m0s
+15m         Normal   ArtifactUpToDate             helmchart/litmus-chaos                                  artifact up-to-date with remote revision: '3.28.0'
+14m         Normal   GitOperationSucceeded        gitrepository/flux-system                               no changes since last reconcilation: observed revision 'main@sha1:f0cc3d6708ce070827c4db550cd3487f1d9483ff'
+14m         Normal   GarbageCollectionSucceeded   helmchart/chaos-theater-aiot-chaos-theater              garbage collected 1 artifacts
+14m         Normal   ArtifactUpToDate             helmchart/chaos-theater-aiot-chaos-theater              artifact up-to-date with remote revision: '0.1.0+f0cc3d6708ce'
+14m         Normal   GarbageCollectionSucceeded   helmchart/blackbox-exporter-blackbox-exporter           garbage collected 1 artifacts
+14m         Normal   ArtifactUpToDate             helmchart/blackbox-exporter-blackbox-exporter           artifact up-to-date with remote revision: '1.0.0+f0cc3d6708ce'
+13m         Normal   ReconciliationSucceeded      kustomization/kserve                                    Reconciliation finished in 7.931994241s, next run in 30m0s
+13m         Normal   ReconciliationSucceeded      kustomization/kubeflow-notebook-controller              Reconciliation finished in 3.447339032s, next run in 30m0s
+13m         Normal   Progressing                  kustomization/kubeflow-notebook-controller              ClusterRole/notebook-controller-kubeflow-notebooks-admin configured
+13m         Normal   GitOperationSucceeded        gitrepository/kserve                                    no changes since last reconcilation: observed revision 'v0.15.2@sha1:d623ea29e4a7312e509829f9104209cd6f820268'
+12m         Normal   ReconciliationSucceeded      kustomization/kubeflow-jupyter-web-app                  Reconciliation finished in 760.70218ms, next run in 30m0s
+12m         Normal   GarbageCollectionSucceeded   helmchart/jenkins-jenkins                               garbage collected 1 artifacts
+12m         Normal   ArtifactUpToDate             helmchart/jenkins-jenkins                               artifact up-to-date with remote revision: '1.0.0+f0cc3d6708ce'
+12m         Normal   Progressing                  kustomization/kubeflow-katib                            Namespace/kubeflow configured
+12m         Normal   ReconciliationSucceeded      kustomization/kubeflow-katib                            Reconciliation finished in 832.589916ms, next run in 30m0s
+12m         Normal   ReconciliationSucceeded      kustomization/kubeflow-centraldashboard                 Reconciliation finished in 722.572401ms, next run in 30m0s
+11m         Normal   GarbageCollectionSucceeded   helmchart/zabbix-zabbix                                 garbage collected 1 artifacts
+11m         Normal   DependencyNotReady           kustomization/kubeflow-profiles                         Dependencies do not meet ready condition, retrying in 30s
+11m         Normal   ArtifactUpToDate             helmchart/qdrant-qdrant                                 artifact up-to-date with remote revision: '1.0.0'
+11m         Normal   ChartPackageSucceeded        helmchart/chaos-theater-aiot-chaos-theater              packaged 'aiot-chaos-theater' chart with version '0.1.0+fc9e6eb63f15'
+11m         Normal   ResolvedDependencies         helmchart/zabbix-zabbix                                 resolved 1 chart dependencies
+11m         Normal   ChartPackageSucceeded        helmchart/zabbix-zabbix                                 packaged 'zabbix-overlay' chart with version '1.0.1+fc9e6eb63f15'
+11m         Normal   ReconciliationSucceeded      kustomization/qdrant-indexer                            Reconciliation finished in 4.256630873s, next run in 30m0s
+11m         Normal   ArtifactUpToDate             helmchart/headlamp-headlamp                             artifact up-to-date with remote revision: '1.1.0'
+11m         Normal   ReconciliationSucceeded      kustomization/kubeflow-authz-crd                        Reconciliation finished in 6.09456313s, next run in 30m0s
+11m         Normal   Progressing                  kustomization/flux-system                               CustomResourceDefinition/authorizationpolicies.security.istio.io configured...
+11m         Normal   ArtifactUpToDate             helmchart/nfs-provisioner-nfs-provisioner               artifact up-to-date with remote revision: '1.0.0'
+11m         Normal   ArtifactUpToDate             helmchart/aiot-aiot-pipeline                            artifact up-to-date with remote revision: '1.0.5'
+11m         Normal   ChartPackageSucceeded        helmchart/jenkins-jenkins                               packaged 'jenkins-overlay' chart with version '1.0.0+fc9e6eb63f15'
+11m         Normal   ResolvedDependencies         helmchart/jenkins-jenkins                               resolved 1 chart dependencies
+10m         Normal   ArtifactUpToDate             helmchart/cluster-copilot-cluster-copilot               artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   Progressing                  kustomization/flux-system                               ConfigMap/observability-logs/alloy configured
+10m         Normal   GarbageCollectionSucceeded   helmchart/terrakube-terrakube                           garbage collected 1 artifacts
+10m         Normal   ArtifactUpToDate             helmchart/event-exporter-event-exporter                 artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   ChartPackageSucceeded        helmchart/aiot-ml-aiot-ml-platform                      packaged 'aiot-ml-platform' chart with version '1.0.0+fc9e6eb63f15'
+10m         Normal   ArtifactUpToDate             helmchart/awx-awx                                       artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   ResolvedDependencies         helmchart/terrakube-terrakube                           resolved 1 chart dependencies
+10m         Normal   ChartPackageSucceeded        helmchart/terrakube-terrakube                           packaged 'terrakube-overlay' chart with version '1.0.0+fc9e6eb63f15'
+10m         Normal   ArtifactUpToDate             helmchart/descheduler-descheduler                       artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   ArtifactUpToDate             helmchart/kube-system-sealed-secrets                    artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   ArtifactUpToDate             helmchart/ingress-nginx-ingress-nginx                   artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   ChartPackageSucceeded        helmchart/aiot-cloudbeaver                              packaged 'cloudbeaver-overlay' chart with version '1.0.0+fc9e6eb63f15'
+10m         Normal   ArtifactUpToDate             helmchart/auth-dex                                      artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   ChartPackageSucceeded        helmchart/victoriametrics-victoriametrics               packaged 'victoriametrics-overlay' chart with version '1.0.0+fc9e6eb63f15'
+10m         Normal   ResolvedDependencies         helmchart/victoriametrics-victoriametrics               resolved 1 chart dependencies
+10m         Normal   ArtifactUpToDate             helmchart/k8up-system-k8up                              artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   ArtifactUpToDate             helmchart/puppet-puppet                                 artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   GarbageCollectionSucceeded   helmchart/observability-logs-alloy                      garbage collected 1 artifacts
+10m         Normal   ArtifactUpToDate             helmchart/cert-manager-cert-manager                     artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   DependencyNotReady           kustomization/kubeflow-ingress                          Dependencies do not meet ready condition, retrying in 30s
+10m         Normal   ArtifactUpToDate             helmchart/pe-console-pe-console                         artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   Progressing                  kustomization/kubeflow-profiles                         CustomResourceDefinition/profiles.kubeflow.org configured...
+10m         Normal   ReconciliationSucceeded      kustomization/kubeflow-profiles                         Reconciliation finished in 2.330073073s, next run in 30m0s
+10m         Normal   Progressing                  kustomization/kubeflow-profiles                         Health check passed in 89.72789ms
+10m         Normal   ResolvedDependencies         helmchart/observability-logs-alloy                      resolved 1 chart dependencies
+10m         Normal   ChartPackageSucceeded        helmchart/observability-logs-alloy                      packaged 'alloy-overlay' chart with version '1.0.0+fc9e6eb63f15'
+10m         Normal   ArtifactUpToDate             helmchart/cnpg-system-cnpg                              artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   GarbageCollectionSucceeded   helmchart/observability-logs-loki                       garbage collected 1 artifacts
+10m         Normal   ResolvedDependencies         helmchart/blackbox-exporter-blackbox-exporter           resolved 1 chart dependencies
+10m         Normal   ChartPackageSucceeded        helmchart/blackbox-exporter-blackbox-exporter           packaged 'blackbox-exporter-overlay' chart with version '1.0.0+fc9e6eb63f15'
+10m         Normal   ArtifactUpToDate             helmchart/gitea-gitea                                   artifact up-to-date with remote revision: '1.0.0'
+10m         Normal   ResolvedDependencies         helmchart/observability-logs-loki                       resolved 1 chart dependencies
+10m         Normal   ChartPackageSucceeded        helmchart/observability-logs-loki                       packaged 'loki-overlay' chart with version '1.0.0+fc9e6eb63f15'
+9m44s       Normal   ArtifactUpToDate             helmchart/awx-awx-operator                              artifact up-to-date with remote revision: '1.0.0'
+9m41s       Normal   ArtifactUpToDate             helmchart/node-problem-detector-node-problem-detector   artifact up-to-date with remote revision: '1.0.0'
+8m53s       Normal   ArtifactUpToDate             helmchart/grafana-grafana                               artifact up-to-date with remote revision: '1.0.3'
+7m57s       Normal   GarbageCollectionSucceeded   helmchart/aiot-cloudbeaver                              garbage collected 1 artifacts
+7m57s       Normal   ArtifactUpToDate             helmchart/aiot-cloudbeaver                              artifact up-to-date with remote revision: '1.0.0+fc9e6eb63f15'
+7m37s       Normal   ArtifactUpToDate             helmchart/databases-pgadmin                             artifact up-to-date with remote revision: '1.0.0'
+5m29s       Normal   ReconciliationSucceeded      kustomization/flux-system                               (combined from similar events): Reconciliation finished in 3.675637508s, next run in 10m0s
+5m29s       Normal   Progressing                  kustomization/flux-system                               CustomResourceDefinition/profiles.kubeflow.org configured...
+4m47s       Normal   GitOperationSucceeded        gitrepository/flux-system                               no changes since last reconcilation: observed revision 'main@sha1:fc9e6eb63f153c81f265ed04c51fadff4d0b62b9'
