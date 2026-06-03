@@ -1,0 +1,425 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    aiot-sensors.json: |-
+      {
+        "title": "AIoT Sensors",
+        "uid": "aiot-sensors",
+        "schemaVersion": 39,
+        "timezone": "browser",
+        "refresh": "10s",
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "templating": {
+          "list": [
+            {
+              "name": "sensor",
+              "type": "query",
+              "datasource": {
+                "type": "postgres",
+                "uid": "AIoT-Postgres"
+              },
+              "refresh": 2,
+              "includeAll": true,
+              "multi": true,
+              "query": "SELECT DISTINCT sensor_id FROM sensor_data WHERE ts > now() - interval '1 hour' ORDER BY 1",
+              "sort": 1
+            },
+            {
+              "name": "location",
+              "type": "query",
+              "datasource": {
+                "type": "postgres",
+                "uid": "AIoT-Postgres"
+              },
+              "refresh": 2,
+              "includeAll": true,
+              "multi": true,
+              "query": "SELECT DISTINCT location FROM sensor_data WHERE ts > now() - interval '1 hour' ORDER BY 1",
+              "sort": 1
+            }
+          ]
+        },
+        "panels": [
+          {
+            "id": 1,
+            "type": "stat",
+            "title": "Active sensors (5m)",
+            "gridPos": {
+              "x": 0,
+              "y": 0,
+              "w": 6,
+              "h": 4
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "AIoT-Postgres"
+            },
+            "targets": [
+              {
+                "format": "table",
+                "rawSql": "SELECT count(DISTINCT sensor_id) FROM sensor_data WHERE ts > now() - interval '5 minutes'",
+                "refId": "A"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "type": "stat",
+            "title": "Msgs/min (5m avg)",
+            "gridPos": {
+              "x": 6,
+              "y": 0,
+              "w": 6,
+              "h": 4
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "AIoT-Postgres"
+            },
+            "targets": [
+              {
+                "format": "table",
+                "rawSql": "SELECT count(*)/5 FROM sensor_data WHERE ts > now() - interval '5 minutes'",
+                "refId": "A"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "type": "stat",
+            "title": "Total rows",
+            "gridPos": {
+              "x": 12,
+              "y": 0,
+              "w": 6,
+              "h": 4
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "AIoT-Postgres"
+            },
+            "targets": [
+              {
+                "format": "table",
+                "rawSql": "SELECT count(*) FROM sensor_data",
+                "refId": "A"
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "type": "stat",
+            "title": "Last sample age (s)",
+            "gridPos": {
+              "x": 18,
+              "y": 0,
+              "w": 6,
+              "h": 4
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "AIoT-Postgres"
+            },
+            "targets": [
+              {
+                "format": "table",
+                "rawSql": "SELECT EXTRACT(EPOCH FROM (now()-max(ts))) FROM sensor_data",
+                "refId": "A"
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "type": "timeseries",
+            "title": "Temperature (C)",
+            "gridPos": {
+              "x": 0,
+              "y": 4,
+              "w": 12,
+              "h": 8
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "AIoT-Postgres"
+            },
+            "targets": [
+              {
+                "format": "time_series",
+                "rawSql": "SELECT ts AS time, sensor_id||'/'||location AS metric, temperature FROM sensor_data WHERE $__timeFilter(ts) AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY ts",
+                "refId": "A"
+              }
+            ]
+          },
+          {
+            "id": 11,
+            "type": "timeseries",
+            "title": "Humidity (%)",
+            "gridPos": {
+              "x": 12,
+              "y": 4,
+              "w": 12,
+              "h": 8
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "AIoT-Postgres"
+            },
+            "targets": [
+              {
+                "format": "time_series",
+                "rawSql": "SELECT ts AS time, sensor_id||'/'||location AS metric, humidity FROM sensor_data WHERE $__timeFilter(ts) AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY ts",
+                "refId": "A"
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "type": "timeseries",
+            "title": "Pressure (hPa)",
+            "gridPos": {
+              "x": 0,
+              "y": 12,
+              "w": 12,
+              "h": 8
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "AIoT-Postgres"
+            },
+            "targets": [
+              {
+                "format": "time_series",
+                "rawSql": "SELECT ts AS time, sensor_id||'/'||location AS metric, pressure FROM sensor_data WHERE $__timeFilter(ts) AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY ts",
+                "refId": "A"
+              }
+            ]
+          },
+          {
+            "id": 13,
+            "type": "timeseries",
+            "title": "Battery (V)",
+            "gridPos": {
+              "x": 12,
+              "y": 12,
+              "w": 12,
+              "h": 8
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "AIoT-Postgres"
+            },
+            "targets": [
+              {
+                "format": "time_series",
+                "rawSql": "SELECT ts AS time, sensor_id||'/'||location AS metric, battery FROM sensor_data WHERE $__timeFilter(ts) AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY ts",
+                "refId": "A"
+              }
+            ]
+          },
+          {
+            "id": 20,
+            "type": "table",
+            "title": "Latest reading per sensor/location",
+            "gridPos": {
+              "x": 0,
+              "y": 20,
+              "w": 24,
+              "h": 10
+            },
+            "datasource": {
+              "type": "postgres",
+              "uid": "AIoT-Postgres"
+            },
+            "targets": [
+              {
+                "format": "table",
+                "rawSql": "SELECT DISTINCT ON (sensor_id, location) ts AS \"time\", sensor_id, location, temperature, humidity, pressure, battery FROM sensor_data WHERE ts > now() - interval '10 minutes' AND sensor_id IN ($sensor) AND location IN ($location) ORDER BY sensor_id, location, ts DESC",
+                "refId": "A"
+              }
+            ]
+          }
+        ]
+      }
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: grafana
+      meta.helm.sh/release-namespace: grafana
+    creationTimestamp: "2026-05-29T14:34:47Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      grafana_dashboard: "1"
+      helm.toolkit.fluxcd.io/name: grafana
+      helm.toolkit.fluxcd.io/namespace: grafana
+    name: aiot-dashboards
+    namespace: grafana
+    resourceVersion: "26920"
+    uid: 7808d24e-43b5-4a13-b7b3-6a06336a25a1
+- apiVersion: v1
+  data:
+    dashboardproviders.yaml: |
+      apiVersion: 1
+      providers:
+      - disableDeletion: false
+        editable: true
+        folder: AIoT
+        name: aiot
+        options:
+          path: /var/lib/grafana/dashboards/aiot
+        orgId: 1
+        type: file
+    datasources.yaml: |
+      apiVersion: 1
+      datasources:
+      - access: proxy
+        editable: true
+        isDefault: true
+        name: Loki
+        type: loki
+        uid: Loki
+        url: http://loki-gateway.observability-logs.svc.cluster.local
+      - access: proxy
+        editable: true
+        isDefault: false
+        name: Prometheus
+        type: prometheus
+        url: http://loki-gateway.observability-logs.svc.cluster.local
+      - access: proxy
+        database: aiot
+        editable: true
+        jsonData:
+          postgresVersion: 1600
+          sslmode: disable
+          timescaledb: false
+        name: AIoT-Postgres
+        secureJsonData:
+          password: Gr4f4n4R0_2026!
+        type: postgres
+        uid: AIoT-Postgres
+        url: http://loki-gateway.observability-logs.svc.cluster.local
+        user: grafana_ro
+    grafana.ini: |
+      [analytics]
+      check_for_updates = true
+      [auth.generic_oauth]
+      allow_assign_grafana_admin = true
+      allow_sign_up = true
+      api_url = http://authentik-server.authentik.svc.cluster.local/application/o/userinfo/
+      auth_url = https://authentik.46.4.123.8.nip.io/application/o/authorize/
+      auto_login = true
+      client_id = i1YjPU3JkwXQZ-ebQGSgMjd-6INKSyEf
+      client_secret = JaSb__wA55TjN98cVcYlrau8o-1jKdhUK1oW7PWnUYL4TF4cUhYZ-UIXlaxPrtdT
+      enabled = true
+      name = Authentik
+      oauth_allow_insecure_email_lookup = true
+      role_attribute_path = contains(groups[*], 'authentik Admins') && 'GrafanaAdmin' || contains(groups[*], 'admin') && 'Admin' || 'Editor'
+      role_attribute_strict = false
+      scopes = openid profile email
+      token_url = http://authentik-server.authentik.svc.cluster.local/application/o/token/
+      use_pkce = true
+      [grafana_net]
+      url = https://grafana.net
+      [log]
+      mode = console
+      [paths]
+      data = /var/lib/grafana/
+      logs = /var/log/grafana
+      plugins = /var/lib/grafana/plugins
+      provisioning = /etc/grafana/provisioning
+      [server]
+      domain = grafana.46.4.123.8.nip.io
+      root_url = https://grafana.46.4.123.8.nip.io
+      [users]
+      auto_assign_org_role = Editor
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"dashboardproviders.yaml":"apiVersion: 1\nproviders:\n- disableDeletion: false\n  editable: true\n  folder: AIoT\n  name: aiot\n  options:\n    path: /var/lib/grafana/dashboards/aiot\n  orgId: 1\n  type: file\n","datasources.yaml":"apiVersion: 1\ndatasources:\n- access: proxy\n  editable: true\n  isDefault: true\n  name: Loki\n  type: loki\n  uid: Loki\n  url: http://loki-gateway.observability-logs.svc.cluster.local\n- access: proxy\n  editable: true\n  isDefault: false\n  name: Prometheus\n  type: prometheus\n  url: http://loki-gateway.observability-logs.svc.cluster.local\n- access: proxy\n  database: aiot\n  editable: true\n  jsonData:\n    postgresVersion: 1600\n    sslmode: disable\n    timescaledb: false\n  name: AIoT-Postgres\n  secureJsonData:\n    password: Gr4f4n4R0_2026!\n  type: postgres\n  uid: AIoT-Postgres\n  url: http://loki-gateway.observability-logs.svc.cluster.local\n  user: grafana_ro\n","grafana.ini":"[analytics]\ncheck_for_updates = true\n[auth.generic_oauth]\nallow_assign_grafana_admin = true\nallow_sign_up = true\napi_url = http://authentik-server.authentik.svc.cluster.local/application/o/userinfo/\nauth_url = https://authentik.46.4.123.8.nip.io/application/o/authorize/\nauto_login = true\nclient_id = i1YjPU3JkwXQZ-ebQGSgMjd-6INKSyEf\nclient_secret = JaSb__wA55TjN98cVcYlrau8o-1jKdhUK1oW7PWnUYL4TF4cUhYZ-UIXlaxPrtdT\nenabled = true\nname = Authentik\noauth_allow_insecure_email_lookup = true\nrole_attribute_path = contains(groups[*], 'authentik Admins') \u0026\u0026 'GrafanaAdmin' || contains(groups[*], 'admin') \u0026\u0026 'Admin' || 'Editor'\nrole_attribute_strict = false\nscopes = openid profile email\ntoken_url = http://authentik-server.authentik.svc.cluster.local/application/o/token/\nuse_pkce = true\n[grafana_net]\nurl = https://grafana.net\n[log]\nmode = console\n[paths]\ndata = /var/lib/grafana/\nlogs = /var/log/grafana\nplugins = /var/lib/grafana/plugins\nprovisioning = /etc/grafana/provisioning\n[server]\ndomain = grafana.46.4.123.8.nip.io\nroot_url = https://grafana.46.4.123.8.nip.io\n[users]\nauto_assign_org_role = Editor\n"},"kind":"ConfigMap","metadata":{"annotations":{"meta.helm.sh/release-name":"grafana","meta.helm.sh/release-namespace":"grafana"},"creationTimestamp":"2026-05-29T14:34:47Z","labels":{"app.kubernetes.io/instance":"grafana","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"grafana","app.kubernetes.io/version":"11.4.0","helm.sh/chart":"grafana-8.8.5","helm.toolkit.fluxcd.io/name":"grafana","helm.toolkit.fluxcd.io/namespace":"grafana"},"name":"grafana","namespace":"grafana","resourceVersion":"310668","uid":"dad27892-6da9-4e07-9a5a-477eec0b67cd"}}
+      meta.helm.sh/release-name: grafana
+      meta.helm.sh/release-namespace: grafana
+    creationTimestamp: "2026-05-29T14:34:47Z"
+    labels:
+      app.kubernetes.io/instance: grafana
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/version: 11.4.0
+      helm.sh/chart: grafana-8.8.5
+      helm.toolkit.fluxcd.io/name: grafana
+      helm.toolkit.fluxcd.io/namespace: grafana
+    name: grafana
+    namespace: grafana
+    resourceVersion: "2009034"
+    uid: dad27892-6da9-4e07-9a5a-477eec0b67cd
+- apiVersion: v1
+  data:
+    datasources.yaml: |
+      apiVersion: 1
+      datasources:
+      - name: Prometheus
+        uid: prometheus
+        type: prometheus
+        access: proxy
+        url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc.cluster.local:8429
+        isDefault: true
+        editable: true
+      - name: VictoriaMetrics
+        uid: victoriametrics
+        type: prometheus
+        access: proxy
+        url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc.cluster.local:8429
+        isDefault: false
+        editable: true
+      - name: Loki
+        uid: loki
+        type: loki
+        access: proxy
+        url: http://loki-gateway.observability-logs.svc.cluster.local
+        isDefault: false
+        editable: true
+        jsonData: {}
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","data":{"datasources.yaml":"apiVersion: 1\ndatasources:\n- name: Prometheus\n  uid: prometheus\n  type: prometheus\n  access: proxy\n  url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc.cluster.local:8429\n  isDefault: true\n  editable: true\n- name: VictoriaMetrics\n  uid: victoriametrics\n  type: prometheus\n  access: proxy\n  url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc.cluster.local:8429\n  isDefault: false\n  editable: true\n- name: Loki\n  uid: loki\n  type: loki\n  access: proxy\n  url: http://loki-gateway.observability-logs.svc.cluster.local\n  isDefault: false\n  editable: true\n  jsonData: {}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"grafana-fixed-datasources","namespace":"grafana"}}
+    creationTimestamp: "2026-06-03T16:24:47Z"
+    labels:
+      app.kubernetes.io/name: grafana
+      grafana_datasource: "1"
+    name: grafana-fixed-datasources
+    namespace: grafana
+    resourceVersion: "2034748"
+    uid: fdd07623-74c7-4f2f-a8fc-301348e3e891
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIBeDCCAR2gAwIBAgIBADAKBggqhkjOPQQDAjAjMSEwHwYDVQQDDBhrM3Mtc2Vy
+      dmVyLWNhQDE3ODAwNTU1ODQwHhcNMjYwNTI5MTE1MzA0WhcNMzYwNTI2MTE1MzA0
+      WjAjMSEwHwYDVQQDDBhrM3Mtc2VydmVyLWNhQDE3ODAwNTU1ODQwWTATBgcqhkjO
+      PQIBBggqhkjOPQMBBwNCAATnP1B2c6bvGqh4/t/PNY47V93faj95N0pSUZ2WB9zz
+      cBe0qIgEqRoBvjagyuLEs5C7lMv7u51Aw24EpbdaqDCBo0IwQDAOBgNVHQ8BAf8E
+      BAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUgZ1quCLKO0rdslFcWGQm
+      PoCfXoowCgYIKoZIzj0EAwIDSQAwRgIhANp5QduduMp3AWUU1skQNxo6S9yrRKya
+      v+s9VL64u4tdAiEAmCsIEJ1hWuuyFQv5MwH9FFGFAEf+3OLU5fpO/Ttdagc=
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2026-05-29T12:56:03Z"
+    name: kube-root-ca.crt
+    namespace: grafana
+    resourceVersion: "6823"
+    uid: 2af8607e-1293-4684-8f5c-070b5843d407
+kind: List
+metadata:
+  resourceVersion: ""

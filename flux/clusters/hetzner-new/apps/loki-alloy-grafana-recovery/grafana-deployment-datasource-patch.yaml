@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: grafana
+spec:
+  template:
+    metadata:
+      annotations:
+        aiot.dhl.com/datasource-gitops-fix: "true"
+    spec:
+      volumes:
+        - name: grafana-fixed-datasources
+          configMap:
+            name: grafana-fixed-datasources
+      containers:
+        - name: grafana
+          volumeMounts:
+            - name: grafana-fixed-datasources
+              mountPath: /etc/grafana/provisioning/datasources/datasources.yaml
+              subPath: datasources.yaml
+              readOnly: true

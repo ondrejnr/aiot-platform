@@ -1,0 +1,125 @@
+apiVersion: v1
+data:
+  config.alloy: "logging {\n  level  = \"info\"\n  format = \"logfmt\"\n}\n\nloki.write\
+    \ \"loki\" {\n  endpoint {\n    url = \"http://loki-gateway.observability-logs.svc.cluster.local/loki/api/v1/push\"\
+    \n  }\n}\n\ndiscovery.kubernetes \"pods\" {\n  role = \"pod\"\n\n  selectors {\n\
+    \    role  = \"pod\"\n    field = \"spec.nodeName=\" + sys.env(\"K8S_NODE_NAME\"\
+    )\n  }\n}\n\ndiscovery.relabel \"pod_logs\" {\n  targets = discovery.kubernetes.pods.targets\n\
+    \n  rule {\n    source_labels = [\"__meta_kubernetes_namespace\"]\n    action\
+    \        = \"replace\"\n    target_label  = \"namespace\"\n  }\n\n  rule {\n \
+    \   source_labels = [\"__meta_kubernetes_pod_name\"]\n    action        = \"replace\"\
+    \n    target_label  = \"pod\"\n  }\n\n  rule {\n    source_labels = [\"__meta_kubernetes_pod_container_name\"\
+    ]\n    action        = \"replace\"\n    target_label  = \"container\"\n  }\n\n\
+    \  rule {\n    source_labels = [\"__meta_kubernetes_pod_node_name\"]\n    action\
+    \        = \"replace\"\n    target_label  = \"node\"\n  }\n\n  rule {\n    source_labels\
+    \ = [\"__meta_kubernetes_pod_label_app_kubernetes_io_name\"]\n    action     \
+    \   = \"replace\"\n    target_label  = \"app\"\n  }\n\n  rule {\n    source_labels\
+    \ = [\"__meta_kubernetes_pod_label_app\"]\n    action        = \"replace\"\n \
+    \   target_label  = \"app_legacy\"\n  }\n\n  rule {\n    source_labels = [\"__meta_kubernetes_namespace\"\
+    , \"__meta_kubernetes_pod_container_name\"]\n    action        = \"replace\"\n\
+    \    target_label  = \"job\"\n    separator     = \"/\"\n    replacement   = \"\
+    $1\"\n  }\n\n  rule {\n        source_labels = [\"__meta_kubernetes_namespace\"\
+    , \"__meta_kubernetes_pod_name\", \"__meta_kubernetes_pod_container_name\"]\n\
+    \        separator     = \"_\"\n        regex         = \"([^_]+)_(.+)_(.+)\"\n\
+    \        target_label  = \"__path__\"\n        replacement   = \"/var/log/containers/${2}_${1}_${3}-*.log\"\
+    \n      }\n\n  rule {\n    source_labels = [\"__meta_kubernetes_pod_container_id\"\
+    ]\n    action        = \"replace\"\n    target_label  = \"container_runtime\"\n\
+    \    regex         = `^(\\\\S+):\\\\/\\\\/.+$`\n    replacement   = \"$1\"\n \
+    \ }\n}\n\nloki.source.file \"pod_logs\" {\n  targets    = discovery.relabel.pod_logs.output\n\
+    \  forward_to = [loki.process.pod_logs.receiver]\n}\n\nloki.process \"pod_logs\"\
+    \ {\n  stage.cri {}\n\n  stage.static_labels {\n    values = {\n      cluster\
+    \ = \"hetzner-new\",\n      source  = \"alloy\",\n    }\n  }\n\n  forward_to =\
+    \ [loki.write.loki.receiver]\n}\n\n\n    loki.source.file \"container_logs_fallback\"\
+    \ {\n      targets = [\n        {\n          __path__ = \"/var/log/containers/*.log\"\
+    ,\n          source   = \"alloy\",\n          job      = \"kubernetes/containers\"\
+    ,\n        },\n      ]\n      forward_to = [loki.process.container_logs_fallback.receiver]\n\
+    \    }\n\n    loki.process \"container_logs_fallback\" {\n      stage.static_labels\
+    \ {\n        values = {\n          source = \"alloy\",\n          job    = \"\
+    kubernetes/containers\",\n        }\n      }\n\n      forward_to = [loki.write.loki.receiver]\n\
+    \    }\n\n    \n    local.file_match \"container_logs_glob\" {\n      path_targets\
+    \ = [\n        {\n          __path__ = \"/var/log/containers/*.log\",\n      \
+    \    source   = \"alloy\",\n          job      = \"kubernetes/containers-glob\"\
+    ,\n        },\n      ]\n    }\n\n    loki.source.file \"container_logs_glob\"\
+    \ {\n      targets    = local.file_match.container_logs_glob.targets\n      forward_to\
+    \ = [loki.process.container_logs_glob.receiver]\n    }\n\n    loki.process \"\
+    container_logs_glob\" {\n      stage.static_labels {\n        values = {\n   \
+    \       source = \"alloy\",\n          job    = \"kubernetes/containers-glob\"\
+    ,\n        }\n      }\n\n      forward_to = [loki.write.loki.receiver]\n    }\n\
+    \n    loki.source.file \"node_logs\" {\n  targets = [\n    {\n      __path__ =\
+    \ \"/var/log/k3d-entrypoints_*.log\",\n    },\n  ]\n  forward_to = [loki.process.node_logs.receiver]\n\
+    \  file_match {\n    enabled     = true\n    sync_period = \"10s\"\n  }\n}\n\n\
+    loki.process \"node_logs\" {\n  stage.regex {\n    expression = \"^\\\\[(?P<time>[^\\\
+    \\]]+)\\\\]\\\\s+(?P<content>.*)$\"\n  }\n\n  stage.static_labels {\n    values\
+    \ = {\n      cluster   = \"hetzner-new\",\n      source    = \"alloy\",\n    \
+    \  log_type  = \"node\",\n      job       = \"node/system\",\n      component\
+    \ = \"k3d-entrypoint\",\n    }\n  }\n\n  stage.output {\n    source = \"content\"\
+    \n  }\n\n  forward_to = [loki.write.loki.receiver]\n}"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: '{"apiVersion":"v1","data":{"config.alloy":"logging
+      {\n  level  = \"info\"\n  format = \"logfmt\"\n}\n\nloki.write \"loki\" {\n  endpoint
+      {\n    url = \"http://loki-gateway.observability-logs.svc.cluster.local/loki/api/v1/push\"\n  }\n}\n\ndiscovery.kubernetes
+      \"pods\" {\n  role = \"pod\"\n\n  selectors {\n    role  = \"pod\"\n    field
+      = \"spec.nodeName=\" + sys.env(\"K8S_NODE_NAME\")\n  }\n}\n\ndiscovery.relabel
+      \"pod_logs\" {\n  targets = discovery.kubernetes.pods.targets\n\n  rule {\n    source_labels
+      = [\"__meta_kubernetes_namespace\"]\n    action        = \"replace\"\n    target_label  =
+      \"namespace\"\n  }\n\n  rule {\n    source_labels = [\"__meta_kubernetes_pod_name\"]\n    action        =
+      \"replace\"\n    target_label  = \"pod\"\n  }\n\n  rule {\n    source_labels
+      = [\"__meta_kubernetes_pod_container_name\"]\n    action        = \"replace\"\n    target_label  =
+      \"container\"\n  }\n\n  rule {\n    source_labels = [\"__meta_kubernetes_pod_node_name\"]\n    action        =
+      \"replace\"\n    target_label  = \"node\"\n  }\n\n  rule {\n    source_labels
+      = [\"__meta_kubernetes_pod_label_app_kubernetes_io_name\"]\n    action        =
+      \"replace\"\n    target_label  = \"app\"\n  }\n\n  rule {\n    source_labels
+      = [\"__meta_kubernetes_pod_label_app\"]\n    action        = \"replace\"\n    target_label  =
+      \"app_legacy\"\n  }\n\n  rule {\n    source_labels = [\"__meta_kubernetes_namespace\",
+      \"__meta_kubernetes_pod_container_name\"]\n    action        = \"replace\"\n    target_label  =
+      \"job\"\n    separator     = \"/\"\n    replacement   = \"$1\"\n  }\n\n  rule
+      {\n        source_labels = [\"__meta_kubernetes_namespace\", \"__meta_kubernetes_pod_name\",
+      \"__meta_kubernetes_pod_container_name\"]\n        separator     = \"_\"\n        regex         =
+      \"([^_]+)_(.+)_(.+)\"\n        target_label  = \"__path__\"\n        replacement   =
+      \"/var/log/containers/${2}_${1}_${3}-*.log\"\n      }\n\n  rule {\n    source_labels
+      = [\"__meta_kubernetes_pod_container_id\"]\n    action        = \"replace\"\n    target_label  =
+      \"container_runtime\"\n    regex         = `^(\\\\S+):\\\\/\\\\/.+$`\n    replacement   =
+      \"$1\"\n  }\n}\n\nloki.source.file \"pod_logs\" {\n  targets    = discovery.relabel.pod_logs.output\n  forward_to
+      = [loki.process.pod_logs.receiver]\n}\n\nloki.process \"pod_logs\" {\n  stage.cri
+      {}\n\n  stage.static_labels {\n    values = {\n      cluster = \"hetzner-new\",\n      source  =
+      \"alloy\",\n    }\n  }\n\n  forward_to = [loki.write.loki.receiver]\n}\n\n\n    loki.source.file
+      \"container_logs_fallback\" {\n      targets = [\n        {\n          __path__
+      = \"/var/log/containers/*.log\",\n          source   = \"alloy\",\n          job      =
+      \"kubernetes/containers\",\n        },\n      ]\n      forward_to = [loki.process.container_logs_fallback.receiver]\n    }\n\n    loki.process
+      \"container_logs_fallback\" {\n      stage.static_labels {\n        values =
+      {\n          source = \"alloy\",\n          job    = \"kubernetes/containers\",\n        }\n      }\n\n      forward_to
+      = [loki.write.loki.receiver]\n    }\n\n    \n    local.file_match \"container_logs_glob\"
+      {\n      path_targets = [\n        {\n          __path__ = \"/var/log/containers/*.log\",\n          source   =
+      \"alloy\",\n          job      = \"kubernetes/containers-glob\",\n        },\n      ]\n    }\n\n    loki.source.file
+      \"container_logs_glob\" {\n      targets    = local.file_match.container_logs_glob.targets\n      forward_to
+      = [loki.process.container_logs_glob.receiver]\n    }\n\n    loki.process \"container_logs_glob\"
+      {\n      stage.static_labels {\n        values = {\n          source = \"alloy\",\n          job    =
+      \"kubernetes/containers-glob\",\n        }\n      }\n\n      forward_to = [loki.write.loki.receiver]\n    }\n\n    loki.source.file
+      \"node_logs\" {\n  targets = [\n    {\n      __path__ = \"/var/log/k3d-entrypoints_*.log\",\n    },\n  ]\n  forward_to
+      = [loki.process.node_logs.receiver]\n  file_match {\n    enabled     = true\n    sync_period
+      = \"10s\"\n  }\n}\n\nloki.process \"node_logs\" {\n  stage.regex {\n    expression
+      = \"^\\\\[(?P\u003ctime\u003e[^\\\\]]+)\\\\]\\\\s+(?P\u003ccontent\u003e.*)$\"\n  }\n\n  stage.static_labels
+      {\n    values = {\n      cluster   = \"hetzner-new\",\n      source    = \"alloy\",\n      log_type  =
+      \"node\",\n      job       = \"node/system\",\n      component = \"k3d-entrypoint\",\n    }\n  }\n\n  stage.output
+      {\n    source = \"content\"\n  }\n\n  forward_to = [loki.write.loki.receiver]\n}"},"kind":"ConfigMap","metadata":{"annotations":{"meta.helm.sh/release-name":"alloy","meta.helm.sh/release-namespace":"observability-logs"},"creationTimestamp":"2026-05-29T17:21:43Z","labels":{"app.kubernetes.io/component":"config","app.kubernetes.io/instance":"alloy","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"alloy","app.kubernetes.io/part-of":"alloy","app.kubernetes.io/version":"v1.16.1","helm.sh/chart":"alloy-1.8.1","helm.toolkit.fluxcd.io/name":"alloy","helm.toolkit.fluxcd.io/namespace":"observability-logs"},"name":"alloy","namespace":"observability-logs","resourceVersion":"2045321","uid":"dd738354-3567-4acd-88cb-09d2820987a9"}}
+
+      '
+    meta.helm.sh/release-name: alloy
+    meta.helm.sh/release-namespace: observability-logs
+    aiot.dhl.com/recovered-by: loki-alloy-grafana-recovery
+    aiot.dhl.com/purpose: Persist working Alloy Loki file collection via local.file_match
+  labels:
+    app.kubernetes.io/component: config
+    app.kubernetes.io/instance: alloy
+    app.kubernetes.io/managed-by: flux
+    app.kubernetes.io/name: alloy
+    app.kubernetes.io/part-of: alloy
+    app.kubernetes.io/version: v1.16.1
+    helm.sh/chart: alloy-1.8.1
+    helm.toolkit.fluxcd.io/name: alloy
+    helm.toolkit.fluxcd.io/namespace: observability-logs
+    aiot.dhl.com/recovery: loki-alloy-grafana
+  name: alloy
+  namespace: observability-logs

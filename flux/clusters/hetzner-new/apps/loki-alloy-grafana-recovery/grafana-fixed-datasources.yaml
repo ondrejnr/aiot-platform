@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-fixed-datasources
+  namespace: grafana
+  labels:
+    grafana_datasource: "1"
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/managed-by: flux
+    aiot.dhl.com/recovery: loki-alloy-grafana
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        uid: prometheus
+        type: prometheus
+        access: proxy
+        url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc.cluster.local:8429
+        isDefault: true
+        editable: true
+      - name: VictoriaMetrics
+        uid: victoriametrics
+        type: prometheus
+        access: proxy
+        url: http://vmsingle-victoriametrics-victoria-metrics-k8s-stack.victoriametrics.svc.cluster.local:8429
+        isDefault: false
+        editable: true
+      - name: Loki
+        uid: loki
+        type: loki
+        access: proxy
+        url: http://loki-gateway.observability-logs.svc.cluster.local
+        isDefault: false
+        editable: true
+        jsonData: {}
