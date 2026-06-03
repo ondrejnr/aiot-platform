@@ -43,12 +43,12 @@ data:
     directory_id = directories[0]["userdirectoryid"]
     api("userdirectory.update", {
         "userdirectoryid": directory_id,
-        "idp_entityid": AUTHENTIK_URL,
-        "sso_url": f"{AUTHENTIK_URL}/application/saml/zabbix/sso/binding/redirect/",
+        "idp_entityid": f"{AUTHENTIK_URL}/application/saml/zabbix/metadata/",
+        "sso_url": f"{AUTHENTIK_URL}/application/saml/zabbix/",
         "slo_url": "",
         "username_attribute": "http://schemas.goauthentik.io/2021/02/saml/username",
-        "sp_entityid": "zabbix.46.4.123.8.nip.io",
-        "nameid_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+        "sp_entityid": f"{ZABBIX_URL}/zabbix",
+        "nameid_format": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
         "sign_assertions": 1,
         "sign_messages": 0,
         "sign_authn_requests": 0,

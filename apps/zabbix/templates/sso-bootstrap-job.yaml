@@ -7,9 +7,6 @@ metadata:
     app.kubernetes.io/name: zabbix
     app.kubernetes.io/component: sso-bootstrap
     app.kubernetes.io/part-of: zabbix
-  annotations:
-    helm.sh/hook: post-install,post-upgrade
-    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
 spec:
   backoffLimit: 3
   template:
