@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudbeaver-authentik-outpost
+  namespace: aiot
+  labels:
+    app.kubernetes.io/name: cloudbeaver
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - cloudbeaver.{{ .Values.domain }}
+      secretName: cloudbeaver-tls
+  rules:
+    - host: cloudbeaver.{{ .Values.domain }}
+      http:
+        paths:
+          - path: /outpost.goauthentik.io
+            pathType: Prefix
+            backend:
+              service:
+                name: authentik-outpost-proxy
+                port:
+                  name: http
