@@ -18,6 +18,15 @@ spec:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: 200m
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      set $awx_sso 0;
+      if ($http_cookie !~* "awx_sessionid=") { set $awx_sso 1; }
+      if ($request_uri ~ "^/sso/") { set $awx_sso 0; }
+      if ($request_uri ~ "^/static/") { set $awx_sso 0; }
+      if ($request_uri ~ "^/api/") { set $awx_sso 0; }
+      if ($request_uri ~ "^/websocket/") { set $awx_sso 0; }
+      if ($arg_local_login = "1") { set $awx_sso 0; }
+      if ($awx_sso = 1) { return 302 /sso/login/saml/?idp=authentik; }
   no_log: false
   replicas: 1
   web_resource_requirements:
