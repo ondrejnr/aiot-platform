@@ -5,6 +5,7 @@ metadata:
   namespace: authentik
 spec:
   schedule: "*/30 * * * *"
+  suspend: true
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
   jobTemplate:
