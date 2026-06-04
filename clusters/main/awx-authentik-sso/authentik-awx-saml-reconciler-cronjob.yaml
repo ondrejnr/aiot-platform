@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: authentik-awx-saml-reconciler
+  namespace: authentik
+spec:
+  schedule: "*/30 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: reconcile-awx-saml
+              image: ghcr.io/goauthentik/server:2026.5.2
+              imagePullPolicy: IfNotPresent
+              command:
+                - /ak-root/.venv/bin/python
+                - -c
+                - |
+                  import os
+                  os.environ.setdefault("DJANGO_SETTINGS_MODULE","authentik.root.settings")
+                  import django
+                  django.setup()
+                  from authentik.core.models import Application
+                  from authentik.providers.saml.models import SAMLProvider
+                  app = Application.objects.get(slug="awx")
+                  p = SAMLProvider.objects.get(pk=app.provider_id)
+                  p.acs_url = "https://awx.46.4.123.8.nip.io/sso/complete/saml/"
+                  p.audience = "https://awx.46.4.123.8.nip.io"
+                  p.sp_binding = "post"
+                  p.save()
+                  app.meta_launch_url = "https://awx.46.4.123.8.nip.io/sso/login/saml/?idp=authentik"
+                  app.save()
+                  print("OK awx authentik saml reconciled")
