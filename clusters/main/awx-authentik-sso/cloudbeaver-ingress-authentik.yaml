@@ -16,7 +16,9 @@
       "app.kubernetes.io/managed-by": "Helm",
       "app.kubernetes.io/name": "cloudbeaver",
       "helm.toolkit.fluxcd.io/name": "cloudbeaver",
-      "helm.toolkit.fluxcd.io/namespace": "aiot"
+      "helm.toolkit.fluxcd.io/namespace": "aiot",
+      "kustomize.toolkit.fluxcd.io/name": "awx-authentik-sso",
+      "kustomize.toolkit.fluxcd.io/namespace": "flux-system"
     },
     "name": "cloudbeaver",
     "namespace": "aiot"

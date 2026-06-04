@@ -15,7 +15,9 @@
       "app.kubernetes.io/name": "aiot-chaos-theater",
       "app.kubernetes.io/part-of": "aiot-platform",
       "helm.toolkit.fluxcd.io/name": "aiot-chaos-theater",
-      "helm.toolkit.fluxcd.io/namespace": "chaos-theater"
+      "helm.toolkit.fluxcd.io/namespace": "chaos-theater",
+      "kustomize.toolkit.fluxcd.io/name": "awx-authentik-sso",
+      "kustomize.toolkit.fluxcd.io/namespace": "flux-system"
     },
     "name": "aiot-chaos-theater",
     "namespace": "chaos-theater"
