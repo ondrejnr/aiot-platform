@@ -10,8 +10,8 @@ spec:
   schedule: {{ .Values.training.schedule | quote }}
   suspend: {{ .Values.training.suspend }}
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 2
-  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       backoffLimit: 1
