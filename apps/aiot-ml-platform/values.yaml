@@ -9,8 +9,8 @@ localAI:
   embeddingModel: nomic-embed-text
   host: ollama.46.4.123.8.nip.io
   numThread: 8
-  timeoutSeconds: 180
-  numPredict: 512
+  timeoutSeconds: 600
+  numPredict: 256
   numCtx: 2048
   temperature: "0.1"
   keepAlive: 30m
