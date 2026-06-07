@@ -239,8 +239,22 @@ def metric_from_question(question):
 
 def parse_hours(question, default=24):
     text = normalize_text(question)
+
+    one_hour_phrases = [
+        "poslednu hodinu",
+        "posledna hodina",
+        "poslednej hodiny",
+        "za hodinu",
+        "za poslednu hodinu",
+        "last hour",
+        "past hour",
+    ]
+    if any(phrase in text for phrase in one_hour_phrases):
+        return 1
+
     patterns = [
         r"posledn\w*\s+(\d{1,3})\s*(?:h|hod|hodin|hodiny|hours?)",
+        r"za\s+posledn\w*\s+(\d{1,3})\s*(?:h|hod|hodin|hodiny|hours?)",
         r"\b(\d{1,3})\s*(?:h|hod|hodin|hodiny|hours?)\b",
     ]
     for pattern in patterns:
