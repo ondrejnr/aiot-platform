@@ -273,13 +273,115 @@ def is_sensor_aggregate_question(question):
         and any(w in q for w in entity_words)
     )
 
+def ask_ollama_with_facts(question, facts, fallback_answer):
+    try:
+        payload = {
+            "model": OLLAMA_MODEL,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "Si lokálny AIOT Copilot. Odpovedaj výlučne po slovensky, stručne a vecne. "
+                        "Použi iba fakty z JSON kontextu. Nič si nevymýšľaj. "
+                        "Ak dáta nestačia, povedz to priamo."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        "Otázka používateľa:\n"
+                        + (question or "")
+                        + "\n\nFakty z databázy alebo clustra:\n"
+                        + json.dumps(facts, ensure_ascii=False, default=str)
+                    ),
+                },
+            ],
+            "stream": False,
+            "keep_alive": OLLAMA_KEEP_ALIVE,
+            "options": {
+                "temperature": OLLAMA_TEMPERATURE,
+                "num_predict": OLLAMA_NUM_PREDICT,
+                "num_ctx": OLLAMA_NUM_CTX,
+                "num_thread": OLLAMA_NUM_THREAD,
+            },
+        }
+        r = requests.post(
+            f"{OLLAMA_URL}/api/chat",
+            json=payload,
+            timeout=OLLAMA_TIMEOUT_SECONDS,
+        )
+        r.raise_for_status()
+        answer = r.json().get("message", {}).get("content", "").strip()
+        return answer or fallback_answer
+    except Exception as exc:
+        return fallback_answer + f" LLM fallback nebol použitý: {exc}"
+
 def answer_sensor_aggregate(question):
+    q = unicodedata.normalize("NFKD", question or "").encode("ascii", "ignore").decode("ascii").lower()
+    q = re.sub(r"\s+", " ", q)
+
     sensor_id = parse_sensor_id(question)
     metric, meta = metric_from_question(question)
     hours = parse_hours(question)
-    if not sensor_id or not metric:
-        return "Upresni senzor a veličinu, napríklad: priemerná teplota sensor-015 za 24 h."
+
+    wants_all = any(w in q for w in [
+        "vsetky", "vsetkych", "vsetkyho", "all", "strojov", "stroje", "senzorov", "senzory"
+    ])
+
+    if not metric:
+        return "Upresni veličinu, napríklad: priemerná teplota všetkých senzorov za 1 h."
+
+    unit = meta["unit"]
+    label = meta["label"]
+
     with pg_conn() as conn, conn.cursor() as cur:
+        if wants_all and not sensor_id:
+            cur.execute(f"""
+                select count(*)::int samples,
+                       count(distinct sensor_id)::int sensors,
+                       avg({metric})::float avg_value,
+                       min({metric})::float min_value,
+                       max({metric})::float max_value,
+                       max(ts) latest
+                from sensor_data
+                where ts > now() - (%s * interval '1 hour')
+                  and {metric} is not null
+            """, (hours,))
+            row = dict(cur.fetchone() or {})
+            samples = row.get("samples") or 0
+            sensors = row.get("sensors") or 0
+            if not samples:
+                return f"Pre všetky senzory nemám za posledných {hours} h žiadne vzorky pre veličinu {label}."
+
+            latest_ts = row.get("latest")
+            latest_txt = latest_ts.isoformat() if hasattr(latest_ts, "isoformat") else latest_ts
+
+            facts = {
+                "question": question,
+                "scope": "all_sensors",
+                "metric": label,
+                "metric_column": metric,
+                "unit": unit,
+                "hours": hours,
+                "samples": samples,
+                "sensors": sensors,
+                "avg": row.get("avg_value"),
+                "min": row.get("min_value"),
+                "max": row.get("max_value"),
+                "latest": latest_txt,
+            }
+
+            fallback = (
+                f"Priemerná {label} všetkých senzorov za posledných {hours} h je {fmt(row.get('avg_value'), unit)}. "
+                f"Počítané z {samples} vzoriek naprieč {sensors} senzormi; "
+                f"min={fmt(row.get('min_value'), unit)}, max={fmt(row.get('max_value'), unit)}, "
+                f"posledná vzorka={latest_txt}."
+            )
+            return ask_ollama_with_facts(question, facts, fallback)
+
+        if not sensor_id:
+            return "Upresni senzor alebo použi formuláciu „všetkých senzorov“, napríklad: priemerná teplota všetkých senzorov za 1 h."
+
         cur.execute(f"""
             select count(*)::int samples,
                    avg({metric})::float avg_value,
@@ -287,21 +389,40 @@ def answer_sensor_aggregate(question):
                    max({metric})::float max_value,
                    max(ts) latest
             from sensor_data
-            where sensor_id = %s and ts > now() - (%s * interval '1 hour')
+            where sensor_id = %s
+              and ts > now() - (%s * interval '1 hour')
+              and {metric} is not null
         """, (sensor_id, hours))
         row = dict(cur.fetchone() or {})
+
     samples = row.get("samples") or 0
     if not samples:
         return f"Pre {sensor_id} nemám za posledných {hours} h žiadne vzorky."
+
     latest_ts = row.get("latest")
     latest_txt = latest_ts.isoformat() if hasattr(latest_ts, "isoformat") else latest_ts
-    unit = meta["unit"]
-    label = meta["label"]
-    return (
+
+    facts = {
+        "question": question,
+        "scope": "single_sensor",
+        "sensor_id": sensor_id,
+        "metric": label,
+        "metric_column": metric,
+        "unit": unit,
+        "hours": hours,
+        "samples": samples,
+        "avg": row.get("avg_value"),
+        "min": row.get("min_value"),
+        "max": row.get("max_value"),
+        "latest": latest_txt,
+    }
+
+    fallback = (
         f"Priemerná {label} pre {sensor_id} za posledných {hours} h je {fmt(row.get('avg_value'), unit)}. "
         f"Počítané z {samples} vzoriek; min={fmt(row.get('min_value'), unit)}, max={fmt(row.get('max_value'), unit)}, "
         f"posledná vzorka={latest_txt}."
     )
+    return ask_ollama_with_facts(question, facts, fallback)
 
 def k8s_get(path, timeout=7):
     """Read-only Kubernetes API helper. This app intentionally never PATCH/POST/DELETEs cluster state."""
