@@ -10,8 +10,8 @@ localAI:
   host: ollama.46.4.123.8.nip.io
   numThread: 8
   timeoutSeconds: 180
-  numPredict: 128
-  numCtx: 1024
+  numPredict: 64
+  numCtx: 512
   temperature: "0.1"
   keepAlive: 30m
   pvcSize: 20Gi
