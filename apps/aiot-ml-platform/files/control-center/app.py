@@ -323,6 +323,11 @@ def answer_sensor_aggregate(question):
     sensor_id = parse_sensor_id(question)
     metric, meta = metric_from_question(question)
     hours = parse_hours(question)
+    wants_llm_explanation = any(w in q for w in [
+        "vysvetli", "vysvetlenie", "interpretuj", "interpretacia",
+        "preco", "prečo", "zhrn", "zhrnutie", "komentar", "komentuj",
+        "analyzuj", "analyza", "odporuc", "odporúč"
+    ])
 
     wants_all = any(w in q for w in [
         "vsetky", "vsetkych", "vsetkyho", "all", "strojov", "stroje", "senzorov", "senzory"
@@ -377,7 +382,9 @@ def answer_sensor_aggregate(question):
                 f"min={fmt(row.get('min_value'), unit)}, max={fmt(row.get('max_value'), unit)}, "
                 f"posledná vzorka={latest_txt}."
             )
-            return ask_ollama_with_facts(question, facts, fallback)
+            if wants_llm_explanation:
+                return ask_ollama_with_facts(question, facts, fallback)
+            return fallback
 
         if not sensor_id:
             return "Upresni senzor alebo použi formuláciu „všetkých senzorov“, napríklad: priemerná teplota všetkých senzorov za 1 h."
@@ -422,7 +429,9 @@ def answer_sensor_aggregate(question):
         f"Počítané z {samples} vzoriek; min={fmt(row.get('min_value'), unit)}, max={fmt(row.get('max_value'), unit)}, "
         f"posledná vzorka={latest_txt}."
     )
-    return ask_ollama_with_facts(question, facts, fallback)
+    if wants_llm_explanation:
+        return ask_ollama_with_facts(question, facts, fallback)
+    return fallback
 
 def k8s_get(path, timeout=7):
     """Read-only Kubernetes API helper. This app intentionally never PATCH/POST/DELETEs cluster state."""
