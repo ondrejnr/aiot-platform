@@ -296,8 +296,10 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                     "role": "system",
                     "content": (
                         "Si lokálny AIOT Copilot. Odpovedaj výlučne po slovensky, stručne a vecne. "
-                        "Použi iba fakty z JSON kontextu. Nič si nevymýšľaj. "
-                        "Ak dáta nestačia, povedz to priamo."
+                        "Použi iba fakty z JSON kontextu a overenú odpoveď. "
+                        "Nikdy nemeň čísla, jednotky, počet vzoriek ani časové okno. "
+                        "Nevymýšľaj nové hodnoty. Ak vysvetľuješ, najprv zachovaj presné čísla z overenej odpovede "
+                        "a potom pridaj maximálne jednu krátku interpretačnú vetu."
                     ),
                 },
                 {
@@ -305,6 +307,8 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                     "content": (
                         "Otázka používateľa:\n"
                         + (question or "")
+                        + "\n\nOverená odpoveď, ktorú nesmieš číselne meniť:\n"
+                        + fallback_answer
                         + "\n\nFakty z databázy alebo clustra:\n"
                         + json.dumps(facts, ensure_ascii=False, default=str)
                     ),
