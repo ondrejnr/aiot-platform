@@ -14,6 +14,11 @@ class ChatRequest(BaseModel):
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama.local-ai.svc.cluster.local:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
 OLLAMA_NUM_THREAD = int(os.getenv("OLLAMA_NUM_THREAD", "4"))
+OLLAMA_TIMEOUT_SECONDS = int(os.getenv("OLLAMA_TIMEOUT_SECONDS", "180"))
+OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "128"))
+OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "1024"))
+OLLAMA_TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.1"))
+OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "30m")
 INFERENCE_URL = os.getenv("INFERENCE_URL", "http://aiot-maintenance-api.aiot.svc.cluster.local:8080")
 INFERENCE_MODEL_NAME = os.getenv("INFERENCE_MODEL_NAME", "aiot-maintenance-predictor")
 FORECAST_MODEL_NAME = os.getenv("FORECAST_MODEL_NAME", "aiot-sensor-forecast-30m")
@@ -245,14 +250,28 @@ def parse_hours(question, default=24):
     return default
 
 
-def is_sensor_aggregate_question(q):
-    text = normalize_text(q)
-    has_aggregate = any(word in text for word in ["priemer", "priemern", "avg", "average", "minimal", "maximal", "minimum", "maximum"])
-    has_history = any(word in text for word in ["posledn", "hodin", "24h", "dnes", "vcera", "histori"])
-    sensor_id = parse_sensor_id(q)
-    metric, _ = metric_from_question(q)
-    return bool(sensor_id and metric and (has_aggregate or has_history))
+def is_sensor_aggregate_question(question):
+    q = unicodedata.normalize("NFKD", question or "").encode("ascii", "ignore").decode("ascii").lower()
+    q = re.sub(r"\s+", " ", q)
 
+    aggregate_words = [
+        "priemer", "avg", "average", "median", "minimum", "maximum", "min", "max",
+        "sucet", "sum", "trend", "poslednu hodinu", "poslednych 60", "last hour",
+        "1h", "hodinu"
+    ]
+    metric_words = [
+        "teplot", "temperature", "vlhk", "humidity", "tlak", "pressure",
+        "bateri", "battery", "rizik", "risk"
+    ]
+    entity_words = [
+        "senzor", "sensor", "stroj", "stroje", "strojov", "vsetky", "vsetkych", "all"
+    ]
+
+    return (
+        any(w in q for w in aggregate_words)
+        and any(w in q for w in metric_words)
+        and any(w in q for w in entity_words)
+    )
 
 def answer_sensor_aggregate(question):
     sensor_id = parse_sensor_id(question)
@@ -709,10 +728,10 @@ def api_chat(req: ChatRequest):
                     {"role": "user", "content": compact_prompt(ctx, question)},
                 ],
                 "stream": False,
-                "keep_alive": "30m",
-                "options": {"temperature": 0.1, "num_predict": 70, "num_ctx": 512, "num_thread": OLLAMA_NUM_THREAD},
+                "keep_alive": OLLAMA_KEEP_ALIVE,
+                "options": {"temperature": OLLAMA_TEMPERATURE, "num_predict": OLLAMA_NUM_PREDICT, "num_ctx": OLLAMA_NUM_CTX, "num_thread": OLLAMA_NUM_THREAD},
             },
-            timeout=60,
+            timeout=OLLAMA_TIMEOUT_SECONDS,
         )
         r.raise_for_status()
         return {"answer": r.json().get("message",{}).get("content", "Bez odpovede."), "source": OLLAMA_MODEL, "seconds": round(time.time() - started, 3)}

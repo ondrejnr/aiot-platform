@@ -41,6 +41,16 @@ spec:
               value: {{ .Values.localAI.model | quote }}
             - name: OLLAMA_NUM_THREAD
               value: {{ .Values.localAI.numThread | quote }}
+            - name: OLLAMA_TIMEOUT_SECONDS
+              value: {{ .Values.localAI.timeoutSeconds | quote }}
+            - name: OLLAMA_NUM_PREDICT
+              value: {{ .Values.localAI.numPredict | quote }}
+            - name: OLLAMA_NUM_CTX
+              value: {{ .Values.localAI.numCtx | quote }}
+            - name: OLLAMA_TEMPERATURE
+              value: {{ .Values.localAI.temperature | quote }}
+            - name: OLLAMA_KEEP_ALIVE
+              value: {{ .Values.localAI.keepAlive | quote }}
             - name: INFERENCE_URL
               value: http://aiot-maintenance-api.aiot.svc.cluster.local:8080
             - name: INFERENCE_MODEL_NAME
