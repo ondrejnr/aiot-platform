@@ -330,9 +330,26 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
         )
         r.raise_for_status()
         answer = r.json().get("message", {}).get("content", "").strip()
-        return answer or fallback_answer
-    except Exception as exc:
-        return fallback_answer + f" LLM fallback nebol použitý: {exc}"
+
+        # LLM is allowed to add only a short qualitative comment.
+        # The verified DB answer remains authoritative and is always returned first.
+        bad_markers = [
+            "yes", "no,", "súdajne", "sudajne", "pravdepodobné výsledky",
+            "pravdepodobne vysledky", "odpoved:", "interpretačná veta:",
+            "interpretacna veta:"
+        ]
+
+        clean = " ".join(answer.split())
+        has_digits = any(ch.isdigit() for ch in clean)
+        is_too_long = len(clean) > 180
+        has_bad_marker = any(marker in clean.lower() for marker in bad_markers)
+
+        if not clean or has_digits or is_too_long or has_bad_marker:
+            return fallback_answer
+
+        return fallback_answer + " Komentár: " + clean
+    except Exception:
+        return fallback_answer
 
 def answer_sensor_aggregate(question):
     q = unicodedata.normalize("NFKD", question or "").encode("ascii", "ignore").decode("ascii").lower()
