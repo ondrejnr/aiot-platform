@@ -19,7 +19,7 @@ OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "128"))
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "2048"))
 OLLAMA_TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.0"))
 OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "30m")
-OLLAMA_FACTS_TIMEOUT_SECONDS = int(os.getenv("OLLAMA_FACTS_TIMEOUT_SECONDS", "15"))
+OLLAMA_FACTS_TIMEOUT_SECONDS = int(os.getenv("OLLAMA_FACTS_TIMEOUT_SECONDS", "120"))
 INFERENCE_URL = os.getenv("INFERENCE_URL", "http://aiot-maintenance-api.aiot.svc.cluster.local:8080")
 INFERENCE_MODEL_NAME = os.getenv("INFERENCE_MODEL_NAME", "aiot-maintenance-predictor")
 FORECAST_MODEL_NAME = os.getenv("FORECAST_MODEL_NAME", "aiot-sensor-forecast-30m")
@@ -296,12 +296,11 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                 {
                     "role": "system",
                     "content": (
-                        "Si odborný AIOT analytik. Odpovedaj výlučne po slovensky. "
-                        "Tvojou jedinou úlohou je stručne vyhodnotiť stav senzorov. "
-                        "NIKDY nepíš kód, Python skripty, ani návody ako dáta spracovať. "
-                        "Nepoužívaj knižnice ako pandas alebo numpy v odpovedi. "
-                        "Použi iba poskytnuté dáta. Nikdy nemeň čísla ani jednotky. "
-                        "Tvoja odpoveď musí byť priama interpretácia (max 2 vety), žiadny úvod."
+                        "Si odborný AIOT analytik. Odpovedaj výhradne v SLOVENČINE. "
+                        "Stručne vyhodnoť stav senzorov JEDNOU vetou. "
+                        "NIKDY nepíš kód, Python, ani Markdown nadpisy (**). "
+                        "Použi iba fakty z kontextu. "
+                        "Tvoja odpoveď musí byť JEDNA krátka veta bez úvodu a bez formátovania."
                     ),
                 },
                 {
@@ -310,7 +309,7 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                         f"Dáta: {json.dumps(facts, ensure_ascii=False, default=str)}\n"
                         f"Sumár: {fallback_answer}\n"
                         f"Otázka: {question or ''}\n"
-                        "Stručne vyhodnoť situáciu v slovenčine (jedna veta):"
+                        "Vyhodnoť stav jednou vetou v slovenčine:"
                     ),
                 },
             ],
@@ -318,7 +317,7 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
             "keep_alive": OLLAMA_KEEP_ALIVE,
             "options": {
                 "temperature": OLLAMA_TEMPERATURE,
-                "num_predict": OLLAMA_NUM_PREDICT,
+                "num_predict": 40,
                 "num_ctx": OLLAMA_NUM_CTX,
                 "num_thread": OLLAMA_NUM_THREAD,
             },
@@ -501,7 +500,11 @@ def answer_location_aggregate(question):
     lines = [f"Priemerná {label} podľa lokácií za posledných {hours} h:"]
     facts = {"question": question, "metric": label, "hours": hours, "locations": {}}
     for row in db_rows:
-        loc, samples, avg_val, min_val, max_val = row
+        loc = row.get("location")
+        samples = row.get("samples")
+        avg_val = row.get("avg_value")
+        min_val = row.get("min_value")
+        max_val = row.get("max_value")
         lines.append(f"- {loc}: {fmt(avg_val, unit)} (z {samples} vzoriek, min={fmt(min_val, unit)}, max={fmt(max_val, unit)})")
         facts["locations"][loc] = {"avg": avg_val, "min": min_val, "max": max_val, "samples": samples}
         
