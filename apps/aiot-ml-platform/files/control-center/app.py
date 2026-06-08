@@ -16,8 +16,8 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
 OLLAMA_NUM_THREAD = int(os.getenv("OLLAMA_NUM_THREAD", "4"))
 OLLAMA_TIMEOUT_SECONDS = int(os.getenv("OLLAMA_TIMEOUT_SECONDS", "180"))
 OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "128"))
-OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "1024"))
-OLLAMA_TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.1"))
+OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "2048"))
+OLLAMA_TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.0"))
 OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "30m")
 OLLAMA_FACTS_TIMEOUT_SECONDS = int(os.getenv("OLLAMA_FACTS_TIMEOUT_SECONDS", "15"))
 INFERENCE_URL = os.getenv("INFERENCE_URL", "http://aiot-maintenance-api.aiot.svc.cluster.local:8080")
@@ -296,22 +296,21 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                 {
                     "role": "system",
                     "content": (
-                        "Si lokálny AIOT Copilot. Odpovedaj výlučne po slovensky, stručne a vecne. "
-                        "Použi iba fakty z JSON kontextu a overenú odpoveď. "
-                        "Nikdy nemeň čísla, jednotky, počet vzoriek ani časové okno. "
-                        "Nevymýšľaj nové hodnoty. Ak vysvetľuješ, najprv zachovaj presné čísla z overenej odpovede "
-                        "a potom pridaj maximálne jednu krátku interpretačnú vetu."
+                        "Si odborný AIOT analytik. Odpovedaj výlučne po slovensky. "
+                        "Tvojou jedinou úlohou je stručne vyhodnotiť stav senzorov. "
+                        "NIKDY nepíš kód, Python skripty, ani návody ako dáta spracovať. "
+                        "Nepoužívaj knižnice ako pandas alebo numpy v odpovedi. "
+                        "Použi iba poskytnuté dáta. Nikdy nemeň čísla ani jednotky. "
+                        "Tvoja odpoveď musí byť priama interpretácia (max 2 vety), žiadny úvod."
                     ),
                 },
                 {
                     "role": "user",
                     "content": (
-                        "Otázka používateľa:\n"
-                        + (question or "")
-                        + "\n\nOverená odpoveď, ktorú nesmieš číselne meniť:\n"
-                        + fallback_answer
-                        + "\n\nFakty z databázy alebo clustra:\n"
-                        + json.dumps(facts, ensure_ascii=False, default=str)
+                        f"Dáta: {json.dumps(facts, ensure_ascii=False, default=str)}\n"
+                        f"Sumár: {fallback_answer}\n"
+                        f"Otázka: {question or ''}\n"
+                        "Stručne vyhodnoť situáciu v slovenčine (jedna veta):"
                     ),
                 },
             ],
@@ -337,7 +336,7 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
         bad_markers = [
             "yes", "no,", "súdajne", "sudajne", "pravdepodobné výsledky",
             "pravdepodobne vysledky", "odpoved:", "interpretačná veta:",
-            "interpretacna veta:"
+            "interpretacna veta:", "python", "import pandas", "numpy", "kód", "kod"
         ]
 
         clean = " ".join(answer.split())
@@ -465,6 +464,56 @@ def answer_sensor_aggregate(question):
         f"Počítané z {samples} vzoriek; min={fmt(row.get('min_value'), unit)}, max={fmt(row.get('max_value'), unit)}, "
         f"posledná vzorka={latest_txt}."
     )
+    if wants_llm_explanation:
+        return ask_ollama_with_facts(question, facts, fallback)
+    return fallback
+
+def is_location_aggregate_question(question):
+    q = unicodedata.normalize("NFKD", question or "").encode("ascii", "ignore").decode("ascii").lower()
+    return "lokaci" in q or "location" in q or "zoskupen" in q or "podla typ" in q
+
+def answer_location_aggregate(question):
+    metric, meta = metric_from_question(question)
+    hours = parse_hours(question)
+    
+    if not metric:
+        return "Upresni veličinu, napríklad: priemerná teplota podľa lokácií."
+        
+    unit = meta["unit"]
+    label = meta["label"]
+    
+    with pg_conn() as conn, conn.cursor() as cur:
+        cur.execute(f"""
+            select location, count(*)::int samples,
+                   avg({metric})::float avg_value,
+                   min({metric})::float min_value,
+                   max({metric})::float max_value
+            from sensor_data
+            where ts > now() - (%s * interval '1 hour')
+              and {metric} is not null
+            group by location
+        """, (hours,))
+        db_rows = cur.fetchall()
+        
+    if not db_rows:
+        return f"Pre veličinu {label} nemám za posledných {hours} h žiadne vzorky podľa lokácií."
+        
+    lines = [f"Priemerná {label} podľa lokácií za posledných {hours} h:"]
+    facts = {"question": question, "metric": label, "hours": hours, "locations": {}}
+    for row in db_rows:
+        loc, samples, avg_val, min_val, max_val = row
+        lines.append(f"- {loc}: {fmt(avg_val, unit)} (z {samples} vzoriek, min={fmt(min_val, unit)}, max={fmt(max_val, unit)})")
+        facts["locations"][loc] = {"avg": avg_val, "min": min_val, "max": max_val, "samples": samples}
+        
+    fallback = "\n".join(lines)
+    
+    q = unicodedata.normalize("NFKD", question or "").encode("ascii", "ignore").decode("ascii").lower()
+    wants_llm_explanation = any(w in q for w in [
+        "vysvetli", "vysvetlenie", "interpretuj", "interpretacia",
+        "preco", "prečo", "zhrn", "zhrnutie", "komentar", "komentuj",
+        "analyzuj", "analyza", "odporuc", "odporúč", "vyhodnot", "poriadku", "standard"
+    ])
+    
     if wants_llm_explanation:
         return ask_ollama_with_facts(question, facts, fallback)
     return fallback
@@ -866,6 +915,8 @@ def api_chat(req: ChatRequest):
         return {"answer": answer_logs(question), "source": "kubernetes-logs-read-only", "seconds": round(time.time() - started, 3)}
     if is_cluster_question(q_lower):
         return {"answer": answer_cluster(), "source": "kubernetes-read-only", "seconds": round(time.time() - started, 3)}
+    if is_location_aggregate_question(question):
+        return {"answer": answer_location_aggregate(question), "source": "sensor-location-postgres", "seconds": round(time.time() - started, 3)}
     if is_sensor_aggregate_question(question):
         return {"answer": answer_sensor_aggregate(question), "source": "sensor-history-postgres", "seconds": round(time.time() - started, 3)}
     if is_forecast_question(q_lower):
@@ -891,7 +942,7 @@ def api_chat(req: ChatRequest):
             json={
                 "model": OLLAMA_MODEL,
                 "messages": [
-                    {"role": "system", "content": "Si lokálny AIOT Copilot. Odpovedaj výlučne po slovensky, stručne, max 3 vety, iba z poskytnutých faktov. Nemáš oprávnenie meniť cluster."},
+                    {"role": "system", "content": "Si odborný AIOT analytik. Odpovedaj výlučne po slovensky, stručne, max 2 vety. NIKDY nepíš kód, Python ani návody. Použi iba fakty."},
                     {"role": "user", "content": compact_prompt(ctx, question)},
                 ],
                 "stream": False,
