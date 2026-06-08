@@ -332,7 +332,15 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
         try:
             parsed = json.loads(raw)
         except Exception:
-            return fallback_answer
+            start = raw.find("{")
+            end = raw.rfind("}")
+            if start >= 0 and end > start:
+                try:
+                    parsed = json.loads(raw[start:end+1])
+                except Exception:
+                    return fallback_answer
+            else:
+                return fallback_answer
 
         if not isinstance(parsed, dict):
             return fallback_answer
@@ -354,7 +362,11 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
             return fallback_answer
         if len(comment) > 180:
             return fallback_answer
-        if any(ch.isdigit() for ch in comment):
+        # LLM may repeat numbers only if those numbers already exist in verified fallback.
+        import re
+        comment_nums = set(re.findall(r"\\d+(?:[.,]\\d+)?", comment))
+        fallback_nums = set(re.findall(r"\\d+(?:[.,]\\d+)?", fallback_answer))
+        if not comment_nums.issubset(fallback_nums):
             return fallback_answer
         if any(marker in comment.lower() for marker in bad_markers):
             return fallback_answer
