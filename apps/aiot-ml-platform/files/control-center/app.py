@@ -341,11 +341,11 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
         ]
 
         clean = " ".join(answer.split())
-        has_digits = any(ch.isdigit() for ch in clean)
-        is_too_long = len(clean) > 180
+        # Zrusene has_digits, pretoze LLM casto prirodzene pouziva cisla (teploty atd.)
+        is_too_long = len(clean) > 800
         has_bad_marker = any(marker in clean.lower() for marker in bad_markers)
 
-        if not clean or has_digits or is_too_long or has_bad_marker:
+        if not clean or is_too_long or has_bad_marker:
             return fallback_answer
 
         return fallback_answer + " Komentár: " + clean
@@ -767,7 +767,8 @@ def is_log_question(q):
 def is_cluster_question(q):
     text = normalize_text(q)
     words=["cluster", "clustr", "kluster", "klustr", "k8s", "kubernetes", "kubernet", "pod", "pody", "node", "nod", "uzol", "uzly", "helm", "flux", "helmrelease", "kustomization", "jenkins", "awx", "signoz", "loki", "grafana", "redis", "redpanda", "cnpg", "postgres", "crash", "fail", "chyba", "chyby", "log", "event", "load"]
-    return any(w in text for w in words)
+    tokens = re.split(r'\W+', text)
+    return any(w in tokens for w in words)
 
 
 def is_forecast_question(q):
@@ -817,7 +818,7 @@ def fast_answer(question, ctx):
 
 
 def compact_prompt(ctx, question):
-    rows=ctx["latest"][:5]
+    rows=ctx["latest"][:50]
     facts="; ".join([
         f"{r.get('sensor_id')} {r.get('location')} stav={r.get('status')} riziko={r.get('risk')} temp={fmt(r.get('temperature'),'°C')} vlhkost={fmt(r.get('humidity'),'%')} tlak={fmt(r.get('pressure'),'hPa')} bateria={fmt(r.get('battery'),'V')}"
         for r in rows
