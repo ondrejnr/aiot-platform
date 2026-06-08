@@ -615,9 +615,9 @@ def answer_compare_locations(question):
         fallback = f"Porovnanie {label} za posledných {hours} h:\n" + "\n".join(lines)
 
         system_prompt = (
-            "Si AIOT analytik. Porovnaj senzorové dáta medzi lokáciami."
-            ' Odpovedz výhradne JSON: {"difference":"rozdiely", "correlation":"popis vzťahu",'
-            ' "analysis":"Napis 2 vety ako porovnanie."}'
+            "You are an IoT sensor analyst. Output ONLY valid JSON, nothing else."
+            ' Example: {"analysis":"Plant is warmer than warehouse by 5°C on average."}'
+            ' Required key: "analysis" (1-2 sentences in Slovak comparing the locations).'
         )
         user_data = json.dumps({"metric": label, "unit": unit, "hours": hours, "locations": db_rows}, ensure_ascii=False, default=str)
         return ask_ollama_analytical(system_prompt, user_data, fallback)
@@ -1396,7 +1396,18 @@ def healthz(): return {"ok": True, "mode": "aiot-copilot-read-only"}
 
 
 @app.get("/api/summary")
-def api_summary(): return {"summary": summary(), "latest": latest(50), "predictions": predictions(), "forecasts": forecasts()}
+def api_summary():
+    def safe(fn, *args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
+    return {
+        "summary": safe(summary),
+        "latest": safe(latest, 50),
+        "predictions": safe(predictions),
+        "forecasts": safe(forecasts),
+    }
 
 
 @app.get("/api/copilot/cluster")
