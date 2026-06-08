@@ -484,6 +484,40 @@ def is_location_aggregate_question(question):
     q = unicodedata.normalize("NFKD", question or "").encode("ascii", "ignore").decode("ascii").lower()
     return "lokaci" in q or "location" in q or "zoskupen" in q or "podla typ" in q
 
+
+LOCATION_TEMP_STANDARDS = {
+    "office": {"min": 20.0, "max": 24.0, "label": "kancelársky priestor"},
+    "lab": {"min": 18.0, "max": 24.0, "label": "laboratórium"},
+    "warehouse": {"min": 16.0, "max": 24.0, "label": "sklad"},
+    "plant": {"min": 18.0, "max": 26.0, "label": "výrobný priestor"},
+    "outside": {"external": True, "label": "vonkajšia referenčná hodnota"},
+}
+
+def location_temperature_eval(location, avg_value, metric):
+    loc = (location or "").lower()
+    if metric != "temperature":
+        return "info", "bez interného teplotného štandardu pre túto veličinu"
+
+    std = LOCATION_TEMP_STANDARDS.get(loc)
+    if not std:
+        return "info", "bez definovaného interného rozsahu"
+
+    if std.get("external"):
+        return "external", "vonkajšia hodnota, nehodnotí sa podľa indoor štandardu"
+
+    lo = std["min"]
+    hi = std["max"]
+    label = std["label"]
+    avg = float(avg_value or 0)
+
+    if avg < lo:
+        return "low", f"pod interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}"
+    if avg > hi:
+        if avg <= hi + 1:
+            return "watch", f"mierne nad interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}"
+        return "high", f"nad interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}"
+    return "ok", f"v poriadku voči internému rozsahu {lo:.0f}–{hi:.0f} °C pre {label}"
+
 def answer_location_aggregate(question):
     metric, meta = metric_from_question(question)
     hours = parse_hours(question)
@@ -512,15 +546,37 @@ def answer_location_aggregate(question):
         
     lines = [f"Priemerná {label} podľa lokácií za posledných {hours} h:"]
     facts = {"question": question, "metric": label, "hours": hours, "locations": {}}
+    problem_locs = []
+
     for row in db_rows:
         loc = row.get("location")
         samples = row.get("samples")
         avg_val = row.get("avg_value")
         min_val = row.get("min_value")
         max_val = row.get("max_value")
-        lines.append(f"- {loc}: {fmt(avg_val, unit)} (z {samples} vzoriek, min={fmt(min_val, unit)}, max={fmt(max_val, unit)})")
-        facts["locations"][loc] = {"avg": avg_val, "min": min_val, "max": max_val, "samples": samples}
-        
+        status, reason = location_temperature_eval(loc, avg_val, metric)
+
+        if status in ["watch", "high", "low"]:
+            problem_locs.append(str(loc))
+
+        lines.append(
+            f"- {loc}: {fmt(avg_val, unit)} – {status}: {reason} "
+            f"(z {samples} vzoriek, min={fmt(min_val, unit)}, max={fmt(max_val, unit)})"
+        )
+        facts["locations"][loc] = {
+            "avg": avg_val,
+            "min": min_val,
+            "max": max_val,
+            "samples": samples,
+            "status": status,
+            "reason": reason,
+        }
+
+    if problem_locs:
+        lines.append("Záver: Pozornosť si zaslúži: " + ", ".join(problem_locs) + ".")
+    else:
+        lines.append("Záver: Hodnotené indoor lokácie sú v poriadku podľa interných rozsahov.")
+
     fallback = "\n".join(lines)
     
     q = unicodedata.normalize("NFKD", question or "").encode("ascii", "ignore").decode("ascii").lower()
