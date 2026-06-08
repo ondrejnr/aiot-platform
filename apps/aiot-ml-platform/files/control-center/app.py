@@ -308,7 +308,7 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                         f"Dáta: {json.dumps(facts, ensure_ascii=False, default=str)}\n"
                         f"Sumár: {fallback_answer}\n"
                         f"Otázka: {question or ''}\n"
-                        "Vyhodnoť stav jednou vetou v slovenčine:"
+                        "Vráť iba validný JSON podľa systémovej inštrukcie. Bez markdownu, bez úvodu."
                     ),
                 },
             ],
@@ -327,25 +327,39 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
             timeout=min(OLLAMA_TIMEOUT_SECONDS, OLLAMA_FACTS_TIMEOUT_SECONDS),
         )
         r.raise_for_status()
-        answer = r.json().get("message", {}).get("content", "").strip()
+        raw = r.json().get("message", {}).get("content", "").strip()
 
-        # LLM is allowed to add only a short qualitative comment.
-        # The verified DB answer remains authoritative and is always returned first.
-        bad_markers = [
-            "yes", "no,", "súdajne", "sudajne", "pravdepodobné výsledky",
-            "pravdepodobne vysledky", "odpoved:", "interpretačná veta:",
-            "interpretacna veta:", "python", "import pandas", "numpy", "kód", "kod"
-        ]
-
-        clean = " ".join(answer.split())
-        # Zrusene has_digits, pretoze LLM casto prirodzene pouziva cisla (teploty atd.)
-        is_too_long = len(clean) > 800
-        has_bad_marker = any(marker in clean.lower() for marker in bad_markers)
-
-        if not clean or is_too_long or has_bad_marker:
+        try:
+            parsed = json.loads(raw)
+        except Exception:
             return fallback_answer
 
-        return fallback_answer + " Komentár: " + clean
+        if not isinstance(parsed, dict):
+            return fallback_answer
+
+        comment = " ".join(str(parsed.get("comment", "")).split())
+        status = str(parsed.get("status", "unknown")).lower().strip()
+
+        allowed_status = {"ok", "watch", "high", "low", "unknown"}
+        bad_markers = [
+            "yes", "no,", "súdajne", "sudajne", "pravdepodobne",
+            "pravdepodobné", "odpoved:", "interpretačná veta",
+            "interpretacna veta", "python", "pandas", "numpy", "```",
+            "kód", "kod", "import "
+        ]
+
+        if status not in allowed_status:
+            return fallback_answer
+        if not comment:
+            return fallback_answer
+        if len(comment) > 180:
+            return fallback_answer
+        if any(ch.isdigit() for ch in comment):
+            return fallback_answer
+        if any(marker in comment.lower() for marker in bad_markers):
+            return fallback_answer
+
+        return fallback_answer + " Komentár: " + comment
     except Exception:
         return fallback_answer
 
