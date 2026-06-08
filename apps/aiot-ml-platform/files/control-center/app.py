@@ -421,7 +421,7 @@ def ask_ollama_analytical(system_prompt, user_data, fallback_answer, num_predict
         if not isinstance(parsed, dict):
             return fallback_answer
         analysis = str(parsed.get("analysis") or parsed.get("comment") or "").strip()
-        if not analysis or len(analysis) > 500:
+        if not analysis or len(analysis) > 800:
             return fallback_answer + f" (LLM missing/too long: {len(analysis)})"
         return fallback_answer + "\nLLM analýza: " + analysis
     except Exception as e:
@@ -553,12 +553,11 @@ def answer_trend_analysis(question):
         fallback = f"Trend {label} pre {location} za posledných {hours} h ({len(rows)} bodov): {'; '.join(points[-20:])}.{std_text}"
 
         system_prompt = (
-            "Si AIOT analytik. Analyzuj trend senzorových dát."
-            ' Odpovedz výhradne JSON: {"trend":"rastúci|klesajúci|stabilný|vlnovitý",'
-            ' "rate":"hodnota zmeny", "concern":"none|low|medium|high",'
-            ' "analysis":"Napis 2 vety ako analyzu."}'
+            "You are an IoT sensor analyst. Output ONLY valid JSON, nothing else."
+            ' Example: {"analysis":"Temperature is stable within normal range."}'
+            ' Required key: "analysis" (1-2 sentences in Slovak about the trend).'
         )
-        user_data = json.dumps({"location": location, "metric": label, "unit": unit, "hours": hours, "standards": std_text, "points": points[-30:]}, ensure_ascii=False, default=str)
+        user_data = json.dumps({"location": location, "metric": label, "unit": unit, "hours": hours, "standards": std_text, "points": points[-20:]}, ensure_ascii=False, default=str)
         return ask_ollama_analytical(system_prompt, user_data, fallback)
     except Exception as exc:
         return f"Chyba pri analýze trendu: {exc}"

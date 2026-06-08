@@ -1,0 +1,193 @@
+HTTP/2 404 
+date: Thu, 04 Jun 2026 02:45:01 GMT
+content-type: text/html; charset=utf-8
+content-length: 5457
+content-language: en
+referrer-policy: same-origin
+vary: Accept-Encoding
+vary: Accept-Language, Cookie
+x-authentik-id: ae8589f372b5454f8c73803724b55c8f
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-powered-by: authentik
+strict-transport-security: max-age=31536000; includeSubDomains
+
+
+
+
+
+
+<!DOCTYPE html>
+<html
+    lang="en"
+    data-theme="light"
+    data-theme-choice="auto"
+>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        
+        <meta name="darkreader-lock">
+        <title>
+authentik
+</title>
+        <link rel="icon" href="/static/dist/assets/icons/icon.png">
+        <link rel="shortcut icon" href="/static/dist/assets/icons/icon.png">
+
+        
+<link rel="prefetch" href="/static/dist/assets/images/flow_background.jpg" />
+
+
+
+<script data-id="authentik-config">
+    "use strict";
+
+    window.authentik = {
+        locale: "en",
+        config: JSON.parse('' || "{}"),
+        brand: JSON.parse('' || "{}"),
+        versionFamily: "",
+        versionSubdomain: "",
+        build: "",
+        api: {
+            base: "",
+            relBase: "",
+        },
+    };
+    window.addEventListener("DOMContentLoaded", function () {
+        
+    });
+</script>
+
+
+
+        
+        <link rel="stylesheet" type="text/css" href="/static/dist/styles/interface-2026.5.2.css" />
+        
+
+        
+
+
+
+  <script data-id="theme-script">
+    "use strict";
+
+    (function () {
+        try {
+            /* Ignore older theme names */
+            let locallyStoredTheme = window.localStorage?.getItem("theme") || null;
+            if (typeof locallyStoredTheme === "string") {
+                locallyStoredTheme = locallyStoredTheme.trim();
+            }
+            if (!(["auto", "light", "dark"].includes(locallyStoredTheme))) {
+                locallyStoredTheme = null;
+            }
+            
+            const initialThemeChoice =
+                new URLSearchParams(window.location.search).get("theme") || locallyStoredTheme;
+
+            const themeChoice =
+                initialThemeChoice || document.documentElement.dataset.themeChoice || "auto";
+
+            document.documentElement.dataset.themeChoice = themeChoice;
+
+            if (themeChoice === "auto") {
+                document.documentElement.dataset.theme = window.matchMedia(
+                    "(prefers-color-scheme: dark)",
+                ).matches
+                    ? "dark"
+                    : "light";
+            } else {
+                document.documentElement.dataset.theme = themeChoice;
+            }
+        } catch (e) {
+            console.error("Failed to apply theme", e);
+        }
+    })();
+  </script>
+
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#18191a" media="(prefers-color-scheme: dark)">
+
+
+
+        <style data-id="brand-css"></style>
+        <script src="/static/dist/poly-2026.5.2.js" type="module"></script>
+        
+<style data-id="static-styles">
+    :root {
+        --ak-global--background-image: url("/static/dist/assets/images/flow_background.jpg");
+    }
+</style>
+
+<link rel="stylesheet" type="text/css" href="/static/dist/styles/static-2026.5.2.css" />
+
+        
+        <meta name="sentry-trace" content="c7dbb349201c40d39daa61673263393e-83a4e8a122560fea" />
+        
+        <meta name="baggage" content="" />
+        
+    </head>
+    <body>
+        
+<ak-skip-to-content></ak-skip-to-content>
+<ak-message-container></ak-message-container>
+
+<div class="pf-c-page__drawer">
+    <div class="pf-c-drawer pf-m-collapsed">
+        <div class="pf-c-drawer__main">
+            <div class="pf-c-drawer__content">
+                <div class="pf-c-drawer__body">
+                    <div class="pf-c-login" data-layout="stacked">
+                        <main class="pf-c-login__main" aria-label="Authentication form">
+                            <div class="pf-c-login__main-header pf-c-brand">
+                                <img class="branding-logo" src="/static/dist/assets/icons/icon_left_brand.svg" alt="authentik Logo" />
+                            </div>
+                            <div class="pf-c-login__main-header">
+                                <h1 class="pf-c-title pf-m-3xl" data-test-id="card-title">
+                                    
+Not Found
+
+                                </h1>
+                            </div>
+                            <div class="pf-c-login__main-body">
+                                
+<div class="pf-c-form">
+    <p></p>
+
+    <div class="pf-c-form__group">
+        <a id="ak-back-home" href="/" class="pf-c-button pf-m-primary pf-m-block">
+            Go home
+        </a>
+    </div>
+</div>
+
+                            </div>
+                        </main>
+                        <footer
+                            name="site-footer"
+                            aria-label="Site footer"
+                            class="pf-c-login__footer pf-m-dark">
+                            <div name="flow-links" aria-label="Flow links">
+                                <ul class="pf-c-list pf-m-inline" part="list">
+                                    
+                                    <li part="list-item">
+                                        <span>
+                                            Powered by authentik
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        
+        
+    </body>
+</html>

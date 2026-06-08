@@ -1,0 +1,29 @@
+version: 1
+metadata:
+  name: aiot-awx-saml-provider
+entries:
+  - model: authentik_providers_saml.samlprovider
+    identifiers:
+      name: awx
+    attrs:
+      name: awx
+      authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+      acs_url: https://awx.46.4.123.8.nip.io/sso/complete/saml/
+      issuer: https://authentik.46.4.123.8.nip.io/application/saml/awx/metadata/
+      audience: https://awx.46.4.123.8.nip.io/sso/metadata/saml/
+      service_provider_binding: post
+      name_id_mapping: !Find [authentik_core.propertymapping, [name, "authentik default SAML Mapping: Username"]]
+      property_mappings:
+        - !Find [authentik_core.propertymapping, [name, "authentik default SAML Mapping: Username"]]
+        - !Find [authentik_core.propertymapping, [name, "authentik default SAML Mapping: Email"]]
+        - !Find [authentik_core.propertymapping, [name, "authentik default SAML Mapping: UPN"]]
+      signing_kp: !Find [authentik_crypto.certificatekeypair, [name, authentik Self-signed Certificate]]
+  - model: authentik_core.application
+    identifiers:
+      slug: awx
+    attrs:
+      name: AWX
+      slug: awx
+      provider: !KeyOf awx
+      meta_launch_url: https://awx.46.4.123.8.nip.io/
+      open_in_new_tab: true

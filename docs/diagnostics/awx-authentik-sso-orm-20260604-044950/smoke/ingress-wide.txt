@@ -1,0 +1,38 @@
+NAMESPACE         NAME                                      CLASS    HOSTS                               ADDRESS      PORTS     AGE
+aiot              aiot-control-center                       nginx    aiot-control.46.4.123.8.nip.io      172.18.0.7   80, 443   5d13h
+aiot              aiot-emqx-dashboard                       nginx    emqx.46.4.123.8.nip.io              172.18.0.7   80, 443   5d13h
+aiot              aiot-emqx-dashboard-authentik-outpost     nginx    emqx.46.4.123.8.nip.io              172.18.0.7   80, 443   18h
+aiot              aiot-emqx-login-bypass                    nginx    emqx.46.4.123.8.nip.io              172.18.0.7   80, 443   5d13h
+aiot              aiot-redpanda-console                     nginx    redpanda.46.4.123.8.nip.io          172.18.0.7   80, 443   5d13h
+aiot              aiot-redpanda-console-authentik-outpost   nginx    redpanda.46.4.123.8.nip.io          172.18.0.7   80, 443   19h
+aiot              cloudbeaver                               nginx    cloudbeaver.46.4.123.8.nip.io       172.18.0.7   80, 443   5d13h
+auth              dex                                       <none>   dex.46.4.123.8.nip.io               172.18.0.7   80, 443   5d12h
+authentik         authentik-server                          nginx    authentik.46.4.123.8.nip.io         172.18.0.7   80, 443   4d22h
+awx               awx-ingress                               nginx    awx.46.4.123.8.nip.io               172.18.0.7   80, 443   5d11h
+chaos-theater     aiot-chaos-theater                        nginx    chaos-theater.46.4.123.8.nip.io     172.18.0.7   80, 443   5d13h
+chef              chef-automate                             nginx    chef.46.4.123.8.nip.io              172.18.0.7   80, 443   4d19h
+cluster-copilot   cluster-copilot                           nginx    cluster-copilot.46.4.123.8.nip.io   172.18.0.7   80, 443   5d12h
+databases         pgadmin-pgadmin4                          nginx    pgadmin.46.4.123.8.nip.io           172.18.0.7   80, 443   5d11h
+flux-ui           weave-gitops                              nginx    flux.46.4.123.8.nip.io              172.18.0.7   80, 443   5d13h
+gitea             gitea                                     nginx    gitea.46.4.123.8.nip.io             172.18.0.7   80, 443   5d12h
+grafana           grafana                                   nginx    grafana.46.4.123.8.nip.io           172.18.0.7   80, 443   5d12h
+headlamp          headlamp                                  nginx    headlamp.46.4.123.8.nip.io          172.18.0.7   80, 443   4d17h
+jenkins           jenkins                                   nginx    jenkins.46.4.123.8.nip.io           172.18.0.7   80, 443   5d13h
+kubeflow          kubeflow-centraldashboard                 nginx    kubeflow.46.4.123.8.nip.io          172.18.0.7   80        5d13h
+kubeflow          kubeflow-jupyter                          nginx    kubeflow.46.4.123.8.nip.io          172.18.0.7   80        5d13h
+kubeflow          kubeflow-katib                            nginx    kubeflow.46.4.123.8.nip.io          172.18.0.7   80        5d13h
+kubeflow          kubeflow-kfam                             nginx    kubeflow.46.4.123.8.nip.io          172.18.0.7   80        5d13h
+kubeflow          kubeflow-pipelines                        nginx    kubeflow.46.4.123.8.nip.io          172.18.0.7   80, 443   5d13h
+kubeflow          kubeflow-tensorboards                     nginx    kubeflow.46.4.123.8.nip.io          172.18.0.7   80        5d13h
+kubeflow          kubeflow-volumes                          nginx    kubeflow.46.4.123.8.nip.io          172.18.0.7   80        5d13h
+litmus            litmus-ingress                            nginx    litmus.46.4.123.8.nip.io            172.18.0.7   80, 443   5d11h
+local-ai          ollama                                    nginx    ollama.46.4.123.8.nip.io            172.18.0.7   80, 443   5d13h
+mlflow            mlflow                                    nginx    mlflow.46.4.123.8.nip.io            172.18.0.7   80, 443   5d13h
+oauth2-proxy      oauth2-proxy                              nginx    oauth2-proxy.46.4.123.8.nip.io      172.18.0.7   80, 443   5d8h
+pe-console        pe-console                                nginx    pe.46.4.123.8.nip.io                172.18.0.7   80, 443   5d13h
+qdrant            qdrant                                    nginx    qdrant.46.4.123.8.nip.io            172.18.0.7   80, 443   5d12h
+qdrant            qdrant-authentik-outpost                  nginx    qdrant.46.4.123.8.nip.io            172.18.0.7   80, 443   17h
+terrakube         terrakube-api                             nginx    terrakube-api.46.4.123.8.nip.io     172.18.0.7   80, 443   5d12h
+terrakube         terrakube-registry                        nginx    terrakube-reg.46.4.123.8.nip.io     172.18.0.7   80, 443   5d12h
+terrakube         terrakube-ui                              nginx    terrakube.46.4.123.8.nip.io         172.18.0.7   80, 443   5d12h
+zabbix            zabbix                                    nginx    zabbix.46.4.123.8.nip.io            172.18.0.7   80, 443   5d11h
