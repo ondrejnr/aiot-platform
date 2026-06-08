@@ -555,12 +555,20 @@ def answer_location_aggregate(question):
         min_val = row.get("min_value")
         max_val = row.get("max_value")
         status, reason = location_temperature_eval(loc, avg_val, metric)
+        status_label = {
+            "ok": "v poriadku",
+            "watch": "sledovať",
+            "high": "vysoké",
+            "low": "nízke",
+            "external": "vonkajšia referencia",
+            "info": "info",
+        }.get(status, status)
 
         if status in ["watch", "high", "low"]:
             problem_locs.append(str(loc))
 
         lines.append(
-            f"- {loc}: {fmt(avg_val, unit)} – {status}: {reason} "
+            f"- {loc}: {fmt(avg_val, unit)} – {status_label}: {reason} "
             f"(z {samples} vzoriek, min={fmt(min_val, unit)}, max={fmt(max_val, unit)})"
         )
         facts["locations"][loc] = {
