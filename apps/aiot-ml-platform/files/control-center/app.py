@@ -305,8 +305,8 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                 {
                     "role": "user",
                     "content": (
-                        f"Dáta: {json.dumps(facts, ensure_ascii=False, default=str)}\n"
-                        f"Sumár: {fallback_answer}\n"
+                        f"Dáta: {json.dumps(facts.get('llm_context', facts), ensure_ascii=False, default=str)}\n"
+                        f"Sumár: {facts.get('llm_verified_summary', fallback_answer)}\n"
                         f"Otázka: {question or ''}\n"
                         "Vráť iba validný JSON podľa systémovej inštrukcie. Bez markdownu, bez úvodu."
                     ),
@@ -555,6 +555,8 @@ def answer_location_aggregate(question):
     lines = [f"Priemerná {label} podľa lokácií za posledných {hours} h:"]
     facts = {"question": question, "metric": label, "hours": hours, "locations": {}}
     problem_locs = []
+    ok_locs = []
+    external_locs = []
 
     for row in db_rows:
         loc = row.get("location")
