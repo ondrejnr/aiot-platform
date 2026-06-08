@@ -494,6 +494,24 @@ def is_location_aggregate_question(question):
         )
     )
 
+LOCATION_TEMP_STANDARDS = {"office":{"min":20.0,"max":24.0,"label":"kancelársky priestor"},"lab":{"min":18.0,"max":24.0,"label":"laboratórium"},"warehouse":{"min":16.0,"max":24.0,"label":"sklad"},"plant":{"min":18.0,"max":26.0,"label":"výrobný priestor"},"outside":{"external":True,"label":"vonkajšia referenčná hodnota"}}
+
+def location_temperature_eval(location, avg_value, metric):
+    loc = (location or "").lower()
+    if metric != "temperature":
+        return "info", "bez interného teplotného štandardu pre túto veličinu"
+    std = LOCATION_TEMP_STANDARDS.get(loc)
+    if not std:
+        return "info", "bez definovaného interného rozsahu"
+    if std.get("external"):
+        return "external", "vonkajšia hodnota, nehodnotí sa podľa indoor štandardu"
+    lo = std["min"]; hi = std["max"]; label = std["label"]; avg = float(avg_value or 0)
+    if avg < lo:
+        return "low", f"pod interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}"
+    if avg > hi:
+        return ("watch", f"mierne nad interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}") if avg <= hi + 1 else ("high", f"nad interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}")
+    return "ok", f"v internom rozsahu {lo:.0f}–{hi:.0f} °C pre {label}"
+
 def answer_location_aggregate(question):
     metric, meta = metric_from_question(question)
     hours = parse_hours(question)
