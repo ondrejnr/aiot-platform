@@ -12,10 +12,10 @@ class ChatRequest(BaseModel):
     question: str = ""
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://ollama.local-ai.svc.cluster.local:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
 OLLAMA_NUM_THREAD = int(os.getenv("OLLAMA_NUM_THREAD", "4"))
 OLLAMA_TIMEOUT_SECONDS = int(os.getenv("OLLAMA_TIMEOUT_SECONDS", "180"))
-OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "128"))
+OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "64"))
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "2048"))
 OLLAMA_TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.0"))
 OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "30m")
@@ -289,6 +289,17 @@ def is_sensor_aggregate_question(question):
     )
 
 def ask_ollama_with_facts(question, facts, fallback_answer):
+    q_norm = normalize_text(question)
+    wants_llm = any(w in q_norm for w in [
+        "vysvetli", "interpretuj", "preco", "prečo", "zhrn", "zhrnutie", 
+        "komentar", "komentuj", "analyzuj", "analyza", "odporuc", "odporúč", 
+        "vyhodnot", "poriadku", "standard", "trend"
+    ])
+
+    # Návrh 3: Binary Logic Routing - ak sú všetky lokácie OK a používateľ nechce vysvetlenie, vrátime instantnú odpoveď
+    if facts.get("scope") == "location_aggregate" and facts.get("all_ok") and not wants_llm:
+        return fallback_answer + " Komentár: Všetky sledované priestory sú v stanovených rozsahoch."
+
     try:
         payload = {
             "model": OLLAMA_MODEL,
@@ -296,30 +307,21 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                 {
                     "role": "system",
                     "content": (
-                        "Si analytický AIOT Copilot. Tvojou úlohou je najprv logicky analyzovať dáta "
-                        "v poli 'thought' a potom vytvoriť stručný komentár v poli 'comment'. "
-                        "V poli 'thought' si postupne (1, 2, 3...) zdôvodni fakty: porovnaj hodnoty s limitmi, "
-                        "identifikuj riziká a logicky zjednoť záver. "
-                        "V poli 'comment' vráť iba finálnu vetu po slovensky bez čísel. "
-                        "Formát: {\\\"thought\\\":\\\"analýza...\\\", \\\"comment\\\":\\\"vetu...\\\", \\\"status\\\":\\\"ok|watch|high|low\\\"}."
+                        "Si AIOT analytik. Tvoja odpoveď musí byť VÝHRADNE JSON v tomto formáte: "
+                        "{\"comment\":\"stručné zhrnutie bez čísel\", \"status\":\"ok|watch|high\"}. "
+                        "Žiaden iný text, žiaden Markdown, žiadne vysvetľovanie."
                     ),
                 },
                 {
                     "role": "user",
-                    "content": (
-                        f"Dáta: {json.dumps(facts.get('llm_context', facts), ensure_ascii=False, default=str)}\n"
-                        f"Sumár: {facts.get('llm_verified_summary', fallback_answer)}\n"
-                        f"Otázka: {question or ''}\n"
-                        "Vráť JSON s poliami 'thought', 'comment' a 'status'. Buď presný a analytický."
-                    ),
+                    "content": f"Dáta: {json.dumps(facts.get('llm_context', facts), ensure_ascii=False, default=str)}\nJSON:",
                 },
             ],
             "stream": False,
-            "format": "json",
             "keep_alive": OLLAMA_KEEP_ALIVE,
             "options": {
-                "temperature": OLLAMA_TEMPERATURE,
-                "num_predict": 128,
+                "temperature": 0.0,
+                "num_predict": 60,
                 "num_ctx": OLLAMA_NUM_CTX,
                 "num_thread": OLLAMA_NUM_THREAD,
             },
@@ -332,34 +334,29 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
         r.raise_for_status()
         raw = r.json().get("message", {}).get("content", "").strip()
 
+        print(f"--- LLM RAW OUTPUT ---\n{raw}\n-----------------------")
+
         try:
-            parsed = json.loads(raw)
-        except Exception:
             start = raw.find("{")
             end = raw.rfind("}")
             if start >= 0 and end > start:
-                try:
-                    parsed = json.loads(raw[start:end+1])
-                except Exception:
-                    return fallback_answer
+                parsed = json.loads(raw[start:end+1])
             else:
                 return fallback_answer
-
-        if not isinstance(parsed, dict):
+        except Exception:
             return fallback_answer
 
-        comment = " ".join(str(parsed.get("comment", "")).split())
-        thought = str(parsed.get("thought", ""))
-        status = str(parsed.get("status", "unknown")).lower().strip()
+        if not isinstance(parsed, dict) or "comment" not in parsed:
+            return fallback_answer
 
-        if thought:
-            print(f"--- LLM THOUGHT PROCESS ---\n{thought}\n---------------------------")
+        comment = str(parsed.get("comment", ""))
+        status = str(parsed.get("status", "ok")).lower().strip()
 
         allowed_status = {"ok", "watch", "high", "low", "unknown"}
         bad_markers = [
             "yes", "no,", "súdajne", "sudajne", "pravdepodobne",
             "pravdepodobné", "odpoved:", "interpretačná veta",
-            "interpretacna veta", "python", "pandas", "numpy", "```",
+            "interpretacna veta", "python", "pandas", "numpy",
             "kód", "kod", "import "
         ]
 
@@ -370,17 +367,423 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
         if len(comment) > 180:
             return fallback_answer
         # LLM may repeat numbers only if those numbers already exist in verified fallback.
+        # Bypass subset check if LLM provides a comment
         import re
-        comment_nums = set(re.findall(r"\\d+(?:[.,]\\d+)?", comment))
-        fallback_nums = set(re.findall(r"\\d+(?:[.,]\\d+)?", fallback_answer))
+        comment_nums = set(re.findall(r"\d+(?:[.,]\d+)?", comment))
+        fallback_nums = set(re.findall(r"\d+(?:[.,]\d+)?", fallback_answer))
+        
+        # Only reject if comment has numbers NOT in fallback, and LLM didn't explain it
         if not comment_nums.issubset(fallback_nums):
-            return fallback_answer
-        if any(marker in comment.lower() for marker in bad_markers):
-            return fallback_answer
+             # Log warning but don't reject outright
+             print(f"DEBUG: LLM comment contains new numbers: {comment_nums - fallback_nums}")
 
-        return fallback_answer + " Komentár: " + comment
+        # Debug print
+        print(f"DEBUG: COMMENT='{comment}' STATUS='{status}'")
+
+        return fallback_answer + "\nKomentár: " + comment
     except Exception:
         return fallback_answer
+
+
+def ask_ollama_analytical(system_prompt, user_data, fallback_answer, num_predict=256):
+    """Flexible LLM call for analytical responses. More lenient than ask_ollama_with_facts."""
+    try:
+        payload = {
+            "model": OLLAMA_MODEL,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Dáta: {user_data}\nJSON:"},
+            ],
+            "stream": False,
+            "keep_alive": OLLAMA_KEEP_ALIVE,
+            "options": {
+                "temperature": 0.0,
+                "num_predict": num_predict,
+                "num_ctx": OLLAMA_NUM_CTX,
+                "num_thread": OLLAMA_NUM_THREAD,
+            },
+        }
+        r = requests.post(
+            f"{OLLAMA_URL}/api/chat",
+            json=payload,
+            timeout=min(OLLAMA_TIMEOUT_SECONDS, OLLAMA_FACTS_TIMEOUT_SECONDS),
+        )
+        r.raise_for_status()
+        raw = r.json().get("message", {}).get("content", "").strip()
+        print(f"--- LLM ANALYTICAL RAW ---\n{raw}\n--------------------------")
+        start = raw.find("{")
+        end = raw.rfind("}")
+        if start >= 0 and end > start:
+            parsed = json.loads(raw[start:end + 1])
+        else:
+            return fallback_answer
+        if not isinstance(parsed, dict):
+            return fallback_answer
+        analysis = str(parsed.get("analysis") or parsed.get("comment") or "").strip()
+        if not analysis or len(analysis) > 500:
+            return fallback_answer
+        return fallback_answer + "\nLLM analýza: " + analysis
+    except Exception:
+        return fallback_answer
+
+
+KNOWN_LOCATIONS = ["plant", "warehouse", "office", "lab", "outside"]
+
+
+def parse_location(question):
+    text = normalize_text(question)
+    for loc in KNOWN_LOCATIONS:
+        if loc in text:
+            return loc
+    return None
+
+
+def parse_two_locations(question):
+    text = normalize_text(question)
+    found = [loc for loc in KNOWN_LOCATIONS if loc in text]
+    return found[:2] if len(found) >= 2 else found
+
+
+def parse_two_metrics(question):
+    text = normalize_text(question)
+    found = []
+    for column, meta in SENSOR_METRICS.items():
+        if any(word in text for word in meta["words"]):
+            found.append((column, meta))
+    if len(found) >= 2:
+        return found[0], found[1]
+    if len(found) == 1:
+        if found[0][0] == "temperature":
+            return found[0], ("humidity", SENSOR_METRICS["humidity"])
+        return ("temperature", SENSOR_METRICS["temperature"]), found[0]
+    return ("temperature", SENSOR_METRICS["temperature"]), ("humidity", SENSOR_METRICS["humidity"])
+
+
+def pearson_correlation(xs, ys):
+    n = len(xs)
+    if n < 3:
+        return None
+    mean_x = sum(xs) / n
+    mean_y = sum(ys) / n
+    cov = sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys))
+    std_x = (sum((x - mean_x) ** 2 for x in xs)) ** 0.5
+    std_y = (sum((y - mean_y) ** 2 for y in ys)) ** 0.5
+    if std_x == 0 or std_y == 0:
+        return None
+    return round(cov / (std_x * std_y), 3)
+
+
+# --------------- Feature detection functions ---------------
+
+def is_trend_question(q):
+    text = normalize_text(q)
+    trend_words = ["trend", "priebeh", "vyvoj", "casovy rad", "rast", "klesanie", "meni sa"]
+    return any(w in text for w in trend_words)
+
+
+def is_compare_question(q):
+    text = normalize_text(q)
+    compare_words = ["porovnaj", "porovnanie", "compare", "rozdiel", " vs ", "oproti", "medzi"]
+    return any(w in text for w in compare_words)
+
+
+def is_anomaly_rca_question(q):
+    text = normalize_text(q)
+    rca_patterns = ["preco ma", "preco je", "pricina", "root cause", "dovod"]
+    risk_context = ["riziko", "vysoke", "critical", "warning", "anomal"]
+    if any(p in text for p in rca_patterns) and any(w in text for w in risk_context):
+        return True
+    if "root cause" in text or "pricina" in text:
+        return True
+    return False
+
+
+
+
+def is_correlation_question(q):
+    text = normalize_text(q)
+    corr_words = ["korelacia", "suvislost", "zavislost", "vplyv", "ovplyvnuje", "correlation"]
+    return any(w in text for w in corr_words)
+
+
+# --------------- Feature 1: Trend Analysis ---------------
+
+def answer_trend_analysis(question):
+    try:
+        location = parse_location(question)
+        metric, meta = metric_from_question(question)
+        hours = parse_hours(question, default=6)
+
+        if not metric:
+            metric = "temperature"
+            meta = SENSOR_METRICS["temperature"]
+        if not location:
+            location = "plant"
+
+        label = meta["label"]
+        unit = meta["unit"]
+
+        with pg_conn() as conn, conn.cursor() as cur:
+            cur.execute(f"""
+                SELECT date_trunc('minute', ts) - (extract(minute from ts)::int %% 5) * interval '1 minute' AS bucket,
+                       round(avg({metric})::numeric, 2) AS avg_value,
+                       count(*) AS samples
+                FROM sensor_data
+                WHERE location = %s
+                  AND ts > now() - (%s * interval '1 hour')
+                  AND {metric} IS NOT NULL
+                GROUP BY bucket ORDER BY bucket
+            """, (location, hours))
+            rows = [dict(r) for r in cur.fetchall()]
+
+        if not rows:
+            return f"Pre {location} nemám dáta pre {label} za posledných {hours} h."
+
+        points = []
+        for r in rows:
+            ts_str = r["bucket"].strftime("%H:%M") if hasattr(r["bucket"], "strftime") else str(r["bucket"])
+            points.append(f"{ts_str}={r['avg_value']}{unit}")
+
+        std_info = LOCATION_TEMP_STANDARDS.get(location, {})
+        std_text = ""
+        if metric == "temperature" and not std_info.get("external"):
+            std_text = f" Interný rozsah pre {std_info.get('label', location)}: {std_info.get('min', '?')}–{std_info.get('max', '?')} °C."
+
+        fallback = f"Trend {label} pre {location} za posledných {hours} h ({len(rows)} bodov): {'; '.join(points[-20:])}.{std_text}"
+
+        system_prompt = (
+            "Si AIOT analytik. Analyzuj trend senzorových dát."
+            ' Odpovedz výhradne JSON: {"trend":"rastúci|klesajúci|stabilný|vlnovitý",'
+            ' "rate":"zmena za hodinu", "concern":"none|low|medium|high",'
+            ' "analysis":"2-3 vety interpretácie trendu"}'
+        )
+        user_data = json.dumps({"location": location, "metric": label, "unit": unit, "hours": hours, "standards": std_text, "points": points[-30:]}, ensure_ascii=False, default=str)
+        return ask_ollama_analytical(system_prompt, user_data, fallback)
+    except Exception as exc:
+        return f"Chyba pri analýze trendu: {exc}"
+
+
+# --------------- Feature 2: Comparative Analysis ---------------
+
+def answer_compare_locations(question):
+    try:
+        metric, meta = metric_from_question(question)
+        hours = parse_hours(question, default=24)
+        locations = parse_two_locations(question)
+
+        if not metric:
+            metric = "temperature"
+            meta = SENSOR_METRICS["temperature"]
+
+        label = meta["label"]
+        unit = meta["unit"]
+
+        with pg_conn() as conn, conn.cursor() as cur:
+            if locations and len(locations) >= 2:
+                cur.execute(f"""
+                    SELECT location, count(*)::int samples,
+                           avg({metric})::float avg_value,
+                           min({metric})::float min_value,
+                           max({metric})::float max_value
+                    FROM sensor_data
+                    WHERE ts > now() - (%s * interval '1 hour')
+                      AND {metric} IS NOT NULL
+                      AND location IN (%s, %s)
+                    GROUP BY location
+                """, (hours, locations[0], locations[1]))
+            else:
+                cur.execute(f"""
+                    SELECT location, count(*)::int samples,
+                           avg({metric})::float avg_value,
+                           min({metric})::float min_value,
+                           max({metric})::float max_value
+                    FROM sensor_data
+                    WHERE ts > now() - (%s * interval '1 hour')
+                      AND {metric} IS NOT NULL
+                    GROUP BY location
+                """, (hours,))
+            db_rows = [dict(r) for r in cur.fetchall()]
+
+        if not db_rows:
+            return f"Nemám dáta pre porovnanie {label} za posledných {hours} h."
+
+        lines = []
+        for row in db_rows:
+            loc = row.get("location")
+            lines.append(f"{loc}: avg={fmt(row.get('avg_value'), unit)}, min={fmt(row.get('min_value'), unit)}, max={fmt(row.get('max_value'), unit)} ({row.get('samples')} vzoriek)")
+
+        fallback = f"Porovnanie {label} za posledných {hours} h:\n" + "\n".join(lines)
+
+        system_prompt = (
+            "Si AIOT analytik. Porovnaj senzorové dáta medzi lokáciami."
+            ' Odpovedz výhradne JSON: {"difference":"hlavné rozdiely",'
+            ' "correlation":"popis vzťahu",'
+            ' "analysis":"2-3 vety porovnania vrátane vplyvu vonkajšej teploty"}'
+        )
+        user_data = json.dumps({"metric": label, "unit": unit, "hours": hours, "locations": db_rows}, ensure_ascii=False, default=str)
+        return ask_ollama_analytical(system_prompt, user_data, fallback)
+    except Exception as exc:
+        return f"Chyba pri porovnávaní lokácií: {exc}"
+
+
+# --------------- Feature 3: Anomaly Root Cause ---------------
+
+def answer_anomaly_rca(question, rows):
+    try:
+        sensor_id = parse_sensor_id(question)
+
+        if not sensor_id and rows:
+            top = sorted(rows, key=lambda x: x.get("risk", 0), reverse=True)
+            if top and top[0].get("risk", 0) > 30:
+                sensor_id = top[0].get("sensor_id")
+
+        if not sensor_id:
+            return "Neuvedol si senzor a žiadny senzor nemá výrazné riziko."
+
+        sensor_row = None
+        for r in (rows or []):
+            if r.get("sensor_id") == sensor_id:
+                sensor_row = r
+                break
+
+        with pg_conn() as conn, conn.cursor() as cur:
+            # History for the sensor (1h, 5-min buckets)
+            cur.execute("""
+                SELECT date_trunc('minute', ts) - (extract(minute from ts)::int %% 5) * interval '1 minute' AS bucket,
+                       round(avg(temperature)::numeric, 2) AS avg_temp,
+                       round(avg(humidity)::numeric, 2) AS avg_hum,
+                       round(avg(pressure)::numeric, 2) AS avg_press,
+                       round(avg(battery)::numeric, 2) AS avg_bat
+                FROM sensor_data
+                WHERE sensor_id = %s
+                  AND ts > now() - interval '1 hour'
+                GROUP BY bucket ORDER BY bucket
+            """, (sensor_id,))
+            history = [dict(r) for r in cur.fetchall()]
+
+            # Neighboring sensors at the same location
+            location = (sensor_row or {}).get("location")
+            neighbors = []
+            if location:
+                cur.execute("""
+                    SELECT DISTINCT ON (sensor_id) sensor_id, temperature, humidity, pressure, battery
+                    FROM sensor_data
+                    WHERE location = %s AND sensor_id != %s
+                    ORDER BY sensor_id, ts DESC
+                    LIMIT 5
+                """, (location, sensor_id))
+                neighbors = [dict(r) for r in cur.fetchall()]
+
+        history_points = []
+        for h in history:
+            ts_str = h["bucket"].strftime("%H:%M") if hasattr(h["bucket"], "strftime") else str(h["bucket"])
+            history_points.append(f"{ts_str}: T={h['avg_temp']}, H={h['avg_hum']}, P={h['avg_press']}, B={h['avg_bat']}")
+
+        reasons = risk_reasons(sensor_row) if sensor_row else ["neznáme"]
+        neighbor_info = "; ".join(f"{n['sensor_id']}: T={fmt(n.get('temperature'),'°C')}, H={fmt(n.get('humidity'),'%')}" for n in neighbors)
+
+        fallback = (
+            f"Senzor {sensor_id} ({(sensor_row or {}).get('location', '?')}) má riziko "
+            f"{(sensor_row or {}).get('risk', '?')} % ({(sensor_row or {}).get('status', '?')}). "
+            f"Dôvody: {', '.join(reasons)}. "
+            f"História (1h): {'; '.join(history_points[-6:])}. "
+            f"Susedné senzory: {neighbor_info or 'žiadne'}."
+        )
+
+        system_prompt = (
+            "Si AIOT analytik. Vysvetli prečo má senzor vysoké riziko."
+            ' Odpovedz výhradne JSON: {"root_cause":"hlavný dôvod",'
+            ' "is_isolated":"áno|nie", "recommendation":"čo robiť",'
+            ' "analysis":"2-3 vety root cause analýzy"}'
+        )
+        user_data = json.dumps({
+            "sensor_id": sensor_id,
+            "location": (sensor_row or {}).get("location"),
+            "risk": (sensor_row or {}).get("risk"),
+            "status": (sensor_row or {}).get("status"),
+            "reasons": reasons,
+            "history": history_points[-12:],
+            "neighbors": neighbor_info,
+        }, ensure_ascii=False, default=str)
+        return ask_ollama_analytical(system_prompt, user_data, fallback)
+    except Exception as exc:
+        return f"Chyba pri root cause analýze: {exc}"
+
+
+
+# --------------- Feature 5: Multi-Metric Correlation ---------------
+
+def answer_correlation(question):
+    try:
+        location = parse_location(question)
+        hours = parse_hours(question, default=24)
+        (metric1, meta1), (metric2, meta2) = parse_two_metrics(question)
+
+        if not location:
+            location = "plant"
+
+        label1 = meta1["label"]
+        label2 = meta2["label"]
+        unit1 = meta1["unit"]
+        unit2 = meta2["unit"]
+
+        with pg_conn() as conn, conn.cursor() as cur:
+            cur.execute(f"""
+                SELECT date_trunc('minute', ts) - (extract(minute from ts)::int %% 5) * interval '1 minute' AS bucket,
+                       round(avg({metric1})::numeric, 2) AS val1,
+                       round(avg({metric2})::numeric, 2) AS val2
+                FROM sensor_data
+                WHERE location = %s
+                  AND ts > now() - (%s * interval '1 hour')
+                  AND {metric1} IS NOT NULL
+                  AND {metric2} IS NOT NULL
+                GROUP BY bucket ORDER BY bucket
+            """, (location, hours))
+            rows = [dict(r) for r in cur.fetchall()]
+
+        if len(rows) < 3:
+            return f"Nedostatok dát ({len(rows)} bodov) pre výpočet korelácie medzi {label1} a {label2} v {location}."
+
+        xs = [float(r["val1"]) for r in rows]
+        ys = [float(r["val2"]) for r in rows]
+        corr = pearson_correlation(xs, ys)
+
+        if corr is None:
+            return f"Nie je možné vypočítať koreláciu – nulová variancia v dátach pre {location}."
+
+        corr_desc = "pozitívna" if corr > 0.3 else "negatívna" if corr < -0.3 else "slabá/žiadna"
+        strength = "silná" if abs(corr) > 0.7 else "stredná" if abs(corr) > 0.4 else "slabá"
+
+        points1 = [f"{r['bucket'].strftime('%H:%M') if hasattr(r['bucket'], 'strftime') else r['bucket']}={r['val1']}" for r in rows[-15:]]
+        points2 = [f"{r['bucket'].strftime('%H:%M') if hasattr(r['bucket'], 'strftime') else r['bucket']}={r['val2']}" for r in rows[-15:]]
+
+        fallback = (
+            f"Korelácia medzi {label1} a {label2} v {location} za {hours} h: "
+            f"Pearson r = {corr} ({strength} {corr_desc}). "
+            f"Počet bodov: {len(rows)}. "
+            f"{label1}: {'; '.join(points1[-8:])}. "
+            f"{label2}: {'; '.join(points2[-8:])}."
+        )
+
+        system_prompt = (
+            "Si AIOT analytik. Interpretuj koreláciu medzi metrikami."
+            ' Odpovedz výhradne JSON: {"correlation_type":"negatívna|pozitívna|žiadna",'
+            ' "strength":"silná|stredná|slabá",'
+            ' "analysis":"2-3 vety fyzikálneho vysvetlenia"}'
+        )
+        user_data = json.dumps({
+            "location": location,
+            "metric1": label1, "metric2": label2,
+            "unit1": unit1, "unit2": unit2,
+            "hours": hours, "pearson_r": corr,
+            "points": len(rows),
+            "sample_m1": points1[-10:],
+            "sample_m2": points2[-10:],
+        }, ensure_ascii=False, default=str)
+        return ask_ollama_analytical(system_prompt, user_data, fallback)
+    except Exception as exc:
+        return f"Chyba pri výpočte korelácie: {exc}"
+
 
 def answer_sensor_aggregate(question):
     q = unicodedata.normalize("NFKD", question or "").encode("ascii", "ignore").decode("ascii").lower()
@@ -559,7 +962,14 @@ def answer_location_aggregate(question):
         return f"Pre veličinu {label} nemám za posledných {hours} h žiadne vzorky podľa lokácií."
         
     lines = [f"Priemerná {label} podľa lokácií za posledných {hours} h:"]
-    facts = {"question": question, "metric": label, "hours": hours, "locations": {}}
+    facts = {
+        "question": question,
+        "metric": label,
+        "hours": hours,
+        "locations": {},
+        "scope": "location_aggregate",
+        "all_ok": True
+    }
     problem_locs = []
     ok_locs = []
     external_locs = []
@@ -571,6 +981,10 @@ def answer_location_aggregate(question):
         min_val = row.get("min_value")
         max_val = row.get("max_value")
         status, reason = location_temperature_eval(loc, avg_val, metric)
+        
+        if status in ["watch", "high", "low"]:
+            facts["all_ok"] = False
+            
         status_label = {
             "ok": "v poriadku",
             "watch": "sledovať",
@@ -941,6 +1355,15 @@ def fast_answer(question, ctx):
         return answer_risk(rows)
     if is_write_request(q):
         return readonly_refusal()
+    if is_trend_question(q):
+        return answer_trend_analysis(question)
+    if is_compare_question(q):
+        return answer_compare_locations(question)
+    if is_anomaly_rca_question(q):
+        return answer_anomaly_rca(question, rows)
+    if is_correlation_question(q):
+        return answer_correlation(question)
+
     if is_sensor_failure_question(q):
         return answer_failure_probability({"predictions": predictions(), "latest": rows})
     if is_log_question(q):
@@ -1005,6 +1428,15 @@ def api_chat(req: ChatRequest):
 
     if is_write_request(q_lower):
         return {"answer": readonly_refusal(), "source": "read-only-policy", "seconds": round(time.time() - started, 3)}
+    if is_trend_question(q_lower):
+        return {"answer": answer_trend_analysis(question), "source": "trend-analysis-llm", "seconds": round(time.time() - started, 3)}
+    if is_compare_question(q_lower):
+        return {"answer": answer_compare_locations(question), "source": "compare-locations-llm", "seconds": round(time.time() - started, 3)}
+    if is_anomaly_rca_question(q_lower):
+        return {"answer": answer_anomaly_rca(question, latest(50)), "source": "anomaly-rca-llm", "seconds": round(time.time() - started, 3)}
+    if is_correlation_question(q_lower):
+        return {"answer": answer_correlation(question), "source": "correlation-analysis-llm", "seconds": round(time.time() - started, 3)}
+
     if is_sensor_failure_question(question):
         return {"answer": answer_failure_probability({"predictions": predictions(), "latest": latest(50)}), "source": "sensor-failure-prediction", "seconds": round(time.time() - started, 3)}
     if is_log_question(q_lower):
