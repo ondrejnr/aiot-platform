@@ -555,8 +555,8 @@ def answer_trend_analysis(question):
         system_prompt = (
             "Si AIOT analytik. Analyzuj trend senzorových dát."
             ' Odpovedz výhradne JSON: {"trend":"rastúci|klesajúci|stabilný|vlnovitý",'
-            ' "rate":"zmena za hodinu", "concern":"none|low|medium|high",'
-            ' "analysis":"2-3 vety interpretácie trendu"}'
+            ' "rate":"hodnota zmeny", "concern":"none|low|medium|high",'
+            ' "analysis":"Napis 2 vety ako analyzu."}'
         )
         user_data = json.dumps({"location": location, "metric": label, "unit": unit, "hours": hours, "standards": std_text, "points": points[-30:]}, ensure_ascii=False, default=str)
         return ask_ollama_analytical(system_prompt, user_data, fallback)
@@ -617,9 +617,8 @@ def answer_compare_locations(question):
 
         system_prompt = (
             "Si AIOT analytik. Porovnaj senzorové dáta medzi lokáciami."
-            ' Odpovedz výhradne JSON: {"difference":"hlavné rozdiely",'
-            ' "correlation":"popis vzťahu",'
-            ' "analysis":"2-3 vety porovnania vrátane vplyvu vonkajšej teploty"}'
+            ' Odpovedz výhradne JSON: {"difference":"rozdiely", "correlation":"popis vzťahu",'
+            ' "analysis":"Napis 2 vety ako porovnanie."}'
         )
         user_data = json.dumps({"metric": label, "unit": unit, "hours": hours, "locations": db_rows}, ensure_ascii=False, default=str)
         return ask_ollama_analytical(system_prompt, user_data, fallback)
@@ -693,9 +692,8 @@ def answer_anomaly_rca(question, rows):
 
         system_prompt = (
             "Si AIOT analytik. Vysvetli prečo má senzor vysoké riziko."
-            ' Odpovedz výhradne JSON: {"root_cause":"hlavný dôvod",'
-            ' "is_isolated":"áno|nie", "recommendation":"čo robiť",'
-            ' "analysis":"2-3 vety root cause analýzy"}'
+            ' Odpovedz výhradne JSON: {"root_cause":"dôvod", "is_isolated":"áno|nie", "recommendation":"kroky",'
+            ' "analysis":"Napis 2 vety ako analyzu pricin."}'
         )
         user_data = json.dumps({
             "sensor_id": sensor_id,
@@ -768,9 +766,7 @@ def answer_correlation(question):
 
         system_prompt = (
             "Si AIOT analytik. Interpretuj koreláciu medzi metrikami."
-            ' Odpovedz výhradne JSON: {"correlation_type":"negatívna|pozitívna|žiadna",'
-            ' "strength":"silná|stredná|slabá",'
-            ' "analysis":"2-3 vety fyzikálneho vysvetlenia"}'
+            ' Odpovedz výhradne JSON: {"correlation_type":"negatívna|pozitívna|žiadna", "strength":"silná|stredná|slabá", "analysis":"Napis 2 vety ako fyzikalne vysvetlenie."}'
         )
         user_data = json.dumps({
             "location": location,
