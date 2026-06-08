@@ -394,6 +394,7 @@ def ask_ollama_analytical(system_prompt, user_data, fallback_answer, num_predict
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Dáta: {user_data}\nJSON:"},
             ],
+            "format": "json",
             "stream": False,
             "keep_alive": OLLAMA_KEEP_ALIVE,
             "options": {
