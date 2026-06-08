@@ -497,9 +497,10 @@ def is_location_aggregate_question(question):
 def answer_location_aggregate(question):
     metric, meta = metric_from_question(question)
     hours = parse_hours(question)
-    
+
     if not metric:
-        return "Upresni veličinu, napríklad: priemerná teplota podľa lokácií."
+        metric = "temperature"
+        meta = {"label": "teplota", "unit": "°C"}
         
     unit = meta["unit"]
     label = meta["label"]
