@@ -296,10 +296,12 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                 {
                     "role": "system",
                     "content": (
-                        "Si validátor a komentátor AIOT dát. Vráť iba validný JSON bez markdownu. "
-                        "Nerob výpočty a nemeň žiadne čísla. Použi iba fakty a overený sumár z kontextu. "
-                        "Ak nevieš pridať bezpečný komentár, vráť {\\\"comment\\\":\\\"\\\",\\\"status\\\":\\\"unknown\\\"}. "
-                        "Formát musí byť presne: {\\\"comment\\\":\\\"krátky komentár po slovensky bez čísel\\\",\\\"status\\\":\\\"ok|watch|high|low|unknown\\\"}."
+                        "Si analytický AIOT Copilot. Tvojou úlohou je najprv logicky analyzovať dáta "
+                        "v poli 'thought' a potom vytvoriť stručný komentár v poli 'comment'. "
+                        "V poli 'thought' si postupne (1, 2, 3...) zdôvodni fakty: porovnaj hodnoty s limitmi, "
+                        "identifikuj riziká a logicky zjednoť záver. "
+                        "V poli 'comment' vráť iba finálnu vetu po slovensky bez čísel. "
+                        "Formát: {\\\"thought\\\":\\\"analýza...\\\", \\\"comment\\\":\\\"vetu...\\\", \\\"status\\\":\\\"ok|watch|high|low\\\"}."
                     ),
                 },
                 {
@@ -308,7 +310,7 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                         f"Dáta: {json.dumps(facts.get('llm_context', facts), ensure_ascii=False, default=str)}\n"
                         f"Sumár: {facts.get('llm_verified_summary', fallback_answer)}\n"
                         f"Otázka: {question or ''}\n"
-                        "Vráť iba JSON v tvare {\"comment\":\"kratky komentar bez novych cisel\",\"status\":\"ok\"}. Bez markdownu."
+                        "Vráť JSON s poliami 'thought', 'comment' a 'status'. Buď presný a analytický."
                     ),
                 },
             ],
@@ -317,7 +319,7 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
             "keep_alive": OLLAMA_KEEP_ALIVE,
             "options": {
                 "temperature": OLLAMA_TEMPERATURE,
-                "num_predict": 40,
+                "num_predict": 128,
                 "num_ctx": OLLAMA_NUM_CTX,
                 "num_thread": OLLAMA_NUM_THREAD,
             },
@@ -347,7 +349,11 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
             return fallback_answer
 
         comment = " ".join(str(parsed.get("comment", "")).split())
+        thought = str(parsed.get("thought", ""))
         status = str(parsed.get("status", "unknown")).lower().strip()
+
+        if thought:
+            print(f"--- LLM THOUGHT PROCESS ---\n{thought}\n---------------------------")
 
         allowed_status = {"ok", "watch", "high", "low", "unknown"}
         bad_markers = [
