@@ -422,10 +422,10 @@ def ask_ollama_analytical(system_prompt, user_data, fallback_answer, num_predict
             return fallback_answer
         analysis = str(parsed.get("analysis") or parsed.get("comment") or "").strip()
         if not analysis or len(analysis) > 500:
-            return fallback_answer
+            return fallback_answer + f" (LLM missing/too long: {len(analysis)})"
         return fallback_answer + "\nLLM analýza: " + analysis
-    except Exception:
-        return fallback_answer
+    except Exception as e:
+        return fallback_answer + f" (LLM Error: {str(e)})"
 
 
 KNOWN_LOCATIONS = ["plant", "warehouse", "office", "lab", "outside"]
