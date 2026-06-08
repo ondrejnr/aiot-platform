@@ -516,7 +516,7 @@ def location_temperature_eval(location, avg_value, metric):
         if avg <= hi + 1:
             return "watch", f"mierne nad interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}"
         return "high", f"nad interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}"
-    return "ok", f"v poriadku voči internému rozsahu {lo:.0f}–{hi:.0f} °C pre {label}"
+    return "ok", f"v internom rozsahu {lo:.0f}–{hi:.0f} °C pre {label}"
 
 def answer_location_aggregate(question):
     metric, meta = metric_from_question(question)
