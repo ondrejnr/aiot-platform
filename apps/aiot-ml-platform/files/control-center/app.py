@@ -19,6 +19,7 @@ OLLAMA_NUM_PREDICT = int(os.getenv("OLLAMA_NUM_PREDICT", "128"))
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "1024"))
 OLLAMA_TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.1"))
 OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "30m")
+OLLAMA_FACTS_TIMEOUT_SECONDS = int(os.getenv("OLLAMA_FACTS_TIMEOUT_SECONDS", "15"))
 INFERENCE_URL = os.getenv("INFERENCE_URL", "http://aiot-maintenance-api.aiot.svc.cluster.local:8080")
 INFERENCE_MODEL_NAME = os.getenv("INFERENCE_MODEL_NAME", "aiot-maintenance-predictor")
 FORECAST_MODEL_NAME = os.getenv("FORECAST_MODEL_NAME", "aiot-sensor-forecast-30m")
@@ -326,7 +327,7 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
         r = requests.post(
             f"{OLLAMA_URL}/api/chat",
             json=payload,
-            timeout=OLLAMA_TIMEOUT_SECONDS,
+            timeout=min(OLLAMA_TIMEOUT_SECONDS, OLLAMA_FACTS_TIMEOUT_SECONDS),
         )
         r.raise_for_status()
         answer = r.json().get("message", {}).get("content", "").strip()
