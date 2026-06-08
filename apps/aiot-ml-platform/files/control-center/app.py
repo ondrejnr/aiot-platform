@@ -308,7 +308,7 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                         f"Dáta: {json.dumps(facts.get('llm_context', facts), ensure_ascii=False, default=str)}\n"
                         f"Sumár: {facts.get('llm_verified_summary', fallback_answer)}\n"
                         f"Otázka: {question or ''}\n"
-                        "Vráť iba validný JSON podľa systémovej inštrukcie. Bez markdownu, bez úvodu."
+                        "Vráť iba JSON v tvare {\"comment\":\"kratky komentar bez novych cisel\",\"status\":\"ok\"}. Bez markdownu."
                     ),
                 },
             ],
