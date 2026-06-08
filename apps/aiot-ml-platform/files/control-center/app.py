@@ -296,11 +296,10 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                 {
                     "role": "system",
                     "content": (
-                        "Si odborný AIOT analytik. Odpovedaj výhradne v SLOVENČINE. "
-                        "Stručne vyhodnoť stav senzorov JEDNOU vetou. "
-                        "NIKDY nepíš kód, Python, ani Markdown nadpisy (**). "
-                        "Použi iba fakty z kontextu. "
-                        "Tvoja odpoveď musí byť JEDNA krátka veta bez úvodu a bez formátovania."
+                        "Si validátor a komentátor AIOT dát. Vráť iba validný JSON bez markdownu. "
+                        "Nerob výpočty a nemeň žiadne čísla. Použi iba fakty a overený sumár z kontextu. "
+                        "Ak nevieš pridať bezpečný komentár, vráť {\\\"comment\\\":\\\"\\\",\\\"status\\\":\\\"unknown\\\"}. "
+                        "Formát musí byť presne: {\\\"comment\\\":\\\"krátky komentár po slovensky bez čísel\\\",\\\"status\\\":\\\"ok|watch|high|low|unknown\\\"}."
                     ),
                 },
                 {
