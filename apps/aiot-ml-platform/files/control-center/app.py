@@ -553,9 +553,9 @@ def answer_trend_analysis(question):
         fallback = f"Trend {label} pre {location} za posledných {hours} h ({len(rows)} bodov): {'; '.join(points[-20:])}.{std_text}"
 
         system_prompt = (
-            "You are an IoT sensor analyst. Output ONLY valid JSON, nothing else."
-            ' Example: {"analysis":"Temperature is stable within normal range."}'
-            ' Required key: "analysis" (1-2 sentences in Slovak about the trend).'
+            "You are a strict industrial AI. Output ONLY valid JSON."
+            ' Example: {"analysis":"Teplota je stabilná, v norme."}'
+            ' Required key "analysis" (Max 1 short, strictly technical sentence in Slovak). No creative words.'
         )
         user_data = json.dumps({"location": location, "metric": label, "unit": unit, "hours": hours, "standards": std_text, "points": points[-20:]}, ensure_ascii=False, default=str)
         return ask_ollama_analytical(system_prompt, user_data, fallback)
@@ -615,9 +615,9 @@ def answer_compare_locations(question):
         fallback = f"Porovnanie {label} za posledných {hours} h:\n" + "\n".join(lines)
 
         system_prompt = (
-            "You are an IoT sensor analyst. Output ONLY valid JSON, nothing else."
-            ' Example: {"analysis":"Plant is warmer than warehouse by 5°C on average."}'
-            ' Required key: "analysis" (1-2 sentences in Slovak comparing the locations).'
+            "You are a strict industrial AI. Output ONLY valid JSON."
+            ' Example: {"analysis":"Hala plant má priemerne o 5°C vyššiu teplotu."}'
+            ' Required key "analysis" (Max 1 short, strictly technical sentence in Slovak comparing data). No creative words.'
         )
         user_data = json.dumps({"metric": label, "unit": unit, "hours": hours, "locations": db_rows}, ensure_ascii=False, default=str)
         return ask_ollama_analytical(system_prompt, user_data, fallback)
