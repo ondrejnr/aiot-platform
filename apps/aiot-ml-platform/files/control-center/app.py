@@ -313,6 +313,7 @@ def ask_ollama_with_facts(question, facts, fallback_answer):
                 },
             ],
             "stream": False,
+            "format": "json",
             "keep_alive": OLLAMA_KEEP_ALIVE,
             "options": {
                 "temperature": OLLAMA_TEMPERATURE,
