@@ -482,41 +482,17 @@ def answer_sensor_aggregate(question):
 
 def is_location_aggregate_question(question):
     q = unicodedata.normalize("NFKD", question or "").encode("ascii", "ignore").decode("ascii").lower()
-    return "lokaci" in q or "location" in q or "zoskupen" in q or "podla typ" in q
-
-
-LOCATION_TEMP_STANDARDS = {
-    "office": {"min": 20.0, "max": 24.0, "label": "kancelársky priestor"},
-    "lab": {"min": 18.0, "max": 24.0, "label": "laboratórium"},
-    "warehouse": {"min": 16.0, "max": 24.0, "label": "sklad"},
-    "plant": {"min": 18.0, "max": 26.0, "label": "výrobný priestor"},
-    "outside": {"external": True, "label": "vonkajšia referenčná hodnota"},
-}
-
-def location_temperature_eval(location, avg_value, metric):
-    loc = (location or "").lower()
-    if metric != "temperature":
-        return "info", "bez interného teplotného štandardu pre túto veličinu"
-
-    std = LOCATION_TEMP_STANDARDS.get(loc)
-    if not std:
-        return "info", "bez definovaného interného rozsahu"
-
-    if std.get("external"):
-        return "external", "vonkajšia hodnota, nehodnotí sa podľa indoor štandardu"
-
-    lo = std["min"]
-    hi = std["max"]
-    label = std["label"]
-    avg = float(avg_value or 0)
-
-    if avg < lo:
-        return "low", f"pod interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}"
-    if avg > hi:
-        if avg <= hi + 1:
-            return "watch", f"mierne nad interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}"
-        return "high", f"nad interným rozsahom {lo:.0f}–{hi:.0f} °C pre {label}"
-    return "ok", f"v internom rozsahu {lo:.0f}–{hi:.0f} °C pre {label}"
+    location_words = ["plant", "outside", "lab", "office", "warehouse"]
+    location_intent = ["lokaci", "location", "zoskupen", "podla typ", "v poriadku", "standard", "norm", "pozornost", "zasluzia", "vysvetli", "preco", "prečo", "interpretuj", "teplot", "temperature"]
+    return (
+        any(w in q for w in location_intent)
+        and (
+            any(loc in q for loc in location_words)
+            or "lokaci" in q
+            or "location" in q
+            or "zoskupen" in q
+        )
+    )
 
 def answer_location_aggregate(question):
     metric, meta = metric_from_question(question)
