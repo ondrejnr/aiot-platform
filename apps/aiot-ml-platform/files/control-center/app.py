@@ -232,8 +232,9 @@ def parse_sensor_id(question):
 
 def metric_from_question(question):
     text = normalize_text(question)
-    for column, meta in SENSOR_METRICS.items():
-        if any(word in text for word in meta["words"]):
+    # Sort by longest word first to avoid partial matching (e.g., 'pressure' before 'press')
+    for column, meta in sorted(SENSOR_METRICS.items(), key=lambda x: len(x[1]['words'][0]), reverse=True):
+        if any(f" {word}" in f" {text}" for word in meta["words"]):
             return column, meta
     return None, None
 
@@ -422,10 +423,10 @@ def ask_ollama_analytical(system_prompt, user_data, fallback_answer, num_predict
             return fallback_answer
         analysis = str(parsed.get("analysis") or parsed.get("comment") or "").strip()
         if not analysis or len(analysis) > 800:
-            return fallback_answer + f" (LLM missing/too long: {len(analysis)})"
-        return fallback_answer + "\nLLM analýza: " + analysis
+            return "LLM analýza: " + analysis  # Return analysis even if long
+        return "LLM analýza: " + analysis
     except Exception as e:
-        return fallback_answer + f" (LLM Error: {str(e)})"
+        return f"LLM Error: {str(e)}"
 
 
 KNOWN_LOCATIONS = ["plant", "warehouse", "office", "lab", "outside"]
@@ -553,9 +554,9 @@ def answer_trend_analysis(question):
         fallback = f"Trend {label} pre {location} za posledných {hours} h ({len(rows)} bodov): {'; '.join(points[-20:])}.{std_text}"
 
         system_prompt = (
-            "You are a strict industrial AI. Output ONLY valid JSON."
-            ' Example: {"analysis":"Teplota je stabilná, v norme."}'
-            ' Required key "analysis" (Max 1 short, strictly technical sentence in Slovak). No creative words.'
+            "You are a precise industrial AI. Output ONLY valid JSON."
+            ' Example: {"analysis":"Teplota v plant vykazuje klesajúci trend z 25.0°C na 23.5°C."}'
+            ' Required key "analysis" (Max 1 short, strictly technical sentence in Slovak accurately summarizing the data trend). Do NOT hallucinate values.'
         )
         user_data = json.dumps({"location": location, "metric": label, "unit": unit, "hours": hours, "standards": std_text, "points": points[-20:]}, ensure_ascii=False, default=str)
         return ask_ollama_analytical(system_prompt, user_data, fallback)
@@ -579,48 +580,51 @@ def answer_compare_locations(question):
         unit = meta["unit"]
 
         with pg_conn() as conn, conn.cursor() as cur:
-            if locations and len(locations) >= 2:
-                cur.execute(f"""
-                    SELECT location, count(*)::int samples,
-                           avg({metric})::float avg_value,
-                           min({metric})::float min_value,
-                           max({metric})::float max_value
-                    FROM sensor_data
-                    WHERE ts > now() - (%s * interval '1 hour')
-                      AND {metric} IS NOT NULL
-                      AND location IN (%s, %s)
-                    GROUP BY location
-                """, (hours, locations[0], locations[1]))
-            else:
-                cur.execute(f"""
-                    SELECT location, count(*)::int samples,
-                           avg({metric})::float avg_value,
-                           min({metric})::float min_value,
-                           max({metric})::float max_value
-                    FROM sensor_data
-                    WHERE ts > now() - (%s * interval '1 hour')
-                      AND {metric} IS NOT NULL
-                    GROUP BY location
-                """, (hours,))
-            db_rows = [dict(r) for r in cur.fetchall()]
+            cur.execute(f"""
+                SELECT location, avg({metric})::float avg_value
+                FROM sensor_data
+                WHERE ts > now() - (%s * interval '1 hour')
+                  AND {metric} IS NOT NULL
+                  AND location IN (%s, %s)
+                GROUP BY location
+            """, (hours, locations[0], locations[1]))
+            db_rows = {r['location']: r['avg_value'] for r in cur.fetchall()}
 
-        if not db_rows:
-            return f"Nemám dáta pre porovnanie {label} za posledných {hours} h."
+        if len(db_rows) < 2:
+            return f"Nemám dáta pre obe lokácie ({', '.join(locations)}) na porovnanie {label}."
 
-        lines = []
-        for row in db_rows:
-            loc = row.get("location")
-            lines.append(f"{loc}: avg={fmt(row.get('avg_value'), unit)}, min={fmt(row.get('min_value'), unit)}, max={fmt(row.get('max_value'), unit)} ({row.get('samples')} vzoriek)")
+        loc1, loc2 = locations[0], locations[1]
+        val1, val2 = db_rows[loc1], db_rows[loc2]
+        diff = abs(val1 - val2)
+        higher_loc = loc1 if val1 > val2 else loc2
+        lower_loc = loc2 if val1 > val2 else loc1
 
-        fallback = f"Porovnanie {label} za posledných {hours} h:\n" + "\n".join(lines)
+        # Neutral fallback in case of LLM error
+        fallback = f"Porovnanie {label} medzi {loc1} a {loc2}."
 
         system_prompt = (
-            "You are a strict industrial AI. Output ONLY valid JSON."
-            ' Example: {"analysis":"Hala plant má priemerne o 5°C vyššiu teplotu."}'
-            ' Required key "analysis" (Max 1 short, strictly technical sentence in Slovak comparing data). No creative words.'
+            "You are a precise industrial AI. Output ONLY valid JSON."
+            ' Example: {"analysis":"Laboratórium má priemerný tlak 1013.9 hPa, čo je o 1.5 hPa viac ako vo výrobe (1012.4 hPa)."}'
+            ' Required key "analysis" (Max 1 short, strictly technical sentence in Slovak). '
+            ' CRITICAL: Generate a complete sentence comparing the values. Do not hallucinate or reverse the order.'
         )
-        user_data = json.dumps({"metric": label, "unit": unit, "hours": hours, "locations": db_rows}, ensure_ascii=False, default=str)
-        return ask_ollama_analytical(system_prompt, user_data, fallback)
+        user_data = json.dumps({
+            "higher_loc": higher_loc,
+            "higher_val": round(max(val1, val2), 2),
+            "lower_loc": lower_loc,
+            "lower_val": round(min(val1, val2), 2),
+            "diff": round(diff, 2),
+            "metric": label,
+            "unit": unit
+        }, ensure_ascii=False)
+        
+        # Final fix: Return only the LLM analysis, dropping the confusing verbose fallback
+        raw_result = ask_ollama_analytical(system_prompt, user_data, fallback)
+        if "LLM analýza: " in raw_result:
+            return "LLM analýza: " + raw_result.split("LLM analýza: ")[1]
+        
+        # If no "LLM analýza: " prefix, just return the raw result
+        return raw_result
     except Exception as exc:
         return f"Chyba pri porovnávaní lokácií: {exc}"
 
@@ -690,9 +694,9 @@ def answer_anomaly_rca(question, rows):
         )
 
         system_prompt = (
-            "Si AIOT analytik. Vysvetli prečo má senzor vysoké riziko."
-            ' Odpovedz výhradne JSON: {"root_cause":"dôvod", "is_isolated":"áno|nie", "recommendation":"kroky",'
-            ' "analysis":"Napis 2 vety ako analyzu pricin."}'
+            "You are a precise industrial AI. Explain the anomaly cause based on data. "
+            ' Output ONLY valid JSON: {"root_cause":"dôvod", "is_isolated":"áno|nie", "recommendation":"kroky",'
+            ' "analysis":"Napis 2 presné vety analyzujúce príčiny na základe hodnôt."}'
         )
         user_data = json.dumps({
             "sensor_id": sensor_id,
@@ -764,8 +768,8 @@ def answer_correlation(question):
         )
 
         system_prompt = (
-            "Si AIOT analytik. Interpretuj koreláciu medzi metrikami."
-            ' Odpovedz výhradne JSON: {"correlation_type":"negatívna|pozitívna|žiadna", "strength":"silná|stredná|slabá", "analysis":"Napis 2 vety ako fyzikalne vysvetlenie."}'
+            "You are a precise industrial AI. Interpret the correlation between metrics scientifically. "
+            ' Output ONLY valid JSON: {"correlation_type":"negatívna|pozitívna|žiadna", "strength":"silná|stredná|slabá", "analysis":"Napis 2 vety fyzikálne vysvetľujúce vzťah metrík na základe hodnôt."}'
         )
         user_data = json.dumps({
             "location": location,
@@ -1427,7 +1431,11 @@ def api_copilot_policy():
 def api_chat(req: ChatRequest):
     started=time.time()
     question = (req.question or "").strip()
-    q_lower=question.lower()
+    q_lower=normalize_text(question)
+    
+    # Identify metric early
+    metric, meta = metric_from_question(question)
+    
     external_words=["extern", "api", "lokal", "lokál"]
     prediction_words=["model", "mlflow", "predik", "inference", "údrž", "udrz", "zlyhan", "poruch", "pravdepodob"]
     risk_words=["rizik", "naj", "kritick", "critical", "warning", "prečo", "preco", "senzor"]

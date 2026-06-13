@@ -319,69 +319,83 @@ data:
     from datetime import datetime
     from kafka import KafkaConsumer
     import psycopg
-    from psycopg import sql
     from psycopg.types.json import Jsonb
-
+    
     brokers   = os.getenv("KAFKA_BROKERS", "aiot-redpanda:9092")
     topic     = os.getenv("KAFKA_TOPIC", "sensor-data")
     table     = os.getenv("PG_TABLE", "sensor_data")
     batch_max = int(os.getenv("BATCH_MAX", "5000"))
     poll_ms   = int(os.getenv("POLL_MS", "200"))
-
-    # Schema is owned by the db-init Job (declarative partitioned table).
-    # pg-sink only INSERTs via COPY; do NOT run DDL here.
-
+    
     def pg_dsn():
         return (
             f"host={os.getenv('PGHOST')} port={os.getenv('PGPORT', '5432')} "
             f"dbname={os.getenv('PGDATABASE')} user={os.getenv('PGUSER')} "
             f"password={os.getenv('PGPASSWORD')}"
         )
-
+    
     def parse_ts(v):
         if not v:
             return None
-        # 2026-05-09T12:34:56.789Z or +00:00
         try:
-            return datetime.fromisoformat(v.replace("Z", "+00:00"))
+            return datetime.fromisoformat(str(v).replace("Z", "+00:00"))
         except Exception:
             return None
-
+    
     copy_stmt = (
         f"COPY {table} (ts, sensor_id, location, temperature, humidity, "
         f"pressure, battery, payload) FROM STDIN WITH (FORMAT BINARY)"
     )
-
+    
     while True:
+        conn = None
         try:
             conn = psycopg.connect(pg_dsn(), autocommit=False)
             consumer = KafkaConsumer(
                 topic,
                 bootstrap_servers=brokers.split(","),
                 group_id="pg-sink",
-                auto_offset_reset="latest",
+                auto_offset_reset="earliest",
                 enable_auto_commit=False,
                 value_deserializer=lambda value: json.loads(value.decode("utf-8")),
                 max_poll_records=batch_max,
                 fetch_max_bytes=32 * 1024 * 1024,
                 max_partition_fetch_bytes=10 * 1024 * 1024,
             )
+    
             print(
                 f"redpanda {brokers}/{topic} -> postgres {os.getenv('PGHOST')}/"
                 f"{os.getenv('PGDATABASE')}.{table} (psycopg3 binary COPY, batch={batch_max})",
                 flush=True,
             )
+    
             total = 0
+            skipped_total = 0
             last_report = time.monotonic()
+    
             while True:
                 polled = consumer.poll(timeout_ms=poll_ms, max_records=batch_max)
                 rows = []
+                seen = 0
+                skipped = 0
+    
                 for tp, msgs in polled.items():
+                    if msgs:
+                        print(f"DEBUG: Partition {tp} has {len(msgs)} messages", flush=True)
+    
                     for msg in msgs:
+                        seen += 1
                         try:
                             p = msg.value
+                            ts = parse_ts(p.get("ts"))
+    
+                            if ts is None:
+                                skipped += 1
+                                print(f"pg-sink skip bad row: invalid ts payload={p}", flush=True)
+                                continue
+    
                             rows.append((
-                                parse_ts(p.get("ts")),
+                                ts,
                                 p.get("sensor_id"),
                                 p.get("location"),
                                 p.get("temperature"),
@@ -391,25 +405,40 @@ data:
                                 Jsonb(p),
                             ))
                         except Exception as exc:
+                            skipped += 1
                             print(f"pg-sink skip bad row: {exc}", flush=True)
+    
                 if rows:
+                    print(f"DEBUG: Trying to write {len(rows)} rows, skipped={skipped}", flush=True)
                     with conn.cursor() as cur:
                         with cur.copy(copy_stmt) as cp:
-                            cp.set_types(["timestamptz", "text", "text",
-                                          "float8", "float8", "float8", "float8", "jsonb"])
+                            cp.set_types([
+                                "timestamptz", "text", "text",
+                                "float8", "float8", "float8", "float8", "jsonb"
+                            ])
                             for r in rows:
                                 cp.write_row(r)
+    
                     conn.commit()
                     consumer.commit()
                     total += len(rows)
+                    skipped_total += skipped
+    
+                elif seen > 0:
+                    print(f"pg-sink committing skipped-only batch: seen={seen}, skipped={skipped}", flush=True)
+                    consumer.commit()
+                    skipped_total += skipped
+    
                 now = time.monotonic()
                 if now - last_report >= 10:
-                    print(f"pg-sink total={total}", flush=True)
+                    print(f"pg-sink total={total} skipped={skipped_total}", flush=True)
                     last_report = now
+    
         except Exception as exc:
             print(f"pg-sink reconnect after error: {exc}", flush=True)
             try:
-                conn.close()
+                if conn:
+                    conn.close()
             except Exception:
                 pass
             time.sleep(3)
