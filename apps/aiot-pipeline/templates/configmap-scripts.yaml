@@ -359,8 +359,8 @@ data:
                 enable_auto_commit=False,
                 value_deserializer=lambda value: json.loads(value.decode("utf-8")),
                 max_poll_records=batch_max,
-                fetch_max_bytes=32 * 1024 * 1024,
-                max_partition_fetch_bytes=10 * 1024 * 1024,
+                fetch_max_bytes=int(os.getenv("FETCH_MAX_BYTES", "4194304")),
+                max_partition_fetch_bytes=int(os.getenv("MAX_PARTITION_FETCH_BYTES", "1048576")),
             )
     
             print(

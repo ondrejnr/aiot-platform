@@ -30,31 +30,15 @@ bridges:
   redisToRedpanda:
     replicas: 8
   pgSink:
-    replicas: 12
-
-# PriorityClass names applied to pipeline pods.
-# These are created cluster-wide by templates/priorityclasses.yaml.
-priorityClass:
-  data: aiot-data-critical          # EMQX, Redpanda, Redis
-  pipeline: aiot-pipeline-high      # bridges + sensor-simulator
-
-# Retention policy.
-# - PG: declarative daily partitions, drop partitions older than pgDays.
-# - Redpanda: retention by time AND bytes per partition (whichever fires first).
-retention:
-  pgDays: 30
-  redpandaMs: 86400000              # 24h
-  redpandaBytesPerPartition: 1073741824  # 1GiB/partition * 24 = 24GiB cap
-
-# Loadtest namespace guardrails.
-# Hard-cap CPU/memory so a runaway emqtt-bench cannot DOS the cluster.
-loadtest:
-  enabled: true
-  namespace: loadtest
-  priorityClass: loadtest-low
-  quota:
-    requestsCpu: "8"
-    requestsMemory: "8Gi"
-    limitsCpu: "16"
-    limitsMemory: "16Gi"
-    pods: "20"
+    replicas: 1
+    batchMax: 100
+    pollMs: 1000
+    fetchMaxBytes: 4194304
+    maxPartitionFetchBytes: 1048576
+    resources:
+      requests:
+        cpu: 50m
+        memory: 512Mi
+      limits:
+        cpu: 200m
+        memory: 2Gi

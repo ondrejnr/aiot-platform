@@ -208,16 +208,19 @@ spec:
               value: {{ .Values.redpanda.topic | quote }}
             - name: PG_TABLE
               value: sensor_data
+            - name: BATCH_MAX
+              value: "{{ .Values.bridges.pgSink.batchMax }}"
+            - name: POLL_MS
+              value: "{{ .Values.bridges.pgSink.pollMs }}"
+            - name: FETCH_MAX_BYTES
+              value: "{{ .Values.bridges.pgSink.fetchMaxBytes }}"
+            - name: MAX_PARTITION_FETCH_BYTES
+              value: "{{ .Values.bridges.pgSink.maxPartitionFetchBytes }}"
           volumeMounts:
             - name: scripts
               mountPath: /app
           resources:
-            requests:
-              cpu: 200m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 1Gi
+{{ toYaml .Values.bridges.pgSink.resources | indent 12 }}
       volumes:
         - name: scripts
           configMap:
