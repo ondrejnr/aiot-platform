@@ -70,7 +70,7 @@ jenkins:
                     id: gitea-git-token
                     description: Gitea aiot-platform read token
                     scope: GLOBAL
-                    username: gitea_admin
+                    username: admin
                     password: ${gitea-git-token-password}
         gitops-pipeline-job: |
           jobs:
