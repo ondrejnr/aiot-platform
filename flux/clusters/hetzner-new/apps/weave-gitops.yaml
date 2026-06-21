@@ -37,6 +37,7 @@ spec:
       create: false
     additionalArgs:
       - --auth-methods=oidc
+      - --insecure
     ingress:
       enabled: true
       className: nginx
