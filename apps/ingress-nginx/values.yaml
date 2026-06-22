@@ -10,10 +10,7 @@ ingress-nginx:
       enabled: false
     service:
       enabled: true
-      type: NodePort
-      nodePorts:
-        http: 30080
-        https: 30443
+      type: ClusterIP
     dnsPolicy: ClusterFirstWithHostNet
     allowSnippetAnnotations: true
     config:
