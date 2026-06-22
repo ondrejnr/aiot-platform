@@ -91,3 +91,6 @@ spec:
           \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
           \       - name: redis\n          resources:\n            requests:\n   \
           \           cpu: 100m\n            limits:\n              cpu: 500m\n"
+  values:
+    priorityClass:
+      pipeline: ""
