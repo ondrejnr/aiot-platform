@@ -12,14 +12,11 @@ ingress-nginx:
       enabled: true
       type: NodePort
       ports:
-        http:
-          port: 80
-          nodePort: 30080
-          protocol: TCP
-        https:
-          port: 443
-          nodePort: 30443
-          protocol: TCP
+        http: 80
+        https: 443
+      nodePorts:
+        http: 30080
+        https: 30443
     dnsPolicy: ClusterFirstWithHostNet
     allowSnippetAnnotations: true
     config:
