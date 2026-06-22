@@ -11,9 +11,6 @@ ingress-nginx:
     service:
       enabled: true
       type: NodePort
-      ports:
-        http: 80
-        https: 443
       nodePorts:
         http: 30080
         https: 30443
