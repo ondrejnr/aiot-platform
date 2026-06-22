@@ -92,5 +92,7 @@ spec:
           \       - name: redis\n          resources:\n            requests:\n   \
           \           cpu: 100m\n            limits:\n              cpu: 500m\n"
   values:
+  values:
     priorityClass:
       pipeline: ""
+      maintenance: ""
