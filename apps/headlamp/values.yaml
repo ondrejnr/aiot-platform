@@ -17,6 +17,9 @@ headlamp:
     inClusterContextName: main
     extraArgs:
       - "-metrics-enabled"
+  env:
+    - name: OIDC_INSECURE_SKIP_VERIFY
+      value: "true"
     oidc:
       externalSecret:
         enabled: true
@@ -76,6 +79,8 @@ headlamp:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "32k"
+      nginx.ingress.kubernetes.io/proxy-buffers-number: "8"
     hosts:
       - host: headlamp.46.4.123.8.nip.io
         paths:
