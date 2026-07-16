@@ -2,16 +2,17 @@ peConsole:
   # External PE master IP:port the Service Endpoints should point at.
   # 172.18.0.1 = k3d docker bridge gateway = the host (PE master native install)
   externalIP: "172.18.0.1"
-  externalPort: 4443
+  externalPort: 4431
   ingress:
     enabled: true
     host: pe.46.4.123.8.nip.io
     className: nginx
     clusterIssuer: letsencrypt-prod
-  authentik:
+  auth:
     enabled: true
-    host: authentik.46.4.123.8.nip.io
-    serverService: authentik-server.authentik.svc.cluster.local
+    # Use oauth2-proxy (same as other websites)
+    authUrl: "https://oauth2-proxy.46.4.123.8.nip.io/oauth2/auth"
+    authSignin: "https://oauth2-proxy.46.4.123.8.nip.io/oauth2/start?rd=$scheme://$host$request_uri"
   autoLogin:
     enabled: true
     username: "admin"
