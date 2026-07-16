@@ -31,7 +31,7 @@ headlamp:
 
   initContainers:
     - name: seed-prometheus-plugin-config
-      image: ghcr.io/headlamp-k8s/headlamp:v0.42.0
+      image: ghcr.io/headlamp-k8s/headlamp:v0.43.0
       imagePullPolicy: IfNotPresent
       securityContext:
         runAsUser: 0
