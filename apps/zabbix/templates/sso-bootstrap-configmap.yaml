@@ -35,6 +35,26 @@ data:
         return data.get("result")
 
     token = api("user.login", {"username": ADMIN_USER, "password": ADMIN_PASSWORD})
+
+    # Zabbix 7 vyžaduje ldap_auth_enabled=1 pred zapnutím SAML.
+    # Vytvoríme placeholder LDAP userdirectory, potom zapneme SAML.
+    directories = api("userdirectory.get", {"output": ["userdirectoryid", "idp_type"]}, token)
+    ldap_dirs = [d for d in directories if d["idp_type"] == "1"]
+    if not ldap_dirs:
+        api("authentication.update", {"ldap_auth_enabled": 1}, token)
+        api("userdirectory.create", {
+            "name": "Authentik LDAP",
+            "idp_type": 1,
+            "host": "authentik-ldap.authentik.svc.cluster.local",
+            "port": "389",
+            "base_dn": "DC=ldap,DC=goauthentik,DC=io",
+            "search_attribute": "uid",
+            "bind_dn": "cn=ldapsearch,ou=users,dc=ldap,dc=goauthentik,dc=io",
+            "bind_password": "unused",
+            "provision_status": 0,
+        }, token)
+        directories = api("userdirectory.get", {"output": ["userdirectoryid", "idp_type"]}, token)
+
     api("authentication.update", {"saml_auth_enabled": 1, "saml_case_sensitive": 0, "ldap_auth_enabled": 1}, token)
 
     directories = api("userdirectory.get", {"output": "extend", "filter": {"idp_type": 2}}, token)
