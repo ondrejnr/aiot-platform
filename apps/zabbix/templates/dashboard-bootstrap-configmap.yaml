@@ -14,7 +14,7 @@ data:
     import urllib.request
 
     ZABBIX_API = "http://zabbix-zabbix-web.zabbix.svc.cluster.local/api_jsonrpc.php"
-    ADMIN_USER = "Admin"
+    ADMIN_USER = "admin"
     ADMIN_PASSWORD = "zabbix"
     KUBE_API_TOKEN = os.environ.get("KUBE_API_TOKEN", "")
     KUBE_API_URL = "https://kubernetes.default.svc.cluster.local:443"
