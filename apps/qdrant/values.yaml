@@ -5,6 +5,9 @@ qdrant:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      # root / presmeruje na webový dashboard (inak vráti len JSON info)
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        if ($uri = /) { return 302 /dashboard; }
     hosts:
       - host: qdrant.46.4.123.8.nip.io
         paths:
