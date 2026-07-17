@@ -42,3 +42,8 @@ bridges:
       limits:
         cpu: 200m
         memory: 2Gi
+
+retention:
+  pgDays: 7
+  redpandaMs: 604800000
+  redpandaBytesPerPartition: 1073741824
