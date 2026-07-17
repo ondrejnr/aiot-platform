@@ -35,7 +35,7 @@ data:
         return data.get("result")
 
     token = api("user.login", {"username": ADMIN_USER, "password": ADMIN_PASSWORD})
-    api("authentication.update", {"saml_auth_enabled": 1, "saml_case_sensitive": 0}, token)
+    api("authentication.update", {"saml_auth_enabled": 1, "saml_case_sensitive": 0, "ldap_auth_enabled": 1}, token)
 
     directories = api("userdirectory.get", {"output": "extend", "filter": {"idp_type": 2}}, token)
     if not directories:
