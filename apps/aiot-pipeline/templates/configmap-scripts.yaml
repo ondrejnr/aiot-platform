@@ -285,7 +285,6 @@ data:
                 key_serializer=None,
                 linger_ms=5,
                 batch_size=524288,
-                buffer_memory=256 * 1024 * 1024,
                 compression_type="lz4",
                 acks=1,
                 max_in_flight_requests_per_connection=10,
