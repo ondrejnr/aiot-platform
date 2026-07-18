@@ -45,7 +45,7 @@ spec:
         patch: "apiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: aiot-redpanda\n\
           \  namespace: aiot\nspec:\n  template:\n    spec:\n      containers:\n \
           \     - name: redpanda\n        resources:\n          requests:\n      \
-          \      cpu: 250m\n          limits:\n            cpu: 700m\n"
+          \      cpu: 250m\n          limits:\n            cpu: 500m\n"
       - target:
           version: v1
           kind: StatefulSet
