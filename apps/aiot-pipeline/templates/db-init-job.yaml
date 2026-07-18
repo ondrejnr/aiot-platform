@@ -47,6 +47,10 @@ spec:
               create index if not exists sensor_data_ts_idx        on sensor_data (ts desc);
               create index if not exists sensor_data_sensor_id_idx on sensor_data (sensor_id);
 
+              -- Idempotent migrations for tables created before these columns existed.
+              alter table sensor_data add column if not exists payload jsonb not null default '{}'::jsonb;
+              alter table sensor_data add column if not exists ingested_at timestamptz not null default now();
+
               -- Pre-create yesterday + today + next 2 days using \gexec (no DO blocks)
               with days as (
                 select generate_series(current_date - 1, current_date + 2, '1 day'::interval)::date as d
