@@ -73,12 +73,13 @@ spec:
             CHAOS_CENTER_UI_ENDPOINT: https://litmus.46.4.123.8.nip.io
         authServer:
           env:
-            DEX_ENABLED: 'true'
+            DEX_ENABLED: 'false'
             DEX_OAUTH_CALLBACK_URL: https://litmus.46.4.123.8.nip.io/auth/dex/callback
             DEX_OAUTH_CLIENT_ID: litmus
             DEX_OAUTH_CLIENT_SECRET: litmus-secret-1
             OIDC_ISSUER: https://authentik.46.4.123.8.nip.io/application/o/litmus/
             OAUTH_JWT_EXP_MINS: '5'
+            SELF_SIGNUP: 'true'
     mongodb:
       enabled: true
       auth:
@@ -113,4 +114,12 @@ spec:
         patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: chaos-litmus-server\n\
           \  namespace: litmus\nspec:\n  template:\n    spec:\n      containers:\n\
           \        - name: graphql-server\n          resources:\n            limits:\n\
-          \              cpu: 500m\n"
+          \              cpu: 500m\n"      - target:
+          group: networking.k8s.io
+          version: v1
+          kind: Ingress
+          name: litmus-ingress
+          namespace: litmus
+        patch: "apiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: litmus-ingress\n\
+          \  namespace: litmus\n  annotations:\n    nginx.ingress.kubernetes.io/configuration-snippet:\
+          \ null\n"
