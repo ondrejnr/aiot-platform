@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-litmus-blueprint
+  namespace: authentik
+  labels:
+    authentik.goauthentik.io/blueprint: "true"
+data:
+  blueprint.yaml: |
+    version: 1
+    metadata:
+      name: Litmus Chaos SSO
+    entries:
+      - model: authentik_providers_oauth2.oauth2provider
+        identifiers:
+          name: litmus
+        attrs:
+          name: litmus
+          client_id: litmus
+          client_secret: litmus-secret-1
+          authorization_grant_type: authorization-code
+          redirect_uris:
+            - https://litmus.46.4.123.8.nip.io/auth/dex/callback
+          property_mappings:
+            - authentik default OAuth Mapping: OpenID 'email'
+            - authentik default OAuth Mapping: OpenID 'profile'
+          signing_key:
+            name: authentik Self-signed Certificate
+      - model: authentik_core.application
+        identifiers:
+          slug: litmus
+        attrs:
+          name: Litmus Chaos
+          slug: litmus
+          provider: litmus
+          meta_launch_url: https://litmus.46.4.123.8.nip.io/
+          open_in_new_tab: false
