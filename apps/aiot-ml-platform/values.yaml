@@ -21,9 +21,9 @@ localAI:
       cpu: "500m"
       memory: 2Gi
     # Zabbix triggers on total CPU limits > 100% of allocatable (8 cores/node).
-    # 8-core limit alone exceeded a whole node; qwen2.5:3b runs fine with 2.
+    # 1500m keeps server-0 under 100% total limits alongside other workloads.
     limits:
-      cpu: "2"
+      cpu: "1500m"
       memory: 12Gi
 
 mlflow:
