@@ -44,6 +44,11 @@ spec:
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.46.4.123.8.nip.io/oauth2/auth
+        nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.46.4.123.8.nip.io/oauth2/start?rd=$scheme://$host$request_uri
+        nginx.ingress.kubernetes.io/auth-snippet: |
+          proxy_set_header X-Forwarded-Host $http_host;
+          proxy_set_header X-Original-URL https://$http_host$request_uri;
       hosts:
         - host: flux.46.4.123.8.nip.io
           paths:
