@@ -29,4 +29,4 @@ spec:
           kind: Deployment
           name: awx-operator-controller-manager
           namespace: awx
-        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: awx-operator-controller-manager\n  namespace: awx\nspec:\n  template:\n    spec:\n      containers:\n        - name: manager\n          resources:\n            requests:\n              cpu: 50m\n            limits:\n              cpu: 500m\n"
+        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: awx-operator-controller-manager\n  namespace: awx\nspec:\n  template:\n    spec:\n      containers:\n        - name: awx-manager\n          resources:\n            requests:\n              cpu: 50m\n            limits:\n              cpu: 500m\n"
