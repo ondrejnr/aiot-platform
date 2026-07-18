@@ -213,9 +213,9 @@ spec:
             - name: POLL_MS
               value: "{{ .Values.bridges.pgSink.pollMs }}"
             - name: FETCH_MAX_BYTES
-              value: "{{ .Values.bridges.pgSink.fetchMaxBytes | quote }}"
+              value: {{ .Values.bridges.pgSink.fetchMaxBytes | quote }}
             - name: MAX_PARTITION_FETCH_BYTES
-              value: "{{ .Values.bridges.pgSink.maxPartitionFetchBytes | quote }}"
+              value: {{ .Values.bridges.pgSink.maxPartitionFetchBytes | quote }}
           volumeMounts:
             - name: scripts
               mountPath: /app
