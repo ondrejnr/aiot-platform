@@ -19,15 +19,3 @@ spec:
     createNamespace: true
   upgrade:
     cleanupOnFail: true
-  # Inline values take precedence and are always re-applied on reconcile,
-  # avoiding the cached-chart issue with reconcileStrategy: Revision.
-  values:
-    victoria-metrics-k8s-stack:
-      vmsingle:
-        resources:
-          requests:
-            cpu: 500m
-            memory: 1Gi
-          limits:
-            cpu: 800m
-            memory: 1500Mi
