@@ -56,7 +56,7 @@ spec:
         patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: ollama\n\
           \  namespace: local-ai\nspec:\n  template:\n    spec:\n      containers:\n\
           \        - name: ollama\n          resources:\n            limits:\n   \
-          \           cpu: 4\n"
+          \           cpu: 2\n"
       - target:
           version: v1
           kind: Deployment
