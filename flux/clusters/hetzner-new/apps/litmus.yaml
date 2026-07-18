@@ -130,7 +130,7 @@ spec:
           kind: Deployment
           name: chaos-litmus-auth-server
           namespace: litmus
-        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: chaos-litmus-auth-server\n\
-          \  namespace: litmus\nspec:\n  template:\n    spec:\n      containers:\n\
-          \        - name: auth-server\n          env:\n          - name: DEX_ENABLED\n\
-          \            value: \"true\"\n"
+        patch: |-
+          - op: replace
+            path: /spec/template/spec/containers/0/env/11/value
+            value: "true"
