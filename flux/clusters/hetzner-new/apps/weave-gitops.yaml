@@ -61,6 +61,15 @@ spec:
     - kustomize:
         patches:
           - target:
+              kind: Ingress
+              name: weave-gitops
+            patch: |
+              - op: add
+                path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-snippet
+                value: |
+                  proxy_set_header X-Forwarded-Host $http_host;
+                  proxy_set_header X-Original-URL https://$http_host$request_uri;
+          - target:
               kind: Deployment
               name: weave-gitops
             patch: |
