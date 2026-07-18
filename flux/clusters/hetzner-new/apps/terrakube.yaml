@@ -77,3 +77,24 @@ spec:
           \  namespace: terrakube\nspec:\n  template:\n    spec:\n      containers:\n\
           \        - name: terrakube-registry\n          resources:\n            requests:\n\
           \              cpu: 50m\n            limits:\n              cpu: 200m\n"
+  # Explicitné hodnoty – zaisťujú, že UI secret (terrakube-ui-secrets) vždy
+  # vygeneruje REACT_APP_TERRAKUBE_API_URL s príponou /api/v1/.
+  # Bez nej UI volá relatívne cesty (organization/...) priamo na koreň API hostu
+  # (https://terrakube-api.../organization/...), čo API neobsluhuje (Elide je pod
+  # /api/v1) → 404 "The requested resource could not be found." na Settings → General.
+  # Upstream chart (terrakube 4.6.3) túto príponu pridáva automaticky cez
+  # ingress.api.domain, tu ju len explicitne zrkadlíme, aby drift nevratil chybu.
+  values:
+    ingress:
+      api:
+        path: /
+        pathType: Prefix
+      ui:
+        path: /
+        pathType: Prefix
+      registry:
+        path: /
+        pathType: Prefix
+      dex:
+        path: /dex
+        pathType: Prefix
