@@ -134,7 +134,7 @@ spec:
           - op: add
             path: /metadata/annotations/nginx.ingress.kubernetes.io~1rewrite-target
             value: /$1
-          - op: replace
+          - op: add
             path: /spec/rules/0/http/paths/1
             value:
               path: /auth/(dex/.*)
