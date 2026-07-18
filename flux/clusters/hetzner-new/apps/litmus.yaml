@@ -136,10 +136,13 @@ spec:
           namespace: litmus
         patch: |-
           - op: add
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1rewrite-target
+            value: /$1
+          - op: add
             path: /spec/rules/0/http/paths/1
             value:
-              path: /auth/dex
-              pathType: Prefix
+              path: /auth/(dex/.*)
+              pathType: ImplementationSpecific
               backend:
                 service:
                   name: chaos-litmus-auth-server-service
