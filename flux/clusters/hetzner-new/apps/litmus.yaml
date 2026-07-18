@@ -123,10 +123,6 @@ spec:
           namespace: litmus
         patch: |-
           - op: remove
-            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-url
-          - op: remove
-            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-signin
-          - op: remove
             path: /metadata/annotations/nginx.ingress.kubernetes.io~1configuration-snippet
       - target:
           group: networking.k8s.io
