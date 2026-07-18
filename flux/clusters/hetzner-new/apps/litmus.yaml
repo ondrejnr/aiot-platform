@@ -79,6 +79,7 @@ spec:
             DEX_OAUTH_CLIENT_SECRET: litmus-secret-1
             OIDC_ISSUER: https://authentik.46.4.123.8.nip.io/application/o/litmus/
             OAUTH_JWT_EXP_MINS: '5'
+            OAUTH_SECRET: litmus-oauth-secret-2025
             SELF_SIGNUP: 'true'
     mongodb:
       enabled: true
@@ -154,15 +155,3 @@ spec:
           - op: replace
             path: /spec/template/spec/containers/0/env/11/value
             value: "true"
-      - target:
-          group: apps
-          version: v1
-          kind: Deployment
-          name: chaos-litmus-auth-server
-          namespace: litmus
-        patch: |-
-          - op: add
-            path: /spec/template/spec/containers/0/env/21
-            value:
-              name: OAUTH_SECRET
-              value: litmus-oauth-secret-2025
