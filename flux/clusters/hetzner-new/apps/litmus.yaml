@@ -76,6 +76,7 @@ spec:
             DEX_ENABLED: 'true'
             DEX_OAUTH_CALLBACK_URL: https://litmus.46.4.123.8.nip.io/auth/dex/callback
             DEX_OAUTH_CLIENT_ID: litmus
+            DEX_OAUTH_CLIENT_SECRET: litmus-secret-1
             OIDC_ISSUER: https://authentik.46.4.123.8.nip.io/application/o/litmus/
             OAUTH_JWT_EXP_MINS: '5'
     mongodb:
