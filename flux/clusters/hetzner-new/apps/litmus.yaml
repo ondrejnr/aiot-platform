@@ -123,3 +123,13 @@ spec:
         patch: "apiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: litmus-ingress\n\
           \  namespace: litmus\n  annotations:\n    nginx.ingress.kubernetes.io/configuration-snippet:\
           \ null\n"
+      - target:
+          group: apps
+          version: v1
+          kind: Deployment
+          name: chaos-litmus-auth-server
+          namespace: litmus
+        patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: chaos-litmus-auth-server\n\
+          \  namespace: litmus\nspec:\n  template:\n    spec:\n      containers:\n\
+          \        - name: auth-server\n          env:\n          - name: DEX_ENABLED\n\
+          \            value: \"true\"\n"
