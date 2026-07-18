@@ -121,10 +121,13 @@ spec:
           kind: Ingress
           name: litmus-ingress
           namespace: litmus
-        patch: "apiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: litmus-ingress\n\
-          \  namespace: litmus\n  annotations:\n    nginx.ingress.kubernetes.io/configuration-snippet:\
-          \ null\n    nginx.ingress.kubernetes.io/auth-url: null\n    nginx.ingress.kubernetes.io/auth-signin:\
-          \ null\n"
+        patch: |-
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-url
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1auth-signin
+          - op: remove
+            path: /metadata/annotations/nginx.ingress.kubernetes.io~1configuration-snippet
       - target:
           group: networking.k8s.io
           version: v1
