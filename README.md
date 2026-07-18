@@ -186,7 +186,7 @@ These are reconciled by Flux from `apps/*` and `flux/clusters/hetzner-new/apps/*
 | Scheduling hygiene | `descheduler/descheduler` | descheduler |
 | Platform UI | `headlamp/headlamp` | Kubernetes web UI |
 | Automation | `awx/awx`, `awx/awx-operator` | AWX and operator |
-| IaC platform | `terrakube/terrakube` | Terrakube UI/API/executor/registry/minio/openldap/redis |
+| IaC platform | `terrakube/terrakube` | Terrakube UI/API/executor/registry/minio/openldap/redis — [inštalačná cesta pre nový klaster](apps/terrakube/README.md) |
 | Configuration mgmt | `puppet/puppet` | Puppet server/PuppetDB stack |
 | PE console proxy | `pe-console/pe-console` | Puppet Enterprise console ingress/proxy |
 
