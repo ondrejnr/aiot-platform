@@ -133,7 +133,7 @@ spec:
           namespace: litmus
         patch: |-
           - op: add
-            path: /spec/rules/0/http/paths/-
+            path: /spec/rules/0/http/paths/1
             value:
               path: /auth/dex
               pathType: Prefix
