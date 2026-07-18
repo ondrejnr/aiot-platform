@@ -15,7 +15,7 @@ spec:
   chart:
     spec:
       chart: ./apps/aiot-pipeline
-      reconcileStrategy: ChartVersion
+      reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository
         name: flux-system
