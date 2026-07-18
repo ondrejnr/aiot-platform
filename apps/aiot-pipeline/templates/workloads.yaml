@@ -45,7 +45,7 @@ spec:
           image: {{ $pythonImage }}
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
-          args: ["pip install --no-cache-dir paho-mqtt >/tmp/pip.log 2>&1 && python /app/sensor_simulator.py"]
+          args: ["python3 -c 'import paho.mqtt' 2>/dev/null || pip install --no-cache-dir paho-mqtt >/tmp/pip.log 2>&1; python /app/sensor_simulator.py"]
           env:
             - name: MQTT_HOST
               value: aiot-emqx
@@ -97,7 +97,7 @@ spec:
           image: {{ $pythonImage }}
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
-          args: ["pip install --no-cache-dir gmqtt 'redis[hiredis]' >/tmp/pip.log 2>&1 && python /app/mqtt_to_redis.py"]
+          args: ["python3 -c 'import gmqtt, redis' 2>/dev/null || pip install --no-cache-dir gmqtt 'redis[hiredis]' >/tmp/pip.log 2>&1; python /app/mqtt_to_redis.py"]
           env:
             - name: MQTT_HOST
               value: aiot-emqx
@@ -147,7 +147,7 @@ spec:
           image: {{ $pythonImage }}
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
-          args: ["pip install --no-cache-dir redis kafka-python lz4 >/tmp/pip.log 2>&1 && python /app/redis_to_redpanda.py"]
+          args: ["python3 -c 'import redis, kafka' 2>/dev/null || pip install --no-cache-dir redis kafka-python lz4 >/tmp/pip.log 2>&1; python /app/redis_to_redpanda.py"]
           env:
             - name: REDIS_HOST
               value: aiot-redis
@@ -197,7 +197,7 @@ spec:
           image: {{ $pythonImage }}
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
-          args: ["pip install --no-cache-dir kafka-python lz4 'psycopg[binary]==3.2.*' >/tmp/pip.log 2>&1 && python /app/pg_sink.py"]
+          args: ["python3 -c 'import kafka, psycopg' 2>/dev/null || pip install --no-cache-dir kafka-python lz4 'psycopg[binary]==3.2.*' >/tmp/pip.log 2>&1; python /app/pg_sink.py"]
           envFrom:
             - secretRef:
                 name: aiot-pg-credentials
