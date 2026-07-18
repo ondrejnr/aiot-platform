@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: ./apps/victoriametrics
-      reconcileStrategy: ChartVersion
+      reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository
         name: flux-system
