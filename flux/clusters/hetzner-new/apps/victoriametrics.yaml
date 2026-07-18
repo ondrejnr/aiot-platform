@@ -30,4 +30,4 @@ spec:
         patch: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: vmsingle-victoriametrics-victoria-metrics-k8s-stack\n\
           \  namespace: victoriametrics\nspec:\n  template:\n    spec:\n      containers:\n\
           \        - name: vmsingle\n          resources:\n            requests:\n\
-          \              cpu: 500m\n            limits:\n              cpu: 1000m\n"
+          \              cpu: 500m\n            limits:\n              cpu: 800m\n"
