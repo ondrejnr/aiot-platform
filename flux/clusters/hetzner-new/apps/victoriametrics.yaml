@@ -19,3 +19,13 @@ spec:
     createNamespace: true
   upgrade:
     cleanupOnFail: true
+  postRenderers:
+  - kustomize:
+      patches:
+      - target:
+          group: operator.victoriametrics.com
+          version: v1beta1
+          kind: VMSingle
+          name: victoriametrics-victoria-metrics-k8s-stack
+          namespace: victoriametrics
+        patch: "apiVersion: operator.victoriametrics.com/v1beta1\nkind: VMSingle\nmetadata:\n  name: victoriametrics-victoria-metrics-k8s-stack\n  namespace: victoriametrics\nspec:\n  resources:\n    requests:\n      cpu: 500m\n      memory: 1Gi\n    limits:\n      cpu: 800m\n      memory: 1500Mi\n"
