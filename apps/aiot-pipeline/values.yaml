@@ -33,8 +33,10 @@ bridges:
     replicas: 1
     batchMax: 100
     pollMs: 1000
-    fetchMaxBytes: 4194304
-    maxPartitionFetchBytes: 1048576
+    # Quoted so Helm/YAML keeps them as strings; Python int() cannot parse
+    # the exponential float form (e.g. "4.194304e+06") that bare numbers become.
+    fetchMaxBytes: "4194304"
+    maxPartitionFetchBytes: "1048576"
     resources:
       requests:
         cpu: 50m
