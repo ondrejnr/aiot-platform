@@ -124,10 +124,24 @@ spec:
         patch: "apiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: litmus-ingress\n\
           \  namespace: litmus\n  annotations:\n    nginx.ingress.kubernetes.io/configuration-snippet:\
           \ null\n    nginx.ingress.kubernetes.io/auth-url: \"off\"\n    nginx.ingress.kubernetes.io/auth-signin:\
-          \ null\n  spec:\n    rules:\n    - host: litmus.46.4.123.8.nip.io\n      http:\n\
-          \        paths:\n        - path: /auth/dex\n          pathType: Prefix\n\
-          \          backend:\n            service:\n              name: chaos-litmus-auth-server-service\n\
-          \              port:\n                number: 9003\n"
+          \ null\n"
+      - target:
+          group: networking.k8s.io
+          version: v1
+          kind: Ingress
+          name: litmus-ingress
+          namespace: litmus
+        patch: |-
+          - op: add
+            path: /spec/rules/0/http/paths/-
+            value:
+              path: /auth/dex
+              pathType: Prefix
+              backend:
+                service:
+                  name: chaos-litmus-auth-server-service
+                  port:
+                    number: 9003
       - target:
           group: apps
           version: v1
