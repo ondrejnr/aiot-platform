@@ -143,13 +143,17 @@ spec:
           readinessProbe:
             tcpSocket:
               port: mqtt
-            initialDelaySeconds: 30
+            initialDelaySeconds: 45
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
           livenessProbe:
             tcpSocket:
               port: mqtt
-            initialDelaySeconds: 90
+            initialDelaySeconds: 120
             periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
           resources:
             requests:
               cpu: "1"
