@@ -73,7 +73,7 @@ spec:
             CHAOS_CENTER_UI_ENDPOINT: https://litmus.46.4.123.8.nip.io
         authServer:
           env:
-            DEX_ENABLED: 'false'
+            DEX_ENABLED: 'true'
             DEX_OAUTH_CALLBACK_URL: https://litmus.46.4.123.8.nip.io/auth/dex/callback
             DEX_OAUTH_CLIENT_ID: litmus
             DEX_OAUTH_CLIENT_SECRET: litmus-secret-1
