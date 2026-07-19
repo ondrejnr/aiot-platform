@@ -123,15 +123,20 @@ spec:
           name: litmus-ingress
           namespace: litmus
         patch: |-
-          - op: remove
-            path: /metadata/annotations/nginx.ingress.kubernetes.io~1rewrite-target
-          - op: replace
+          - op: add
             path: /metadata/annotations/nginx.ingress.kubernetes.io~1configuration-snippet
             value: |
               if ($uri ~ ^/auth/dex/(.*)$) {
                 rewrite ^/auth/dex/(.*)$ /dex/$1 break;
               }
-          - op: replace
+      - target:
+          group: networking.k8s.io
+          version: v1
+          kind: Ingress
+          name: litmus-ingress
+          namespace: litmus
+        patch: |-
+          - op: add
             path: /spec/rules/0/http/paths/1
             value:
               path: /auth/dex
