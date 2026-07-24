@@ -155,6 +155,34 @@ alloy:
 
           forward_to = [loki.write.loki.receiver]
         }
+
+        otelcol.receiver.otlp "default" {
+          grpc {
+            endpoint = "0.0.0.0:4317"
+          }
+          http {
+            endpoint = "0.0.0.0:4318"
+          }
+
+          output {
+            traces = [otelcol.processor.batch.default.input]
+          }
+        }
+
+        otelcol.processor.batch "default" {
+          output {
+            traces = [otelcol.exporter.otlp.tempo.input]
+          }
+        }
+
+        otelcol.exporter.otlp "tempo" {
+          client {
+            endpoint = "tempo.observability-logs.svc.cluster.local:4317"
+            tls {
+              insecure = true
+            }
+          }
+        }
   controller:
     type: daemonset
     tolerations:
