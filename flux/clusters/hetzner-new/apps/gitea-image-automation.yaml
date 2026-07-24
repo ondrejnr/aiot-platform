@@ -49,3 +49,6 @@ spec:
       messageTemplate: 'chore(gitea): update image'
     push:
       branch: main
+  update:
+    path: ./apps/gitea/values.yaml
+    strategy: Setters
