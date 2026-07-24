@@ -1,0 +1,162 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tempo
+  namespace: observability-logs
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: tempo
+      version: "1.16.0"
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      reconcileStrategy: ChartVersion
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    tempo:
+      persistence:
+        enabled: true
+        storageClass: nfs
+        size: 50Gi
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+        requests:
+          cpu: 200m
+          memory: 512Mi
+      tempo:
+        config: |
+          server:
+            http_listen_port: 3200
+            grpc_listen_port: 9095
+          distributor:
+            receivers:
+              otlp:
+                protocols:
+                  grpc:
+                    endpoint: 0.0.0.0:4317
+                  http:
+                    endpoint: 0.0.0.0:4318
+              jaeger:
+                protocols:
+                  thrift_http:
+                    endpoint: 0.0.0.0:14268
+              zipkin:
+                endpoint: 0.0.0.0:9411
+          ingester:
+            max_block_duration: 1h
+            max_block_bytes: 1073741824
+          compactor:
+            compaction:
+              block_retention: 72h
+              compacted_block_retention: 1h
+          storage:
+            trace:
+              backend: local
+              local:
+                path: /var/tempo/traces
+              wal:
+                path: /var/tempo/wal
+          overrides:
+            defaults:
+              ingestion_rate_limit_mb: 10
+              ingestion_burst_size_mb: 20
+    gateway:
+      enabled: true
+      service:
+        type: ClusterIP
+        port: 80
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+    queryFrontend:
+      replicas: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+    querier:
+      replicas: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+    compactor:
+      enabled: true
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+    distributor:
+      replicas: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+    ingester:
+      replicas: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+    metricsGenerator:
+      enabled: true
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+    serviceMonitor:
+      enabled: true
+      namespace: observability-logs
+      additionalLabels:
+        release: prometheus
+    grafana:
+      enabled: false
+    initContainers:
+      - name: init-chown
+        image: busybox:1.36
+        command: ["sh", "-c", "chown -R 10001:10001 /var/tempo"]
+        volumeMounts:
+          - name: storage
+            mountPath: /var/tempo
+    extraVolumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: tempo
+    extraVolumeMounts:
+      - name: storage
+        mountPath: /var/tempo
