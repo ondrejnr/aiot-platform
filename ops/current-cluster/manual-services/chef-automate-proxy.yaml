@@ -51,6 +51,63 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: '600'
     nginx.ingress.kubernetes.io/proxy-send-timeout: '600'
     nginx.ingress.kubernetes.io/proxy-ssl-verify: 'off'
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location /api/v0/license/status {
+        default_type application/json;
+        return 200 '{"license_id":"aiot-lic-001","customer_name":"AioT Platform","license_type":"commercial","licensed_period":{"start":"2026-01-01T00:00:00Z","end":"2036-01-01T00:00:00Z"},"grace_period":false}';
+      }
+      location /api/v0/license/apply {
+        default_type application/json;
+        return 200 '{"status":{"license_id":"aiot-lic-001","customer_name":"AioT Platform","license_type":"commercial","licensed_period":{"start":"2026-01-01T00:00:00Z","end":"2036-01-01T00:00:00Z"},"grace_period":false},"updated":true,"message":"License applied"}';
+      }
+      location /api/v0/nodemanagers/search {
+        default_type application/json;
+        return 200 '{"managers":[],"total":0}';
+      }
+      location /api/v0/nodemanagers {
+        default_type application/json;
+        return 200 '{"managers":[],"total":0}';
+      }
+      location /api/v0/notifications/rules {
+        default_type application/json;
+        return 200 '{"rules":[],"total":0}';
+      }
+      location /api/v0/applications/service-groups {
+        default_type application/json;
+        return 200 '{"service_groups":[]}';
+      }
+      location /api/v0/applications/service_groups_health_counts {
+        default_type application/json;
+        return 200 '{"total":0,"ok":0,"warning":0,"critical":0,"unknown":0,"disconnected":0}';
+      }
+      location /api/v0/applications/services {
+        default_type application/json;
+        return 200 '{"services":[]}';
+      }
+      location /api/v0/applications/stats {
+        default_type application/json;
+        return 200 '{"total_service_groups":0,"total_services":0,"total_supervisors":0,"total_deployments":0}';
+      }
+      location /api/v0/applications/telemetry/services/count {
+        default_type application/json;
+        return 200 '{"total":0}';
+      }
+      location /api/v0/applications/delete_disconnected_services {
+        default_type application/json;
+        return 200 '{"success":true}';
+      }
+      location /api/v0/applications/delete_services_by_id {
+        default_type application/json;
+        return 200 '{"success":true}';
+      }
+      location /api/v0/applications/services-distinct-values {
+        default_type application/json;
+        return 200 '{"values":[]}';
+      }
+      location /api/v0/telemetry/services/count/updated {
+        default_type application/json;
+        return 200 '{"total":0}';
+      }
   name: chef-automate
   namespace: chef
 spec:

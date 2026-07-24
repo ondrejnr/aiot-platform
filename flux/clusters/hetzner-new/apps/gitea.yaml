@@ -22,8 +22,9 @@ spec:
     cleanupOnFail: true
   values:
     gitea:
-      admin:
-        username: "gitea-admin"
-        password: "r8sA8CPHD9!bt6d"
-        email: "gitea@local.domain"
-        passwordMode: "keepUpdated"
+      gitea:
+        admin:
+          username: "gitea-admin"
+          password: "r8sA8CPHD9!bt6d"
+          email: "gitea@local.domain"
+          passwordMode: "keepUpdated"

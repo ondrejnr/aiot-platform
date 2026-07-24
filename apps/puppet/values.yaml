@@ -12,7 +12,6 @@ puppetserver:
   puppetdb:
     extraEnv:
       PUPPETDB_POSTGRES_HOSTNAME: pg-cluster-rw.databases.svc.cluster.local
-      PUPPETDB_JAVA_ARGS: ""
     credentials:
       puppetdb:
         postgres: "PuppetDb2026!"
