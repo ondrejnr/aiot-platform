@@ -49,7 +49,7 @@ jenkins:
                   caseSensitive: {}
                 fullNameFieldName: name
                 emailFieldName: email
-                groupsFieldName: groups
+                # groupsFieldName: groups  # Disabled - Authentik doesn't return groups claim
                 logoutFromOpenidProvider: true
                 postLogoutRedirectUrl: https://jenkins.46.4.123.8.nip.io
                 sendScopesInTokenRequest: true
