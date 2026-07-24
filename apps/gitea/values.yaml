@@ -49,6 +49,13 @@ gitea:
       password: r8sA8CPHD9!bt6d
       email: gitea@local.domain
       passwordMode: keepUpdated
+    extraEnv:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://alloy.observability-logs.svc.cluster.local:4318"
+      - name: OTEL_SERVICE_NAME
+        value: "gitea"
+      - name: OTEL_TRACES_EXPORTER
+        value: "otlp"
     config:
       server:
         DOMAIN: gitea.46.4.123.8.nip.io

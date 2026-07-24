@@ -10,6 +10,10 @@ grafana:
     passwordKey: admin-password
   image:
     tag: "11.6.16" # {"$imagepolicy": "flux-system:grafana-stable:tag"}
+  env:
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy.observability-logs.svc.cluster.local:4318
+    OTEL_SERVICE_NAME: grafana
+    OTEL_TRACES_EXPORTER: otlp
   ingress:
     enabled: true
     ingressClassName: nginx
