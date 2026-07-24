@@ -6,6 +6,8 @@ victoria-metrics-k8s-stack:
   vmsingle:
     spec:
       retentionPeriod: "1"
+      image:
+        tag: "v1.114.0" # {"$imagepolicy": "flux-system:victoriametrics-stable:tag"}
     # Keep CPU limit under 1 core so agent nodes stay <100% total limits (Zabbix trigger).
     resources:
       requests:

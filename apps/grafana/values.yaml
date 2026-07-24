@@ -8,6 +8,8 @@ grafana:
     existingSecret: grafana-admin
     userKey: admin-user
     passwordKey: admin-password
+  image:
+    tag: "11.4.0" # {"$imagepolicy": "flux-system:grafana-stable:tag"}
   ingress:
     enabled: true
     ingressClassName: nginx

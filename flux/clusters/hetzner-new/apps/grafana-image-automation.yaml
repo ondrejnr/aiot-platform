@@ -1,0 +1,53 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: grafana
+  namespace: flux-system
+spec:
+  image: grafana/grafana
+  interval: 5m0s
+  exclusionList:
+    - '.*-rc.*$'
+    - '.*-beta.*$'
+    - '.*-alpha.*$'
+    - '^latest$'
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: grafana-stable
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: grafana
+  policy:
+    semver:
+      range: '>=11.0.0-0 <12.0.0-0'
+  filterTags:
+    pattern: '^11\.\d+\.\d+$'
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageUpdateAutomation
+metadata:
+  name: grafana-auto-update
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: flux-bot@local.domain
+        name: flux-bot
+      messageTemplate: 'chore(grafana): update image'
+    push:
+      branch: main
+  update:
+    path: ./apps/grafana/values.yaml
+    strategy: Setters

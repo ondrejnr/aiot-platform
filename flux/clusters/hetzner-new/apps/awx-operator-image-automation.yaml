@@ -1,0 +1,53 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: awx-operator
+  namespace: flux-system
+spec:
+  image: quay.io/ansible/awx-operator
+  interval: 5m0s
+  exclusionList:
+    - '.*-rc.*$'
+    - '.*-beta.*$'
+    - '.*-alpha.*$'
+    - '^latest$'
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: awx-operator-stable
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: awx-operator
+  policy:
+    semver:
+      range: '>=2.19.0-0 <3.0.0-0'
+  filterTags:
+    pattern: '^2\.\d+\.\d+$'
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageUpdateAutomation
+metadata:
+  name: awx-operator-auto-update
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: flux-bot@local.domain
+        name: flux-bot
+      messageTemplate: 'chore(awx-operator): update image'
+    push:
+      branch: main
+  update:
+    path: ./apps/awx-operator/values.yaml
+    strategy: Setters

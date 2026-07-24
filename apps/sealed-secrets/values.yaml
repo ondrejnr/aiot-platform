@@ -1,2 +1,4 @@
 # No live values dump available — pass-through skeleton for sealed-secrets
-sealed-secrets: {}
+sealed-secrets:
+  image:
+    tag: "0.38.1" # {"$imagepolicy": "flux-system:sealed-secrets-controller-stable:tag"}

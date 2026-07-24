@@ -1,0 +1,53 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: alloy
+  namespace: flux-system
+spec:
+  image: grafana/alloy
+  interval: 5m0s
+  exclusionList:
+    - '.*-rc.*$'
+    - '.*-beta.*$'
+    - '.*-alpha.*$'
+    - '^latest$'
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: alloy-stable
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: alloy
+  policy:
+    semver:
+      range: '>=1.16.0-0 <2.0.0-0'
+  filterTags:
+    pattern: '^v?1\.\d+\.\d+$'
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageUpdateAutomation
+metadata:
+  name: alloy-auto-update
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: flux-bot@local.domain
+        name: flux-bot
+      messageTemplate: 'chore(alloy): update image'
+    push:
+      branch: main
+  update:
+    path: ./apps/alloy/values.yaml
+    strategy: Setters

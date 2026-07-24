@@ -5,11 +5,15 @@ resources:
   - aiot-ml-platform.yaml
   - aiot-pipeline.yaml
   - alloy.yaml
+  - alloy-image-automation.yaml
   - authentik-litmus-blueprint.yaml
   - awx-operator.yaml
+  - awx-operator-image-automation.yaml
   - awx.yaml
+  - awx-image-automation.yaml
   - blackbox-exporter.yaml
   - cert-manager.yaml
+  - cert-manager-image-automation.yaml
   - cloudbeaver.yaml
   - cloudbeaver-image-automation.yaml
   - cluster-copilot.yaml
@@ -20,8 +24,10 @@ resources:
   - gitea.yaml
   - gitea-image-automation.yaml
   - grafana.yaml
+  - grafana-image-automation.yaml
   - headlamp.yaml
   - ingress-nginx.yaml
+  - ingress-nginx-image-automation.yaml
   - jenkins-flux-rbac.yaml
   - jenkins.yaml
   - jenkins-image-automation.yaml
@@ -31,6 +37,7 @@ resources:
   - litmus.yaml
   - loki-alloy-grafana-recovery
   - loki.yaml
+  - loki-image-automation.yaml
   - monitoring.yaml
   - nfs-provisioner.yaml
   - node-problem-detector.yaml
@@ -40,8 +47,10 @@ resources:
   - qdrant-indexer.yaml
   - qdrant.yaml
   - sealed-secrets.yaml
+  - sealed-secrets-image-automation.yaml
   - terrakube.yaml
   - victoriametrics.yaml
+  - victoriametrics-image-automation.yaml
   - weave-gitops-rbac.yaml
   - weave-gitops.yaml
   - zabbix.yaml

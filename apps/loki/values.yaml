@@ -27,6 +27,8 @@ loki:
       delete_request_store: filesystem
     ruler:
       enable_api: false
+    image:
+      tag: "3.6.7" # {"$imagepolicy": "flux-system:loki-stable:tag"}
 
   deploymentMode: SingleBinary
 
