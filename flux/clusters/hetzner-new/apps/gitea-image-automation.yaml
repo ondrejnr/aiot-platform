@@ -1,0 +1,50 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: gitea
+  namespace: flux-system
+spec:
+  image: gitea/gitea
+  interval: 5m0s
+  filterTags:
+    pattern: '^1\\.22\\.[0-9]+-rootless$'
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: gitea-patch
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: gitea
+  policy:
+    semver:
+      range: 1.22.x
+  filterTags:
+    pattern: '^1\\.22\\.[0-9]+-rootless$'
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageUpdateAutomation
+metadata:
+  name: gitea-auto-update
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: flux-bot@local.domain
+        name: flux-bot
+      messageTemplate: 'chore(gitea): update to {{.LatestTag}}'
+    push:
+      branch: flux-update-gitea-{{.LatestTag}}
+  update:
+    strategy: Setters
+    path: ./apps/gitea/values.yaml
