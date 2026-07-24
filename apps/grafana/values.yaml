@@ -9,7 +9,7 @@ grafana:
     userKey: admin-user
     passwordKey: admin-password
   image:
-    tag: "11.4.0" # {"$imagepolicy": "flux-system:grafana-stable:tag"}
+    tag: "11.6.16" # {"$imagepolicy": "flux-system:grafana-stable:tag"}
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -37,8 +37,7 @@ grafana:
       api_url: https://authentik.46.4.123.8.nip.io/application/o/userinfo/
       allow_sign_up: true
       auto_login: false
-      role_attribute_path: contains(groups[*], 'authentik Admins') && 'GrafanaAdmin'
-        || contains(groups[*], 'admin') && 'Admin' || 'Editor'
+      role_attribute_path: contains(groups[*], 'authentik Admins') && 'GrafanaAdmin' || contains(groups[*], 'admin') && 'Admin' || 'Editor'
       role_attribute_strict: false
       allow_assign_grafana_admin: true
       use_pkce: true
