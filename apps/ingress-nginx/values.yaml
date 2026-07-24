@@ -16,7 +16,7 @@ ingress-nginx:
     config:
       annotations-risk-level: Critical
     image:
-      tag: "v1.11.3" # {"$imagepolicy": "flux-system:ingress-nginx-controller-stable:tag"}
+      tag: "v1.15.1" # {"$imagepolicy": "flux-system:ingress-nginx-controller-stable:tag"}
     metrics:
       enabled: true
       port: 10254
