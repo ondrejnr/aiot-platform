@@ -1,5 +1,5 @@
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
 metadata:
   name: gitea
@@ -7,10 +7,14 @@ metadata:
 spec:
   image: gitea/gitea
   interval: 5m0s
-  filterTags:
-    pattern: '^1\\.22\\.[0-9]+-rootless$'
+  exclusionList:
+    - '.*-rootless$'
+    - '.*-rc.*$'
+    - '.*-beta.*$'
+    - '.*-alpha.*$'
+    - '^latest$'
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
   name: gitea-patch
@@ -22,9 +26,9 @@ spec:
     semver:
       range: 1.22.x
   filterTags:
-    pattern: '^1\\.22\\.[0-9]+-rootless$'
+    pattern: '^1\.22\.[0-9]+$'
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageUpdateAutomation
 metadata:
   name: gitea-auto-update
