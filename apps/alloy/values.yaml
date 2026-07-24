@@ -16,7 +16,7 @@ alloy:
         cpu: 500m
         memory: 512Mi
     image:
-      tag: "v1.16.1" # {"$imagepolicy": "flux-system:alloy-stable:tag"}
+      tag: "v1.18.0" # {"$imagepolicy": "flux-system:alloy-stable:tag"}
     configMap:
       content: |-
         logging {
@@ -155,7 +155,6 @@ alloy:
 
           forward_to = [loki.write.loki.receiver]
         }
-
   controller:
     type: daemonset
     tolerations:
