@@ -43,7 +43,7 @@ gitea:
     image:
       registry: docker.io
       repository: gitea/gitea
-      tag: "1.22.3-rootless" # {"$imagepolicy": "flux-system:gitea-patch"}
+      tag: "gitea/gitea:1.22.6" # {"$imagepolicy": "flux-system:gitea-patch"}
     admin:
       username: gitea-admin
       password: r8sA8CPHD9!bt6d
