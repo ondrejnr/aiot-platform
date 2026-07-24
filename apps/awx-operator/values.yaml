@@ -2,7 +2,7 @@
 # We deploy ONLY the operator here; AWX CR is in apps/awx for separation
 awx-operator:
   AWX:
-    enabled: false  # bundled AWX disabled; we manage AWX CR ourselves
+    enabled: false # bundled AWX disabled; we manage AWX CR ourselves
   rbac:
     create: true
   resources:
@@ -12,4 +12,4 @@ awx-operator:
     limits:
       cpu: 500m
       memory: 512Mi
-  image: quay.io/ansible/awx-operator:2.19.1 # {"$imagepolicy": "flux-system:awx-operator-stable:tag"}
+  image: 2.19.1 # {"$imagepolicy": "flux-system:awx-operator-stable:tag"}

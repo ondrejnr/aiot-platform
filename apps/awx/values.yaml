@@ -8,7 +8,7 @@ awx:
   #   then update the values and let Flux reconcile
   adminPassword: Qyk6AEWWIkIlhBOg3QcL7TjA
   secretKey: b1c3a69c5e127dfb0ec3f7524ff6dfd3d678b36de34e24dbe8aa0b026621f02f
-  image: quay.io/ansible/awx:24.6.1 # {"$imagepolicy": "flux-system:awx-stable:tag"}
+  image: 24.6.1 # {"$imagepolicy": "flux-system:awx-stable:tag"}
 postgres:
   host: pg-cluster-rw.databases.svc.cluster.local
   port: 5432
@@ -18,7 +18,6 @@ postgres:
   sslmode: prefer
 nodeSelector:
   role: apps
-
 oidc:
   clientId: awx
   clientSecret: tQz97tI1PGVW1puzzHIvvJmQ5HJgLrYUvL4yBicBzuVOA65srgIunSWMECn0Vrmxpi8WhkW8gV3xZBkyNQvSqcaynchpNAHNa261VaEok2NICBo8uxMqVVdFSmoAB0Kg
