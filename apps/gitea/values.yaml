@@ -41,7 +41,10 @@ gitea:
         role: apps
   gitea:
     admin:
-      username: admin
+      username: gitea-admin
+      password: r8sA8CPHD9!bt6d
+      email: gitea@local.domain
+      passwordMode: keepUpdated
     config:
       server:
         DOMAIN: gitea.46.4.123.8.nip.io
