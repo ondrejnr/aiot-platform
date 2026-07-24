@@ -46,9 +46,6 @@ spec:
       author:
         email: flux-bot@local.domain
         name: flux-bot
-      messageTemplate: 'chore(gitea): update to {{.LatestTag}}'
+      messageTemplate: 'chore(gitea): update image'
     push:
-      branch: flux-update-gitea-{{.LatestTag}}
-  update:
-    strategy: Setters
-    path: ./apps/gitea/values.yaml
+      branch: main
