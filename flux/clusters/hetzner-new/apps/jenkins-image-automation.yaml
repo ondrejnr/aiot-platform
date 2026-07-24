@@ -25,7 +25,7 @@ spec:
     semver:
       range: 2.555.x
   filterTags:
-    pattern: '^2\.555\.[0-9]+-jdk21$'
+    extract: '^(2\.555\.[0-9]+)-jdk21$'
 ---
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageUpdateAutomation
