@@ -42,13 +42,13 @@ jenkins:
                 serverConfiguration:
                   wellKnown:
                     wellKnownOpenIDConfigurationUrl: https://authentik.46.4.123.8.nip.io/application/o/jenkins/.well-known/openid-configuration
-                userNameField: preferred_username
+                userNameField: sub
                 userIdStrategy:
                   caseSensitive: {}
                 groupIdStrategy:
                   caseSensitive: {}
-                fullNameFieldName: name
-                emailFieldName: email
+                fullNameFieldName: sub
+                emailFieldName: sub
                 # groupsFieldName: groups  # Disabled - Authentik doesn't return groups claim
                 logoutFromOpenidProvider: true
                 postLogoutRedirectUrl: https://jenkins.46.4.123.8.nip.io
