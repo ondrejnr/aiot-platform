@@ -47,6 +47,9 @@ grafana:
       use_pkce: true
     users:
       auto_assign_org_role: Editor
+    tracing.opentelemetry.otlp:
+      address: alloy.observability-logs.svc.cluster.local:4318
+      propagation: w3c
   datasources:
     datasources.yaml:
       apiVersion: 1

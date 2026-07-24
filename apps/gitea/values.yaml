@@ -78,6 +78,11 @@ gitea:
         ACCOUNT_LINKING: auto
         USERNAME: nickname
         UPDATE_AVATAR: true
+      tracing:
+        ENABLED: true
+        PROVIDER: otel
+      "tracing.otel":
+        ENDPOINT: alloy.observability-logs.svc.cluster.local:4318
   ingress:
     enabled: true
     className: nginx
