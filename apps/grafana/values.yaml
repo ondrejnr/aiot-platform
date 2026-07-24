@@ -65,7 +65,7 @@ grafana:
         uid: Tempo
         type: tempo
         access: proxy
-        url: http://tempo-gateway.observability-logs.svc.cluster.local
+        url: http://tempo.observability-logs.svc.cluster.local:3200
         isDefault: false
         editable: true
         jsonData:
