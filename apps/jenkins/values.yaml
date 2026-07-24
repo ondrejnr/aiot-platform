@@ -17,7 +17,7 @@ jenkins:
     overwritePlugins: true
     overwritePluginsFromImage: true
     image:
-      tag: "2.555.3-jdk21" # {"$imagepolicy": "flux-system:jenkins-lts:tag"}
+      tag: "2.568.1-jdk21" # {"$imagepolicy": "flux-system:jenkins-lts:tag"}
     installPlugins:
     - kubernetes
     - workflow-aggregator
