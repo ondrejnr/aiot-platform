@@ -54,6 +54,26 @@ grafana:
         url: http://loki-gateway.observability-logs.svc.cluster.local
         isDefault: true
         editable: true
+      - name: Tempo
+        uid: Tempo
+        type: tempo
+        access: proxy
+        url: http://tempo-gateway.observability-logs.svc.cluster.local
+        isDefault: false
+        editable: true
+        jsonData:
+          tracesToLogsV2:
+            datasourceUid: Loki
+            spanStartTimeShift: "-5m"
+            spanEndTimeShift: "5m"
+            filterByTraceID: false
+            filterBySpanID: false
+            tags: [ { key: 'service.name', value: 'app' } ]
+          tracesToMetrics:
+            datasourceUid: Prometheus
+            queries:
+              - name: 'Requests'
+                query: 'sum(rate(traces_spanmetrics_calls_total{$$__tags}[$$__rate_interval]))'
       - name: Prometheus
         type: prometheus
         access: proxy
