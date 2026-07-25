@@ -24,6 +24,10 @@ The current cluster was bootstrapped as k3d/k3s on one Hetzner host:
 
 A fresh rebuild should recreate the k3d cluster, bootstrap Flux to `flux/clusters/hetzner-new/flux-system`, point Flux at the internal Gitea repository, and then let Flux reconcile `apps/*`.
 
+## Post-install: Application SSO integrations
+
+- [Habitat Builder + Chef Automate SSO](docs/HABITAT-BUILDER-CHEF-AUTOMATE-SSO.md) – preklik z Chef Automate do Habitat Builderu (3-vrstvový bug, 2 dni debugovania)
+
 ## API server OIDC (required for Headlamp SSO)
 
 The Kubernetes API server must trust Authentik as an OIDC issuer, otherwise the

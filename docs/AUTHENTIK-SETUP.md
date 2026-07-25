@@ -155,6 +155,8 @@ scopes: [ "openid", "email", "profile" ]
 
 ## Application Integration
 
+> **Chef Automate → Habitat Builder:** Samostatný sprievodca v [HABITAT-BUILDER-CHEF-AUTOMATE-SSO.md](HABITAT-BUILDER-CHEF-AUTOMATE-SSO.md) – rieši preklik z Applications sekcie v Chef Automate
+
 ### 1. Headlamp (Kubernetes Dashboard)
 
 **OIDC Type:** Native OIDC + RBAC binding  
