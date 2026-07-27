@@ -30,7 +30,7 @@ zabbix:
         value: "10051"
       - name: ZBX_SSO_SETTINGS
         value: >-
-          {"strict": false, "baseurl": "https://zabbix.46.4.123.8.nip.io/", "use_proxy_headers": true}
+          {"strict":true,"baseurl":"https://zabbix.46.4.123.8.nip.io/","use_proxy_headers":true,"sp":{"entityId":"zabbix","assertionConsumerService":{"url":"https://zabbix.46.4.123.8.nip.io/index_sso.php?acs","binding":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"}},"idp":{"entityId":"zabbix","singleSignOnService":{"url":"https://authentik.46.4.123.8.nip.io/application/saml/zabbix/sso/binding/post/","binding":"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"}}}
   ingress:
     enabled: true
     ingressClassName: nginx
