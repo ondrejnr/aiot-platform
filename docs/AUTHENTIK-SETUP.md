@@ -344,71 +344,77 @@ Users click "Sign in with Authentik" → redirected to Authentik → after auth 
 ### 4. Chef Automate (Infrastructure Automation)
 
 **OIDC Type:** SAML via Dex → Authentik  
-**Location:** `ops/current-cluster/manual-services/chef-automate-proxy.yaml`
+**Location:** `ops/current-cluster/manual-services/chef-automate-proxy.yaml`  
+**⚠️ Kompletný návod:** [`CHEF-AUTOMATE-SAML-AUTHENTIK.md`](CHEF-AUTOMATE-SAML-AUTHENTIK.md) — obsahuje všetky nástrahy a riešenia!
 
 #### Architecture
 
 ```
 Chef UI (backend port 443)
-  ↓ (User clicks "Sign in")
-Dex connector (OIDC helper)
-  ↓ (SAMLRequest)
+  ↓ (User clicks "Sign in with SAML")
+Dex connector (SAML connector)
+  ↓ (SAMLRequest → Authentik)
 Authentik SAML IdP
   ↓ (SAMLResponse signed)
-Dex → Chef callback
+Dex → /dex/callback
   ↓
-User logged in
+User logged in → IAM policy check → Dashboard
 ```
 
-#### Authentik SAML Provider
+#### Kľúčové súbory (v Docker kontajneri)
 
-Created via Django:
+| Súbor | Účel |
+|-------|------|
+| `/etc/chef-automate/dex/saml-ca.pem` | SAML certifikát (mimo hab) |
+| `/hab/svc/automate-dex/var/etc/config.yml` | Dex config (immutable) |
+| `/etc/chef-automate/dex/start-saml-dex.sh` | Startup skript |
+| `/etc/systemd/system/dex-saml.service` | Systemd service |
 
-```python
-from authentik.providers.saml.models import SAMLProvider
-from authentik.crypto.models import CertificateKeyPair
-from authentik.flows.models import Flow
+#### ⚠️ Najčastejšie chyby
 
-# Get existing certificate
-cert = CertificateKeyPair.objects.get(name="authentik Self-signed Certificate")
+1. **"Requested resource does not exist"** — Dex config nemá `connectors` sekciu
+2. **"no attribute with name email"** — Atribúty musia byť v URI formáte (`http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`)
+3. **"It looks like you do not have permission"** — IAM politika nesedí na SAML identifikátory (viď sekciu 4 v CHEF-AUTOMATE-SAML-AUTHENTIK.md)
+4. **Habitat prepisuje súbory** — certifikát musí byť mimo `/hab/svc/`, config musí byť immutable
 
-# Create SAML provider
-saml_provider = SAMLProvider.objects.create(
-    name="chef-automate-provider",
-    acs_url="https://chef.46.4.123.8.nip.io/dex/callback",
-    audience="https://chef.46.4.123.8.nip.io/dex/callback",
-    sp_binding="post",
-    signing_key_pair=cert,
-    name_id_mapping=NameIdFormats.EMAILADDRESS,
-)
+#### Dex SAML Connector (finálna funkčná verzia)
 
-# Add property mappings (Name, Email, Groups)
-# Then link to Application "chef-automate"
-app = Application.objects.get(slug="chef-automate")
-app.provider = saml_provider
-# Set authorization flow to implicit consent
-saml_provider.authorization_flow = Flow.objects.get(slug="default-provider-authorization-implicit-consent")
-saml_provider.save()
-app.save()
+```yaml
+connectors:
+  - type: saml
+    id: saml
+    name: SAML
+    config:
+      ssoURL: https://authentik.46.4.123.8.nip.io/application/saml/chef-automate/sso/binding/post/
+      ca: /etc/chef-automate/dex/saml-ca.pem
+      redirectURI: https://chef.46.4.123.8.nip.io/dex/callback
+      entityIssuer: authentik
+      usernameAttr: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name
+      emailAttr: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress
+      groupsAttr: http://schemas.xmlsoap.org/claims/Group
+      nameIDPolicyFormat: emailAddress
 ```
 
-#### Chef Dex SAML Connector
+#### IAM Policy (oprávnenia)
 
-In Chef config (typically `/etc/chef-automate/config.toml` or via `chef-automate config patch`):
+```bash
+# Vytvorenie admin tokenu
+chef-automate iam token create admin-token --admin
 
-```toml
-[dex.v1.sys.connectors.saml]
-id = "saml"
-name = "Authentik"
-config = {
-  ca_contents = "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
-  sso_url = "https://authentik.46.4.123.8.nip.io/application/saml/chef-automate-provider/sso/binding/post/"
-  entity_issuer = "https://chef.46.4.123.8.nip.io/dex/callback"
-  name_id_policy = "emailAddress"
-}
+# Vytvorenie SAML Admins politiky
+curl -sk -X POST -H "api-token: $TOKEN" \
+  https://localhost/apis/iam/v2/policies \
+  -d '{
+    "name": "SAML Admins",
+    "id": "saml-admins",
+    "members": [
+      "user:saml:akadmin@example.com",
+      "team:saml:authentik Admins"
+    ],
+    "statements": [{"effect": "ALLOW", "role": "owner", "projects": ["*"]}],
+    "projects": []
+  }'
 ```
-
-**Note:** After rebuilding Authentik (new certificate), you must update `ca_contents` in Chef config.
 
 ---
 
