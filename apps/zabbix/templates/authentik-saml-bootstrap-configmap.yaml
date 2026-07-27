@@ -29,16 +29,20 @@ data:
     ACS_URL = f"{ZABBIX_URL}/index_sso.php?acs"
     AUDIENCE = f"{ZABBIX_URL}/zabbix"
 
+    # IdP-initiated SSO launch URL so the Authentik application tile starts the
+    # SAML flow instead of hitting Zabbix directly (avoids "SAML request payload is missing").
+    LAUNCH_URL = f"{AUTHENTIK_URL}/application/saml/{APP_SLUG}/sso/binding/init/"
+
     app, _ = Application.objects.get_or_create(
         slug=APP_SLUG,
         defaults={
             "name": "Zabbix",
-            "meta_launch_url": ZABBIX_URL,
+            "meta_launch_url": LAUNCH_URL,
             "open_in_new_tab": True,
         },
     )
     app.name = "Zabbix"
-    app.meta_launch_url = ZABBIX_URL
+    app.meta_launch_url = LAUNCH_URL
     app.open_in_new_tab = True
 
     auth_flow = Flow.objects.get(slug="default-provider-authorization-implicit-consent")
