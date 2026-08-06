@@ -28,7 +28,7 @@ loki:
     ruler:
       enable_api: false
     image:
-      tag: "3.7.5" # {"$imagepolicy": "flux-system:loki-stable:tag"}
+      tag: "3.7.6" # {"$imagepolicy": "flux-system:loki-stable:tag"}
   deploymentMode: SingleBinary
   singleBinary:
     replicas: 1
