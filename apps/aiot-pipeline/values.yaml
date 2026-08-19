@@ -3,11 +3,11 @@ global:
   namespace: aiot
 
 postgres:
-  host: pg-cluster-pooler-rw.databases.svc.cluster.local
+  host: postgresql.authentik.svc.cluster.local
   port: 5432
-  database: aiot
-  user: appuser
-  password: "AiotPg2026!"
+  database: authentik
+  user: authentik
+  password: "bankpass"
 
 mqtt:
   topic: aiot/sensors/telemetry
