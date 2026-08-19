@@ -1,6 +1,13 @@
 zabbix:
   zabbixImageTag: alpine-7.0.29
   postgresAccess:
+    existingSecretName: zabbix-db-access
+    secretHostKey: host
+    secretPortKey: port
+    secretUserKey: user
+    secretPasswordKey: password
+    secretDBKey: dbname
+    secretSchemaKey: ""
     host: pg-cluster-rw.databases.svc.cluster.local
     port: "5432"
     user: zabbix
