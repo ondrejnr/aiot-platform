@@ -27,3 +27,8 @@ spec:
   upgrade:
     cleanupOnFail: true
     crds: CreateReplace
+  values:
+    puppetdb:
+      extraEnv:
+        PUPPETDB_JAVA_ARGS: "-Xms256m -Xmx512m"
+        PUPPETDB_POSTGRES_HOSTNAME: pg-cluster-rw.databases.svc.cluster.local
