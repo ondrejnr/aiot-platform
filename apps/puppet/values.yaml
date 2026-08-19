@@ -10,8 +10,7 @@ puppetserver:
     fqdns:
       alternateServerNames: "puppet.46.4.123.8.nip.io,puppet"
   puppetdb:
-    extraEnv:
-      PUPPETDB_POSTGRES_HOSTNAME: pg-cluster-rw.databases.svc.cluster.local
+    extraEnv: {}
     credentials:
       puppetdb:
         postgres: "PuppetDb2026!"
