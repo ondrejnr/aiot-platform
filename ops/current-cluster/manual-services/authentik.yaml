@@ -577,6 +577,11 @@ spec:
                   app.kubernetes.io/name: authentik
               topologyKey: kubernetes.io/hostname
             weight: 100
+      volumes:
+      - name: authentik-shm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 256Mi
       containers:
       - args:
         - server
@@ -605,6 +610,9 @@ spec:
           successThreshold: 1
           timeoutSeconds: 15
         name: server
+        volumeMounts:
+        - name: authentik-shm
+          mountPath: /dev/shm
         ports:
         - containerPort: 9000
           name: http

@@ -11,7 +11,8 @@ grafana:
   image:
     tag: "11.6.16" # {"$imagepolicy": "flux-system:grafana-stable:tag"}
   env:
-    OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy.observability-logs.svc.cluster.local:4318
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://alloy.observability-logs.svc.cluster.local:4317
+    OTEL_EXPORTER_OTLP_PROTOCOL: grpc
     OTEL_SERVICE_NAME: grafana
     OTEL_TRACES_EXPORTER: otlp
   ingress:
@@ -48,7 +49,7 @@ grafana:
     users:
       auto_assign_org_role: Editor
     tracing.opentelemetry.otlp:
-      address: alloy.observability-logs.svc.cluster.local:4318
+      address: alloy.observability-logs.svc.cluster.local:4317
       propagation: w3c
   datasources:
     datasources.yaml:

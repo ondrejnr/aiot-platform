@@ -7,6 +7,8 @@ spec:
   suspend: false
   interval: 30m
   releaseName: terrakube
+  driftDetection:
+    mode: enabled
   chart:
     spec:
       chart: ./apps/terrakube

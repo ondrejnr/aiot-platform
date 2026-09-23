@@ -1,5 +1,7 @@
 cert-manager:
   crds:
     enabled: true
+  extraArgs:
+    - --acme-http01-solver-nameservers=1.1.1.1:53,8.8.8.8:53
   image:
     tag: "v1.21.2" # {"$imagepolicy": "flux-system:cert-manager-controller-stable:tag"}

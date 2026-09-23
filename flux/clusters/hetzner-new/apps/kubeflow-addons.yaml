@@ -166,6 +166,27 @@ spec:
   timeout: 10m
   targetNamespace: kubeflow
   path: ./applications/tensorboard/tensorboard-controller/upstream/base
+  patches:
+    - target:
+        kind: Deployment
+        name: tensorboard-controller-deployment
+      patch: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: tensorboard-controller-deployment
+        spec:
+          template:
+            spec:
+              containers:
+                - name: manager
+                  resources:
+                    limits:
+                      cpu: 250m
+                - name: kube-rbac-proxy
+                  resources:
+                    limits:
+                      cpu: 100m
   prune: true
   wait: true
   dependsOn:
@@ -219,6 +240,29 @@ spec:
   interval: 30m
   timeout: 20m
   path: ./manifests/v1beta1/installs/katib-standalone
+  patches:
+    - target:
+        kind: MutatingWebhookConfiguration
+        name: katib.kubeflow.org
+      patch: |
+        - op: add
+          path: /metadata/annotations
+          value:
+            cert-manager.io/inject-ca-from-secret: kubeflow/katib-webhook-cert
+        - op: remove
+          path: /webhooks/0/clientConfig/caBundle
+        - op: remove
+          path: /webhooks/1/clientConfig/caBundle
+    - target:
+        kind: ValidatingWebhookConfiguration
+        name: katib.kubeflow.org
+      patch: |
+        - op: add
+          path: /metadata/annotations
+          value:
+            cert-manager.io/inject-ca-from-secret: kubeflow/katib-webhook-cert
+        - op: remove
+          path: /webhooks/0/clientConfig/caBundle
   prune: true
   wait: true
   dependsOn:

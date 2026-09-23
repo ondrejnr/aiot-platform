@@ -7,6 +7,8 @@ spec:
   suspend: false
   interval: 30m
   releaseName: alloy
+  driftDetection:
+    mode: enabled
   dependsOn:
   - name: loki
     namespace: observability-logs

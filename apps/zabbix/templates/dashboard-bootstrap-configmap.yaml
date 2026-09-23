@@ -11,6 +11,7 @@ data:
   zabbix-dashboard-bootstrap.py: |
     import json
     import os
+    import ssl
     import urllib.request
 
     ZABBIX_API = "http://zabbix-zabbix-web.zabbix.svc.cluster.local/api_jsonrpc.php"
@@ -18,14 +19,22 @@ data:
     ADMIN_PASSWORD = "zabbix"
     KUBE_API_TOKEN = os.environ.get("KUBE_API_TOKEN", "")
     KUBE_API_URL = "https://kubernetes.default.svc.cluster.local:443"
-    KUBE_STATE_ENDPOINT_NAME = "prometheus-kube-state-metrics"
-    NODES = [
-        ("k3d-aiot-hetzner-server-0", "Node k3d-aiot-hetzner-server-0", "172.18.0.2"),
-        ("k3d-aiot-hetzner-agent-0", "Node k3d-aiot-hetzner-agent-0", "172.18.0.4"),
-        ("k3d-aiot-hetzner-agent-1", "Node k3d-aiot-hetzner-agent-1", "172.18.0.6"),
-        ("k3d-aiot-hetzner-agent-2", "Node k3d-aiot-hetzner-agent-2", "172.18.0.3"),
-        ("k3d-aiot-hetzner-agent-3", "Node k3d-aiot-hetzner-agent-3", "172.18.0.5"),
-    ]
+    KUBE_STATE_ENDPOINT_NAME = "victoriametrics-kube-state-metrics"
+
+    def discover_nodes():
+        request = urllib.request.Request(
+            KUBE_API_URL + "/api/v1/nodes",
+            headers={"Authorization": "Bearer " + KUBE_API_TOKEN},
+        )
+        context = ssl.create_default_context(cafile="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
+        with urllib.request.urlopen(request, context=context, timeout=30) as response:
+            nodes = json.load(response)["items"]
+        return [
+            (node["metadata"]["name"], "Node " + node["metadata"]["name"], address["address"])
+            for node in nodes
+            for address in node["status"]["addresses"]
+            if address["type"] == "InternalIP" and ":" not in address["address"]
+        ]
 
     def api(method, params=None, token=None):
         payload = {"jsonrpc": "2.0", "method": method, "params": params or {}, "id": 1}
@@ -104,6 +113,54 @@ data:
         group = ensure_hostgroup(token, "Kubernetes")
         state_template = template_id(token, "Kubernetes cluster state by HTTP")
         nodes_template = template_id(token, "Kubernetes nodes by HTTP")
+        kubelet_template = template_id(token, "Kubernetes Kubelet by HTTP")
+        for rule in api("discoveryrule.get", {
+            "templateids": [kubelet_template],
+            "filter": {"key_": "kube.kubelet.pods.discovery"},
+            "output": ["itemid"],
+        }, token):
+            api("discoveryrule.update", {
+                "itemid": rule["itemid"],
+                "preprocessing": [{"type": 12, "params": '$.items[?(@.status.phase == "Running")]', "error_handler": 1}],
+            }, token)
+        optional_node_fields = {
+            "kube.node.conditions.networkunavailable[{#NAME}]": "Unknown",
+            "kube.node.addresses.external_ip[{#NAME}]": "Not assigned",
+        }
+        for prototype in api("itemprototype.get", {
+            "templateids": [nodes_template],
+            "filter": {"key_": list(optional_node_fields)},
+            "output": ["itemid", "key_"],
+            "selectPreprocessing": "extend",
+        }, token):
+            preprocessing = prototype["preprocessing"]
+            preprocessing[0]["error_handler"] = 2
+            preprocessing[0]["error_handler_params"] = optional_node_fields[prototype["key_"]]
+            api("itemprototype.update", {"itemid": prototype["itemid"], "preprocessing": preprocessing}, token)
+        server_hosts = api("host.get", {"filter": {"host": ["Zabbix server"]}, "output": ["hostid"]}, token)
+        unavailable_server_keys = [
+            "zabbix[process,ipmi poller,avg,busy]",
+            "zabbix[process,ipmi manager,avg,busy]",
+            "zabbix[process,java poller,avg,busy]",
+            "zabbix[process,snmp trapper,avg,busy]",
+            "zabbix[process,vmware collector,avg,busy]",
+            "zabbix[vmware,buffer,pused]",
+            "zabbix[connector_queue]",
+            "zabbix[process,connector manager,avg,busy]",
+            "zabbix[process,connector worker,avg,busy]",
+            "system.sw.packages.get",
+        ]
+        if server_hosts:
+            for item in api("item.get", {
+                "hostids": [host["hostid"] for host in server_hosts],
+                "filter": {"key_": unavailable_server_keys, "state": 1},
+                "output": ["itemid"],
+            }, token):
+                api("item.update", {
+                    "itemid": item["itemid"],
+                    "status": 1,
+                    "description": "Not applicable to this deployment: optional server collectors are not enabled; Alpine package inventory is unsupported. Re-enable when the corresponding capability is deployed.",
+                }, token)
         state_hostid = upsert_host(
             token,
             "k3d-aiot-hetzner",
@@ -144,7 +201,7 @@ data:
         linux_group = first("hostgroup.get", {"filter": {"name": ["Linux servers"]}, "output": ["groupid", "name"]}, token, "Linux servers group")
         linux_prom = first("template.get", {"filter": {"host": ["Linux by Prom"]}, "output": ["templateid", "host", "name"]}, token, "Linux by Prom template")
         hostids = []
-        for host, name, ip in NODES:
+        for host, name, ip in discover_nodes():
             macros = [
                 {"macro": "{$NODE_EXPORTER_HOST}", "value": ip},
                 {"macro": "{$VFS.DEV.READ.AWAIT.WARN}", "value": "500"},

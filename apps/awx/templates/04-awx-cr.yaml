@@ -14,7 +14,8 @@ spec:
   ingress_class_name: nginx
   hostname: {{ .Values.awx.hostname | quote }}
   ingress_tls_secret: awx-tls
-  image: {{ .Values.awx.image | quote }}
+  image: quay.io/ansible/awx
+  image_version: {{ .Values.awx.image | quote }}
   ingress_annotations: |
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-body-size: 200m
