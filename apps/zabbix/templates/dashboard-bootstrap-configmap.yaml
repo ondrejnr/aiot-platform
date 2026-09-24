@@ -110,6 +110,52 @@ data:
         if not KUBE_API_TOKEN:
             print("Skipping Kubernetes Zabbix bootstrap: missing KUBE_API_TOKEN")
             return []
+        http_templates = api("template.get", {
+            "filter": {"host": [
+                "Linux by Prom",
+                "Kubernetes API server by HTTP",
+                "Kubernetes Controller manager by HTTP",
+                "Kubernetes Kubelet by HTTP",
+                "Kubernetes nodes by HTTP",
+                "Kubernetes Scheduler by HTTP",
+                "Kubernetes cluster state by HTTP",
+            ]},
+            "output": ["templateid"],
+        }, token)
+        for item in api("item.get", {
+            "templateids": [template["templateid"] for template in http_templates],
+            "filter": {"type": 19},
+            "output": ["itemid", "key_", "headers", "url", "timeout", "status_codes", "http_proxy"],
+        }, token):
+            headers = [header for header in item["headers"] if header["name"].lower() != "connection"]
+            headers.append({"name": "Connection", "value": "close"})
+            if item["key_"] == "node_exporter.get":
+                api("item.update", {"itemid": item["itemid"], "headers": headers}, token)
+                continue
+            api("item.update", {
+                "itemid": item["itemid"],
+                "type": 21,
+                "timeout": item["timeout"] or "10s",
+                "parameters": [
+                    {"name": "url", "value": item["url"]},
+                    {"name": "headers", "value": json.dumps(headers)},
+                    {"name": "status_codes", "value": item["status_codes"]},
+                    {"name": "http_proxy", "value": item["http_proxy"]},
+                ],
+                "params": (
+                    "var settings = JSON.parse(value), request = new HttpRequest();\n"
+                    "request.setProxy(settings.http_proxy);\n"
+                    "JSON.parse(settings.headers).forEach(function (header) {\n"
+                    "    request.addHeader(header.name + ': ' + header.value);\n"
+                    "});\n"
+                    "var response = request.get(settings.url);\n"
+                    "var accepted = settings.status_codes.split(',').map(function (code) { return Number(code); });\n"
+                    "if (accepted.indexOf(request.getStatus()) === -1) {\n"
+                    "    throw 'Unexpected HTTP status: ' + request.getStatus();\n"
+                    "}\n"
+                    "return response;"
+                ),
+            }, token)
         group = ensure_hostgroup(token, "Kubernetes")
         state_template = template_id(token, "Kubernetes cluster state by HTTP")
         nodes_template = template_id(token, "Kubernetes nodes by HTTP")
@@ -152,6 +198,14 @@ data:
         ]
         if server_hosts:
             for item in api("item.get", {
+                "templateids": [template_id(token, "Linux by Zabbix agent")],
+                "filter": {"key_": "system.hostname"},
+                "output": ["itemid"],
+                "selectPreprocessing": "extend",
+            }, token):
+                preprocessing = [step for step in item["preprocessing"] if str(step["type"]) not in ("19", "20")]
+                api("item.update", {"itemid": item["itemid"], "preprocessing": preprocessing}, token)
+            for item in api("item.get", {
                 "hostids": [host["hostid"] for host in server_hosts],
                 "filter": {"key_": unavailable_server_keys, "state": 1},
                 "output": ["itemid"],
@@ -160,6 +214,25 @@ data:
                     "itemid": item["itemid"],
                     "status": 1,
                     "description": "Not applicable to this deployment: optional server collectors are not enabled; Alpine package inventory is unsupported. Re-enable when the corresponding capability is deployed.",
+                }, token)
+        for template_name, swap_free, swap_total, memory_used in [
+            ("Linux by Prom", "system.swap.pfree[node_exporter]", "system.swap.total[node_exporter]", "vm.memory.util[node_exporter]"),
+            ("Linux by Zabbix agent", "system.swap.size[,pfree]", "system.swap.size[,total]", "vm.memory.util"),
+        ]:
+            template = template_id(token, template_name)
+            for trigger in api("trigger.get", {
+                "templateids": [template],
+                "filter": {"description": "Linux: High swap space usage"},
+                "output": ["triggerid"],
+            }, token):
+                api("trigger.update", {
+                    "triggerid": trigger["triggerid"],
+                    "expression": (
+                        f"max(/{template_name}/{swap_free},5m)<" + "{$SWAP.PFREE.MIN.WARN}"
+                        + f" and last(/{template_name}/{swap_total})>0"
+                        f" and min(/{template_name}/{memory_used},5m)>80"
+                    ),
+                    "comments": "Warn when swap is low AND available RAM stays below 20% for five minutes. Cold swapped pages alone do not indicate active memory pressure. In k3d these measurements describe the shared physical host.",
                 }, token)
         state_hostid = upsert_host(
             token,

@@ -34,6 +34,35 @@ The active Flux-managed source remains:
 
 Historical exports under `namespaces/`, `cluster-wide/` and `manifests/` are legacy references from older clusters and are not the active source of truth for `hetzner-new`.
 
+## Zabbix alert recovery on 2026-09-24
+
+The HTTP agent poller in Zabbix 7.0.29 exhausted its 1024 soft file-descriptor
+limit with roughly 1000 sockets, mostly HTTPS connections in CLOSE_WAIT.
+All five exporters remained reachable from the server container. Raising only
+the affected process's soft limit immediately restored collection, confirming
+the resource exhaustion; this was diagnostic, not the permanent solution.
+
+`Connection: close` alone did not stop the HTTPS socket accumulation. The
+dashboard bootstrap now converts the Kubernetes HTTP GET template items to
+Zabbix Script items using the built-in HttpRequest client. It preserves their
+keys, dependent items, URLs, authorization headers, accepted status codes and
+timeouts. Linux node_exporter remains an HTTP agent item with Connection: close.
+After migration, restart the server once to release previously leaked sockets;
+monitor poller descriptors and fresh dependent-item timestamps, not just Ready
+status. Reassess the workaround when upgrading the affected Zabbix transport.
+
+Swap metrics are unchanged. Their warning now requires both less than the
+existing free-swap threshold and memory utilization above 80% for five minutes.
+The host had roughly 16 GiB available RAM and cold swapped pages, with no
+sustained heavy swap I/O; occupied swap alone was not active memory pressure.
+The five k3d nodes and Zabbix sidecar report the same physical host memory.
+This is an intentional alert-policy change, not a claim that swap was emptied.
+
+The Linux agent template's system.hostname item no longer discards unchanged
+values for 12 hours. Its hourly samples allow the existing change() trigger to
+recover naturally after a legitimate Kubernetes pod replacement. No events
+need to be manually acknowledged or closed for this recovery.
+
 ## Recovery on 2026-09-23
 
 Live repairs and their corresponding manifests are recorded here. After
