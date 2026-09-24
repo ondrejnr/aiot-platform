@@ -87,4 +87,6 @@ stringData:
   clientID: weave-gitops
   clientSecret: wsec
   redirectURL: https://flux.46.4.123.8.nip.io/oauth2/callback
-  scopes: openid,profile,email,groups
+  claimUsername: email
+  claimGroups: groups
+  customScopes: openid,profile,email,groups
